@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RiftArchive — Riftbound Deck Database</title>
+  <style>
+    /* ── Reset & Tokens ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0e0f13;
+      --surface:   #16181f;
+      --raised:    #1e2029;
+      --border:    #2a2d38;
+      --text:      #e2e4ec;
+      --muted:     #7a7f96;
+      --accent:    #5b6aff;
+      --accent-dim:#2d3580;
+      --win:       #3ecf6e;
+      --loss:      #e05555;
+      --tag-bg:    #22243080;
+
+      --legend-storm:   #4a9eff;
+      --legend-shadow:  #a06ae0;
+      --legend-earth:   #c28a3a;
+      --legend-light:   #e8c53a;
+      --legend-nature:  #45b86e;
+      --legend-fire:    #f05a28;
+
+      --radius: 8px;
+      --radius-lg: 12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; }
+
+    /* ── Header ─────────────────────────────────────────────────── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      padding: 0 24px;
+      height: 52px;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: .5px;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .logo span { color: var(--accent); }
+
+    nav { display: flex; gap: 4px; flex: 1; }
+
+    nav button {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: var(--radius);
+      transition: background .15s, color .15s;
+    }
+    nav button:hover { background: var(--raised); color: var(--text); }
+    nav button.active { background: var(--accent-dim); color: #fff; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+    }
+
+    .format-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    /* ── Layout ─────────────────────────────────────────────────── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .container { max-width: 1280px; margin: 0 auto; padding: 24px 24px; }
+
+    /* ── Deck Browser ────────────────────────────────────────────── */
+    .browser-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* Search bar above the grid */
+    .search-row {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .card-search {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+      padding: 9px 14px 9px 36px;
+      outline: none;
+      transition: border-color .15s;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237a7f96' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 11px center;
+    }
+    .card-search:focus { border-color: var(--accent); }
+    .card-search::placeholder { color: var(--muted); }
+
+    .sort-select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 13px;
+      padding: 9px 12px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Filter Sidebar */
+    .filter-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: sticky;
+      top: 72px;
+    }
+
+    .filter-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .legend-filter-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .legend-filter-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background .12s;
+      user-select: none;
+    }
+    .legend-filter-item:hover { background: var(--raised); }
+    .legend-filter-item input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
+
+    .legend-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .legend-filter-label {
+      font-size: 13px;
+      font-weight: 500;
+      flex: 1;
+    }
+
+    .legend-filter-count {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .filter-divider { border: none; border-top: 1px solid var(--border); }
+
+    .filter-chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .filter-chip {
+      background: var(--raised);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: 12px;
+      padding: 4px 12px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background .12s, color .12s, border-color .12s;
+    }
+    .filter-chip:hover,
+    .filter-chip.active {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .clear-filters {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: left;
+      padding: 0;
+      transition: color .12s;
+    }
+    .clear-filters:hover { color: var(--text); }
+
+    /* Active filter chips strip */
+    .active-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .active-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent);
+      border-radius: 99px;
+      font-size: 12px;
+      padding: 3px 10px;
+      color: #e0e4ff;
+    }
+    .active-chip .remove { color: #aab; cursor: pointer; font-size: 14px; line-height: 1; }
+
+    /* Deck list */
+    .deck-list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .result-count { font-size: 13px; color: var(--muted); }
+    .result-count strong { color: var(--text); }
+
+    .deck-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .deck-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0 16px;
+      align-items: center;
+      transition: border-color .15s, background .15s;
+      cursor: pointer;
+    }
+    .deck-card:hover {
+      border-color: var(--accent);
+      background: var(--raised);
+    }
+
+    .deck-legend-banner {
+      width: 4px;
+      height: 100%;
+      min-height: 56px;
+      border-radius: 99px;
+      grid-row: 1 / -1;
+      align-self: stretch;
+    }
+
+    .deck-main { min-width: 0; }
+
+    .deck-name {
+      font-weight: 600;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+
+    .deck-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .deck-legend-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+      letter-spacing: .3px;
+    }
+
+    .deck-archetype-tag {
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: 11px;
+      padding: 2px 8px;
+      color: var(--muted);
+    }
+
+    .deck-stats {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .win-rate {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--win);
+    }
+    .win-rate.mid { color: #e0b94a; }
+    .win-rate.low { color: var(--loss); }
+
+    .games-played { font-size: 11px; color: var(--muted); }
+
+    .deck-updated { font-size: 11px; color: var(--muted); }
+
+    /* ── Legend Overview ─────────────────────────────────────────── */
+    .legend-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .legend-selector-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s, background .15s, transform .1s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-selector-card:hover { background: var(--raised); transform: translateY(-2px); }
+    .legend-selector-card.active { border-color: var(--accent); background: var(--raised); }
+
+    .legend-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .legend-selector-name {
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 1.2;
+    }
+
+    .legend-selector-element {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .legend-selector-meta {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .legend-play-bar {
+      width: 100%;
+      height: 3px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+    .legend-play-fill {
+      height: 100%;
+      border-radius: 99px;
+    }
+
+    /* Legend detail */
+    .legend-detail { display: none; }
+    .legend-detail.active { display: block; }
+
+    .legend-detail-header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .legend-detail-avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .legend-detail-info { flex: 1; }
+
+    .legend-detail-name {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .legend-detail-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .legend-stat-row { display: flex; gap: 24px; flex-wrap: wrap; }
+
+    .legend-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .legend-stat-value { font-size: 20px; font-weight: 700; }
+    .legend-stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+
+    .legend-overview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .panel-subtitle { font-size: 12px; color: var(--muted); }
+
+    /* Top decks list in legend overview */
+    .top-deck-list { padding: 8px; }
+
+    .top-deck-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 10px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background .12s;
+    }
+    .top-deck-row:hover { background: var(--raised); }
+
+    .top-deck-rank {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .top-deck-rank.gold { color: #e8c53a; }
+    .top-deck-rank.silver { color: #b0b8c8; }
+    .top-deck-rank.bronze { color: #c28a3a; }
+
+    .top-deck-info { flex: 1; min-width: 0; }
+    .top-deck-name { font-size: 13px; font-weight: 600; }
+    .top-deck-sub { font-size: 11px; color: var(--muted); }
+
+    .top-deck-wr {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* Card play rate table */
+    .play-rate-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .play-rate-table th {
+      padding: 10px 18px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      text-align: left;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .play-rate-table th.right { text-align: right; }
+
+    .play-rate-table td {
+      padding: 9px 18px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .play-rate-table tr:last-child td { border-bottom: none; }
+    .play-rate-table tbody tr { cursor: pointer; transition: background .1s; }
+    .play-rate-table tbody tr:hover { background: var(--raised); }
+
+    .td-right { text-align: right; color: var(--muted); }
+
+    .card-type-badge {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+    .type-unit     { background: #1e3a5f; color: #7ab8f5; }
+    .type-spell    { background: #3a1e5f; color: #b87af5; }
+    .type-equipment{ background: #3a2e1e; color: #f5c07a; }
+    .type-landmark { background: #1e3a28; color: #7af5a8; }
+    .type-champion { background: #3a1e2a; color: #f57aaa; }
+
+    .play-bar-cell { min-width: 80px; }
+
+    .play-bar-outer {
+      background: var(--border);
+      border-radius: 99px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .play-bar-inner {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--accent);
+    }
+
+    .play-rate-pct {
+      font-size: 13px;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    /* ── Meta page placeholder ───────────────────────────────────── */
+    .meta-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px;
+      text-align: center;
+      gap: 12px;
+    }
+    .meta-placeholder h2 { font-size: 20px; }
+    .meta-placeholder p { color: var(--muted); max-width: 360px; line-height: 1.6; }
+
+    /* ── Utility ─────────────────────────────────────────────────── */
+    .flex-gap-8 { display: flex; gap: 8px; align-items: center; }
+    .spacer { flex: 1; }
+  </style>
+</head>
+<body>
+
+<!-- ─── Header ─────────────────────────────────────────────────── -->
+<header>
+  <div class="logo">Rift<span>Archive</span></div>
+  <nav>
+    <button class="active" onclick="showPage('decks', this)">Decks</button>
+    <button onclick="showPage('legends', this)">Legends</button>
+    <button onclick="showPage('meta', this)">Meta</button>
+  </nav>
+  <div class="header-right">
+    <span class="format-badge">Standard</span>
+  </div>
+</header>
+
+<!-- ─── Deck Browser ────────────────────────────────────────────── -->
+<div class="page active" id="page-decks">
+  <div class="container">
+    <div class="browser-layout">
+
+      <!-- Search row (full width) -->
+      <div class="search-row">
+        <input class="card-search" type="text" placeholder="Search decks by card name (e.g. &quot;Stormcaller's Oath&quot;, &quot;Vex&quot;)…" />
+        <select class="sort-select">
+          <option>Sort: Win Rate</option>
+          <option>Sort: Play Count</option>
+          <option>Sort: Most Recent</option>
+        </select>
+      </div>
+
+      <!-- Filter sidebar -->
+      <aside class="filter-panel">
+        <div>
+          <div class="filter-section-title">Legend</div>
+          <div class="legend-filter-list" id="legend-filter-list">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+        <hr class="filter-divider" />
+
+        <div>
+          <div class="filter-section-title">Archetype</div>
+          <div class="filter-chip-row">
+            <button class="filter-chip">Aggro</button>
+            <button class="filter-chip">Midrange</button>
+            <button class="filter-chip">Control</button>
+            <button class="filter-chip">Combo</button>
+            <button class="filter-chip">Tempo</button>
+          </div>
+        </div>
+
+        <hr class="filter-divider" />
+
+        <div>
+          <div class="filter-section-title">Format</div>
+          <div class="filter-chip-row">
+            <button class="filter-chip active">Standard</button>
+            <button class="filter-chip">Eternal</button>
+            <button class="filter-chip">Draft</button>
+          </div>
+        </div>
+
+        <hr class="filter-divider" />
+
+        <div>
+          <div class="filter-section-title">Date Range</div>
+          <div class="filter-chip-row">
+            <button class="filter-chip active">7d</button>
+            <button class="filter-chip">30d</button>
+            <button class="filter-chip">All time</button>
+          </div>
+        </div>
+
+        <hr class="filter-divider" />
+        <button class="clear-filters">Clear all filters</button>
+      </aside>
+
+      <!-- Deck list column -->
+      <div>
+        <div class="active-filters" id="active-filters">
+          <!-- chips populated by JS when filters active -->
+        </div>
+        <div class="deck-list-header">
+          <span class="result-count"><strong id="deck-count">15</strong> decks</span>
+        </div>
+        <div class="deck-list" id="deck-list">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ─── Legend Overview ─────────────────────────────────────────── -->
+<div class="page" id="page-legends">
+  <div class="container">
+
+    <div class="legend-selector-grid" id="legend-selector-grid">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- Per-legend detail panels -->
+    <div id="legend-details-container">
+      <!-- populated by JS -->
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── Meta placeholder ────────────────────────────────────────── -->
+<div class="page" id="page-meta">
+  <div class="container">
+    <div class="meta-placeholder">
+      <h2>Meta Snapshot</h2>
+      <p>A full meta breakdown — tier lists, matchup matrices, and trend charts — is coming soon.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────
+
+const LEGENDS = [
+  { id: 'aethon',   name: 'Aethon',    title: 'the Stormborn',   element: 'Storm',  color: 'var(--legend-storm)',  initials: 'Ae', playShare: 0.28 },
+  { id: 'kira',     name: 'Kira',      title: 'Shadowbane',      element: 'Shadow', color: 'var(--legend-shadow)', initials: 'Ki', playShare: 0.21 },
+  { id: 'malachar', name: 'Malachar',  title: 'the Unyielding',  element: 'Earth',  color: 'var(--legend-earth)',  initials: 'Ma', playShare: 0.14 },
+  { id: 'solenne',  name: 'Solenne',   title: 'the Luminarch',   element: 'Light',  color: 'var(--legend-light)',  initials: 'So', playShare: 0.18 },
+  { id: 'theron',   name: 'Theron',    title: 'Wildhorn',        element: 'Nature', color: 'var(--legend-nature)', initials: 'Th', playShare: 0.11 },
+  { id: 'vex',      name: 'Vex',       title: 'the Cunning',     element: 'Fire',   color: 'var(--legend-fire)',   initials: 'Vx', playShare: 0.08 },
+];
+
+const DECKS = [
+  { id:1,  name: 'Tempest Aggro',             legend:'aethon',   champion:'Stormrider',      archetype:'Aggro',     wr:0.618, games:1840, updated:'Mar 31' },
+  { id:2,  name: 'Skyveil Tempo',             legend:'aethon',   champion:'Cloudbreaker',    archetype:'Tempo',     wr:0.574, games:1220, updated:'Apr 1'  },
+  { id:3,  name: 'Chain Lightning OTK',       legend:'aethon',   champion:'Arc Invoker',     archetype:'Combo',     wr:0.541, games:740,  updated:'Mar 29' },
+  { id:4,  name: 'Shadow Blades Midrange',    legend:'kira',     champion:'Nightfall Duelist',archetype:'Midrange', wr:0.602, games:2100, updated:'Apr 1'  },
+  { id:5,  name: 'Void Control',              legend:'kira',     champion:'Umbral Sage',     archetype:'Control',   wr:0.559, games:980,  updated:'Mar 30' },
+  { id:6,  name: 'Assassin Tempo',            legend:'kira',     champion:'Veilstep Rogue',  archetype:'Tempo',     wr:0.488, games:610,  updated:'Mar 27' },
+  { id:7,  name: 'Ironwall Fortress',         legend:'malachar', champion:'Rampart Guardian',archetype:'Control',   wr:0.591, games:870,  updated:'Apr 1'  },
+  { id:8,  name: 'Landslide Beatdown',        legend:'malachar', champion:'Stonecrusher',    archetype:'Aggro',     wr:0.512, games:540,  updated:'Mar 28' },
+  { id:9,  name: 'Radiant Lifegain',          legend:'solenne',  champion:'Dawnsinger',      archetype:'Control',   wr:0.577, games:1540, updated:'Mar 31' },
+  { id:10, name: 'Holy Blitz',                legend:'solenne',  champion:'Auric Templar',   archetype:'Aggro',     wr:0.535, games:920,  updated:'Mar 30' },
+  { id:11, name: 'Genesis Ramp',              legend:'theron',   champion:'Grove Warden',    archetype:'Midrange',  wr:0.563, games:710,  updated:'Mar 29' },
+  { id:12, name: 'Beastcaller Swarm',         legend:'theron',   champion:'Thornmane Alpha', archetype:'Aggro',     wr:0.502, games:480,  updated:'Mar 26' },
+  { id:13, name: 'Emberburst Aggro',          legend:'vex',      champion:'Cinderfang',      archetype:'Aggro',     wr:0.588, games:660,  updated:'Apr 1'  },
+  { id:14, name: 'Wildfire Combo',            legend:'vex',      champion:'Pyroclast Mage',  archetype:'Combo',     wr:0.547, games:430,  updated:'Mar 30' },
+  { id:15, name: 'Stormward Midrange',        legend:'aethon',   champion:'Galeforce Knight',archetype:'Midrange',  wr:0.529, games:890,  updated:'Mar 28' },
+];
+
+// Card play rate data per legend (top cards)
+const CARD_PLAY_RATES = {
+  aethon: [
+    { name: 'Stormcaller\'s Oath',  type: 'spell',     playRate: 0.94, avgCopies: 3.8, wrWith: 0.58 },
+    { name: 'Gale Familiar',        type: 'unit',      playRate: 0.87, avgCopies: 3.2, wrWith: 0.56 },
+    { name: 'Arc Invoker',          type: 'champion',  playRate: 0.72, avgCopies: 1.0, wrWith: 0.61 },
+    { name: 'Thunderclap',          type: 'spell',     playRate: 0.68, avgCopies: 2.9, wrWith: 0.59 },
+    { name: 'Sky Citadel',          type: 'landmark',  playRate: 0.51, avgCopies: 2.1, wrWith: 0.57 },
+    { name: 'Stormrider',           type: 'champion',  playRate: 0.48, avgCopies: 1.0, wrWith: 0.62 },
+    { name: 'Nimbus Sentinel',      type: 'unit',      playRate: 0.44, avgCopies: 2.8, wrWith: 0.54 },
+    { name: 'Chain Lightning',      type: 'spell',     playRate: 0.41, avgCopies: 2.3, wrWith: 0.55 },
+    { name: 'Cloudbreaker',         type: 'champion',  playRate: 0.38, avgCopies: 1.0, wrWith: 0.57 },
+    { name: 'Windwraith Cloak',     type: 'equipment', playRate: 0.29, avgCopies: 2.0, wrWith: 0.53 },
+  ],
+  kira: [
+    { name: 'Shadowstep',           type: 'spell',     playRate: 0.96, avgCopies: 3.9, wrWith: 0.61 },
+    { name: 'Veilborn Wraith',      type: 'unit',      playRate: 0.89, avgCopies: 3.5, wrWith: 0.59 },
+    { name: 'Nightfall Duelist',    type: 'champion',  playRate: 0.78, avgCopies: 1.0, wrWith: 0.60 },
+    { name: 'Void Tendril',         type: 'spell',     playRate: 0.65, avgCopies: 3.1, wrWith: 0.56 },
+    { name: 'Umbral Sage',          type: 'champion',  playRate: 0.52, avgCopies: 1.0, wrWith: 0.56 },
+    { name: 'Ecliptic Shroud',      type: 'equipment', playRate: 0.47, avgCopies: 1.9, wrWith: 0.58 },
+    { name: 'Dark Convergence',     type: 'landmark',  playRate: 0.43, avgCopies: 1.7, wrWith: 0.59 },
+    { name: 'Veilstep Rogue',       type: 'champion',  playRate: 0.34, avgCopies: 1.0, wrWith: 0.49 },
+    { name: 'Shadow Brand',         type: 'spell',     playRate: 0.31, avgCopies: 2.4, wrWith: 0.54 },
+  ],
+  malachar: [
+    { name: 'Ironveil Bulwark',     type: 'unit',      playRate: 0.91, avgCopies: 3.6, wrWith: 0.59 },
+    { name: 'Tremor Slam',          type: 'spell',     playRate: 0.84, avgCopies: 3.3, wrWith: 0.57 },
+    { name: 'Rampart Guardian',     type: 'champion',  playRate: 0.77, avgCopies: 1.0, wrWith: 0.59 },
+    { name: 'Granite Colossus',     type: 'unit',      playRate: 0.63, avgCopies: 2.2, wrWith: 0.60 },
+    { name: 'Stonecrusher',         type: 'champion',  playRate: 0.44, avgCopies: 1.0, wrWith: 0.51 },
+    { name: 'Ancient Monolith',     type: 'landmark',  playRate: 0.39, avgCopies: 1.5, wrWith: 0.61 },
+    { name: 'Earthwarden\'s Plate', type: 'equipment', playRate: 0.35, avgCopies: 1.8, wrWith: 0.58 },
+  ],
+  solenne: [
+    { name: 'Dawnsong Chorus',      type: 'spell',     playRate: 0.93, avgCopies: 3.7, wrWith: 0.59 },
+    { name: 'Dawnsinger',           type: 'champion',  playRate: 0.81, avgCopies: 1.0, wrWith: 0.58 },
+    { name: 'Radiant Paladin',      type: 'unit',      playRate: 0.76, avgCopies: 3.0, wrWith: 0.57 },
+    { name: 'Auric Templar',        type: 'champion',  playRate: 0.58, avgCopies: 1.0, wrWith: 0.54 },
+    { name: 'Sanctuary Beacon',     type: 'landmark',  playRate: 0.54, avgCopies: 2.3, wrWith: 0.60 },
+    { name: 'Divine Intervention',  type: 'spell',     playRate: 0.49, avgCopies: 2.6, wrWith: 0.56 },
+    { name: 'Aegis Plate',          type: 'equipment', playRate: 0.40, avgCopies: 1.7, wrWith: 0.55 },
+    { name: 'Sun Herald',           type: 'unit',      playRate: 0.37, avgCopies: 2.8, wrWith: 0.53 },
+  ],
+  theron: [
+    { name: 'Verdant Growth',       type: 'spell',     playRate: 0.88, avgCopies: 3.4, wrWith: 0.58 },
+    { name: 'Grove Warden',         type: 'champion',  playRate: 0.74, avgCopies: 1.0, wrWith: 0.56 },
+    { name: 'Pack Alpha',           type: 'unit',      playRate: 0.69, avgCopies: 3.1, wrWith: 0.55 },
+    { name: 'Thornmane Alpha',      type: 'champion',  playRate: 0.52, avgCopies: 1.0, wrWith: 0.50 },
+    { name: 'Ancient Grove',        type: 'landmark',  playRate: 0.46, avgCopies: 1.9, wrWith: 0.58 },
+    { name: 'Root Network',         type: 'spell',     playRate: 0.41, avgCopies: 2.7, wrWith: 0.54 },
+  ],
+  vex: [
+    { name: 'Ignition Protocol',    type: 'spell',     playRate: 0.97, avgCopies: 3.9, wrWith: 0.62 },
+    { name: 'Cinderfang',           type: 'champion',  playRate: 0.84, avgCopies: 1.0, wrWith: 0.59 },
+    { name: 'Emberstrike Imp',      type: 'unit',      playRate: 0.79, avgCopies: 3.6, wrWith: 0.58 },
+    { name: 'Pyroclast Mage',       type: 'champion',  playRate: 0.55, avgCopies: 1.0, wrWith: 0.55 },
+    { name: 'Inferno Cascade',      type: 'spell',     playRate: 0.52, avgCopies: 2.5, wrWith: 0.60 },
+    { name: 'Furnace Core',         type: 'landmark',  playRate: 0.44, avgCopies: 1.6, wrWith: 0.61 },
+    { name: 'Smoldering Blade',     type: 'equipment', playRate: 0.38, avgCopies: 1.9, wrWith: 0.57 },
+  ],
+};
+
+// ── Helpers ───────────────────────────────────────────────────────
+
+function getLegend(id) { return LEGENDS.find(l => l.id === id); }
+
+function wrClass(wr) {
+  if (wr >= 0.57) return '';
+  if (wr >= 0.50) return ' mid';
+  return ' low';
+}
+
+function pct(n, decimals = 1) { return (n * 100).toFixed(decimals) + '%'; }
+
+function typeClass(t) {
+  return { unit:'type-unit', spell:'type-spell', equipment:'type-equipment', landmark:'type-landmark', champion:'type-champion' }[t] || '';
+}
+
+// ── Render: Deck Browser ──────────────────────────────────────────
+
+function renderDeckList() {
+  // Legend filter checkboxes
+  const filterContainer = document.getElementById('legend-filter-list');
+  filterContainer.innerHTML = LEGENDS.map(l => {
+    const count = DECKS.filter(d => d.legend === l.id).length;
+    return `
+      <label class="legend-filter-item">
+        <input type="checkbox" checked />
+        <span class="legend-dot" style="background:${l.color}"></span>
+        <span class="legend-filter-label">${l.name}</span>
+        <span class="legend-filter-count">${count}</span>
+      </label>`;
+  }).join('');
+
+  // Deck cards
+  const list = document.getElementById('deck-list');
+  list.innerHTML = DECKS.map(d => {
+    const leg = getLegend(d.legend);
+    return `
+      <div class="deck-card">
+        <div class="deck-legend-banner" style="background:${leg.color}"></div>
+        <div class="deck-main">
+          <div class="deck-name">${d.name}</div>
+          <div class="deck-meta">
+            <span class="deck-legend-tag" style="background:${leg.color}22;color:${leg.color}">${leg.name}</span>
+            <span>${d.champion}</span>
+            <span class="deck-archetype-tag">${d.archetype}</span>
+            <span class="deck-updated">${d.updated}</span>
+          </div>
+        </div>
+        <div class="deck-stats">
+          <span class="win-rate${wrClass(d.wr)}">${pct(d.wr)}</span>
+          <span class="games-played">${d.games.toLocaleString()} games</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Render: Legend Overview ───────────────────────────────────────
+
+function renderLegendOverview() {
+  const maxShare = Math.max(...LEGENDS.map(l => l.playShare));
+
+  // Selector grid
+  const grid = document.getElementById('legend-selector-grid');
+  grid.innerHTML = LEGENDS.map((l, i) => `
+    <div class="legend-selector-card ${i === 0 ? 'active' : ''}"
+         onclick="selectLegend('${l.id}', this)">
+      <div class="legend-avatar" style="background:${l.color}33;border:2px solid ${l.color}">${l.initials}</div>
+      <div class="legend-selector-name">${l.name}<br><small style="font-weight:400;color:var(--muted)">${l.title}</small></div>
+      <div class="legend-selector-element">${l.element}</div>
+      <div class="legend-selector-meta">${pct(l.playShare, 0)} play share</div>
+      <div class="legend-play-bar">
+        <div class="legend-play-fill" style="width:${(l.playShare/maxShare)*100}%;background:${l.color}"></div>
+      </div>
+    </div>`).join('');
+
+  // Detail panels
+  const container = document.getElementById('legend-details-container');
+  container.innerHTML = LEGENDS.map((l, i) => {
+    const decks = DECKS.filter(d => d.legend === l.id).sort((a,b) => b.wr - a.wr);
+    const cards = CARD_PLAY_RATES[l.id] || [];
+    const avgWr = decks.reduce((s,d) => s + d.wr, 0) / decks.length;
+
+    const rankLabel = (i) => {
+      if (i === 0) return '<span class="top-deck-rank gold">#1</span>';
+      if (i === 1) return '<span class="top-deck-rank silver">#2</span>';
+      if (i === 2) return '<span class="top-deck-rank bronze">#3</span>';
+      return `<span class="top-deck-rank">#${i+1}</span>`;
+    };
+
+    return `
+      <div class="legend-detail ${i === 0 ? 'active' : ''}" id="legend-detail-${l.id}">
+        <div class="legend-detail-header">
+          <div class="legend-detail-avatar" style="background:${l.color}33;border:2px solid ${l.color}">${l.initials}</div>
+          <div class="legend-detail-info">
+            <div class="legend-detail-name" style="color:${l.color}">${l.name} <span style="color:var(--text);font-weight:400">${l.title}</span></div>
+            <div class="legend-detail-subtitle">${l.element} · Standard</div>
+            <div class="legend-stat-row">
+              <div class="legend-stat">
+                <span class="legend-stat-value">${pct(l.playShare, 0)}</span>
+                <span class="legend-stat-label">Play share</span>
+              </div>
+              <div class="legend-stat">
+                <span class="legend-stat-value">${decks.length}</span>
+                <span class="legend-stat-label">Decks tracked</span>
+              </div>
+              <div class="legend-stat">
+                <span class="legend-stat-value" style="color:var(--win)">${pct(avgWr)}</span>
+                <span class="legend-stat-label">Avg win rate</span>
+              </div>
+              <div class="legend-stat">
+                <span class="legend-stat-value">${decks.reduce((s,d)=>s+d.games,0).toLocaleString()}</span>
+                <span class="legend-stat-label">Total games</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="legend-overview-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Top Decks</span>
+              <span class="panel-subtitle">by win rate · 7 days</span>
+            </div>
+            <div class="top-deck-list">
+              ${decks.map((d, idx) => `
+                <div class="top-deck-row">
+                  ${rankLabel(idx)}
+                  <div class="top-deck-info">
+                    <div class="top-deck-name">${d.name}</div>
+                    <div class="top-deck-sub">${d.champion} · ${d.archetype} · ${d.games.toLocaleString()} games</div>
+                  </div>
+                  <span class="top-deck-wr" style="color:${d.wr >= 0.57 ? 'var(--win)' : d.wr >= 0.50 ? '#e0b94a' : 'var(--loss)'}">${pct(d.wr)}</span>
+                </div>`).join('')}
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Card Play Rates</span>
+              <span class="panel-subtitle">% of ${l.name} decks running card</span>
+            </div>
+            <table class="play-rate-table">
+              <thead>
+                <tr>
+                  <th>Card</th>
+                  <th>Type</th>
+                  <th>Play rate</th>
+                  <th class="right">WR w/</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${cards.map(c => `
+                  <tr>
+                    <td>${c.name}</td>
+                    <td><span class="card-type-badge ${typeClass(c.type)}">${c.type}</span></td>
+                    <td class="play-bar-cell">
+                      <div style="display:flex;align-items:center;gap:8px">
+                        <div class="play-bar-outer" style="flex:1">
+                          <div class="play-bar-inner" style="width:${c.playRate*100}%;background:${l.color}"></div>
+                        </div>
+                        <span class="play-rate-pct" style="width:36px">${pct(c.playRate, 0)}</span>
+                      </div>
+                    </td>
+                    <td class="td-right">${pct(c.wrWith)}</td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Interactions ──────────────────────────────────────────────────
+
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function selectLegend(id, el) {
+  document.querySelectorAll('.legend-selector-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.legend-detail').forEach(d => d.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('legend-detail-' + id).classList.add('active');
+}
+
+// Chip toggle demo
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('filter-chip')) {
+    // For format and date chips: mutually exclusive within group
+    const row = e.target.closest('.filter-chip-row');
+    if (row) {
+      row.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    }
+    e.target.classList.add('active');
+  }
+});
+
+// ── Init ──────────────────────────────────────────────────────────
+renderDeckList();
+renderLegendOverview();
+</script>
+</body>
+</html>
