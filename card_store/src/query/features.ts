@@ -214,6 +214,11 @@ export const querySyntaxGuides: QuerySyntaxGuide[] = [
     behavior: "Matches null or empty field values."
   },
   {
+    operation: "Result uniqueness",
+    examples: ["unique:legal", "unique:id", "unique:art", "unique:cn"],
+    behavior: "Defaults to one representative per legal card. Use id for every record, art for one per artwork, or cn for one per set collector number."
+  },
+  {
     operation: "Finish and treatment filters",
     examples: ["is:foil", "is:ON", "is:Signed", "is:altart"],
     behavior: "Matches finishes plus treatment flags: foil, nonfoil, normal, overnumbered, signed, and alternate art."

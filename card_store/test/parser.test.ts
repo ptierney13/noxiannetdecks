@@ -24,6 +24,7 @@ describe("parseQuery", () => {
     ["missing values", "might:none artist:none"],
     ["variant flags", "is:foil is:nonfoil is:ON is:overnumbered is:Signed is:Signature is:AA is:altart is:alternateart"],
     ["finish field", "finish:foil variant:nonfoil"],
+    ["unique option", "unique:legal"],
     ["keywords and cost", "keyword:Action k:Action cost>=3"],
     ["collector suffix", "number=200a c:200a"]
   ])("parses %s", (_label, query) => {
@@ -34,7 +35,26 @@ describe("parseQuery", () => {
     expect(parseQuery("n:jinx u:champion e>=3 variant:foil").normalizedQuery).toBe("name:jinx supertype:champion energy>=3 finish:foil");
   });
 
-  it.each(["energy>>3", "energy=abc", "(type:unit", "unknown:thing", "name>jinx", "is:etched"])("returns diagnostics for %s", (query) => {
+  it("normalizes unique option aliases", () => {
+    const parsed = parseQuery("n:jinx unique:prints");
+    expect(parsed.normalizedQuery).toBe("name:jinx unique:id");
+    expect(parsed.uniqueMode).toBe("id");
+    expect(parseQuery("unique:*").uniqueMode).toBe("id");
+    expect(parseQuery("unique:\"collector number\"").normalizedQuery).toBe("unique:cn");
+  });
+
+  it.each([
+    "energy>>3",
+    "energy=abc",
+    "(type:unit",
+    "unknown:thing",
+    "name>jinx",
+    "is:etched",
+    "unique:etched",
+    "unique>id",
+    "-unique:id",
+    "unique:legal or domain:body"
+  ])("returns diagnostics for %s", (query) => {
     expect(parseQuery(query).diagnostics.length).toBeGreaterThan(0);
   });
 });

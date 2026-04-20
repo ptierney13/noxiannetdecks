@@ -4,10 +4,12 @@ import type { ParsedQuery, QueryNode, QueryOperator } from "./ast.js";
 import { resolveField } from "./fields.js";
 import { normalizeText } from "./normalize.js";
 import { parseQuery } from "./parser.js";
+import type { SearchUniqueMode } from "./unique.js";
 
 export type SearchResult = {
   total: number;
   normalizedQuery: string;
+  uniqueMode: SearchUniqueMode;
   diagnostics: ParsedQuery["diagnostics"];
   items: CardRecord[];
 };
@@ -167,6 +169,85 @@ function compareCollectorNumbers(left: string | null, right: string | null): num
   return a.raw.localeCompare(b.raw);
 }
 
+function legalIdentityKey(card: CardRecord): string {
+  if (card.riftbound_id) return `riftbound:${card.riftbound_id}`;
+  if (card.clean_name) return `clean:${normalizeText(card.clean_name)}`;
+  return `id:${card.id}`;
+}
+
+function normalizedImageKey(card: CardRecord): string {
+  if (!card.media.image_url) return `missing:${card.id}`;
+
+  try {
+    const url = new URL(card.media.image_url);
+    url.search = "";
+    url.hash = "";
+    return url.toString().toLowerCase();
+  } catch {
+    return card.media.image_url.trim().toLowerCase();
+  }
+}
+
+function uniqueKeyForCard(card: CardRecord, uniqueMode: SearchUniqueMode): string {
+  switch (uniqueMode) {
+    case "legal":
+      return legalIdentityKey(card);
+    case "art":
+      return `${legalIdentityKey(card)}::art:${normalizedImageKey(card)}`;
+    case "id":
+      return `id:${card.id}`;
+    case "cn":
+      return `${card.set.set_id.toLowerCase()}::cn:${normalizeText(card.collector_number ?? card.id)}`;
+  }
+}
+
+function isPromoLike(card: CardRecord): boolean {
+  const values = [card.rarity ?? "", card.set.set_id, card.set.label].join(" ").toLowerCase();
+  return /\b(promo|promotional|showcase)\b/.test(values) || ["jdg", "opp", "pr"].includes(card.set.set_id.toLowerCase());
+}
+
+function representativeScore(card: CardRecord): number {
+  const collector = collectorNumberParts(card.collector_number);
+  let score = 0;
+
+  if (card.variant.signed) score += 160;
+  if (card.variant.overnumbered) score += 80;
+  if (card.variant.alternate_art) score += 60;
+  if (isPromoLike(card)) score += 40;
+  if (!card.finishes.includes("nonfoil")) score += 10;
+  if (!card.media.image_url) score += 5;
+  if (collector.suffix) score += 1;
+
+  return score;
+}
+
+function compareRepresentativeCards(left: CardRecord, right: CardRecord): number {
+  const scoreOrder = representativeScore(left) - representativeScore(right);
+  if (scoreOrder !== 0) return scoreOrder;
+
+  const setOrder = left.set.set_id.localeCompare(right.set.set_id);
+  if (setOrder !== 0) return setOrder;
+
+  const collectorOrder = compareCollectorNumbers(left.collector_number, right.collector_number);
+  if (collectorOrder !== 0) return collectorOrder;
+
+  return left.id.localeCompare(right.id);
+}
+
+function rollupCards(cards: CardRecord[], uniqueMode: SearchUniqueMode): CardRecord[] {
+  const representatives = new Map<string, CardRecord>();
+
+  for (const card of cards) {
+    const key = uniqueKeyForCard(card, uniqueMode);
+    const existing = representatives.get(key);
+    if (!existing || compareRepresentativeCards(card, existing) < 0) {
+      representatives.set(key, card);
+    }
+  }
+
+  return sortCards([...representatives.values()]);
+}
+
 function isMissingValue(card: CardRecord, canonicalField: string): boolean {
   const numberValue = numberValueForField(card, canonicalField);
   if (numberValue !== null) return false;
@@ -259,14 +340,16 @@ export function sortCards(cards: CardRecord[]): CardRecord[] {
 
 export function searchCards(cards: CardRecord[], query: string): SearchResult {
   const parsed = parseQuery(query);
-  const items =
+  const matched =
     parsed.diagnostics.length > 0
       ? []
       : sortCards(cards.filter((card) => evaluateQueryNode(card, parsed.ast)));
+  const items = parsed.diagnostics.length > 0 ? [] : rollupCards(matched, parsed.uniqueMode);
 
   return {
     total: items.length,
     normalizedQuery: parsed.normalizedQuery,
+    uniqueMode: parsed.uniqueMode,
     diagnostics: parsed.diagnostics,
     items
   };

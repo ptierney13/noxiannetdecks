@@ -126,7 +126,7 @@ CardRecord:
 | `media.image_url` | `string \| null` | Source image URL. | Null when unavailable. | Card gallery display. |
 | `media.artist` | `string \| null` | Illustrator/artist credit. | Null when unavailable. | Display and artist search. |
 | `media.accessibility_text` | `string \| null` | Alt/accessibility description from source. | Null when unavailable. | Accessible UI image text. |
-| `media.layout` | `string` | Media/card layout/orientation, currently values such as `portrait`. | Required, non-empty. | Rendering decisions and layout/orientation search. |
+| `media.layout` | `string` | Media/card layout/orientation, currently values such as `portrait` or `landscape`. | Required, non-empty. Battlefield records must use a landscape layout. | Rendering decisions and layout/orientation search. |
 
 ## Core Invariants
 
@@ -141,7 +141,8 @@ These invariants should be enforced by tests and preserved by importers:
 7. A `riftbound_id` must map to exactly one `clean_name`.
 8. `riot_name` stays source/display-specific and may include presentation suffixes.
 9. `tcgplayer_id` is an external TCGplayer identifier and must not be used as internal identity.
-10. Parser/search code should consume this schema through accessors/evaluator logic, not by coupling to storage/import source quirks.
+10. Landscape battlefield cards render in the same no-cost lane as runes and legends, and that lane must remain the rightmost card-layout lane so no energy column appears to the right of a battlefield.
+11. Parser/search code should consume this schema through accessors/evaluator logic, not by coupling to storage/import source quirks.
 
 ## Source And API Boundaries
 
@@ -178,6 +179,14 @@ These invariants should be enforced by tests and preserved by importers:
 - `is:Signed`, `is:Signature`, and `is:sig` search `variant.signed`.
 - `riftbound_id:` searches legal/decklist identity, not the old source string ID.
 - `tcgplayer_id:` searches external TCGplayer product IDs.
+- Search results default to `unique:legal`, returning one representative record per
+  `riftbound_id`. `unique:id` returns every matched source record, matching the
+  previous behavior. `unique:art` returns one record per legal-card artwork/image
+  URL, and `unique:cn` returns one record per set collector number.
+- Legal-card rollup chooses the most standard representative available after
+  filtering: normal treatments before alternate art, overnumbered, or signed
+  records; non-promotional records before promo/showcase records; and nonfoil
+  availability before foil-only records when other factors are equal.
 
 ## Current Design Rationale
 

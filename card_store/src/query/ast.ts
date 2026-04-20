@@ -1,3 +1,5 @@
+import type { SearchUniqueMode } from "./unique.js";
+
 export type StringOperator = "contains" | "eq";
 export type NumericOperator = "eq" | "lt" | "lte" | "gt" | "gte";
 export type QueryOperator = StringOperator | NumericOperator;
@@ -20,6 +22,7 @@ export type ParsedQuery = {
   source: string;
   normalizedQuery: string;
   ast: QueryNode;
+  uniqueMode: SearchUniqueMode;
+  uniqueModeSpecified: boolean;
   diagnostics: QueryDiagnostic[];
 };
-

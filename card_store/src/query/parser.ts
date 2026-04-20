@@ -3,6 +3,7 @@ import { normalizeVariantQuery } from "../data/variant.js";
 import type { ParsedQuery, QueryDiagnostic, QueryNode, QueryOperator } from "./ast.js";
 import { resolveField } from "./fields.js";
 import { quoteIfNeeded, unquote } from "./normalize.js";
+import { defaultSearchUniqueMode, normalizeUniqueMode, type SearchUniqueMode } from "./unique.js";
 
 const WhiteSpace = createToken({ name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED });
 const LParen = createToken({ name: "LParen", pattern: /\(/ });
@@ -290,6 +291,101 @@ function astToQuery(node: QueryNode, parent?: QueryNode["type"]): string {
   }
 }
 
+type QueryOptionState = {
+  uniqueMode: SearchUniqueMode;
+  uniqueModeSpecified: boolean;
+};
+
+type QueryOptionContext = {
+  insideOr: boolean;
+  negated: boolean;
+};
+
+function isUniquePredicate(node: QueryNode): node is Extract<QueryNode, { type: "predicate" }> {
+  return node.type === "predicate" && node.field.toLowerCase() === "unique";
+}
+
+function stripQueryOptions(
+  node: QueryNode,
+  diagnostics: QueryDiagnostic[],
+  state: QueryOptionState,
+  context: QueryOptionContext
+): QueryNode | null {
+  switch (node.type) {
+    case "all":
+    case "term":
+      return node;
+    case "predicate": {
+      if (!isUniquePredicate(node)) return node;
+
+      if (context.insideOr || context.negated) {
+        diagnostics.push({ message: `Field "unique" must be used as a positive top-level query option.` });
+        return node;
+      }
+
+      if (node.operator !== "contains" && node.operator !== "eq") {
+        diagnostics.push({ message: `Field "unique" supports only ":" or "=".` });
+        return node;
+      }
+
+      const uniqueMode = normalizeUniqueMode(node.value);
+      if (!uniqueMode) {
+        diagnostics.push({ message: `Field "unique" requires legal, art, id, or cn.` });
+        return node;
+      }
+
+      if (state.uniqueModeSpecified && state.uniqueMode !== uniqueMode) {
+        diagnostics.push({ message: `Only one unique option may be used.` });
+        return node;
+      }
+
+      state.uniqueMode = uniqueMode;
+      state.uniqueModeSpecified = true;
+      return null;
+    }
+    case "not": {
+      const child = stripQueryOptions(node.child, diagnostics, state, { ...context, negated: true });
+      return child ? { type: "not", child } : node;
+    }
+    case "and": {
+      const children = node.children
+        .map((child) => stripQueryOptions(child, diagnostics, state, context))
+        .filter((child): child is QueryNode => Boolean(child));
+
+      if (children.length === 0) return null;
+      return children.length === 1 ? children[0] : { type: "and", children };
+    }
+    case "or": {
+      const children = node.children
+        .map((child) => stripQueryOptions(child, diagnostics, state, { ...context, insideOr: true }))
+        .filter((child): child is QueryNode => Boolean(child));
+
+      if (children.length === 0) return null;
+      return children.length === 1 ? children[0] : { type: "or", children };
+    }
+  }
+}
+
+function extractQueryOptions(ast: QueryNode, diagnostics: QueryDiagnostic[]): { ast: QueryNode } & QueryOptionState {
+  const state: QueryOptionState = {
+    uniqueMode: defaultSearchUniqueMode,
+    uniqueModeSpecified: false
+  };
+
+  return {
+    ast: stripQueryOptions(ast, diagnostics, state, { insideOr: false, negated: false }) ?? { type: "all" },
+    ...state
+  };
+}
+
+function normalizedQueryWithOptions(ast: QueryNode, uniqueMode: SearchUniqueMode, uniqueModeSpecified: boolean): string {
+  const parts = [astToQuery(ast)];
+  if (uniqueModeSpecified) {
+    parts.push(`unique:${uniqueMode}`);
+  }
+  return parts.filter(Boolean).join(" ");
+}
+
 function validateNode(node: QueryNode, diagnostics: QueryDiagnostic[]): void {
   switch (node.type) {
     case "all":
@@ -334,6 +430,8 @@ export function parseQuery(source: string): ParsedQuery {
       source,
       normalizedQuery: "",
       ast: { type: "all" },
+      uniqueMode: defaultSearchUniqueMode,
+      uniqueModeSpecified: false,
       diagnostics: []
     };
   }
@@ -349,14 +447,27 @@ export function parseQuery(source: string): ParsedQuery {
   const parsed = parser.parse();
   diagnostics.push(...parsed.diagnostics);
 
+  let ast = parsed.ast;
+  let uniqueMode = defaultSearchUniqueMode;
+  let uniqueModeSpecified = false;
+
   if (diagnostics.length === 0) {
-    validateNode(parsed.ast, diagnostics);
+    const extracted = extractQueryOptions(ast, diagnostics);
+    ast = extracted.ast;
+    uniqueMode = extracted.uniqueMode;
+    uniqueModeSpecified = extracted.uniqueModeSpecified;
+  }
+
+  if (diagnostics.length === 0) {
+    validateNode(ast, diagnostics);
   }
 
   return {
     source,
-    normalizedQuery: diagnostics.length > 0 ? trimmedSource : astToQuery(parsed.ast),
-    ast: diagnostics.length > 0 ? { type: "all" } : parsed.ast,
+    normalizedQuery: diagnostics.length > 0 ? trimmedSource : normalizedQueryWithOptions(ast, uniqueMode, uniqueModeSpecified),
+    ast: diagnostics.length > 0 ? { type: "all" } : ast,
+    uniqueMode: diagnostics.length > 0 ? defaultSearchUniqueMode : uniqueMode,
+    uniqueModeSpecified: diagnostics.length > 0 ? false : uniqueModeSpecified,
     diagnostics
   };
 }
