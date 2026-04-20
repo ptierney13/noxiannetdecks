@@ -71,4 +71,68 @@ describe("card store API", () => {
 
     await app.close();
   });
+
+  it("serves the seeded metagame pilot bundle when available", async () => {
+    const pilotBundle = {
+      version: 1,
+      generatedAt: "2026-04-24T12:00:00.000Z",
+      sourceCoverageSummary: "Pilot summary",
+      assumptions: ["Single event pilot."],
+      overview: {
+        kind: "metagame-overview",
+        generatedAt: "2026-04-24T12:00:00.000Z",
+        sourceCoverageSummary: "Pilot summary",
+        filters: {
+          metagameBuckets: ["set-1"],
+          regionBuckets: ["na", "non-cn"],
+          prestigeLevels: ["premier"]
+        },
+        totalDecks: 8,
+        legends: []
+      },
+      eventIndex: {
+        kind: "event-index",
+        generatedAt: "2026-04-24T12:00:00.000Z",
+        sourceCoverageSummary: "Pilot summary",
+        filters: {
+          metagameBuckets: ["set-1"],
+          regionBuckets: ["na", "non-cn"],
+          prestigeLevels: ["premier"]
+        },
+        events: []
+      },
+      eventDetails: [],
+      legendDetails: [],
+      deckDetails: []
+    };
+
+    const app = await createApp({
+      cards: fixtureCards,
+      loadMetagamePilotBundle: async () => pilotBundle
+    });
+
+    const response = await app.inject({ method: "GET", url: "/api/metagame/pilot" });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual(pilotBundle);
+
+    await app.close();
+  });
+
+  it("serves pack generator options and validates generation requests", async () => {
+    const app = await createApp({ cards: fixtureCards });
+
+    const options = await app.inject({ method: "GET", url: "/api/pack-generator/options" });
+    expect(options.statusCode).toBe(200);
+    expect(options.json().sets.map((set: { id: string }) => set.id)).toEqual(["OGN", "SFD", "UNL"]);
+    expect(options.json().seededPacks).toHaveLength(12);
+
+    const malformed = await app.inject({
+      method: "POST",
+      url: "/api/pack-generator/pools",
+      payload: { format: "custom", packs: ["OGN"] }
+    });
+    expect(malformed.statusCode).toBe(400);
+
+    await app.close();
+  });
 });

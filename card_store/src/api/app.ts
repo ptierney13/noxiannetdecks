@@ -1,32 +1,32 @@
+import { readFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import cors from "@fastify/cors";
 import Fastify from "fastify";
 import type { CardRecord } from "../data/schema.js";
-import { fieldDefinitions, parseQuery, queryFieldGuides, querySyntaxGuides, searchCards, sortCards } from "../query/index.js";
+import { CardApiError, createCardApiService } from "./service.js";
 
 type CreateAppOptions = {
   cards: CardRecord[];
+  loadMetagamePilotBundle?: () => Promise<unknown>;
 };
 
-function uniqueSorted(values: Array<string | null | undefined>): string[] {
-  return [...new Set(values.filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b));
+function resolveDefaultMetagamePilotBundlePath(environment: NodeJS.ProcessEnv = process.env) {
+  const configuredRoot = environment.NOXIANNET_DECK_DATA_DIR?.trim();
+  if (configuredRoot) {
+    return resolve(configuredRoot, "exports", "metagame-pilot", "bundle.json");
+  }
+
+  const currentDir = dirname(fileURLToPath(import.meta.url));
+  return resolve(currentDir, "..", "..", "..", ".deck_data", "exports", "metagame-pilot", "bundle.json");
 }
 
-function metadataForCards(cards: CardRecord[]) {
-  return {
-    sets: uniqueSorted(cards.flatMap((card) => [card.set.set_id, card.set.label])),
-    domains: uniqueSorted(cards.flatMap((card) => card.attributes.domain)),
-    types: uniqueSorted(cards.map((card) => card.type.cardtype)),
-    supertypes: uniqueSorted(cards.map((card) => card.type.supertype)),
-    rarities: uniqueSorted(cards.map((card) => card.rarity)),
-    tags: uniqueSorted(cards.flatMap((card) => card.type.tags)),
-    keywords: uniqueSorted(cards.flatMap((card) => card.text.keywords)),
-    variantFlags: ["foil", "nonfoil", "alternate_art", "overnumbered", "signed"],
-    numericFields: fieldDefinitions.filter((field) => field.kind === "number"),
-    queryFields: fieldDefinitions
-  };
+async function loadMetagamePilotBundleFromDisk() {
+  const raw = await readFile(resolveDefaultMetagamePilotBundlePath(), "utf8");
+  return JSON.parse(raw) as unknown;
 }
 
-export async function createApp({ cards }: CreateAppOptions) {
+export async function createApp({ cards, loadMetagamePilotBundle = loadMetagamePilotBundleFromDisk }: CreateAppOptions) {
   const app = Fastify({
     logger: false,
     ajv: {
@@ -35,29 +35,31 @@ export async function createApp({ cards }: CreateAppOptions) {
       }
     }
   });
-  const sortedCards = sortCards(cards);
+  const api = createCardApiService({
+    cards,
+    loadMetagamePilotBundle
+  });
 
   await app.register(cors, {
     origin: true
   });
 
-  app.get("/api/health", async () => ({
-    ok: true,
-    cardCount: sortedCards.length
-  }));
+  app.get("/api/health", async () => api.health());
 
   app.get<{ Querystring: { q?: string } }>("/api/cards", async (request) => {
-    const query = request.query.q ?? "";
-    return searchCards(sortedCards, query);
+    return api.search(request.query.q ?? "");
   });
 
   app.get<{ Params: { id: string } }>("/api/cards/:id", async (request, reply) => {
-    const card = sortedCards.find((candidate) => candidate.id === request.params.id);
-    if (!card) {
-      return reply.status(404).send({ message: `Card "${request.params.id}" was not found.` });
-    }
+    try {
+      return api.cardById(request.params.id);
+    } catch (caught) {
+      if (caught instanceof CardApiError) {
+        return reply.status(caught.status).send({ message: caught.message });
+      }
 
-    return card;
+      throw caught;
+    }
   });
 
   app.post<{ Body: { query?: unknown } }>(
@@ -74,21 +76,47 @@ export async function createApp({ cards }: CreateAppOptions) {
       }
     },
     async (request, reply) => {
-      const query = request.body?.query;
-      if (query !== undefined && typeof query !== "string") {
-        return reply.status(400).send({ message: "Query must be a string." });
-      }
+      try {
+        return api.parseQuery(request.body);
+      } catch (caught) {
+        if (caught instanceof CardApiError) {
+          return reply.status(caught.status).send({ message: caught.message });
+        }
 
-      return parseQuery(query ?? "");
+        throw caught;
+      }
     }
   );
 
-  app.get("/api/query/features", async () => ({
-    fields: queryFieldGuides,
-    syntax: querySyntaxGuides
-  }));
+  app.get("/api/query/features", async () => api.queryFeatures());
 
-  app.get("/api/metadata", async () => metadataForCards(sortedCards));
+  app.get("/api/metadata", async () => api.metadata());
+
+  app.get("/api/metagame/pilot", async (_request, reply) => {
+    try {
+      return await api.metagamePilot();
+    } catch (caught) {
+      if (caught instanceof CardApiError) {
+        return reply.status(caught.status).send({ message: caught.message });
+      }
+
+      throw caught;
+    }
+  });
+
+  app.get("/api/pack-generator/options", async () => api.packGeneratorOptions());
+
+  app.post<{ Body: unknown }>("/api/pack-generator/pools", async (request, reply) => {
+    try {
+      return api.generateSealedPool(request.body);
+    } catch (caught) {
+      if (caught instanceof CardApiError) {
+        return reply.status(caught.status).send({ message: caught.message });
+      }
+
+      throw caught;
+    }
+  });
 
   return app;
 }
