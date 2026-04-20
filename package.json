@@ -1,0 +1,20 @@
+{
+  "name": "noxiannetdecks",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "card_store",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web \"npm.cmd run dev -w @noxiannet/card-store\" \"npm.cmd run dev -w @noxiannet/frontend\"",
+    "dev:api": "npm.cmd run dev -w @noxiannet/card-store",
+    "dev:web": "npm.cmd run dev -w @noxiannet/frontend",
+    "build": "npm.cmd run build -w @noxiannet/card-store && npm.cmd run build -w @noxiannet/frontend",
+    "test": "npm.cmd run test -w @noxiannet/card-store && npm.cmd run test -w @noxiannet/frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
