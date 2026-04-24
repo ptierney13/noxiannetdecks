@@ -4,4 +4,9 @@ coverage/
 .vite/
 .dev/
 .claude/
+.deck_data/
+.wrangler/
+.dev-*.log
+frontend/test-results/
+playwright-report/
 *.local

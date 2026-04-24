@@ -17,6 +17,8 @@ Significant work includes:
 
 Trivial typo fixes, small documentation edits, and narrow cleanup may proceed without a plan.
 
+Once a plan has been manually approved, later edits to that existing plan do not require a second approval before implementation. Keep the plan updated so it reflects the work actually being done, and ask for approval again only when the change is better represented as a separate new plan.
+
 ## Plan Locations
 
 Plans live under `plans/`:
@@ -34,4 +36,3 @@ Plan documents should include:
 - Key changes
 - Test plan
 - Assumptions
-
