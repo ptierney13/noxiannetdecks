@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["DOM", "ES2022"],
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": [
+    "functions/**/*.ts",
+    "card_store/src/api/service.ts",
+    "card_store/src/data/**/*.ts",
+    "card_store/src/pack_generator/**/*.ts",
+    "card_store/src/query/**/*.ts",
+    "card_store/data/cards.json"
+  ]
+}

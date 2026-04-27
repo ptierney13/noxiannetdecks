@@ -14,9 +14,10 @@ The current site provides:
 
 From the repository root:
 
-- `npm.cmd run dev:web`
-- `npm.cmd test -w @noxiannet/frontend`
-- `npm.cmd run build -w @noxiannet/frontend`
+- `npm run dev:web`
+- `npm run test -w @noxiannet/frontend`
+- `npm run build -w @noxiannet/frontend`
 
-The Vite dev server proxies `/api` to the card store API at `http://127.0.0.1:4545`.
-
+Browser API calls default to same-origin `/api/*` routes so the production
+shape matches Cloudflare Pages + Functions. Local browser development points to
+`http://127.0.0.1:4545` through `frontend/.env.development`.
