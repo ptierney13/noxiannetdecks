@@ -1,4 +1,4 @@
-import { type CSSProperties, type FormEvent, type MouseEvent, type PointerEvent, type ReactNode, useEffect, useMemo, useState } from "react";
+import { type CSSProperties, type FormEvent, type MouseEvent, type PointerEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { generateSealedPool, loadPackGeneratorOptions, loadQueryFeatures, searchCards } from "./api";
 import DeckExplorerView from "./DeckExplorerView";
 import { normalizePathname, parseAppRoute, routeSection } from "./routes";
@@ -1493,16 +1493,42 @@ function ProjectNavLink({
 export default function App() {
   const [route, setRoute] = useState(() => parseAppRoute(window.location.pathname));
   const [error, setError] = useState<string | null>(null);
+  const [showToolsMenu, setShowToolsMenu] = useState(false);
+  const toolsMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function handlePopState() {
       setRoute(parseAppRoute(window.location.pathname));
       setError(null);
+      setShowToolsMenu(false);
     }
 
     window.addEventListener("popstate", handlePopState);
     return () => {
       window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
+  useEffect(() => {
+    function handlePointerDown(event: globalThis.PointerEvent) {
+      if (!toolsMenuRef.current || toolsMenuRef.current.contains(event.target as Node)) {
+        return;
+      }
+
+      setShowToolsMenu(false);
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setShowToolsMenu(false);
+      }
+    }
+
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
@@ -1515,6 +1541,7 @@ export default function App() {
     }
 
     setError(null);
+    setShowToolsMenu(false);
   }
 
   const activeSection = routeSection(route);
@@ -1529,18 +1556,30 @@ export default function App() {
           <ProjectNavLink href="/deck-explorer" current={activeSection === "deck-explorer"} onNavigate={navigate}>
             Deck Explorer
           </ProjectNavLink>
+          <div className="project-menu" ref={toolsMenuRef}>
+            <button
+              type="button"
+              className="project-menu-trigger"
+              aria-expanded={showToolsMenu}
+              aria-haspopup="menu"
+              aria-pressed={activeSection === "tools-tier-list" || activeSection === "tools-sealed-pools"}
+              onClick={() => setShowToolsMenu((current) => !current)}
+            >
+              Tools
+              <ChevronIcon expanded={showToolsMenu} />
+            </button>
+            {showToolsMenu ? (
+              <div className="project-menu-popover" role="menu" aria-label="Tools">
+                <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
+                  Tier List
+                </ProjectNavLink>
+                <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
+                  Sealed Pools
+                </ProjectNavLink>
+              </div>
+            ) : null}
+          </div>
         </nav>
-        <div className="project-tab-group" aria-label="Tools navigation">
-          <span className="project-tab-label">Tools</span>
-          <nav className="project-tabs project-tabs--tools" aria-label="Tools">
-            <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
-              Tier List
-            </ProjectNavLink>
-            <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
-              Sealed Pools
-            </ProjectNavLink>
-          </nav>
-        </div>
       </header>
       {error ? <div className="error-banner">{error}</div> : null}
       {route.kind === "cards" ? (

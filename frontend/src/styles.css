@@ -40,20 +40,6 @@ select {
   gap: 16px 28px;
 }
 
-.project-tab-group {
-  display: grid;
-  justify-items: end;
-  gap: 8px;
-}
-
-.project-tab-label {
-  color: #4e5c63;
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .project-tabs,
 .view-tabs {
   display: flex;
@@ -64,9 +50,11 @@ select {
 
 .project-tabs {
   padding: 0 0 10px;
+  position: relative;
 }
 
 .project-tabs button,
+.project-menu-trigger,
 .project-tabs a,
 .view-tabs button,
 .view-tabs a {
@@ -83,17 +71,47 @@ select {
   cursor: pointer;
 }
 
+.project-menu {
+  position: relative;
+}
+
+.project-menu-trigger {
+  gap: 8px;
+}
+
+.project-menu-trigger svg {
+  width: 18px;
+  height: 18px;
+}
+
 .project-tabs button[aria-pressed="true"],
+.project-menu-trigger[aria-pressed="true"],
 .project-tabs a[aria-current="page"],
 .view-tabs button[aria-pressed="true"],
 .view-tabs a[aria-current="page"] {
   color: #fffdf8;
   border-color: #0f6f78;
   background: #0f6f78;
+  border-color: #0f6f78;
 }
 
-.project-tabs--tools {
-  padding-bottom: 0;
+.project-menu-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 20;
+  display: grid;
+  min-width: 190px;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid rgba(23, 32, 38, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 253, 248, 0.98);
+  box-shadow: 0 18px 36px rgba(23, 32, 38, 0.14);
+}
+
+.project-menu-popover a {
+  justify-content: flex-start;
 }
 
 .search-panel {
@@ -1886,8 +1904,9 @@ code {
     align-items: stretch;
   }
 
-  .project-tab-group {
-    justify-items: start;
+  .project-menu-popover {
+    left: 0;
+    right: auto;
   }
 
   .deck-explorer-summary-grid,

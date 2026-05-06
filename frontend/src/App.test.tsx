@@ -464,8 +464,15 @@ function mockFetch(poolFactory = generatedPool) {
 }
 
 async function openTierListGenerator(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole("button", { name: "Tools" }));
   await user.click(screen.getByRole("link", { name: "Tier List" }));
   expect(await screen.findByRole("heading", { name: "Tier List" })).toBeInTheDocument();
+}
+
+async function openSealedPools(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole("button", { name: "Tools" }));
+  await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
+  expect(await screen.findByRole("heading", { name: "Sealed Pools" })).toBeInTheDocument();
 }
 
 async function generateTierList(user: ReturnType<typeof userEvent.setup>, query: string) {
@@ -562,9 +569,15 @@ describe("App", () => {
     const user = userEvent.setup();
 
     render(<App />);
-    await openTierListGenerator(user);
+    await user.click(screen.getByRole("button", { name: "Tools" }));
+    expect(screen.getByRole("link", { name: "Tier List" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Sealed Pools" })).toBeInTheDocument();
+    await user.click(screen.getByRole("link", { name: "Tier List" }));
+    expect(await screen.findByRole("heading", { name: "Tier List" })).toBeInTheDocument();
 
     expect(window.location.pathname).toBe("/tools/tier-list");
+    expect(screen.getByRole("button", { name: "Tools" })).toHaveAttribute("aria-pressed", "true");
+    await user.click(screen.getByRole("button", { name: "Tools" }));
     expect(screen.getByRole("link", { name: "Tier List" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("Generate a filtered card pool")).toBeInTheDocument();
   });
@@ -595,7 +608,26 @@ describe("App", () => {
     render(<App />);
 
     expect(await screen.findByRole("heading", { name: "Sealed Pools" })).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Tools" }));
     expect(screen.getByRole("link", { name: "Sealed Pools" })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("closes the tools menu after navigation and when clicking away", async () => {
+    const user = userEvent.setup();
+
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: "Tools" }));
+    expect(screen.getByRole("link", { name: "Sealed Pools" })).toBeInTheDocument();
+
+    await user.click(document.body);
+    expect(screen.queryByRole("link", { name: "Sealed Pools" })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Tools" }));
+    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
+
+    expect(await screen.findByRole("heading", { name: "Sealed Pools" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Tier List" })).not.toBeInTheDocument();
   });
 
   it("keeps the generated query fixed until Generate is clicked again", async () => {
@@ -763,8 +795,7 @@ describe("App", () => {
     const fetchMock = mockFetch();
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    expect(await screen.findByRole("heading", { name: "Sealed Pools" })).toBeInTheDocument();
+    await openSealedPools(user);
     expect(screen.getByLabelText("Pool type")).toHaveValue("pre-rift-UNL");
     expect(screen.queryByText("Settings")).not.toBeInTheDocument();
     expect(screen.getByRole("dialog", { name: "Choose pre-rift seed" })).toBeInTheDocument();
@@ -786,8 +817,7 @@ describe("App", () => {
     const fetchMock = mockFetch();
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    await screen.findByRole("heading", { name: "Sealed Pools" });
+    await openSealedPools(user);
 
     await user.selectOptions(screen.getByLabelText("Pool type"), "custom");
 
@@ -812,8 +842,7 @@ describe("App", () => {
     const fetchMock = mockFetch();
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    await screen.findByRole("heading", { name: "Sealed Pools" });
+    await openSealedPools(user);
 
     await user.selectOptions(screen.getByLabelText("Pool type"), "pre-rift-SFD");
     expect(screen.getByRole("dialog", { name: "Choose pre-rift seed" })).toBeInTheDocument();
@@ -837,8 +866,8 @@ describe("App", () => {
     mockFetch(generatedPoolWithDuplicate);
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    await user.click(await screen.findByRole("button", { name: "New Pool" }));
+    await openSealedPools(user);
+    await user.click(screen.getByRole("button", { name: "New Pool" }));
 
     const voidButtons = await screen.findAllByRole("button", { name: "Add Void Gate" });
     expect(voidButtons).toHaveLength(2);
@@ -866,8 +895,8 @@ describe("App", () => {
     mockFetch(generatedPoolWithDeckTypeMix);
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    await user.click(await screen.findByRole("button", { name: "New Pool" }));
+    await openSealedPools(user);
+    await user.click(screen.getByRole("button", { name: "New Pool" }));
 
     await user.click(screen.getByRole("button", { name: "Add Void Gate" }));
     await user.click(screen.getByRole("button", { name: "Add Mystic Burst" }));
@@ -889,8 +918,8 @@ describe("App", () => {
     mockFetch(generatedPoolWithBattlefield);
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    await user.click(await screen.findByRole("button", { name: "New Pool" }));
+    await openSealedPools(user);
+    await user.click(screen.getByRole("button", { name: "New Pool" }));
 
     const pack = await screen.findByLabelText("SFD Pack 1");
     const columns = within(pack).getAllByTestId("energy-column");
@@ -907,8 +936,8 @@ describe("App", () => {
     mockFetch(generatedPoolWithBattlefield);
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    await user.click(await screen.findByRole("button", { name: "New Pool" }));
+    await openSealedPools(user);
+    await user.click(screen.getByRole("button", { name: "New Pool" }));
 
     expect(screen.getByTestId("main-deck-count")).toHaveAttribute("data-valid", "false");
     expect(screen.getByTestId("battlefields-deck-count")).toHaveAttribute("data-valid", "true");
@@ -927,8 +956,8 @@ describe("App", () => {
     const user = userEvent.setup();
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    await user.click(await screen.findByRole("button", { name: "New Pool" }));
+    await openSealedPools(user);
+    await user.click(screen.getByRole("button", { name: "New Pool" }));
 
     const cardButton = await screen.findByRole("button", { name: "Add Void Gate" });
     fireEvent.pointerEnter(cardButton, { clientX: 120, clientY: 140 });
@@ -946,8 +975,8 @@ describe("App", () => {
     const user = userEvent.setup();
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    await user.click(await screen.findByRole("button", { name: "New Pool" }));
+    await openSealedPools(user);
+    await user.click(screen.getByRole("button", { name: "New Pool" }));
     await screen.findByRole("button", { name: "Add Void Gate" });
 
     await user.click(screen.getByRole("button", { name: "Domain" }));
@@ -961,8 +990,8 @@ describe("App", () => {
     mockFetch(generatedPoolWithMulticolor);
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    await user.click(await screen.findByRole("button", { name: "New Pool" }));
+    await openSealedPools(user);
+    await user.click(screen.getByRole("button", { name: "New Pool" }));
     await screen.findByRole("button", { name: "Add Twin Paths" });
 
     await user.click(screen.getByRole("button", { name: "Domain" }));
@@ -985,8 +1014,8 @@ describe("App", () => {
     const user = userEvent.setup();
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    await user.click(await screen.findByRole("button", { name: "New Pool" }));
+    await openSealedPools(user);
+    await user.click(screen.getByRole("button", { name: "New Pool" }));
 
     await user.click(screen.getByRole("button", { name: "Add Jinx - Rebel" }));
     expect(screen.getByRole("button", { name: "Remove Jinx - Rebel" })).toBeInTheDocument();
@@ -1008,8 +1037,8 @@ describe("App", () => {
     const user = userEvent.setup();
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    await user.click(await screen.findByRole("button", { name: "New Pool" }));
+    await openSealedPools(user);
+    await user.click(screen.getByRole("button", { name: "New Pool" }));
     await user.click(await screen.findByRole("button", { name: "Add Void Gate" }));
 
     await user.click(screen.getByRole("button", { name: "Snapshot" }));
@@ -1030,8 +1059,8 @@ describe("App", () => {
     const user = userEvent.setup();
 
     render(<App />);
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-    await user.click(await screen.findByRole("button", { name: "New Pool" }));
+    await openSealedPools(user);
+    await user.click(screen.getByRole("button", { name: "New Pool" }));
     await user.click(await screen.findByRole("button", { name: "Add Void Gate" }));
 
     for (const name of ["Build 1", "Build 2", "Build 3", "Build 4", "Build 5"]) {
