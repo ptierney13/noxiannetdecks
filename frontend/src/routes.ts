@@ -1,5 +1,6 @@
 export type AppRoute =
-  | { kind: "cards"; path: "/" | "/cards" }
+  | { kind: "home"; path: "/" | "/home" }
+  | { kind: "cards"; path: "/cards" }
   | { kind: "deck-explorer-home"; path: "/deck-explorer" }
   | { kind: "deck-explorer-events"; path: "/deck-explorer/events" }
   | { kind: "deck-explorer-event"; path: string; eventId: string }
@@ -11,7 +12,7 @@ export type AppRoute =
   | { kind: "tools-sealed-pools"; path: "/tools/sealed-pools" }
   | { kind: "not-found"; path: string };
 
-export type NavSection = "cards" | "deck-explorer" | "tools-tier-list" | "tools-sealed-pools" | "not-found";
+export type NavSection = "home" | "cards" | "deck-explorer" | "tools-tier-list" | "tools-sealed-pools" | "not-found";
 
 export function normalizePathname(pathname: string): string {
   if (!pathname || pathname === "/") {
@@ -33,8 +34,12 @@ function decodeSegment(segment: string) {
 export function parseAppRoute(pathname: string): AppRoute {
   const normalizedPath = normalizePathname(pathname);
 
-  if (normalizedPath === "/" || normalizedPath === "/cards") {
-    return { kind: "cards", path: normalizedPath as "/" | "/cards" };
+  if (normalizedPath === "/" || normalizedPath === "/home") {
+    return { kind: "home", path: normalizedPath as "/" | "/home" };
+  }
+
+  if (normalizedPath === "/cards") {
+    return { kind: "cards", path: "/cards" };
   }
 
   const segments = normalizedPath.split("/").filter(Boolean).map(decodeSegment);
@@ -103,6 +108,8 @@ export function parseAppRoute(pathname: string): AppRoute {
 
 export function routeSection(route: AppRoute): NavSection {
   switch (route.kind) {
+    case "home":
+      return "home";
     case "cards":
       return "cards";
     case "deck-explorer-home":

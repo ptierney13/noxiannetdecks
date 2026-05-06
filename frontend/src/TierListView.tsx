@@ -4,13 +4,13 @@ import type { CardRecord, QueryDiagnostic } from "./types";
 
 const defaultTierLabels = ["S", "A", "B", "C", "D"] as const;
 const tierAccentPairs = [
-  { solid: "#c94b4b", soft: "#f7d6d6" },
-  { solid: "#de7c30", soft: "#f8e1cc" },
-  { solid: "#d2ad2b", soft: "#f7efcb" },
-  { solid: "#7da63d", soft: "#dcecc7" },
-  { solid: "#4e7cb7", soft: "#d8e6f8" },
-  { solid: "#6a5fb7", soft: "#e1dcfb" },
-  { solid: "#8b5fa3", soft: "#eadcf3" }
+  { solid: "#c94b4b", soft: "rgba(201,75,75,0.10)" },
+  { solid: "#de7c30", soft: "rgba(222,124,48,0.10)" },
+  { solid: "#d2ad2b", soft: "rgba(210,173,43,0.10)" },
+  { solid: "#7da63d", soft: "rgba(125,166,61,0.10)" },
+  { solid: "#4e7cb7", soft: "rgba(78,124,183,0.10)" },
+  { solid: "#6a5fb7", soft: "rgba(106,95,183,0.10)" },
+  { solid: "#8b5fa3", soft: "rgba(139,95,163,0.10)" }
 ] as const;
 
 type TierViewProps = {

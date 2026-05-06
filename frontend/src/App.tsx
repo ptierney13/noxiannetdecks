@@ -1490,6 +1490,156 @@ function ProjectNavLink({
   );
 }
 
+function HomePage({ onNavigate }: { onNavigate: (href: string) => void }) {
+  const [query, setQuery] = useState("");
+
+  function handleSearch(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const q = query.trim();
+    onNavigate(q ? `/cards?q=${encodeURIComponent(q)}` : "/cards");
+  }
+
+  return (
+    <div className="home-page">
+      <section className="hero">
+        <div className="hero-bg-wrap">
+          <svg className="hero-bg" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g transform="rotate(45, 200, 200)">
+              <polygon points="200,18 193,55 207,55" fill="#c9813a"/>
+              <rect x="195" y="55" width="10" height="220" fill="#c9813a"/>
+              <rect x="155" y="268" width="90" height="12" rx="6" fill="#c9813a"/>
+              <rect x="193" y="280" width="14" height="48" rx="7" fill="#c9813a"/>
+            </g>
+            <g transform="rotate(-45, 200, 200)">
+              <polygon points="200,18 193,55 207,55" fill="#b52038"/>
+              <rect x="195" y="55" width="10" height="220" fill="#b52038"/>
+              <rect x="155" y="268" width="90" height="12" rx="6" fill="#b52038"/>
+              <rect x="193" y="280" width="14" height="48" rx="7" fill="#b52038"/>
+            </g>
+            <circle cx="200" cy="200" r="22" stroke="#c9813a" strokeWidth="5" fill="none"/>
+            <circle cx="200" cy="200" r="10" fill="#c9813a"/>
+          </svg>
+        </div>
+        <div className="hero-content">
+          <h1 className="hero-heading">
+            <span className="plain">The complete</span><br/>
+            <span className="gradient">Riftbound archive.</span>
+          </h1>
+          <p className="hero-sub">Search cards, study tournament decks, simulate sealed pools.</p>
+          <form className="hero-search-box" onSubmit={handleSearch}>
+            <div className="hero-search-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <circle cx="11" cy="11" r="7"/>
+                <path d="m21 21-4.35-4.35"/>
+              </svg>
+            </div>
+            <input
+              className="hero-search-input"
+              placeholder="Search for cards…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <button type="submit" className="hero-search-btn">Search</button>
+          </form>
+        </div>
+      </section>
+
+      <hr className="home-divider" />
+
+      <div className="home-section">
+        <div className="home-feature-grid">
+          <a
+            href="/cards"
+            className="home-feature-card"
+            onClick={(e) => { e.preventDefault(); onNavigate("/cards"); }}
+          >
+            <div className="home-feature-icon-row">
+              <div className="home-feature-icon-tile">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <ellipse cx="11" cy="11" rx="7.5" ry="7.5" stroke="white" strokeWidth="2"/>
+                  <path d="M7.5 8.5 Q9 7 11.5 7.5" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" fill="none"/>
+                  <line x1="16.5" y1="16.5" x2="24" y2="24" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                  <line x1="18.8" y1="18.2" x2="20.4" y2="19.8" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2"/>
+                  <line x1="20.5" y1="19.9" x2="22.1" y2="21.5" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2"/>
+                </svg>
+              </div>
+              <span className="home-feature-arrow">→</span>
+            </div>
+            <div className="home-feature-title">Card Search</div>
+            <div className="home-feature-desc">Full database. Filter by cost, domain, type, and more.</div>
+          </a>
+
+          <a
+            href="/deck-explorer"
+            className="home-feature-card"
+            onClick={(e) => { e.preventDefault(); onNavigate("/deck-explorer"); }}
+          >
+            <div className="home-feature-icon-row">
+              <div className="home-feature-icon-tile">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="7" width="14" height="18" rx="2" transform="rotate(-14 10 16)" stroke="rgba(255,255,255,0.45)" strokeWidth="1.8" fill="rgba(255,255,255,0.06)"/>
+                  <rect x="5" y="6" width="14" height="18" rx="2" transform="rotate(-5 12 15)" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8" fill="rgba(255,255,255,0.08)"/>
+                  <rect x="9" y="5" width="14" height="18" rx="2" stroke="white" strokeWidth="2" fill="rgba(255,255,255,0.10)"/>
+                  <line x1="12" y1="9" x2="20" y2="9" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2"/>
+                  <line x1="12" y1="12" x2="20" y2="12" stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
+                </svg>
+              </div>
+              <span className="home-feature-arrow">→</span>
+            </div>
+            <div className="home-feature-title">Deck Explorer</div>
+            <div className="home-feature-desc">Tournament decks by event, legend, and player.</div>
+          </a>
+
+          <a
+            href="/tools/sealed-pools"
+            className="home-feature-card"
+            onClick={(e) => { e.preventDefault(); onNavigate("/tools/sealed-pools"); }}
+          >
+            <div className="home-feature-icon-row">
+              <div className="home-feature-icon-tile">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="10" width="9" height="13" rx="1.5" transform="rotate(-28 6.5 16.5)" stroke="rgba(255,255,255,0.4)" strokeWidth="1.6" fill="rgba(255,255,255,0.05)"/>
+                  <rect x="5" y="9" width="9" height="13" rx="1.5" transform="rotate(-12 9.5 15.5)" stroke="rgba(255,255,255,0.65)" strokeWidth="1.8" fill="rgba(255,255,255,0.07)"/>
+                  <rect x="9" y="8" width="9" height="13" rx="1.5" stroke="white" strokeWidth="2" fill="rgba(255,255,255,0.10)"/>
+                  <rect x="7" y="18" width="14" height="8" rx="2" stroke="rgba(255,255,255,0.85)" strokeWidth="2" fill="rgba(255,255,255,0.12)"/>
+                  <line x1="9" y1="20.5" x2="19" y2="20.5" stroke="rgba(255,255,255,0.4)" strokeWidth="1"/>
+                  <path d="M7 18 Q10 16.5 14 18 Q18 16.5 21 18" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" fill="none"/>
+                </svg>
+              </div>
+              <span className="home-feature-arrow">→</span>
+            </div>
+            <div className="home-feature-title">Sealed Pools</div>
+            <div className="home-feature-desc">Generate pools from any format. Build and save decks.</div>
+          </a>
+        </div>
+      </div>
+
+      <hr className="home-divider" />
+
+      <div className="home-section" style={{ paddingTop: "48px" }}>
+        <div className="home-promo-grid">
+          <a
+            href="/tools/tier-list"
+            className="home-promo-card"
+            onClick={(e) => { e.preventDefault(); onNavigate("/tools/tier-list"); }}
+          >
+            <div className="home-promo-label">Tool</div>
+            <h3>Tier List Builder</h3>
+            <p>Rank any card set by dragging into tiers.</p>
+          </a>
+          <div className="home-promo-card" style={{ cursor: "default", opacity: 0.6 }}>
+            <div className="home-promo-label">Archive</div>
+            <h3>Tournament Results</h3>
+            <p>Events, legend win rates, top-placing decks.</p>
+          </div>
+        </div>
+      </div>
+
+      <footer className="home-footer">NoxianNet Decks · Riftbound</footer>
+    </div>
+  );
+}
+
 export default function App() {
   const [route, setRoute] = useState(() => parseAppRoute(window.location.pathname));
   const [error, setError] = useState<string | null>(null);
@@ -1533,10 +1683,12 @@ export default function App() {
   }, []);
 
   function navigate(nextPath: string) {
-    const normalizedPath = normalizePathname(nextPath);
+    const normalizedPath = normalizePathname(nextPath.split("?")[0]);
+    const search = nextPath.includes("?") ? nextPath.slice(nextPath.indexOf("?")) : "";
+    const fullPath = normalizedPath + search;
 
-    if (normalizedPath !== normalizePathname(window.location.pathname)) {
-      window.history.pushState({}, "", normalizedPath);
+    if (fullPath !== window.location.pathname + window.location.search) {
+      window.history.pushState({}, "", fullPath);
       setRoute(parseAppRoute(normalizedPath));
     }
 
@@ -1545,68 +1697,101 @@ export default function App() {
   }
 
   const activeSection = routeSection(route);
+  const isHome = route.kind === "home";
+
+  const navContent = (
+    <nav className="nav" aria-label="Primary navigation">
+      <button
+        type="button"
+        className="nav-brand"
+        onClick={() => navigate("/")}
+        aria-label="NoxianNet Decks home"
+      >
+        <div className="nav-logo">N</div>
+        <span className="nav-wordmark">NoxianNet Decks</span>
+      </button>
+      <div className="nav-links">
+        <ProjectNavLink
+          href="/cards"
+          current={activeSection === "cards"}
+          onNavigate={navigate}
+        >
+          <span className={`nav-link${activeSection === "cards" ? " active" : ""}`}>Cards</span>
+        </ProjectNavLink>
+        <ProjectNavLink
+          href="/deck-explorer"
+          current={activeSection === "deck-explorer"}
+          onNavigate={navigate}
+        >
+          <span className={`nav-link${activeSection === "deck-explorer" ? " active" : ""}`}>Deck Explorer</span>
+        </ProjectNavLink>
+        <div className="nav-tools-menu" ref={toolsMenuRef}>
+          <button
+            type="button"
+            className={`nav-link${activeSection === "tools-tier-list" || activeSection === "tools-sealed-pools" ? " active" : ""}`}
+            aria-expanded={showToolsMenu}
+            aria-haspopup="menu"
+            onClick={() => setShowToolsMenu((current) => !current)}
+          >
+            Tools
+            <ChevronIcon expanded={showToolsMenu} />
+          </button>
+          {showToolsMenu ? (
+            <div className="nav-tools-popover" role="menu" aria-label="Tools">
+              <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
+                Tier List
+              </ProjectNavLink>
+              <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
+                Sealed Pools
+              </ProjectNavLink>
+            </div>
+          ) : null}
+        </div>
+      </div>
+      <div />
+    </nav>
+  );
+
+  if (isHome) {
+    return (
+      <>
+        {navContent}
+        <HomePage onNavigate={navigate} />
+      </>
+    );
+  }
 
   return (
-    <main className="app-shell">
-      <header className="app-header">
-        <nav className="project-tabs" aria-label="Primary navigation">
-          <ProjectNavLink href="/cards" current={activeSection === "cards"} onNavigate={navigate}>
-            Cards
-          </ProjectNavLink>
-          <ProjectNavLink href="/deck-explorer" current={activeSection === "deck-explorer"} onNavigate={navigate}>
-            Deck Explorer
-          </ProjectNavLink>
-          <div className="project-menu" ref={toolsMenuRef}>
-            <button
-              type="button"
-              className="project-menu-trigger"
-              aria-expanded={showToolsMenu}
-              aria-haspopup="menu"
-              aria-pressed={activeSection === "tools-tier-list" || activeSection === "tools-sealed-pools"}
-              onClick={() => setShowToolsMenu((current) => !current)}
-            >
-              Tools
-              <ChevronIcon expanded={showToolsMenu} />
-            </button>
-            {showToolsMenu ? (
-              <div className="project-menu-popover" role="menu" aria-label="Tools">
-                <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
-                  Tier List
-                </ProjectNavLink>
-                <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
-                  Sealed Pools
-                </ProjectNavLink>
-              </div>
-            ) : null}
-          </div>
-        </nav>
-      </header>
-      {error ? <div className="error-banner">{error}</div> : null}
-      {route.kind === "cards" ? (
-        <SearchView onError={setError} />
-      ) : route.kind === "tools-tier-list" ? (
-        <TierListView onError={setError} />
-      ) : route.kind === "tools-sealed-pools" ? (
-        <SealedSimulator onError={setError} />
-      ) : route.kind.startsWith("deck-explorer") ? (
-        <DeckExplorerView route={route} onError={setError} onNavigate={navigate} />
-      ) : (
-        <section className="route-panel route-panel--not-found">
-          <div className="section-heading">
-            <p className="eyebrow">Not Found</p>
-            <h1>That page does not exist</h1>
-            <p>The current URL is not mapped to Cards, Deck Explorer, or one of the Tools routes.</p>
-          </div>
-          <nav className="view-tabs" aria-label="Recovery navigation">
-            <ProjectNavLink href="/cards" current={false} onNavigate={navigate}>
-              Back to Cards
-            </ProjectNavLink>
-            <ProjectNavLink href="/deck-explorer" current={false} onNavigate={navigate}>
-              Open Deck Explorer
-            </ProjectNavLink>
-          </nav>
-        </section>
-      )}
-    </main>
+    <>
+      {navContent}
+      <main className="app-shell">
+        {error ? <div className="error-banner">{error}</div> : null}
+        {route.kind === "cards" ? (
+          <SearchView onError={setError} />
+        ) : route.kind === "tools-tier-list" ? (
+          <TierListView onError={setError} />
+        ) : route.kind === "tools-sealed-pools" ? (
+          <SealedSimulator onError={setError} />
+        ) : route.kind.startsWith("deck-explorer") ? (
+          <DeckExplorerView route={route} onError={setError} onNavigate={navigate} />
+        ) : (
+          <section className="route-panel route-panel--not-found">
+            <div className="section-heading">
+              <p className="eyebrow">Not Found</p>
+              <h1>That page does not exist</h1>
+              <p>The current URL is not mapped to Cards, Deck Explorer, or one of the Tools routes.</p>
+            </div>
+            <nav className="view-tabs" aria-label="Recovery navigation">
+              <ProjectNavLink href="/cards" current={false} onNavigate={navigate}>
+                Back to Cards
+              </ProjectNavLink>
+              <ProjectNavLink href="/deck-explorer" current={false} onNavigate={navigate}>
+                Open Deck Explorer
+              </ProjectNavLink>
+            </nav>
+          </section>
+        )}
+      </main>
+    </>
   );
 }
