@@ -25,6 +25,14 @@ Plans live under `plans/`:
 
 - `plans/todo/` contains proposed or approved plans that have not yet been enacted.
 - `plans/executed/` contains plans that have been enacted.
+- One-off or isolated work may use a single plan file directly under `plans/todo/`
+  or `plans/executed/`.
+- Large self-contained initiatives that are expected to need multiple related
+  plans should get matching feature folders under both `plans/todo/` and
+  `plans/executed/`.
+- Feature-folder plans should stay grouped under
+  `plans/todo/<feature-slug>/` while pending and under
+  `plans/executed/<feature-slug>/` once enacted.
 
 When significant work is completed, move or record the plan in `plans/executed/`.
 
