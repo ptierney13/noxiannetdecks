@@ -512,24 +512,24 @@ describe("App", () => {
 
   it("renders the feature chart without initial search results", async () => {
     const fetchMock = mockFetch();
+    window.history.pushState({}, "", "/cards");
     render(<App />);
 
     expect(await screen.findByRole("heading", { name: "Query Language" })).toBeInTheDocument();
     expect(screen.getByText("Searchable Fields")).toBeInTheDocument();
-    expect(screen.getByText("Type line")).toBeInTheDocument();
+    expect(screen.queryByText("Type line")).not.toBeInTheDocument();
     expect(screen.getByText("Query Syntax")).toBeInTheDocument();
     expect(screen.queryByAltText("Void Gate card image.")).not.toBeInTheDocument();
     expect(screen.queryByTestId("card-grid")).not.toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalledWith(expect.stringMatching(/^\/api\/cards/));
   });
 
-  it("collapses and expands query helper tables", async () => {
+  it("starts with query helper tables collapsed and expands them on demand", async () => {
     const user = userEvent.setup();
+    window.history.pushState({}, "", "/cards");
     render(<App />);
 
-    expect(await screen.findByText("Type line")).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "Hide Searchable Fields" }));
+    expect(await screen.findByRole("button", { name: "Show Searchable Fields" })).toBeInTheDocument();
     expect(screen.queryByText("Type line")).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Show Searchable Fields" }));
@@ -540,6 +540,7 @@ describe("App", () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch();
 
+    window.history.pushState({}, "", "/cards");
     render(<App />);
     await screen.findByRole("heading", { name: "Query Language" });
 
@@ -555,6 +556,7 @@ describe("App", () => {
 
   it("shows parse diagnostics", async () => {
     const user = userEvent.setup();
+    window.history.pushState({}, "", "/cards");
     render(<App />);
     await screen.findByRole("heading", { name: "Query Language" });
 
@@ -563,6 +565,26 @@ describe("App", () => {
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText(/Expected value/)).toBeInTheDocument();
+  });
+
+  it("submits homepage search through the cards route and keeps the query visible", async () => {
+    const user = userEvent.setup();
+    const fetchMock = mockFetch();
+
+    render(<App />);
+
+    await user.type(screen.getByRole("textbox"), "name:void");
+    await user.keyboard("{Enter}");
+
+    await waitFor(() => {
+      expect(window.location.pathname).toBe("/cards");
+      expect(window.location.search).toBe("?q=name%3Avoid");
+      expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid");
+    });
+
+    expect(await screen.findByRole("heading", { name: "Riftbound Card Search" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Query")).toHaveValue("name:void");
+    expect(await screen.findByAltText("Void Gate card image.")).toBeInTheDocument();
   });
 
   it("shows the tier list tool inside the top-bar tools section", async () => {
@@ -576,7 +598,7 @@ describe("App", () => {
     expect(await screen.findByRole("heading", { name: "Tier List" })).toBeInTheDocument();
 
     expect(window.location.pathname).toBe("/tools/tier-list");
-    expect(screen.getByRole("button", { name: "Tools" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Tools" })).toHaveClass("active");
     await user.click(screen.getByRole("button", { name: "Tools" }));
     expect(screen.getByRole("link", { name: "Tier List" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("Generate a filtered card pool")).toBeInTheDocument();
