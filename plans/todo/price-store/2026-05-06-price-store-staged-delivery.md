@@ -41,6 +41,17 @@ commits.
 Each stage should have its own detailed plan document written immediately
 before implementation starts for that stage.
 
+Each future stage should also keep a draft summary plan in this folder so a new
+context window can read:
+
+- the executed plans for prior completed stages
+- the draft summary for the current stage
+
+That draft summary must then be finalized and approved before implementation
+begins for the stage. Completing any stage should include refreshing the
+remaining future-stage draft summaries with any newly pertinent decisions,
+constraints, or changed assumptions.
+
 ## Test Plan
 
 - Review the planning convention updates in `AGENTS.md`,
@@ -62,3 +73,6 @@ before implementation starts for that stage.
   lifecycle rather than replacing it with a new root-level structure.
 - Later stage plans should be grouped under the `price-store` feature folders
   even if some stages are further split into sub-stages.
+- Later workers may operate in fresh contexts and should be able to orient
+  themselves by reading prior completed stage plans plus the current stage
+  draft summary.

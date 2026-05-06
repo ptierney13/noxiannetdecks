@@ -19,6 +19,18 @@ Trivial typo fixes, small documentation edits, and narrow cleanup may proceed wi
 
 Once a plan has been manually approved, later edits to that existing plan do not require a second approval before implementation. Keep the plan updated so it reflects the work actually being done, and ask for approval again only when the change is better represented as a separate new plan.
 
+For large self-contained initiatives that are split into multiple stages,
+expect the workflow to be:
+
+- one initiative-level plan that explains the overall sequence
+- one draft summary plan per planned stage so a later worker can start from a
+  bounded context
+- one finalized, approved plan for the current stage before implementation
+  begins for that stage
+- a requirement that completing a stage also updates the remaining future-stage
+  draft summaries with any newly relevant decisions, constraints, or changed
+  assumptions
+
 ## Plan Locations
 
 Plans live under `plans/`:
@@ -33,6 +45,9 @@ Plans live under `plans/`:
 - Feature-folder plans should stay grouped under
   `plans/todo/<feature-slug>/` while pending and under
   `plans/executed/<feature-slug>/` once enacted.
+- For multi-stage initiatives, keep draft summary plans for future stages in
+  the feature folder so new context windows can read prior completed stages plus
+  the current stage draft before producing the finalized stage plan.
 
 When significant work is completed, move or record the plan in `plans/executed/`.
 
@@ -44,3 +59,10 @@ Plan documents should include:
 - Key changes
 - Test plan
 - Assumptions
+
+Draft summary plans for future stages should also state clearly that:
+
+- they are drafts
+- they must be finalized and approved before implementation begins
+- completing the current stage requires refreshing future-stage draft summaries
+  with any newly pertinent information
