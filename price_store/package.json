@@ -1,0 +1,25 @@
+{
+  "name": "@noxiannet/price-store",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run --pool=threads",
+    "preinit:data-dir": "npm run build",
+    "init:data-dir": "node dist/scripts/init-data-dir.js",
+    "preinspect:data-dir": "npm run build",
+    "inspect:data-dir": "node dist/scripts/inspect-data-dir.js"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

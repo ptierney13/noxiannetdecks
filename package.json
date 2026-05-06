@@ -6,14 +6,15 @@
   "workspaces": [
     "card_store",
     "deck_store",
+    "price_store",
     "frontend"
   ],
   "scripts": {
     "dev": "concurrently -n api,web \"npm run dev -w @noxiannet/card-store\" \"npm run dev -w @noxiannet/frontend\"",
     "dev:api": "npm run dev -w @noxiannet/card-store",
     "dev:web": "npm run dev -w @noxiannet/frontend",
-    "build": "npm run build -w @noxiannet/card-store && npm run build -w @noxiannet/deck-store && npm run build -w @noxiannet/frontend",
-    "test": "npm run test -w @noxiannet/card-store && npm run test -w @noxiannet/deck-store && npm run test -w @noxiannet/frontend"
+    "build": "npm run build -w @noxiannet/card-store && npm run build -w @noxiannet/deck-store && npm run build -w @noxiannet/price-store && npm run build -w @noxiannet/frontend",
+    "test": "npm run test -w @noxiannet/card-store && npm run test -w @noxiannet/deck-store && npm run test -w @noxiannet/price-store && npm run test -w @noxiannet/frontend"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

@@ -1,4 +1,4 @@
-# DRAFT: Price Store Stage 6 Cardmarket Pull And Transform
+# DRAFT: Price Store Stage 6 Cardmarket Transform Pipeline
 
 ## Draft Status
 

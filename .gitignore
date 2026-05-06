@@ -5,6 +5,7 @@ coverage/
 .dev/
 .claude/
 .deck_data/
+.price_data/
 .wrangler/
 .dev-*.log
 frontend/test-results/

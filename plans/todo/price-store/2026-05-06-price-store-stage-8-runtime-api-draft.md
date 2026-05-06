@@ -1,4 +1,4 @@
-# DRAFT: Price Store Stage 8 Runtime API Read Integration
+# DRAFT: Price Store Stage 8 Frontend Static Read Integration
 
 ## Draft Status
 
@@ -11,41 +11,46 @@ decisions.
 
 ## Summary
 
-Stage 8 exposes published price snapshots to the application through a stable
-runtime repository and read-only API routes.
+Stage 8 exposes the repo-published price snapshots to the frontend through
+static same-origin asset reads so the deployed app can use price data without a
+dedicated runtime API layer.
 
 ## Pertinent Details So Far
 
 - Runtime reads should use published snapshots, not live marketplace calls.
-- The Pages Functions layer is the expected API surface for the public app.
+- The first frontend integration should prefer static deployed files over a new
+  API route when that keeps deployment and maintenance simpler.
 - Responses should include source attribution and freshness metadata.
 - Price lookup should be keyed to existing card IDs.
 
 ## Expected Outputs
 
-- runtime `PriceRepository` or equivalent snapshot reader
-- read-only API routes for manifest and card price lookups
+- frontend-facing snapshot loader utilities for static asset reads
+- app integration that reads the published manifest and card price payloads from
+  the deployed static asset path
 - tests for lookup behavior and stale-snapshot metadata handling
 
 ## Explicit Non-Goals
 
 - no source pulling
 - no scheduled refresh logic
+- no mandatory API/Function layer if static assets are sufficient
 - no alerting/monitoring rollout
 
 ## Questions To Finalize In The Real Stage Plan
 
-- exact route shapes and response schemas
+- exact static asset paths and manifest lookup flow
 - multi-card query behavior
-- caching headers and runtime cache expectations
+- frontend caching behavior and cache-busting expectations
 - missing-card and stale-data response behavior
 
 ## Test Plan
 
-- API tests for single-card and multi-card lookups
+- frontend/static loader tests for single-card and multi-card lookups
 - tests for missing-card behavior
 - tests for freshness metadata propagation
 
 ## Assumptions
 
-- Stage 8 should keep runtime coupling low by reading only published artifacts.
+- Stage 8 should keep runtime coupling low by reading only published artifacts
+  that were already deployed with the frontend.
