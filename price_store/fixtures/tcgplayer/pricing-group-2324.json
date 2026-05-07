@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "errors": [],
+  "results": [
+    {
+      "productId": 19137,
+      "lowPrice": 4.5,
+      "midPrice": 5.84,
+      "highPrice": 10.0,
+      "marketPrice": 5.5,
+      "subTypeName": "Normal"
+    },
+    {
+      "productId": 19136,
+      "lowPrice": 3.33,
+      "midPrice": 4.71,
+      "highPrice": 10.0,
+      "marketPrice": 4.32,
+      "subTypeName": "Foil"
+    }
+  ]
+}

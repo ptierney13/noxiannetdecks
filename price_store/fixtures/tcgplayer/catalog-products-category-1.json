@@ -1,0 +1,54 @@
+{
+  "success": true,
+  "errors": [],
+  "results": [
+    {
+      "productId": 87435,
+      "name": "Vindicate",
+      "cleanName": "Vindicate",
+      "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/87435.jpg",
+      "categoryId": 1,
+      "groupId": 47,
+      "url": "https://www.tcgplayer.com/product/87435/magic-the-gathering-apocalypse-vindicate",
+      "modifiedOn": "2015-05-22T16:25:23.997",
+      "imageCount": 1,
+      "presaleInfo": null,
+      "extendedData": [
+        {
+          "name": "Number",
+          "value": "126"
+        },
+        {
+          "name": "Rarity",
+          "value": "Rare"
+        },
+        {
+          "name": "Description",
+          "value": "Destroy target permanent."
+        }
+      ]
+    },
+    {
+      "productId": 87436,
+      "name": "Spiritmonger",
+      "cleanName": "Spiritmonger",
+      "imageUrl": "https://product-images.tcgplayer.com/fit-in/437x437/87436.jpg",
+      "categoryId": 1,
+      "groupId": 47,
+      "url": "https://www.tcgplayer.com/product/87436/magic-the-gathering-apocalypse-spiritmonger",
+      "modifiedOn": "2015-05-22T16:25:23.997",
+      "imageCount": 1,
+      "presaleInfo": null,
+      "extendedData": [
+        {
+          "name": "Number",
+          "value": "121"
+        },
+        {
+          "name": "Rarity",
+          "value": "Rare"
+        }
+      ]
+    }
+  ]
+}

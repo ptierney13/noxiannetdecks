@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "sourceId": "tcgplayer",
+  "datasetLabel": "docs-reference-examples",
+  "entries": [
+    {
+      "captureKey": "catalog-products-category-1",
+      "capturedAt": "2026-05-06T00:00:00.000Z",
+      "payloadFile": "catalog-products-category-1.json",
+      "payloadFormat": "json",
+      "extension": "json",
+      "requestUrl": "https://api.tcgplayer.com/catalog/products?categoryId=1&productTypes=Cards&limit=2",
+      "notes": [
+        "Derived from public TCGplayer API documentation examples on 2026-05-06.",
+        "Representative catalog payload for product identity and URL inspection."
+      ]
+    },
+    {
+      "captureKey": "pricing-group-2324",
+      "capturedAt": "2026-05-06T00:00:00.000Z",
+      "payloadFile": "pricing-group-2324.json",
+      "payloadFormat": "json",
+      "extension": "json",
+      "requestUrl": "https://api.tcgplayer.com/pricing/group/2324",
+      "notes": [
+        "Derived from public TCGplayer API documentation examples on 2026-05-06.",
+        "Representative pricing payload for market/low/mid/high metrics and subtype coverage."
+      ]
+    }
+  ]
+}

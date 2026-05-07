@@ -1,5 +1,5 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import type { PriceDataLayout } from "../config.js";
 import type { RawCaptureMetadata, RawCapturePayloadFormat } from "./schema.js";
 import { rawCaptureMetadataSchema } from "./schema.js";
@@ -38,4 +38,26 @@ export async function writeRawCapture(
 
   await writeFile(paths.metadataPath, JSON.stringify(metadata, null, 2));
   return metadata;
+}
+
+export async function loadRawCaptureMetadata(
+  layout: PriceDataLayout,
+  relativeMetadataPath: string
+): Promise<RawCaptureMetadata> {
+  const content = await readFile(join(layout.rootDir, relativeMetadataPath), "utf8");
+  return rawCaptureMetadataSchema.parse(JSON.parse(content));
+}
+
+export async function loadRawCaptureText(
+  layout: PriceDataLayout,
+  metadata: Pick<RawCaptureMetadata, "relativePayloadPath">
+): Promise<string> {
+  return readFile(join(layout.rootDir, metadata.relativePayloadPath), "utf8");
+}
+
+export async function loadRawCaptureJson<T>(
+  layout: PriceDataLayout,
+  metadata: Pick<RawCaptureMetadata, "relativePayloadPath">
+): Promise<T> {
+  return JSON.parse(await loadRawCaptureText(layout, metadata)) as T;
 }

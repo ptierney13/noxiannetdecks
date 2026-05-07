@@ -1,0 +1,47 @@
+{
+  "data": [
+    {
+      "id": "riftbound-league-of-legends-trading-card-game-origins-ahri-nine-tailed-fox-signature-showcase",
+      "name": "Ahri - Nine-Tailed Fox (Signature)",
+      "game": "Riftbound: League of Legends Trading Card Game",
+      "set": "origins-riftbound-league-of-legends-trading-card-game",
+      "set_name": "Origins",
+      "number": "303*/298",
+      "tcgplayerId": "653102",
+      "rarity": "Showcase",
+      "details": null,
+      "variants": [
+        {
+          "id": "riftbound-league-of-legends-trading-card-game-origins-ahri-nine-tailed-fox-signature-showcase_near-mint_foil",
+          "condition": "Near Mint",
+          "printing": "Foil",
+          "language": "English",
+          "tcgplayerSkuId": "825001",
+          "price": 1946.02,
+          "lastUpdated": 1778109617,
+          "priceHistory": [
+            {
+              "date": "2026-05-01T00:00:00.000Z",
+              "price": 2100.5
+            },
+            {
+              "t": 1777938208,
+              "p": 1999.99
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "total": 1092,
+    "limit": 20,
+    "offset": 0,
+    "hasMore": true
+  },
+  "_metadata": {
+    "apiPlan": "free",
+    "apiRequestLimit": 1000,
+    "apiDailyLimit": 100
+  }
+}

@@ -37,14 +37,30 @@ Stage 1 also establishes raw capture conventions:
 
 - `npm run init:data-dir -w @noxiannet/price-store`
 - `npm run inspect:data-dir -w @noxiannet/price-store`
+- `npm run import:tcgplayer:samples -w @noxiannet/price-store`
+- `npm run capture:justtcg:sample -w @noxiannet/price-store`
 
 ## Current Boundary
 
 Stage 1 does not define normalized card price records yet. That contract is
 deferred until TCGplayer sample payloads are approved and captured in Stage 2.
 
+Stage 2 now adds:
+
+- TCGplayer source approval notes under `src/sources/tcgplayer/`
+- a manifest-driven sample import command that preserves bounded representative
+  payloads under `.price_data/raw/`
+- docs-derived bundled example payloads that do not require partner credentials
+  to inspect the initial contract space
+
+Stage 3 now adds:
+
+- JustTCG as the active V0 source path under `src/sources/justtcg/`
+- local untracked API-key loading from `price_store/.env.local`
+- a single bounded live-capture command designed around the free-plan limits
+
 ## Plans
 
 - [Stage 1 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-1-foundation-and-raw-capture.md)
-- [Stage 2 draft](../plans/todo/price-store/2026-05-06-price-store-stage-2-tcgplayer-approval-and-samples-draft.md)
-- [Stage 3 draft](../plans/todo/price-store/2026-05-06-price-store-stage-3-tcgplayer-contracts-draft.md)
+- [Stage 2 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-2-tcgplayer-approval-and-samples.md)
+- [Stage 3 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-3-justtcg-approval-auth-and-first-live-capture.md)

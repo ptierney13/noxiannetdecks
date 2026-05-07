@@ -3,10 +3,12 @@
 ## Summary
 
 Implement the `price_store` initiative as a staged, reviewable project on a
-dedicated `codex/price-store-*` branch. The initial source scope is TCGplayer
-and Cardmarket. The first usable serving model is repo-tracked published price
-snapshots that can be deployed with the app and read by the frontend without
-live marketplace calls or runtime write access.
+dedicated `codex/price-store-*` branch. The V0 shipping source is now JustTCG
+only, using an existing server-side API key and JustTCG's documented pricing
+API as the sole upstream price feed before first release. The first usable
+serving model is repo-tracked published price snapshots that can be deployed
+with the app and read by the frontend without live marketplace calls or runtime
+write access.
 
 After the local-first published artifact flow is working, later stages should
 automate daily refreshes in Cloudflare using the same published artifact shape
@@ -23,12 +25,18 @@ commits.
   `plans/todo/price-store/` and `plans/executed/price-store/`.
 - Keep the overall initiative plan plus all stage-specific detailed plans
   grouped in the `price-store` feature folders for the life of the project.
-- Start with TCGplayer as the first source and Cardmarket as the second source.
+- Use JustTCG as the only V0 source.
+- Treat the earlier TCGplayer exploratory work as historical context rather
+  than the shipping source strategy.
 - Use published price snapshots as the serving contract for the app.
+- Keep Stage 4 canonical storage source-oriented so later stages can merge into
+  `card_store` and frontend-facing shapes deliberately instead of prematurely.
 - Make the first app-readable publish target repo-tracked files that can be
   deployed alongside the frontend.
 - Reserve Cloudflare automation for a later stage that updates the same
   published artifact contract daily without local operator steps.
+- Defer affiliate-link setup until a final dedicated stage after the rest of
+  the price-store pipeline and operations work is already in place.
 - Require a detailed approved plan for each implementation stage before code
   for that stage is written.
 - Land the work as stage-by-stage commits on a dedicated `codex/price-store-*`
@@ -37,15 +45,14 @@ commits.
 ## Planned Stages
 
 1. Stage 1: `price_store` foundation and raw capture scaffolding
-2. Stage 2: TCGplayer approval and sample payload capture
-3. Stage 3: TCGplayer-driven contracts and repositories
-4. Stage 4: TCGplayer transform pipeline
-5. Stage 5: Cardmarket source approval
-6. Stage 6: Cardmarket transform pipeline
-7. Stage 7: merge and repo-publish pipeline
-8. Stage 8: frontend static read integration
-9. Stage 9: Cloudflare worker automation and hosted publishing
-10. Stage 10: monitoring and runbooks
+2. Stage 2: TCGplayer exploratory approval and sample capture
+3. Stage 3: JustTCG approval, auth wiring, and first live capture
+4. Stage 4: JustTCG-driven contracts and repositories
+5. Stage 5: JustTCG publishable snapshot pipeline
+6. Stage 6: frontend static read integration
+7. Stage 7: Cloudflare worker automation and hosted publishing
+8. Stage 8: monitoring and runbooks
+9. Stage 9: affiliate-link setup and rollout
 
 Each stage should have its own detailed plan document written immediately
 before implementation starts for that stage.
@@ -69,10 +76,12 @@ constraints, or changed assumptions.
   `plans/executed/`.
 - Confirm this initiative plan lives under `plans/todo/price-store/`.
 - Confirm the plan explicitly records:
-  - TCGplayer and Cardmarket as the initial sources
+  - JustTCG as the only V0 source
+  - TCGplayer Stage 2 as historical context rather than the shipping plan
   - published snapshots as the serving model
   - repo-tracked deployable artifacts as the first frontend-readable output
   - Cloudflare automation as a later no-local-maintenance step
+  - affiliate setup as the literal last stage
   - the requirement for a detailed approved plan per stage
   - stage-by-stage branch-based delivery
 
@@ -87,3 +96,8 @@ constraints, or changed assumptions.
 - Later workers may operate in fresh contexts and should be able to orient
   themselves by reading prior completed stage plans plus the current stage
   draft summary.
+- JustTCG's current documented API surface and the existing user-held API key
+  are sufficient to make it the cleanest V0 source, even if later versions
+  revisit multi-source coverage.
+- The Stage 4 canonical contract should remain a source-truth layer, while the
+  app-facing merge and publish shape is deferred to Stage 5.

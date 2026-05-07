@@ -11,7 +11,13 @@
     "preinit:data-dir": "npm run build",
     "init:data-dir": "node dist/scripts/init-data-dir.js",
     "preinspect:data-dir": "npm run build",
-    "inspect:data-dir": "node dist/scripts/inspect-data-dir.js"
+    "inspect:data-dir": "node dist/scripts/inspect-data-dir.js",
+    "preimport:tcgplayer:samples": "npm run build",
+    "import:tcgplayer:samples": "node dist/scripts/import-tcgplayer-samples.js",
+    "precapture:justtcg:sample": "npm run build",
+    "capture:justtcg:sample": "node dist/scripts/capture-justtcg-sample.js",
+    "prematerialize:justtcg:canonical": "npm run build",
+    "materialize:justtcg:canonical": "node dist/scripts/materialize-justtcg-canonical-snapshot.js"
   },
   "dependencies": {
     "zod": "^4.1.12"
