@@ -1,6 +1,7 @@
 import { type CSSProperties, type FormEvent, type MouseEvent, type PointerEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { generateSealedPool, loadPackGeneratorOptions, loadQueryFeatures, searchCards } from "./api";
 import DeckExplorerView from "./DeckExplorerView";
+import QueryBuilderView from "./QueryBuilderView";
 import { normalizePathname, parseAppRoute, routeSection } from "./routes";
 import TierListView from "./TierListView";
 import type {
@@ -1711,6 +1712,8 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [showToolsMenu, setShowToolsMenu] = useState(false);
   const toolsMenuRef = useRef<HTMLDivElement | null>(null);
+  const [showCardsMenu, setShowCardsMenu] = useState(false);
+  const cardsMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function handlePopState() {
@@ -1718,6 +1721,7 @@ export default function App() {
       setLocationSearch(window.location.search);
       setError(null);
       setShowToolsMenu(false);
+      setShowCardsMenu(false);
     }
 
     window.addEventListener("popstate", handlePopState);
@@ -1728,16 +1732,18 @@ export default function App() {
 
   useEffect(() => {
     function handlePointerDown(event: globalThis.PointerEvent) {
-      if (!toolsMenuRef.current || toolsMenuRef.current.contains(event.target as Node)) {
-        return;
+      if (toolsMenuRef.current && !toolsMenuRef.current.contains(event.target as Node)) {
+        setShowToolsMenu(false);
       }
-
-      setShowToolsMenu(false);
+      if (cardsMenuRef.current && !cardsMenuRef.current.contains(event.target as Node)) {
+        setShowCardsMenu(false);
+      }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setShowToolsMenu(false);
+        setShowCardsMenu(false);
       }
     }
 
@@ -1762,6 +1768,7 @@ export default function App() {
 
     setError(null);
     setShowToolsMenu(false);
+    setShowCardsMenu(false);
   }
 
   const activeSection = routeSection(route);
@@ -1779,13 +1786,28 @@ export default function App() {
         <span className="nav-wordmark">NoxianNet Decks</span>
       </button>
       <div className="nav-links">
-        <ProjectNavLink
-          href="/cards"
-          current={activeSection === "cards"}
-          onNavigate={navigate}
-        >
-          <span className={`nav-link${activeSection === "cards" ? " active" : ""}`}>Cards</span>
-        </ProjectNavLink>
+        <div className="nav-tools-menu" ref={cardsMenuRef}>
+          <button
+            type="button"
+            className={`nav-link${activeSection === "cards" ? " active" : ""}`}
+            aria-expanded={showCardsMenu}
+            aria-haspopup="menu"
+            onClick={() => setShowCardsMenu((current) => !current)}
+          >
+            Cards
+            <ChevronIcon expanded={showCardsMenu} />
+          </button>
+          {showCardsMenu ? (
+            <div className="nav-tools-popover" role="menu" aria-label="Cards">
+              <ProjectNavLink href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
+                Search
+              </ProjectNavLink>
+              <ProjectNavLink href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
+                Query Builder
+              </ProjectNavLink>
+            </div>
+          ) : null}
+        </div>
         <ProjectNavLink
           href="/deck-explorer"
           current={activeSection === "deck-explorer"}
@@ -1836,6 +1858,8 @@ export default function App() {
         {error ? <div className="error-banner">{error}</div> : null}
         {route.kind === "cards" ? (
           <SearchView onError={setError} locationSearch={locationSearch} onNavigate={navigate} />
+        ) : route.kind === "cards-query-builder" ? (
+          <QueryBuilderView onNavigate={navigate} />
         ) : route.kind === "tools-tier-list" ? (
           <TierListView onError={setError} />
         ) : route.kind === "tools-sealed-pools" ? (

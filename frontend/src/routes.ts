@@ -1,6 +1,7 @@
 export type AppRoute =
   | { kind: "home"; path: "/" | "/home" }
   | { kind: "cards"; path: "/cards" }
+  | { kind: "cards-query-builder"; path: "/cards/query-builder" }
   | { kind: "deck-explorer-home"; path: "/deck-explorer" }
   | { kind: "deck-explorer-events"; path: "/deck-explorer/events" }
   | { kind: "deck-explorer-event"; path: string; eventId: string }
@@ -40,6 +41,10 @@ export function parseAppRoute(pathname: string): AppRoute {
 
   if (normalizedPath === "/cards") {
     return { kind: "cards", path: "/cards" };
+  }
+
+  if (normalizedPath === "/cards/query-builder") {
+    return { kind: "cards-query-builder", path: "/cards/query-builder" };
   }
 
   const segments = normalizedPath.split("/").filter(Boolean).map(decodeSegment);
@@ -111,6 +116,7 @@ export function routeSection(route: AppRoute): NavSection {
     case "home":
       return "home";
     case "cards":
+    case "cards-query-builder":
       return "cards";
     case "deck-explorer-home":
     case "deck-explorer-events":
