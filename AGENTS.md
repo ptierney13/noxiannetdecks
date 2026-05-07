@@ -36,3 +36,22 @@ Plan documents should include:
 - Key changes
 - Test plan
 - Assumptions
+
+## GitHub Workflow
+
+The `gh` CLI is **not installed** on this machine. All GitHub operations use plain `git`.
+
+`main` is permanently checked out in a dedicated worktree at:
+
+```
+C:\Users\ptier\repos\Deck Archive Project-main-merge
+```
+
+To merge a finished branch to main and deploy:
+
+```bash
+git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" merge --ff-only <branch-name>
+git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" push origin main
+```
+
+Use `--ff-only` to keep history linear. Cloudflare Pages deploys automatically when `main` is pushed — there is no separate deploy step.
