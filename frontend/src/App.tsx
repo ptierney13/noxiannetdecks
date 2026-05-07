@@ -1,8 +1,8 @@
 import { type CSSProperties, type FormEvent, type MouseEvent, type PointerEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { generateSealedPool, loadPackGeneratorOptions, loadQueryFeatures, searchCards } from "./api";
+import { generateSealedPool, getCard, loadPackGeneratorOptions, loadQueryFeatures, searchCards } from "./api";
 import DeckExplorerView from "./DeckExplorerView";
 import QueryBuilderView from "./QueryBuilderView";
-import { normalizePathname, parseAppRoute, routeSection } from "./routes";
+import { buildCardDetailPath, buildCardsSearchPath, normalizePathname, parseAppRoute, routeSection } from "./routes";
 import TierListView from "./TierListView";
 import type {
   CardRecord,
@@ -231,7 +231,55 @@ function sortCardsByKey(cards: CardRecord[], sort: SortKey): CardRecord[] {
   });
 }
 
-function CardGrid({ cards }: { cards: CardRecord[] }) {
+function cardPrice(rarity: string | null): string {
+  switch (rarity?.toUpperCase()) {
+    case "C": return "$0.01";
+    case "U": return "$0.10";
+    case "R": return "$1.00";
+    case "EPIC": return "$5.00";
+    default: return "$100.00";
+  }
+}
+
+const RIFTBOUND_REGIONS = new Set([
+  "Noxus", "Freljord", "Ionia", "Demacia", "Piltover", "Zaun",
+  "Bilgewater", "Shadow Isles", "Shurima", "Mount Targon",
+  "Bandle City", "The Void", "Targon"
+]);
+
+function formatTypeline(card: CardRecord): string {
+  const { supertype, cardtype, tags } = card.type;
+  const nonRegion = tags.filter((t) => !RIFTBOUND_REGIONS.has(t));
+  const region = tags.filter((t) => RIFTBOUND_REGIONS.has(t));
+  const sortedTags = [...nonRegion, ...region];
+
+  const left = [supertype, cardtype].filter(Boolean).join(" ");
+  const right = sortedTags.join(" ");
+  return right ? `${left} - ${right}` : left;
+}
+
+const SYMBOL_MAP: Record<string, string> = {
+  rb_might: "{M}",
+  rb_exhaust: "{E}",
+  rb_rune_fury: "{Fury}",
+  rb_rune_calm: "{Calm}",
+  rb_rune_mind: "{Mind}",
+  rb_rune_body: "{Body}",
+  rb_rune_chaos: "{Chaos}",
+  rb_rune_order: "{Order}",
+  rb_rune_rainbow: "{Rainbow}",
+};
+
+function formatCardText(text: string): string {
+  return text.replace(/:([a-z_]+):/g, (_, key) => SYMBOL_MAP[key] ?? `{${key}}`);
+}
+
+function formatCost(card: CardRecord): string | null {
+  if (card.attributes.cost == null) return null;
+  return `${card.attributes.cost}P`;
+}
+
+function CardGrid({ cards, onCardClick }: { cards: CardRecord[]; onCardClick?: (card: CardRecord) => void }) {
   const [sort, setSort] = useState<SortKey>("energy-asc");
   const sorted = useMemo(() => sortCardsByKey(cards, sort), [cards, sort]);
 
@@ -256,7 +304,11 @@ function CardGrid({ cards }: { cards: CardRecord[] }) {
       </div>
       <div className="card-grid" data-testid="card-grid" data-columns="4">
         {sorted.map((card) => (
-          <article className="card-tile" key={card.id}>
+          <article
+            className={`card-tile${onCardClick ? " card-tile--clickable" : ""}`}
+            key={card.id}
+            onClick={onCardClick ? () => onCardClick(card) : undefined}
+          >
             {card.media.image_url ? (
               <img
                 src={card.media.image_url}
@@ -279,6 +331,64 @@ function CardGrid({ cards }: { cards: CardRecord[] }) {
   );
 }
 
+function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; onClose: () => void; onNavigate: (path: string) => void }) {
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  function handleBackdropClick(event: MouseEvent<HTMLDivElement>) {
+    if (event.target === event.currentTarget) onClose();
+  }
+
+  function handleViewDetails() {
+    onClose();
+    onNavigate(buildCardDetailPath(card.id));
+  }
+
+  const price = cardPrice(card.rarity);
+
+  return (
+    <div className="card-quick-look-backdrop" onClick={handleBackdropClick} role="presentation">
+      <div className="card-quick-look-dialog" role="dialog" aria-label={card.riot_name} aria-modal="true">
+        <div className="card-quick-look-image-col">
+          {card.media.image_url ? (
+            <img src={card.media.image_url} alt={card.media.accessibility_text ?? card.riot_name} />
+          ) : (
+            <div className="missing-image">{card.riot_name}</div>
+          )}
+        </div>
+        <div className="card-quick-look-info-col">
+          <div className="card-quick-look-header">
+            <h2 className="card-quick-look-name">{card.riot_name}</h2>
+            <button type="button" className="card-quick-look-close" onClick={onClose} aria-label="Close">✕</button>
+          </div>
+          <p className="card-quick-look-typeline">{formatTypeline(card)}</p>
+          <div className="card-quick-look-attrs">
+            {formatCost(card) != null && <span className="card-attr-chip">{formatCost(card)}</span>}
+            {card.attributes.might != null && <span className="card-attr-chip">{card.attributes.might}{"{M}"}</span>}
+            {card.attributes.domain.map((d) => (
+              <span key={d} className={`card-attr-chip card-attr-chip--domain card-attr-chip--domain-${d.toLowerCase()}`}>{d}</span>
+            ))}
+          </div>
+          {card.text.plain && <p className="card-quick-look-text">{formatCardText(card.text.plain)}</p>}
+          <div className="card-quick-look-meta">
+            <span>{card.set.label} · {card.set.set_id} {card.collector_number ?? "?"}</span>
+            {card.rarity && <span>{card.rarity}</span>}
+            <span className="card-quick-look-price">{price}</span>
+          </div>
+          <button type="button" className="card-quick-look-detail-link" onClick={handleViewDetails}>
+            View full details →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SearchView({
   onError,
   locationSearch,
@@ -296,6 +406,7 @@ function SearchView({
   const [normalizedQuery, setNormalizedQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [quickLookCard, setQuickLookCard] = useState<CardRecord | null>(null);
   const searchParamQuery = new URLSearchParams(locationSearch).get("q") ?? "";
 
   async function runSearch(nextQuery: string) {
@@ -429,7 +540,10 @@ function SearchView({
 
       <Diagnostics diagnostics={diagnostics} />
       <QueryLanguageTables fields={fieldGuides} syntax={syntaxGuides} />
-      {hasSearched ? <CardGrid cards={cards} /> : null}
+      {hasSearched ? <CardGrid cards={cards} onCardClick={setQuickLookCard} /> : null}
+      {quickLookCard ? (
+        <CardQuickLookModal card={quickLookCard} onClose={() => setQuickLookCard(null)} onNavigate={onNavigate} />
+      ) : null}
     </>
   );
 }
@@ -1756,6 +1870,213 @@ function HomePage({ onNavigate }: { onNavigate: (href: string) => void }) {
   );
 }
 
+function CardDetailView({
+  cardId,
+  onError,
+  onNavigate
+}: {
+  cardId: string;
+  onError: (message: string | null) => void;
+  onNavigate: (path: string) => void;
+}) {
+  const [card, setCard] = useState<CardRecord | null>(null);
+  const [allPrintings, setAllPrintings] = useState<CardRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let ignore = false;
+    setLoading(true);
+    setCard(null);
+    setAllPrintings([]);
+    onError(null);
+
+    async function load() {
+      try {
+        const loaded = await getCard(cardId);
+        if (ignore) return;
+        setCard(loaded);
+
+        if (loaded.clean_name) {
+          try {
+            const result = await searchCards(`n:"${loaded.clean_name}" unique:prints`);
+            if (!ignore) {
+              setAllPrintings(result.items);
+            }
+          } catch {
+            // printings are best-effort
+          }
+        }
+      } catch (caught) {
+        if (!ignore) onError(caught instanceof Error ? caught.message : "Failed to load card.");
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+
+    void load();
+    return () => { ignore = true; };
+  }, [cardId, onError]);
+
+  if (loading) {
+    return (
+      <section className="card-detail-view">
+        <p className="card-detail-loading">Loading…</p>
+      </section>
+    );
+  }
+
+  if (!card) return null;
+
+  const price = cardPrice(card.rarity);
+  const apiUrl = `/api/cards/${encodeURIComponent(card.id)}`;
+
+  return (
+    <section className="card-detail-view">
+      <nav className="card-detail-breadcrumb">
+        <button type="button" className="text-button" onClick={() => onNavigate("/cards")}>
+          ← Card Search
+        </button>
+      </nav>
+
+      <div className="card-detail-layout">
+        <div className="card-detail-image-col">
+          {card.media.image_url ? (
+            <img
+              className="card-detail-image"
+              src={card.media.image_url}
+              alt={card.media.accessibility_text ?? card.riot_name}
+            />
+          ) : (
+            <div className="missing-image card-detail-image">{card.riot_name}</div>
+          )}
+
+          {allPrintings.length > 0 && (() => {
+            type PrintingRow = { key: string; cardRec: CardRecord; finish: string; variantTags: string[]; isCurrent: boolean };
+            const rows: PrintingRow[] = [];
+            for (const p of allPrintings) {
+              const variantTags: string[] = [];
+              if (p.variant.alternate_art) variantTags.push("Alt Art");
+              if (p.variant.signed) variantTags.push("Signed");
+              if (p.variant.overnumbered) variantTags.push("Overnumbered");
+              for (const finish of p.finishes) {
+                rows.push({ key: `${p.id}-${finish}`, cardRec: p, finish, variantTags, isCurrent: p.id === card.id });
+              }
+            }
+            function rowLabel(r: PrintingRow) {
+              const parts = [r.finish === "foil" ? "Foil" : "Nonfoil", ...r.variantTags];
+              return parts.join(", ");
+            }
+            return (
+              <div className="card-detail-versions">
+                <p className="card-detail-versions-heading">Printings</p>
+                {rows.map((r) => {
+                  const barPrice = cardPrice(r.cardRec.rarity);
+                  if (r.isCurrent) {
+                    return (
+                      <div key={r.key} className="card-detail-version-bar card-detail-version-bar--active" aria-current="page">
+                        <span className="card-detail-version-set">{r.cardRec.set.set_id} #{r.cardRec.collector_number ?? "?"}</span>
+                        <span className="card-detail-version-name">{rowLabel(r)}</span>
+                        <span className="card-detail-version-price">{barPrice}</span>
+                      </div>
+                    );
+                  }
+                  const href = buildCardDetailPath(r.cardRec.id);
+                  return (
+                    <a
+                      key={r.key}
+                      href={href}
+                      className="card-detail-version-bar"
+                      onClick={(event) => {
+                        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+                        event.preventDefault();
+                        onNavigate(href);
+                      }}
+                    >
+                      <span className="card-detail-version-set">{r.cardRec.set.set_id} #{r.cardRec.collector_number ?? "?"}</span>
+                      <span className="card-detail-version-name">{rowLabel(r)}</span>
+                      <span className="card-detail-version-price">{barPrice}</span>
+                    </a>
+                  );
+                })}
+              </div>
+            );
+          })()}
+        </div>
+
+        <div className="card-detail-info-col">
+          <div className="card-detail-name-row">
+            <h1 className="card-detail-name">{card.riot_name}</h1>
+            <span className="card-detail-price">{price}</span>
+          </div>
+
+          <p className="card-detail-typeline">{formatTypeline(card)}</p>
+
+          <div className="card-detail-attrs">
+            {formatCost(card) != null && (
+              <div className="card-attr-block"><span className="card-attr-label">Cost</span><span className="card-attr-value">{formatCost(card)}</span></div>
+            )}
+            {card.attributes.might != null && (
+              <div className="card-attr-block"><span className="card-attr-label">Might</span><span className="card-attr-value">{card.attributes.might}{"{M}"}</span></div>
+            )}
+            {card.attributes.domain.length > 0 && (
+              <div className="card-attr-block">
+                <span className="card-attr-label">Domain</span>
+                <span className="card-attr-value">{card.attributes.domain.join(", ")}</span>
+              </div>
+            )}
+          </div>
+
+          {card.text.plain && (
+            <div className="card-detail-section">
+              <p className="card-detail-body-text">{formatCardText(card.text.plain)}</p>
+            </div>
+          )}
+
+          {card.text.flavour && (
+            <div className="card-detail-section">
+              <p className="card-detail-flavour">"{card.text.flavour}"</p>
+            </div>
+          )}
+
+          <div className="card-detail-section card-detail-facts">
+            <div className="card-fact-row"><span>Set</span><span>{card.set.label} ({card.set.set_id})</span></div>
+            <div className="card-fact-row"><span>Number</span><span>{card.collector_number ?? "—"}</span></div>
+            {card.rarity && <div className="card-fact-row"><span>Rarity</span><span>{card.rarity}</span></div>}
+            <div className="card-fact-row"><span>Market Price</span><span>{price}</span></div>
+            <div className="card-fact-row"><span>Finishes</span><span>{card.finishes.join(", ")}</span></div>
+            {card.media.artist && <div className="card-fact-row"><span>Artist</span><span>{card.media.artist}</span></div>}
+            <div className="card-fact-row"><span>Language</span><span>{card.language}</span></div>
+            {card.variant.alternate_art && <div className="card-fact-row"><span>Variant</span><span>Alternate Art</span></div>}
+            {card.variant.signed && <div className="card-fact-row"><span>Variant</span><span>Signed</span></div>}
+            {card.variant.overnumbered && <div className="card-fact-row"><span>Variant</span><span>Overnumbered</span></div>}
+          </div>
+
+          <div className="card-detail-links">
+            <a
+              className="card-detail-json-link"
+              href={apiUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Card JSON ↗
+            </a>
+            {card.tcgplayer_id && (
+              <a
+                className="card-detail-json-link"
+                href={`https://www.tcgplayer.com/product/${card.tcgplayer_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                TCGPlayer ↗
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function App() {
   const [route, setRoute] = useState(() => parseAppRoute(window.location.pathname));
   const [locationSearch, setLocationSearch] = useState(() => window.location.search);
@@ -1910,6 +2231,8 @@ export default function App() {
           <SearchView onError={setError} locationSearch={locationSearch} onNavigate={navigate} />
         ) : route.kind === "cards-query-builder" ? (
           <QueryBuilderView onNavigate={navigate} />
+        ) : route.kind === "card-detail" ? (
+          <CardDetailView cardId={route.cardId} onError={setError} onNavigate={navigate} />
         ) : route.kind === "tools-tier-list" ? (
           <TierListView onError={setError} />
         ) : route.kind === "tools-sealed-pools" ? (

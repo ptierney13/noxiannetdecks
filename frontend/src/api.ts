@@ -1,4 +1,5 @@
 import type {
+  CardRecord,
   CardSearchResponse,
   GeneratedSealedPool,
   GenerateSealedPoolRequest,
@@ -48,6 +49,10 @@ export function searchCards(query: string): Promise<CardSearchResponse> {
 
   const suffix = params.toString() ? `?${params.toString()}` : "";
   return getJson<CardSearchResponse>(`/api/cards${suffix}`);
+}
+
+export function getCard(id: string): Promise<CardRecord> {
+  return getJson<CardRecord>(`/api/cards/${encodeURIComponent(id)}`);
 }
 
 export function loadQueryFeatures(): Promise<QueryFeaturesResponse> {
