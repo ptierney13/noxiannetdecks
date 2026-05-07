@@ -305,7 +305,6 @@ function matchesTerm(card: CardRecord, value: string): boolean {
     card.clean_name ?? "",
     card.text.plain,
     card.text.rich,
-    card.text.flavour ?? "",
     ...card.text.keywords,
     ...card.type.tags
   ];

@@ -136,6 +136,10 @@ describe("searchCards", () => {
     expect(namesFor("name:jinx")).toEqual(["Jinx - Loose Cannon"]);
   });
 
+  it("does not use flavor text for free-text search", () => {
+    expect(namesFor("down")).toEqual([]);
+  });
+
   it("matches exact fields and aliases", () => {
     expect(namesFor("set=OGN r:rare")).toEqual(["Void Gate"]);
   });

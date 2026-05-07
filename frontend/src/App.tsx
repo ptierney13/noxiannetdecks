@@ -118,8 +118,8 @@ function QueryLanguageTables({
   fields: QueryFieldGuide[];
   syntax: QuerySyntaxGuide[];
 }) {
-  const [showFields, setShowFields] = useState(true);
-  const [showSyntax, setShowSyntax] = useState(true);
+  const [showFields, setShowFields] = useState(false);
+  const [showSyntax, setShowSyntax] = useState(false);
 
   return (
     <section className="feature-section" aria-labelledby="query-language-heading">
@@ -228,7 +228,26 @@ function CardGrid({ cards }: { cards: CardRecord[] }) {
   );
 }
 
-function SearchView({ onError }: { onError: (message: string | null) => void }) {
+function buildCardsSearchPath(query: string): string {
+  const trimmedQuery = query.trim();
+  if (trimmedQuery.length === 0) {
+    return "/cards";
+  }
+
+  const params = new URLSearchParams();
+  params.set("q", query);
+  return `/cards?${params.toString()}`;
+}
+
+function SearchView({
+  onError,
+  locationSearch,
+  onNavigate
+}: {
+  onError: (message: string | null) => void;
+  locationSearch: string;
+  onNavigate: (nextPath: string) => void;
+}) {
   const [query, setQuery] = useState("");
   const [cards, setCards] = useState<CardRecord[]>([]);
   const [diagnostics, setDiagnostics] = useState<QueryDiagnostic[]>([]);
@@ -237,6 +256,7 @@ function SearchView({ onError }: { onError: (message: string | null) => void }) 
   const [normalizedQuery, setNormalizedQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const searchParamQuery = new URLSearchParams(locationSearch).get("q") ?? "";
 
   async function runSearch(nextQuery: string) {
     setIsSearching(true);
@@ -278,9 +298,64 @@ function SearchView({ onError }: { onError: (message: string | null) => void }) 
     };
   }, [onError]);
 
+  useEffect(() => {
+    let ignore = false;
+
+    setQuery(searchParamQuery);
+    onError(null);
+
+    if (searchParamQuery.trim().length === 0) {
+      setCards([]);
+      setDiagnostics([]);
+      setNormalizedQuery("");
+      setHasSearched(false);
+      return () => {
+        ignore = true;
+      };
+    }
+
+    setIsSearching(true);
+    setHasSearched(true);
+
+    async function syncSearchFromUrl() {
+      try {
+        const result = await searchCards(searchParamQuery);
+        if (ignore) {
+          return;
+        }
+
+        setCards(result.items);
+        setDiagnostics(result.diagnostics);
+        setNormalizedQuery(result.normalizedQuery);
+      } catch (caught) {
+        if (!ignore) {
+          onError(caught instanceof Error ? caught.message : "Search failed.");
+        }
+      } finally {
+        if (!ignore) {
+          setIsSearching(false);
+        }
+      }
+    }
+
+    void syncSearchFromUrl();
+
+    return () => {
+      ignore = true;
+    };
+  }, [locationSearch, onError, searchParamQuery]);
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    void runSearch(query);
+    const nextPath = buildCardsSearchPath(query);
+    const currentPath = `${normalizePathname(window.location.pathname)}${window.location.search}`;
+
+    if (nextPath === currentPath) {
+      void runSearch(query);
+      return;
+    }
+
+    onNavigate(nextPath);
   }
 
   return (
@@ -1492,6 +1567,7 @@ function ProjectNavLink({
 
 export default function App() {
   const [route, setRoute] = useState(() => parseAppRoute(window.location.pathname));
+  const [locationSearch, setLocationSearch] = useState(() => window.location.search);
   const [error, setError] = useState<string | null>(null);
   const [showToolsMenu, setShowToolsMenu] = useState(false);
   const toolsMenuRef = useRef<HTMLDivElement | null>(null);
@@ -1499,6 +1575,7 @@ export default function App() {
   useEffect(() => {
     function handlePopState() {
       setRoute(parseAppRoute(window.location.pathname));
+      setLocationSearch(window.location.search);
       setError(null);
       setShowToolsMenu(false);
     }
@@ -1533,11 +1610,15 @@ export default function App() {
   }, []);
 
   function navigate(nextPath: string) {
-    const normalizedPath = normalizePathname(nextPath);
+    const nextUrl = new URL(nextPath, window.location.origin);
+    const normalizedPath = normalizePathname(nextUrl.pathname);
+    const nextLocation = `${normalizedPath}${nextUrl.search}`;
+    const currentLocation = `${normalizePathname(window.location.pathname)}${window.location.search}`;
 
-    if (normalizedPath !== normalizePathname(window.location.pathname)) {
-      window.history.pushState({}, "", normalizedPath);
+    if (nextLocation !== currentLocation) {
+      window.history.pushState({}, "", nextLocation);
       setRoute(parseAppRoute(normalizedPath));
+      setLocationSearch(nextUrl.search);
     }
 
     setError(null);
@@ -1583,7 +1664,7 @@ export default function App() {
       </header>
       {error ? <div className="error-banner">{error}</div> : null}
       {route.kind === "cards" ? (
-        <SearchView onError={setError} />
+        <SearchView onError={setError} locationSearch={locationSearch} onNavigate={navigate} />
       ) : route.kind === "tools-tier-list" ? (
         <TierListView onError={setError} />
       ) : route.kind === "tools-sealed-pools" ? (

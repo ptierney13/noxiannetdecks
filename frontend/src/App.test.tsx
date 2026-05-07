@@ -516,20 +516,18 @@ describe("App", () => {
 
     expect(await screen.findByRole("heading", { name: "Query Language" })).toBeInTheDocument();
     expect(screen.getByText("Searchable Fields")).toBeInTheDocument();
-    expect(screen.getByText("Type line")).toBeInTheDocument();
+    expect(screen.queryByText("Type line")).not.toBeInTheDocument();
     expect(screen.getByText("Query Syntax")).toBeInTheDocument();
     expect(screen.queryByAltText("Void Gate card image.")).not.toBeInTheDocument();
     expect(screen.queryByTestId("card-grid")).not.toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalledWith(expect.stringMatching(/^\/api\/cards/));
   });
 
-  it("collapses and expands query helper tables", async () => {
+  it("starts with query helper tables collapsed and expands them on demand", async () => {
     const user = userEvent.setup();
     render(<App />);
 
-    expect(await screen.findByText("Type line")).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "Hide Searchable Fields" }));
+    expect(await screen.findByRole("button", { name: "Show Searchable Fields" })).toBeInTheDocument();
     expect(screen.queryByText("Type line")).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Show Searchable Fields" }));
@@ -563,6 +561,27 @@ describe("App", () => {
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText(/Expected value/)).toBeInTheDocument();
+  });
+
+  it("submits homepage search through the cards route and keeps the query visible", async () => {
+    const user = userEvent.setup();
+    const fetchMock = mockFetch();
+
+    window.history.pushState({}, "", "/");
+    render(<App />);
+    await screen.findByRole("heading", { name: "Query Language" });
+
+    await user.type(screen.getByLabelText("Query"), "name:void");
+    await user.keyboard("{Enter}");
+
+    await waitFor(() => {
+      expect(window.location.pathname).toBe("/cards");
+      expect(window.location.search).toBe("?q=name%3Avoid");
+      expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid");
+    });
+
+    expect(screen.getByLabelText("Query")).toHaveValue("name:void");
+    expect(await screen.findByAltText("Void Gate card image.")).toBeInTheDocument();
   });
 
   it("shows the tier list tool inside the top-bar tools section", async () => {

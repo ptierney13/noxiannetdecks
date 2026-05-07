@@ -1,5 +1,8 @@
 export type AppRoute =
-  | { kind: "cards"; path: "/" | "/cards" }
+  | { kind: "home"; path: "/" | "/home" }
+  | { kind: "cards"; path: "/cards" }
+  | { kind: "cards-query-builder"; path: "/cards/query-builder" }
+  | { kind: "card-detail"; path: string; cardId: string }
   | { kind: "deck-explorer-home"; path: "/deck-explorer" }
   | { kind: "deck-explorer-events"; path: "/deck-explorer/events" }
   | { kind: "deck-explorer-event"; path: string; eventId: string }
@@ -11,7 +14,7 @@ export type AppRoute =
   | { kind: "tools-sealed-pools"; path: "/tools/sealed-pools" }
   | { kind: "not-found"; path: string };
 
-export type NavSection = "cards" | "deck-explorer" | "tools-tier-list" | "tools-sealed-pools" | "not-found";
+export type NavSection = "home" | "cards" | "deck-explorer" | "tools-tier-list" | "tools-sealed-pools" | "not-found";
 
 export function normalizePathname(pathname: string): string {
   if (!pathname || pathname === "/") {
@@ -33,11 +36,23 @@ function decodeSegment(segment: string) {
 export function parseAppRoute(pathname: string): AppRoute {
   const normalizedPath = normalizePathname(pathname);
 
-  if (normalizedPath === "/" || normalizedPath === "/cards") {
-    return { kind: "cards", path: normalizedPath as "/" | "/cards" };
+  if (normalizedPath === "/" || normalizedPath === "/home") {
+    return { kind: "home", path: normalizedPath as "/" | "/home" };
+  }
+
+  if (normalizedPath === "/cards") {
+    return { kind: "cards", path: "/cards" };
+  }
+
+  if (normalizedPath === "/cards/query-builder") {
+    return { kind: "cards-query-builder", path: "/cards/query-builder" };
   }
 
   const segments = normalizedPath.split("/").filter(Boolean).map(decodeSegment);
+
+  if (segments[0] === "cards" && segments.length === 2) {
+    return { kind: "card-detail", path: normalizedPath, cardId: segments[1] };
+  }
 
   if (segments[0] === "deck-explorer") {
     if (segments.length === 1) {
@@ -103,7 +118,11 @@ export function parseAppRoute(pathname: string): AppRoute {
 
 export function routeSection(route: AppRoute): NavSection {
   switch (route.kind) {
+    case "home":
+      return "home";
     case "cards":
+    case "cards-query-builder":
+    case "card-detail":
       return "cards";
     case "deck-explorer-home":
     case "deck-explorer-events":
@@ -120,6 +139,14 @@ export function routeSection(route: AppRoute): NavSection {
     default:
       return "not-found";
   }
+}
+
+export function buildCardDetailPath(cardId: string): string {
+  return `/cards/${encodeURIComponent(cardId)}`;
+}
+
+export function buildCardsSearchPath(query: string): string {
+  return query.trim().length > 0 ? `/cards?q=${encodeURIComponent(query)}` : "/cards";
 }
 
 export function buildDeckExplorerEventPath(eventId: string): string {

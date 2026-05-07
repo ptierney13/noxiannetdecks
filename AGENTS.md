@@ -66,3 +66,22 @@ Draft summary plans for future stages should also state clearly that:
 - they must be finalized and approved before implementation begins
 - completing the current stage requires refreshing future-stage draft summaries
   with any newly pertinent information
+## GitHub Workflow
+
+The `gh` CLI is **not installed** on this machine. All GitHub operations use plain `git`.
+
+`main` is permanently checked out in a dedicated worktree at:
+
+```
+C:\Users\ptier\repos\Deck Archive Project-main-merge
+```
+
+To merge a finished branch to main and deploy:
+
+```bash
+git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" merge --ff-only <branch-name>
+git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" push origin main
+```
+
+Use `--ff-only` to keep history linear. Cloudflare Pages deploys automatically when `main` is pushed — there is no separate deploy step.
+
