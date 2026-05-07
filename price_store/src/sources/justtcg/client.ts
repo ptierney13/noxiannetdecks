@@ -5,6 +5,7 @@ import { justTcgCardsResponseSchema } from "./schema.js";
 export type JustTcgCardsQuery = {
   game?: string;
   limit?: number;
+  offset?: number;
   includePriceHistory?: boolean;
   includeStatistics?: boolean;
   includeNullPrices?: boolean;
@@ -18,6 +19,24 @@ export type JustTcgRequestResult<T> = {
   requestUrl: string;
 };
 
+export class JustTcgRequestError extends Error {
+  readonly status: number;
+  readonly statusText: string;
+  readonly detail?: string;
+
+  constructor(status: number, statusText: string, detail?: string) {
+    super(
+      detail
+        ? `JustTCG request failed with ${status} ${statusText}: ${detail}`
+        : `JustTCG request failed with ${status} ${statusText}`
+    );
+    this.name = "JustTcgRequestError";
+    this.status = status;
+    this.statusText = statusText;
+    this.detail = detail;
+  }
+}
+
 export async function fetchJustTcgCards(
   config: JustTcgConfig,
   query: JustTcgCardsQuery = {}
@@ -25,6 +44,9 @@ export async function fetchJustTcgCards(
   const url = new URL("cards", ensureTrailingSlash(config.baseUrl));
   url.searchParams.set("game", query.game ?? config.defaultGame);
   url.searchParams.set("limit", String(query.limit ?? config.defaultLimit));
+  if (query.offset !== undefined) {
+    url.searchParams.set("offset", String(query.offset));
+  }
   url.searchParams.set(
     "include_price_history",
     String(query.includePriceHistory ?? config.includePriceHistory)
@@ -66,11 +88,7 @@ export async function fetchJustTcgCards(
       parsed && typeof parsed === "object"
         ? extractApiErrorDetail(parsed)
         : sanitizeErrorDetail(rawText);
-    throw new Error(
-      detail
-        ? `JustTCG request failed with ${response.status} ${response.statusText}: ${detail}`
-        : `JustTCG request failed with ${response.status} ${response.statusText}`
-    );
+    throw new JustTcgRequestError(response.status, response.statusText, detail);
   }
 
   const payload = justTcgCardsResponseSchema.parse({

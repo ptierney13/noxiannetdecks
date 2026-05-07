@@ -25,8 +25,15 @@ contract the frontend already consumes.
 - Secrets are required for the JustTCG API key and should stay server-side.
 - The free JustTCG plan allows only 10 requests per minute and 1,000 requests
   per month, so automation must be intentionally frugal.
+- Stage 5 verified on the live API that the current key supports `limit=20`
+  and rejects `limit=21`, so automation should assume `20` is the actual live
+  page-size cap unless re-verified later.
 - Stage 4 canonical snapshots now preserve request usage metadata from JustTCG
   when available, which Stage 7 can reuse for budget-aware automation logging.
+- Stage 5's published contract is marketplace-facing:
+  - `TCGPlayer` is the consumer-facing price source
+  - `JustTCG` stays in provenance/debug metadata
+  - variant rows are preserved without frontend display-price choices baked in
 
 ## Expected Outputs
 
@@ -50,6 +57,8 @@ contract the frontend already consumes.
 - rerun/retry semantics with upstream rate limits
 - what daily cadence and request shape stay safely inside the monthly free-plan
   budget
+- whether automation should re-run limit verification on a schedule or treat
+  the Stage 5 `20` cap as stable until a manual recheck
 
 ## Test Plan
 

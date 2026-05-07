@@ -1,7 +1,7 @@
 # Price Store
 
-Stage 1 foundation for the price archive pipeline that will later capture,
-normalize, and publish daily marketplace snapshots.
+Price archive pipeline for capturing, normalizing, and publishing static
+marketplace snapshots.
 
 This package is intentionally narrow at the start:
 
@@ -20,11 +20,11 @@ repo-local git-ignored store:
 
 - `repo-root/.price_data/`
 
-The Stage 1 layout is:
+The current layout is:
 
 - `raw/`: captured source payloads and sidecar metadata
-- `canonical/`: reserved for later normalized source snapshots
-- `exports/`: reserved for later publishable snapshot artifacts
+- `canonical/`: normalized source snapshots
+- `exports/`: local publish artifacts and publish metadata
 - `runs/`: run-status records for capture-oriented workflows
 
 Stage 1 also establishes raw capture conventions:
@@ -39,6 +39,12 @@ Stage 1 also establishes raw capture conventions:
 - `npm run inspect:data-dir -w @noxiannet/price-store`
 - `npm run import:tcgplayer:samples -w @noxiannet/price-store`
 - `npm run capture:justtcg:sample -w @noxiannet/price-store`
+- `npm run verify:justtcg:limit -w @noxiannet/price-store`
+- `npm run capture:justtcg:catalog -w @noxiannet/price-store`
+- `npm run materialize:justtcg:canonical -w @noxiannet/price-store`
+- `npm run materialize:justtcg:canonical:run -w @noxiannet/price-store`
+- `npm run publish:justtcg:prices -w @noxiannet/price-store`
+- `npm run publish:justtcg:catalog -w @noxiannet/price-store`
 
 ## Current Boundary
 
@@ -59,8 +65,30 @@ Stage 3 now adds:
 - local untracked API-key loading from `price_store/.env.local`
 - a single bounded live-capture command designed around the free-plan limits
 
+Stage 4 now adds:
+
+- source-oriented canonical JustTCG snapshots under `.price_data/canonical/`
+- normalized variant-level current-price and history handling
+- raw-to-canonical materialization commands that preserve provenance
+
+Stage 5 now adds:
+
+- live request-limit verification for the current JustTCG key
+- paged JustTCG catalog capture under one run id
+- canonical run aggregation across multiple raw capture pages
+- published static price artifacts under:
+  - `.price_data/exports/prices/`
+  - `frontend/public/data/prices/`
+- a marketplace-facing published contract that:
+  - exposes `TCGPlayer` as the price source
+  - keeps `JustTCG` in provenance/debug metadata only
+  - emits one row per source variant
+  - leaves default display-price selection to later frontend logic
+
 ## Plans
 
 - [Stage 1 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-1-foundation-and-raw-capture.md)
 - [Stage 2 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-2-tcgplayer-approval-and-samples.md)
 - [Stage 3 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-3-justtcg-approval-auth-and-first-live-capture.md)
+- [Stage 4 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-4-justtcg-contracts-and-repositories.md)
+- [Stage 5 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-5-justtcg-publishable-snapshot-pipeline.md)

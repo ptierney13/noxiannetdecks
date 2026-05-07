@@ -7,11 +7,14 @@ import { resolveCanonicalSnapshotPaths } from "./paths.js";
 
 export type WriteCanonicalSnapshotInput = {
   sourceId: string;
+  runId?: string;
   capturedAt: string;
   snapshotKey: string;
   snapshot: string;
   rawRelativePayloadPath?: string;
   rawRelativeMetadataPath?: string;
+  rawRelativePayloadPaths?: string[];
+  rawRelativeMetadataPaths?: string[];
   notes?: string[];
 };
 
@@ -32,11 +35,14 @@ export async function writeCanonicalSnapshot(
   const metadata = canonicalSnapshotMetadataSchema.parse({
     version: 1,
     sourceId: input.sourceId,
+    runId: input.runId,
     capturedAt: new Date(input.capturedAt).toISOString(),
     relativeSnapshotPath: paths.relativeSnapshotPath,
     snapshotKey: input.snapshotKey,
     rawRelativePayloadPath: input.rawRelativePayloadPath,
     rawRelativeMetadataPath: input.rawRelativeMetadataPath,
+    rawRelativePayloadPaths: input.rawRelativePayloadPaths ?? [],
+    rawRelativeMetadataPaths: input.rawRelativeMetadataPaths ?? [],
     notes: input.notes ?? []
   });
 

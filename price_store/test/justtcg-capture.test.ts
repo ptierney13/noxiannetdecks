@@ -3,10 +3,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  captureJustTcgCardsCatalog,
   captureJustTcgCardsSample,
   loadRunStatus,
   rawCaptureMetadataSchema,
-  resolvePriceDataLayout
+  resolvePriceDataLayout,
+  verifyJustTcgRequestLimit
 } from "../src/index.js";
 
 const createdDirs: string[] = [];
@@ -92,12 +94,126 @@ describe("JustTCG capture", () => {
 
     expect(payload).toContain("\"riftbound-demo-card\"");
     expect(payload).toContain("\"apiPlan\"");
-    expect(rawCaptureMetadataSchema.parse(metadata).notes).toContain("free-plan-budgeted-capture");
+    expect(rawCaptureMetadataSchema.parse(metadata)).toMatchObject({
+      runId: "justtcg-capture-2026-05-06-riftbound",
+      notes: expect.arrayContaining(["free-plan-budgeted-capture"])
+    });
 
     await expect(loadRunStatus(layout, result.runId)).resolves.toMatchObject({
       status: "succeeded",
       rawCaptureCount: 1,
       sourceId: "justtcg"
+    });
+  });
+
+  it("verifies the documented limit and searches upward when a higher limit works", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation(async (input: URL | string) => {
+        const url = new URL(typeof input === "string" ? input : input.toString());
+        const limit = Number(url.searchParams.get("limit"));
+
+        if (limit <= 37) {
+          return {
+            ok: true,
+            text: async () => JSON.stringify({ data: [], meta: { total: 0, limit, offset: 0, hasMore: false } }),
+            status: 200,
+            statusText: "OK"
+          };
+        }
+
+        return {
+          ok: false,
+          text: async () => JSON.stringify({ error: "limit too high", code: "validation_error" }),
+          status: 400,
+          statusText: "Bad Request"
+        };
+      })
+    );
+
+    const result = await verifyJustTcgRequestLimit({
+      apiKey: "tcg_test",
+      baseUrl: "https://api.justtcg.com/v1",
+      defaultGame: "riftbound",
+      defaultLimit: 20,
+      includePriceHistory: false,
+      includeStatistics: false
+    });
+
+    expect(result.verifiedLimit).toBe(37);
+    expect(result.documentedLimitWorked).toBe(true);
+    expect(result.nextHigherLimitWorked).toBe(true);
+    expect(result.testedLimits).toContain(20);
+    expect(result.testedLimits).toContain(21);
+  });
+
+  it("captures a paged catalog run and records one raw file per page", async () => {
+    const rootDir = await mkdtemp(join(tmpdir(), "price-store-justtcg-catalog-"));
+    createdDirs.push(rootDir);
+    const layout = resolvePriceDataLayout(rootDir);
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          text: async () =>
+            JSON.stringify({
+              data: [
+                { id: "card-1", name: "One", game: "riftbound", variants: [{ id: "card-1_nm", price: 1.1 }] },
+                { id: "card-2", name: "Two", game: "riftbound", variants: [{ id: "card-2_nm", price: 2.2 }] }
+              ],
+              meta: { total: 3, limit: 2, offset: 0, hasMore: true }
+            }),
+          status: 200,
+          statusText: "OK"
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          text: async () =>
+            JSON.stringify({
+              data: [{ id: "card-3", name: "Three", game: "riftbound", variants: [{ id: "card-3_nm", price: 3.3 }] }],
+              meta: { total: 3, limit: 2, offset: 2, hasMore: false }
+            }),
+          status: 200,
+          statusText: "OK"
+        })
+    );
+
+    const result = await captureJustTcgCardsCatalog(
+      layout,
+      {
+        apiKey: "tcg_test",
+        baseUrl: "https://api.justtcg.com/v1",
+        defaultGame: "riftbound",
+        defaultLimit: 20,
+        includePriceHistory: false,
+        includeStatistics: false
+      },
+      {
+        startedAt: "2026-05-07T03:00:00.000Z",
+        limit: 2,
+        verifyLimit: false,
+        requestDelayMs: 0
+      }
+    );
+
+    expect(result.rawCaptureCount).toBe(2);
+    expect(result.cardCount).toBe(3);
+    expect(result.pageCount).toBe(2);
+    expect(result.relativeMetadataPaths).toHaveLength(2);
+
+    const firstMetadata = JSON.parse(await readFile(join(rootDir, result.relativeMetadataPaths[0]), "utf8"));
+    expect(rawCaptureMetadataSchema.parse(firstMetadata)).toMatchObject({
+      runId: result.runId,
+      notes: expect.arrayContaining(["paged-catalog-capture", "page-index:1", "page-offset:0"])
+    });
+
+    await expect(loadRunStatus(layout, result.runId)).resolves.toMatchObject({
+      status: "succeeded",
+      rawCaptureCount: 2,
+      pageCount: 2,
+      cardCount: 3
     });
   });
 });

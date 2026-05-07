@@ -19,9 +19,14 @@ with monitoring, runbook guidance, and clear operator recovery paths.
 - Stage 7 should already automate daily refresh and hosted publishing.
 - JustTCG plan limits and rate limits are an operational concern that should be
   visible to maintainers.
+- Stage 5 verified the current key's live request-size cap as `20`, which is a
+  concrete operational invariant worth monitoring for drift or revalidation.
 - V0 remains single-source, so upstream availability is a concentrated risk.
 - Stage 4 canonical snapshots can already preserve upstream usage-limit
   metadata, giving Stage 8 a concrete place to source request-budget signals.
+- Stage 5's published artifacts are marketplace-facing variant rows, so stale
+  data checks should verify both publish freshness and the presence of the
+  tracked `frontend/public/data/prices/` outputs.
 
 ## Expected Outputs
 
@@ -40,6 +45,7 @@ with monitoring, runbook guidance, and clear operator recovery paths.
 - which health signals are most actionable
 - how stale-data thresholds should be defined
 - how much request-usage telemetry should be persisted from upstream responses
+- whether request-limit verification should have its own monitorable drift check
 
 ## Test Plan
 

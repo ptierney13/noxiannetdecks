@@ -28,6 +28,29 @@ export {
   loadCanonicalSnapshotMetadata,
   writeCanonicalSnapshot
 } from "./canonical/repository.js";
+export type {
+  PublishedPriceExportMetadata,
+  PublishedPriceFreshness,
+  PublishedPriceHistoryPoint,
+  PublishedPriceManifest,
+  PublishedPriceRow,
+  PublishedPriceSnapshot,
+  PublishedPriceSource
+} from "./published/schema.js";
+export {
+  publishedPriceExportMetadataSchema,
+  publishedPriceFreshnessSchema,
+  publishedPriceHistoryPointSchema,
+  publishedPriceManifestSchema,
+  publishedPriceRowSchema,
+  publishedPriceSnapshotSchema,
+  publishedPriceSourceSchema
+} from "./published/schema.js";
+export type {
+  WritePublishedPriceArtifactsInput,
+  WritePublishedPriceArtifactsResult
+} from "./published/repository.js";
+export { writePublishedPriceArtifacts } from "./published/repository.js";
 export type { PriceRunStage, PriceRunStatus, PriceRunStatusState } from "./runs/schema.js";
 export { priceRunStageSchema, priceRunStatusSchema, priceRunStatusStateSchema } from "./runs/schema.js";
 export { loadRunStatus, resolveRunStatusPath, writeRunStatus } from "./runs/repository.js";
@@ -45,6 +68,8 @@ export {
   tcgplayerSampleManifestSchema
 } from "./sources/tcgplayer/index.js";
 export type {
+  CaptureJustTcgCatalogInput,
+  CaptureJustTcgCatalogResult,
   CaptureJustTcgSampleInput,
   CaptureJustTcgSampleResult,
   JustTcgCard,
@@ -56,20 +81,31 @@ export type {
   JustTcgCardsResponse,
   JustTcgConfig,
   JustTcgEnvironment,
+  PublishJustTcgPricesResult,
   JustTcgRequestResult,
+  VerifyJustTcgRequestLimitInput,
+  VerifyJustTcgRequestLimitResult,
   JustTcgVariant
 } from "./sources/justtcg/index.js";
 export {
+  captureJustTcgCardsCatalog,
   captureJustTcgCardsSample,
   createJustTcgCanonicalSnapshot,
+  createJustTcgCanonicalSnapshotFromPages,
   createJustTcgCanonicalSnapshotId,
   createJustTcgCaptureRunId,
   fetchJustTcgCards,
+  createPublishedPriceManifest,
+  createPublishedPriceSnapshot,
   justTcgCardSchema,
   justTcgCanonicalSnapshotSchema,
   justTcgCardsResponseSchema,
+  JustTcgRequestError,
   justTcgVariantSchema,
   loadJustTcgConfig,
+  materializeJustTcgCanonicalRunSnapshot,
   materializeJustTcgCanonicalSnapshot,
-  resolveJustTcgLocalEnvPath
+  publishJustTcgCanonicalSnapshot,
+  resolveJustTcgLocalEnvPath,
+  verifyJustTcgRequestLimit
 } from "./sources/justtcg/index.js";

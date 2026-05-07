@@ -10,11 +10,31 @@ export type {
 } from "./canonical.js";
 export {
   createJustTcgCanonicalSnapshot,
+  createJustTcgCanonicalSnapshotFromPages,
   createJustTcgCanonicalSnapshotId,
   justTcgCanonicalSnapshotSchema,
+  materializeJustTcgCanonicalRunSnapshot,
   materializeJustTcgCanonicalSnapshot
 } from "./canonical.js";
 export type { JustTcgCardsQuery, JustTcgRequestResult } from "./client.js";
-export { fetchJustTcgCards } from "./client.js";
-export type { CaptureJustTcgSampleInput, CaptureJustTcgSampleResult } from "./capture.js";
-export { captureJustTcgCardsSample, createJustTcgCaptureRunId } from "./capture.js";
+export { fetchJustTcgCards, JustTcgRequestError } from "./client.js";
+export type {
+  CaptureJustTcgCatalogInput,
+  CaptureJustTcgCatalogResult,
+  CaptureJustTcgSampleInput,
+  CaptureJustTcgSampleResult,
+  VerifyJustTcgRequestLimitInput,
+  VerifyJustTcgRequestLimitResult
+} from "./capture.js";
+export {
+  captureJustTcgCardsCatalog,
+  captureJustTcgCardsSample,
+  createJustTcgCaptureRunId,
+  verifyJustTcgRequestLimit
+} from "./capture.js";
+export type { PublishJustTcgPricesResult } from "./publish.js";
+export {
+  createPublishedPriceManifest,
+  createPublishedPriceSnapshot,
+  publishJustTcgCanonicalSnapshot
+} from "./publish.js";

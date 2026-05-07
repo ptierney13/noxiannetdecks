@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   createJustTcgCanonicalSnapshot,
+  createJustTcgCanonicalSnapshotFromPages,
   justTcgCanonicalSnapshotSchema,
   justTcgCardsResponseSchema,
   rawCaptureMetadataSchema
@@ -91,5 +92,92 @@ describe("JustTCG canonical snapshots", () => {
       }
     ]);
     expect(snapshot.cards[0]?.variants[0]?.externalIds.tcgplayerSkuId).toBe("825001");
+  });
+
+  it("aggregates paged raw captures into a single canonical run snapshot", () => {
+    const pageOneMetadata = rawCaptureMetadataSchema.parse({
+      version: 1,
+      sourceId: "justtcg",
+      runId: "justtcg-capture-2026-05-07-riftbound",
+      capturedAt: "2026-05-07T03:00:00.000Z",
+      payloadFormat: "json",
+      relativePayloadPath: "raw/justtcg/2026/05/07/page-1.json",
+      captureKey: "riftbound-league-of-legends-trading-card-game-cards-page-001",
+      requestUrl:
+        "https://api.justtcg.com/v1/cards?game=riftbound-league-of-legends-trading-card-game&limit=2&offset=0&include_price_history=true",
+      notes: ["requested-limit:2", "include-price-history:true", "include-statistics:false"]
+    });
+    const pageTwoMetadata = rawCaptureMetadataSchema.parse({
+      version: 1,
+      sourceId: "justtcg",
+      runId: "justtcg-capture-2026-05-07-riftbound",
+      capturedAt: "2026-05-07T03:00:05.000Z",
+      payloadFormat: "json",
+      relativePayloadPath: "raw/justtcg/2026/05/07/page-2.json",
+      captureKey: "riftbound-league-of-legends-trading-card-game-cards-page-002",
+      requestUrl:
+        "https://api.justtcg.com/v1/cards?game=riftbound-league-of-legends-trading-card-game&limit=2&offset=2&include_price_history=true",
+      notes: ["requested-limit:2", "include-price-history:true", "include-statistics:false"]
+    });
+
+    const pageOneResponse = justTcgCardsResponseSchema.parse({
+      data: [
+        {
+          id: "card-1",
+          name: "Card One",
+          game: "Riftbound: League of Legends Trading Card Game",
+          set: "ogn",
+          set_name: "Origins",
+          variants: [{ id: "card-1_nm", price: 1.11, lastUpdated: 1746576000 }]
+        },
+        {
+          id: "card-2",
+          name: "Card Two",
+          game: "Riftbound: League of Legends Trading Card Game",
+          set: "ogn",
+          set_name: "Origins",
+          variants: [{ id: "card-2_nm", price: 2.22, lastUpdated: 1746576001 }]
+        }
+      ],
+      meta: { total: 3, limit: 2, offset: 0, hasMore: true },
+      _metadata: { apiPlan: "free", apiRequestsUsed: 1 }
+    });
+    const pageTwoResponse = justTcgCardsResponseSchema.parse({
+      data: [
+        {
+          id: "card-3",
+          name: "Card Three",
+          game: "Riftbound: League of Legends Trading Card Game",
+          set: "ogn",
+          set_name: "Origins",
+          variants: [{ id: "card-3_nm", price: 3.33, lastUpdated: 1746576002 }]
+        }
+      ],
+      meta: { total: 3, limit: 2, offset: 2, hasMore: false },
+      _metadata: { apiPlan: "free", apiRequestsUsed: 2 }
+    });
+
+    const snapshot = createJustTcgCanonicalSnapshotFromPages([
+      { metadata: pageOneMetadata, response: pageOneResponse },
+      { metadata: pageTwoMetadata, response: pageTwoResponse }
+    ]);
+
+    expect(justTcgCanonicalSnapshotSchema.parse(snapshot)).toMatchObject({
+      sourceContext: {
+        runId: "justtcg-capture-2026-05-07-riftbound",
+        pageCount: 2,
+        rawRelativePayloadPaths: [
+          "raw/justtcg/2026/05/07/page-1.json",
+          "raw/justtcg/2026/05/07/page-2.json"
+        ]
+      },
+      pagination: {
+        total: 3,
+        limit: 2,
+        offset: 0,
+        hasMore: false
+      }
+    });
+    expect(snapshot.cards).toHaveLength(3);
   });
 });

@@ -1,8 +1,8 @@
 import type { PriceDataLayout } from "../../config.js";
 import type { CanonicalSnapshotMetadata } from "../../canonical/schema.js";
-import { writeCanonicalSnapshot } from "../../canonical/repository.js";
 import { loadRawCaptureJson } from "../../raw/repository.js";
 import type { RawCaptureMetadata } from "../../raw/schema.js";
+import { writeCanonicalSnapshot } from "../../canonical/repository.js";
 import type { JustTcgCardsResponse, JustTcgVariant } from "./schema.js";
 import { justTcgCardsResponseSchema } from "./schema.js";
 import { z } from "zod";
@@ -55,10 +55,15 @@ export const justTcgCanonicalSnapshotSchema = z.object({
     label: z.string().min(1).optional()
   }),
   sourceContext: z.object({
-    captureKey: z.string().min(1),
+    captureKey: z.string().min(1).optional(),
+    runId: z.string().min(1).optional(),
     requestUrl: z.string().url().optional(),
-    rawRelativePayloadPath: z.string().min(1),
-    rawRelativeMetadataPath: z.string().min(1),
+    requestUrls: z.array(z.string().url()).default([]),
+    rawRelativePayloadPath: z.string().min(1).optional(),
+    rawRelativeMetadataPath: z.string().min(1).optional(),
+    rawRelativePayloadPaths: z.array(z.string().min(1)).default([]),
+    rawRelativeMetadataPaths: z.array(z.string().min(1)).default([]),
+    pageCount: z.number().int().positive().optional(),
     requestedLimit: z.number().int().positive().optional(),
     includePriceHistory: z.boolean().optional(),
     includeStatistics: z.boolean().optional()
@@ -84,9 +89,188 @@ export function createJustTcgCanonicalSnapshot(
   rawMetadata: RawCaptureMetadata,
   response: JustTcgCardsResponse
 ): JustTcgCanonicalSnapshot {
+  return buildCanonicalSnapshot(rawMetadata, response);
+}
+
+export function createJustTcgCanonicalSnapshotFromPages(
+  entries: Array<{
+    metadata: RawCaptureMetadata;
+    response: JustTcgCardsResponse;
+  }>
+): JustTcgCanonicalSnapshot {
+  if (entries.length === 0) {
+    throw new Error("At least one JustTCG raw capture entry is required to build a canonical snapshot.");
+  }
+
+  const sorted = [...entries].sort((left, right) => left.metadata.capturedAt.localeCompare(right.metadata.capturedAt));
+  const first = sorted[0];
+  if (!first) {
+    throw new Error("Expected at least one JustTCG raw capture entry.");
+  }
+
+  const perPageSnapshots = sorted.map((entry) => buildCanonicalSnapshot(entry.metadata, entry.response));
+  const firstSnapshot = perPageSnapshots[0];
+  if (!firstSnapshot) {
+    throw new Error("Expected at least one canonical page snapshot.");
+  }
+
+  const requestUrls = perPageSnapshots
+    .map((snapshot) => snapshot.sourceContext.requestUrl)
+    .filter((value): value is string => Boolean(value));
+  const rawRelativePayloadPaths = perPageSnapshots.map(
+    (snapshot) => snapshot.sourceContext.rawRelativePayloadPath
+  ).filter((value): value is string => Boolean(value));
+  const rawRelativeMetadataPaths = perPageSnapshots.map(
+    (snapshot) => snapshot.sourceContext.rawRelativeMetadataPath
+  ).filter((value): value is string => Boolean(value));
+  const pageCount = perPageSnapshots.length;
+  const cards = mergeCanonicalCards(perPageSnapshots);
+  const capturedAt = first.metadata.capturedAt;
+  const gameSlug = firstSnapshot.game.slug;
+  const requestedLimit = readLastDefined(
+    perPageSnapshots.map((snapshot) => snapshot.sourceContext.requestedLimit)
+  );
+  const includePriceHistory = readLastDefined(
+    perPageSnapshots.map((snapshot) => snapshot.sourceContext.includePriceHistory)
+  );
+  const includeStatistics = readLastDefined(
+    perPageSnapshots.map((snapshot) => snapshot.sourceContext.includeStatistics)
+  );
+  const usage = readLastDefined(perPageSnapshots.map((snapshot) => snapshot.usage));
+  const total = readLastDefined(perPageSnapshots.map((snapshot) => snapshot.pagination.total));
+  const limit = readLastDefined(perPageSnapshots.map((snapshot) => snapshot.pagination.limit));
+  const finalHasMore = readLastDefined(perPageSnapshots.map((snapshot) => snapshot.pagination.hasMore));
+
+  return justTcgCanonicalSnapshotSchema.parse({
+    version: 1,
+    sourceId: "justtcg",
+    snapshotId: createJustTcgCanonicalSnapshotId(capturedAt, gameSlug),
+    capturedAt,
+    game: firstSnapshot.game,
+    sourceContext: {
+      captureKey: `${gameSlug}-cards-catalog`,
+      runId: first.metadata.runId,
+      requestUrl: requestUrls[0],
+      requestUrls,
+      rawRelativePayloadPath: rawRelativePayloadPaths[0],
+      rawRelativeMetadataPath: rawRelativeMetadataPaths[0],
+      rawRelativePayloadPaths,
+      rawRelativeMetadataPaths,
+      pageCount,
+      requestedLimit,
+      includePriceHistory,
+      includeStatistics
+    },
+    pagination: {
+      total,
+      limit,
+      offset: 0,
+      hasMore: finalHasMore
+    },
+    usage,
+    cards
+  });
+}
+
+export async function materializeJustTcgCanonicalSnapshot(
+  layout: PriceDataLayout,
+  rawMetadata: RawCaptureMetadata
+): Promise<{
+  canonicalMetadata: CanonicalSnapshotMetadata;
+  snapshot: JustTcgCanonicalSnapshot;
+}> {
+  const response = justTcgCardsResponseSchema.parse(
+    await loadRawCaptureJson<unknown>(layout, rawMetadata)
+  );
+  const snapshot = createJustTcgCanonicalSnapshot(rawMetadata, response);
+  const canonicalMetadata = await writeCanonicalSnapshot(layout, {
+    sourceId: "justtcg",
+    runId: rawMetadata.runId,
+    capturedAt: snapshot.capturedAt,
+    snapshotKey: `${snapshot.game.slug}-cards-snapshot`,
+    snapshot: JSON.stringify(snapshot, null, 2),
+    rawRelativePayloadPath: rawMetadata.relativePayloadPath,
+    rawRelativeMetadataPath: deriveRawMetadataPath(rawMetadata.relativePayloadPath),
+    rawRelativePayloadPaths: [rawMetadata.relativePayloadPath],
+    rawRelativeMetadataPaths: [deriveRawMetadataPath(rawMetadata.relativePayloadPath)],
+    notes: [
+      "canonical-source-snapshot",
+      `game:${snapshot.game.slug}`,
+      `card-count:${String(snapshot.cards.length)}`,
+      `variant-count:${String(snapshot.cards.reduce((count, card) => count + card.variants.length, 0))}`
+    ]
+  });
+
+  return {
+    canonicalMetadata,
+    snapshot
+  };
+}
+
+export async function materializeJustTcgCanonicalRunSnapshot(
+  layout: PriceDataLayout,
+  rawMetadatas: RawCaptureMetadata[]
+): Promise<{
+  canonicalMetadata: CanonicalSnapshotMetadata;
+  snapshot: JustTcgCanonicalSnapshot;
+}> {
+  if (rawMetadatas.length === 0) {
+    throw new Error("At least one JustTCG raw capture metadata record is required.");
+  }
+
+  const sortedMetadatas = [...rawMetadatas].sort((left, right) => left.capturedAt.localeCompare(right.capturedAt));
+  const entries = await Promise.all(
+    sortedMetadatas.map(async (metadata) => ({
+      metadata,
+      response: justTcgCardsResponseSchema.parse(await loadRawCaptureJson<unknown>(layout, metadata))
+    }))
+  );
+  const snapshot = createJustTcgCanonicalSnapshotFromPages(entries);
+  const rawRelativePayloadPaths = entries.map((entry) => entry.metadata.relativePayloadPath);
+  const rawRelativeMetadataPaths = entries.map((entry) => deriveRawMetadataPath(entry.metadata.relativePayloadPath));
+  const firstMetadata = sortedMetadatas[0];
+  if (!firstMetadata) {
+    throw new Error("Expected at least one sorted JustTCG raw metadata record.");
+  }
+  const canonicalMetadata = await writeCanonicalSnapshot(layout, {
+    sourceId: "justtcg",
+    runId: firstMetadata.runId,
+    capturedAt: snapshot.capturedAt,
+    snapshotKey: `${snapshot.game.slug}-cards-snapshot`,
+    snapshot: JSON.stringify(snapshot, null, 2),
+    rawRelativePayloadPath: rawRelativePayloadPaths[0],
+    rawRelativeMetadataPath: rawRelativeMetadataPaths[0],
+    rawRelativePayloadPaths,
+    rawRelativeMetadataPaths,
+    notes: [
+      "canonical-source-snapshot",
+      "canonical-source-run-snapshot",
+      `game:${snapshot.game.slug}`,
+      `page-count:${String(entries.length)}`,
+      `card-count:${String(snapshot.cards.length)}`,
+      `variant-count:${String(snapshot.cards.reduce((count, card) => count + card.variants.length, 0))}`
+    ]
+  });
+
+  return {
+    canonicalMetadata,
+    snapshot
+  };
+}
+
+export function createJustTcgCanonicalSnapshotId(capturedAt: string, gameSlug: string): string {
+  const datePrefix = new Date(capturedAt).toISOString().slice(0, 10);
+  return `justtcg-canonical-${datePrefix}-${sanitizeSegment(gameSlug)}`;
+}
+
+function buildCanonicalSnapshot(
+  rawMetadata: RawCaptureMetadata,
+  response: JustTcgCardsResponse
+): JustTcgCanonicalSnapshot {
   const gameSlug = parseGameSlug(rawMetadata);
   const sourceContextFlags = parseCaptureNotes(rawMetadata.notes);
-  const snapshot = justTcgCanonicalSnapshotSchema.parse({
+
+  return justTcgCanonicalSnapshotSchema.parse({
     version: 1,
     sourceId: "justtcg",
     snapshotId: createJustTcgCanonicalSnapshotId(rawMetadata.capturedAt, gameSlug),
@@ -97,9 +281,14 @@ export function createJustTcgCanonicalSnapshot(
     },
     sourceContext: {
       captureKey: rawMetadata.captureKey,
+      runId: rawMetadata.runId,
       requestUrl: rawMetadata.requestUrl,
+      requestUrls: rawMetadata.requestUrl ? [rawMetadata.requestUrl] : [],
       rawRelativePayloadPath: rawMetadata.relativePayloadPath,
       rawRelativeMetadataPath: deriveRawMetadataPath(rawMetadata.relativePayloadPath),
+      rawRelativePayloadPaths: [rawMetadata.relativePayloadPath],
+      rawRelativeMetadataPaths: [deriveRawMetadataPath(rawMetadata.relativePayloadPath)],
+      pageCount: 1,
       requestedLimit: sourceContextFlags.requestedLimit,
       includePriceHistory: sourceContextFlags.includePriceHistory,
       includeStatistics: sourceContextFlags.includeStatistics
@@ -138,45 +327,6 @@ export function createJustTcgCanonicalSnapshot(
       }))
     }))
   });
-
-  return snapshot;
-}
-
-export async function materializeJustTcgCanonicalSnapshot(
-  layout: PriceDataLayout,
-  rawMetadata: RawCaptureMetadata
-): Promise<{
-  canonicalMetadata: CanonicalSnapshotMetadata;
-  snapshot: JustTcgCanonicalSnapshot;
-}> {
-  const response = justTcgCardsResponseSchema.parse(
-    await loadRawCaptureJson<unknown>(layout, rawMetadata)
-  );
-  const snapshot = createJustTcgCanonicalSnapshot(rawMetadata, response);
-  const canonicalMetadata = await writeCanonicalSnapshot(layout, {
-    sourceId: "justtcg",
-    capturedAt: snapshot.capturedAt,
-    snapshotKey: `${snapshot.game.slug}-cards-snapshot`,
-    snapshot: JSON.stringify(snapshot, null, 2),
-    rawRelativePayloadPath: rawMetadata.relativePayloadPath,
-    rawRelativeMetadataPath: deriveRawMetadataPath(rawMetadata.relativePayloadPath),
-    notes: [
-      "canonical-source-snapshot",
-      `game:${snapshot.game.slug}`,
-      `card-count:${String(snapshot.cards.length)}`,
-      `variant-count:${String(snapshot.cards.reduce((count, card) => count + card.variants.length, 0))}`
-    ]
-  });
-
-  return {
-    canonicalMetadata,
-    snapshot
-  };
-}
-
-export function createJustTcgCanonicalSnapshotId(capturedAt: string, gameSlug: string): string {
-  const datePrefix = new Date(capturedAt).toISOString().slice(0, 10);
-  return `justtcg-canonical-${datePrefix}-${sanitizeSegment(gameSlug)}`;
 }
 
 function parseGameSlug(metadata: RawCaptureMetadata): string {
@@ -190,6 +340,10 @@ function parseGameSlug(metadata: RawCaptureMetadata): string {
 
   if (metadata.captureKey.endsWith("-cards-sample")) {
     return metadata.captureKey.slice(0, -"-cards-sample".length);
+  }
+
+  if (metadata.captureKey.includes("-cards-page-")) {
+    return metadata.captureKey.slice(0, metadata.captureKey.indexOf("-cards-page-"));
   }
 
   return metadata.captureKey;
@@ -260,6 +414,26 @@ function extractPagination(meta: JustTcgCardsResponse["meta"]): {
     offset,
     hasMore
   };
+}
+
+function mergeCanonicalCards(
+  pageSnapshots: JustTcgCanonicalSnapshot[]
+): JustTcgCanonicalCard[] {
+  const seen = new Set<string>();
+  const merged: JustTcgCanonicalCard[] = [];
+
+  for (const snapshot of pageSnapshots) {
+    for (const card of snapshot.cards) {
+      if (seen.has(card.sourceCardId)) {
+        throw new Error(`Duplicate JustTCG source card id encountered during canonical merge: ${card.sourceCardId}`);
+      }
+
+      seen.add(card.sourceCardId);
+      merged.push(card);
+    }
+  }
+
+  return merged;
 }
 
 function readInteger(value: unknown): number | undefined {
@@ -350,4 +524,15 @@ function sanitizeSegment(value: string): string {
   }
 
   return sanitized.toLowerCase();
+}
+
+function readLastDefined<T>(values: Array<T | undefined>): T | undefined {
+  for (let index = values.length - 1; index >= 0; index -= 1) {
+    const value = values[index];
+    if (value !== undefined) {
+      return value;
+    }
+  }
+
+  return undefined;
 }

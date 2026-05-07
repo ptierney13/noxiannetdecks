@@ -1,0 +1,1053 @@
+{
+  "version": 1,
+  "game": {
+    "slug": "riftbound-league-of-legends-trading-card-game",
+    "key": "riftbound",
+    "label": "Riftbound: League of Legends Trading Card Game"
+  },
+  "priceSource": {
+    "id": "tcgplayer",
+    "label": "TCGPlayer"
+  },
+  "publishedAt": "2026-05-07T21:44:52.126Z",
+  "sourceCapturedAt": "2026-05-07T01:04:45.650Z",
+  "freshness": {
+    "rowCount": 21,
+    "pricedRowCount": 21,
+    "freshestPriceAt": "2026-05-06T23:20:59.000Z",
+    "stalestPriceAt": "2025-12-10T20:24:18.000Z"
+  },
+  "rows": [
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-ahri-nine-tailed-fox-metal-promo::riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-ahri-nine-tailed-fox-metal-promo_near-mint_foil",
+      "cardName": "Ahri - Nine-Tailed Fox (Metal)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-ahri-nine-tailed-fox-metal-promo",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-ahri-nine-tailed-fox-metal-promo_near-mint_foil",
+      "set": {
+        "slug": "riftbound-organized-play-promotional-cards-riftbound-league-of-legends-trading-card-game",
+        "label": "Riftbound Organized Play Promotional Cards"
+      },
+      "collectorNumber": "255/298",
+      "rarity": "Promo",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "669254",
+        "tcgplayerSkuId": "9055270"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 4999.99,
+        "lastUpdatedAt": "2026-05-06T23:20:47.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 4999.99,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 4999.99,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 4999.99,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 4999.99,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 4999.99,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 4999.99,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 4999.99,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-spiritforged-ahri-inquisitive-signature-showcase::riftbound-league-of-legends-trading-card-game-spiritforged-ahri-inquisitive-signature-showcase_near-mint_foil",
+      "cardName": "Ahri - Inquisitive (Signature)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-spiritforged-ahri-inquisitive-signature-showcase",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-spiritforged-ahri-inquisitive-signature-showcase_near-mint_foil",
+      "set": {
+        "slug": "spiritforged-riftbound-league-of-legends-trading-card-game",
+        "label": "Spiritforged"
+      },
+      "collectorNumber": "227*/221",
+      "rarity": "Showcase",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "664913",
+        "tcgplayerSkuId": "9026610"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 2740.35,
+        "lastUpdatedAt": "2026-05-06T23:20:39.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 2740.35,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 2740.35,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 2740.35,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 2740.35,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 2740.35,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 2740.35,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 2740.35,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-kai-sa-daughter-of-the-void-metal-promo::riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-kai-sa-daughter-of-the-void-metal-promo_near-mint_foil",
+      "cardName": "Kai'Sa - Daughter of the Void (Metal)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-kai-sa-daughter-of-the-void-metal-promo",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-kai-sa-daughter-of-the-void-metal-promo_near-mint_foil",
+      "set": {
+        "slug": "riftbound-organized-play-promotional-cards-riftbound-league-of-legends-trading-card-game",
+        "label": "Riftbound Organized Play Promotional Cards"
+      },
+      "collectorNumber": "247/298",
+      "rarity": "Promo",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "669250",
+        "tcgplayerSkuId": "9055250"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 2499.5,
+        "lastUpdatedAt": "2026-05-06T23:20:47.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 2499.5,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 2499.5,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 2499.5,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 2499.5,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 2499.5,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 2499.5,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 2499.5,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-origins-kai-sa-daughter-of-the-void-signature-showcase::riftbound-league-of-legends-trading-card-game-origins-kai-sa-daughter-of-the-void-signature-showcase_near-mint_foil",
+      "cardName": "Kai'Sa - Daughter of the Void (Signature)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-origins-kai-sa-daughter-of-the-void-signature-showcase",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-origins-kai-sa-daughter-of-the-void-signature-showcase_near-mint_foil",
+      "set": {
+        "slug": "origins-riftbound-league-of-legends-trading-card-game",
+        "label": "Origins"
+      },
+      "collectorNumber": "299*/298",
+      "rarity": "Showcase",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "653094",
+        "tcgplayerSkuId": "8927857"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 2331.96,
+        "lastUpdatedAt": "2026-05-06T23:20:17.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 2331.96,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 2331.96,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 2331.96,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 2331.96,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 2331.96,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 2331.96,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 2331.96,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-origins-ahri-nine-tailed-fox-signature-showcase::riftbound-league-of-legends-trading-card-game-origins-ahri-nine-tailed-fox-signature-showcase_near-mint_foil",
+      "cardName": "Ahri - Nine-Tailed Fox (Signature)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-origins-ahri-nine-tailed-fox-signature-showcase",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-origins-ahri-nine-tailed-fox-signature-showcase_near-mint_foil",
+      "set": {
+        "slug": "origins-riftbound-league-of-legends-trading-card-game",
+        "label": "Origins"
+      },
+      "collectorNumber": "303*/298",
+      "rarity": "Showcase",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "653102",
+        "tcgplayerSkuId": "8927897"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1946.02,
+        "lastUpdatedAt": "2026-05-06T23:20:17.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1946.02,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 1946.02,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 1946.02,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1946.02,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1946.02,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 1946.02,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 1946.02,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-origins-ahri-nine-tailed-fox-signature-showcase::riftbound-league-of-legends-trading-card-game-origins-ahri-nine-tailed-fox-signature-showcase_lightly-played_foil",
+      "cardName": "Ahri - Nine-Tailed Fox (Signature)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-origins-ahri-nine-tailed-fox-signature-showcase",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-origins-ahri-nine-tailed-fox-signature-showcase_lightly-played_foil",
+      "set": {
+        "slug": "origins-riftbound-league-of-legends-trading-card-game",
+        "label": "Origins"
+      },
+      "collectorNumber": "303*/298",
+      "rarity": "Showcase",
+      "language": "English",
+      "condition": "Lightly Played",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "653102",
+        "tcgplayerSkuId": "8927898"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1150,
+        "lastUpdatedAt": "2026-05-04T23:43:28.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1150,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 1150,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 1150,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1150,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1150,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-master-yi-wuju-bladesman-metal-promo::riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-master-yi-wuju-bladesman-metal-promo_near-mint_foil",
+      "cardName": "Master Yi - Wuju Bladesman (Metal)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-master-yi-wuju-bladesman-metal-promo",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-master-yi-wuju-bladesman-metal-promo_near-mint_foil",
+      "set": {
+        "slug": "riftbound-organized-play-promotional-cards-riftbound-league-of-legends-trading-card-game",
+        "label": "Riftbound Organized Play Promotional Cards"
+      },
+      "collectorNumber": "019/024",
+      "rarity": "Promo",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "669266",
+        "tcgplayerSkuId": "9055318"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1935,
+        "lastUpdatedAt": "2026-05-06T23:20:47.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1935,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 1935,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 1935,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1935,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1935,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 1935,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 1935,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-jinx-loose-cannon-metal-promo::riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-jinx-loose-cannon-metal-promo_near-mint_foil",
+      "cardName": "Jinx - Loose Cannon (Metal)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-jinx-loose-cannon-metal-promo",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-jinx-loose-cannon-metal-promo_near-mint_foil",
+      "set": {
+        "slug": "riftbound-organized-play-promotional-cards-riftbound-league-of-legends-trading-card-game",
+        "label": "Riftbound Organized Play Promotional Cards"
+      },
+      "collectorNumber": "251/298",
+      "rarity": "Promo",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "669252",
+        "tcgplayerSkuId": "9055260"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1874,
+        "lastUpdatedAt": "2026-05-06T23:20:47.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1874,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 1874,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 1874,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1874,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1874,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 1874,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 1874,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-spiritforged-irelia-fervent-signature-showcase::riftbound-league-of-legends-trading-card-game-spiritforged-irelia-fervent-signature-showcase_near-mint_foil",
+      "cardName": "Irelia - Fervent (Signature)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-spiritforged-irelia-fervent-signature-showcase",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-spiritforged-irelia-fervent-signature-showcase_near-mint_foil",
+      "set": {
+        "slug": "spiritforged-riftbound-league-of-legends-trading-card-game",
+        "label": "Spiritforged"
+      },
+      "collectorNumber": "225*/221",
+      "rarity": "Showcase",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "664930",
+        "tcgplayerSkuId": "9026700"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1648,
+        "lastUpdatedAt": "2026-05-06T23:20:39.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1648,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 1648,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 1648,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1648,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1648,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 1648,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 1648,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-origins-origins-booster-display-case::riftbound-league-of-legends-trading-card-game-origins-origins-booster-display-case_sealed",
+      "cardName": "Origins - Booster Display Case",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-origins-origins-booster-display-case",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-origins-origins-booster-display-case_sealed",
+      "set": {
+        "slug": "origins-riftbound-league-of-legends-trading-card-game",
+        "label": "Origins"
+      },
+      "collectorNumber": "N/A",
+      "rarity": "None",
+      "language": "English",
+      "condition": "Sealed",
+      "printing": "Normal",
+      "externalIds": {
+        "tcgplayerId": "635369",
+        "tcgplayerSkuId": "8757576"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1547.35,
+        "lastUpdatedAt": "2026-05-06T23:20:22.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1641.38,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 1620.06,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 1605.74,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1602.94,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1588.82,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 1585.78,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 1547.35,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-volibear-relentless-storm-metal-promo::riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-volibear-relentless-storm-metal-promo_near-mint_foil",
+      "cardName": "Volibear - Relentless Storm (Metal)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-volibear-relentless-storm-metal-promo",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-volibear-relentless-storm-metal-promo_near-mint_foil",
+      "set": {
+        "slug": "riftbound-organized-play-promotional-cards-riftbound-league-of-legends-trading-card-game",
+        "label": "Riftbound Organized Play Promotional Cards"
+      },
+      "collectorNumber": "249/298",
+      "rarity": "Promo",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "669251",
+        "tcgplayerSkuId": "9055255"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1500.2,
+        "lastUpdatedAt": "2026-05-06T23:20:47.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1500.2,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 1500.2,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 1500.2,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1500.2,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1500.2,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 1500.2,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 1500.2,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-lux-lady-of-luminosity-metal-rare::riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-lux-lady-of-luminosity-metal-rare_near-mint_foil",
+      "cardName": "Lux - Lady of Luminosity (Metal)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-lux-lady-of-luminosity-metal-rare",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-lux-lady-of-luminosity-metal-rare_near-mint_foil",
+      "set": {
+        "slug": "riftbound-organized-play-promotional-cards-riftbound-league-of-legends-trading-card-game",
+        "label": "Riftbound Organized Play Promotional Cards"
+      },
+      "collectorNumber": "021/024",
+      "rarity": "Rare",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "669267",
+        "tcgplayerSkuId": "9055323"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1450,
+        "lastUpdatedAt": "2026-01-27T16:32:49.000Z"
+      },
+      "priceHistory": []
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-garen-might-of-demacia-metal-promo::riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-garen-might-of-demacia-metal-promo_near-mint_foil",
+      "cardName": "Garen - Might of Demacia (Metal)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-garen-might-of-demacia-metal-promo",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-garen-might-of-demacia-metal-promo_near-mint_foil",
+      "set": {
+        "slug": "riftbound-organized-play-promotional-cards-riftbound-league-of-legends-trading-card-game",
+        "label": "Riftbound Organized Play Promotional Cards"
+      },
+      "collectorNumber": "023/024",
+      "rarity": "Promo",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "669268",
+        "tcgplayerSkuId": "9055328"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1349.99,
+        "lastUpdatedAt": "2026-05-06T23:20:47.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1349.99,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 1349.99,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 1349.99,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1349.99,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1349.99,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 1349.99,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 1349.99,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-garen-might-of-demacia-metal-rare::riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-garen-might-of-demacia-metal-rare_near-mint_foil",
+      "cardName": "Garen - Might of Demacia (Metal)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-garen-might-of-demacia-metal-rare",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-garen-might-of-demacia-metal-rare_near-mint_foil",
+      "set": {
+        "slug": "riftbound-organized-play-promotional-cards-riftbound-league-of-legends-trading-card-game",
+        "label": "Riftbound Organized Play Promotional Cards"
+      },
+      "collectorNumber": "023/024",
+      "rarity": "Rare",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "669268",
+        "tcgplayerSkuId": "9055328"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1349.99,
+        "lastUpdatedAt": "2026-02-27T16:32:40.000Z"
+      },
+      "priceHistory": []
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-unleashed-leblanc-deceiver-signature-showcase::riftbound-league-of-legends-trading-card-game-unleashed-leblanc-deceiver-signature-showcase_near-mint_foil",
+      "cardName": "LeBlanc - Deceiver (Signature)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-unleashed-leblanc-deceiver-signature-showcase",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-unleashed-leblanc-deceiver-signature-showcase_near-mint_foil",
+      "set": {
+        "slug": "unleashed-riftbound-league-of-legends-trading-card-game",
+        "label": "Unleashed"
+      },
+      "collectorNumber": "235*/219",
+      "rarity": "Showcase",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "685609",
+        "tcgplayerSkuId": "9197804"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1300,
+        "lastUpdatedAt": "2026-05-06T23:20:59.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1300,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1300,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1300,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 1300,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 1300,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-lee-sin-blind-monk-metal-promo::riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-lee-sin-blind-monk-metal-promo_near-mint_foil",
+      "cardName": "Lee Sin - Blind Monk (Metal)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-lee-sin-blind-monk-metal-promo",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-lee-sin-blind-monk-metal-promo_near-mint_foil",
+      "set": {
+        "slug": "riftbound-organized-play-promotional-cards-riftbound-league-of-legends-trading-card-game",
+        "label": "Riftbound Organized Play Promotional Cards"
+      },
+      "collectorNumber": "257/298",
+      "rarity": "Promo",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "669256",
+        "tcgplayerSkuId": "9055276"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1299.99,
+        "lastUpdatedAt": "2026-05-06T23:20:47.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1299.99,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 1299.99,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 1299.99,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1299.99,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1299.99,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 1299.99,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 1299.99,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-spiritforged-vayne-hunter-signature-showcase::riftbound-league-of-legends-trading-card-game-spiritforged-vayne-hunter-signature-showcase_near-mint_foil",
+      "cardName": "Vayne - Hunter (Signature)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-spiritforged-vayne-hunter-signature-showcase",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-spiritforged-vayne-hunter-signature-showcase_near-mint_foil",
+      "set": {
+        "slug": "spiritforged-riftbound-league-of-legends-trading-card-game",
+        "label": "Spiritforged"
+      },
+      "collectorNumber": "223*/221",
+      "rarity": "Showcase",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "664938",
+        "tcgplayerSkuId": "9026745"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1090.69,
+        "lastUpdatedAt": "2026-05-06T23:20:39.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1108.74,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 1108.74,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 1108.74,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1108.74,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1108.74,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 1108.74,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 1090.69,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-origins-miss-fortune-bounty-hunter-signature-showcase::riftbound-league-of-legends-trading-card-game-origins-miss-fortune-bounty-hunter-signature-showcase_near-mint_foil",
+      "cardName": "Miss Fortune - Bounty Hunter (Signature)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-origins-miss-fortune-bounty-hunter-signature-showcase",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-origins-miss-fortune-bounty-hunter-signature-showcase_near-mint_foil",
+      "set": {
+        "slug": "origins-riftbound-league-of-legends-trading-card-game",
+        "label": "Origins"
+      },
+      "collectorNumber": "309*/298",
+      "rarity": "Showcase",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "653114",
+        "tcgplayerSkuId": "8927957"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1025.51,
+        "lastUpdatedAt": "2026-05-06T23:20:17.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1025.51,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 1025.51,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 1025.51,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1025.51,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1025.51,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 1025.51,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 1025.51,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-darius-hand-of-noxus-metal-promo::riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-darius-hand-of-noxus-metal-promo_near-mint_foil",
+      "cardName": "Darius - Hand of Noxus (Metal)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-darius-hand-of-noxus-metal-promo",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-riftbound-organized-play-promotional-cards-darius-hand-of-noxus-metal-promo_near-mint_foil",
+      "set": {
+        "slug": "riftbound-organized-play-promotional-cards-riftbound-league-of-legends-trading-card-game",
+        "label": "Riftbound Organized Play Promotional Cards"
+      },
+      "collectorNumber": "253/298",
+      "rarity": "Promo",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "669253",
+        "tcgplayerSkuId": "9055265"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 1023.97,
+        "lastUpdatedAt": "2026-05-06T23:20:47.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 1023.97,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 1023.97,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 1023.97,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 1023.97,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 1023.97,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 1023.97,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 1023.97,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-origins-jinx-loose-cannon-signature-showcase::riftbound-league-of-legends-trading-card-game-origins-jinx-loose-cannon-signature-showcase_near-mint_foil",
+      "cardName": "Jinx - Loose Cannon (Signature)",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-origins-jinx-loose-cannon-signature-showcase",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-origins-jinx-loose-cannon-signature-showcase_near-mint_foil",
+      "set": {
+        "slug": "origins-riftbound-league-of-legends-trading-card-game",
+        "label": "Origins"
+      },
+      "collectorNumber": "301*/298",
+      "rarity": "Showcase",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "externalIds": {
+        "tcgplayerId": "653098",
+        "tcgplayerSkuId": "8927877"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 972.52,
+        "lastUpdatedAt": "2026-05-06T23:20:17.000Z"
+      },
+      "priceHistory": [
+        {
+          "amount": 972.52,
+          "observedAt": "2026-04-30T00:00:00.000Z"
+        },
+        {
+          "amount": 972.52,
+          "observedAt": "2026-05-01T00:00:00.000Z"
+        },
+        {
+          "amount": 972.52,
+          "observedAt": "2026-05-02T00:00:00.000Z"
+        },
+        {
+          "amount": 972.52,
+          "observedAt": "2026-05-03T00:00:00.000Z"
+        },
+        {
+          "amount": 972.52,
+          "observedAt": "2026-05-04T00:00:00.000Z"
+        },
+        {
+          "amount": 972.52,
+          "observedAt": "2026-05-05T00:00:00.000Z"
+        },
+        {
+          "amount": 972.52,
+          "observedAt": "2026-05-06T00:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "rowId": "riftbound-league-of-legends-trading-card-game-origins-proving-grounds-origins-proving-grounds-box-set-case::riftbound-league-of-legends-trading-card-game-origins-proving-grounds-origins-proving-grounds-box-set-case_sealed",
+      "cardName": "Origins - Proving Grounds Box Set Case",
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-origins-proving-grounds-origins-proving-grounds-box-set-case",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-origins-proving-grounds-origins-proving-grounds-box-set-case_sealed",
+      "set": {
+        "slug": "origins-proving-grounds-riftbound-league-of-legends-trading-card-game",
+        "label": "Origins: Proving Grounds"
+      },
+      "collectorNumber": "N/A",
+      "rarity": "None",
+      "language": "English",
+      "condition": "Sealed",
+      "printing": "Normal",
+      "externalIds": {
+        "tcgplayerId": "663920",
+        "tcgplayerSkuId": "9021022"
+      },
+      "currentPrice": {
+        "currency": "USD",
+        "amount": 899.99,
+        "lastUpdatedAt": "2025-12-10T20:24:18.000Z"
+      },
+      "priceHistory": []
+    }
+  ]
+}

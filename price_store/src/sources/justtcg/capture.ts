@@ -3,7 +3,11 @@ import { writeRawCapture } from "../../raw/repository.js";
 import { writeRunStatus } from "../../runs/repository.js";
 import type { PriceRunStatus } from "../../runs/schema.js";
 import type { JustTcgConfig } from "./config.js";
-import { fetchJustTcgCards } from "./client.js";
+import { fetchJustTcgCards, JustTcgRequestError } from "./client.js";
+
+const DOCUMENTED_FREE_PLAN_LIMIT = 20;
+const DEFAULT_LIMIT_SEARCH_UPPER_BOUND = 200;
+const DEFAULT_MAX_REQUESTS = 60;
 
 export type CaptureJustTcgSampleInput = {
   game?: string;
@@ -20,6 +24,48 @@ export type CaptureJustTcgSampleResult = {
   cardCount: number;
 };
 
+export type VerifyJustTcgRequestLimitInput = {
+  game?: string;
+  includePriceHistory?: boolean;
+  includeStatistics?: boolean;
+  searchUpperBound?: number;
+};
+
+export type VerifyJustTcgRequestLimitResult = {
+  verifiedLimit: number;
+  testedLimits: number[];
+  documentedLimitWorked: boolean;
+  nextHigherLimitWorked: boolean;
+  searchUpperBound: number;
+  boundedBySearchUpperLimit: boolean;
+};
+
+export type CaptureJustTcgCatalogInput = {
+  game?: string;
+  limit?: number;
+  verifyLimit?: boolean;
+  includePriceHistory?: boolean;
+  includeStatistics?: boolean;
+  startedAt?: string;
+  maxPages?: number;
+  maxRequests?: number;
+  requestDelayMs?: number;
+  limitSearchUpperBound?: number;
+};
+
+export type CaptureJustTcgCatalogResult = {
+  runId: string;
+  rawCaptureCount: number;
+  relativePayloadPaths: string[];
+  relativeMetadataPaths: string[];
+  cardCount: number;
+  pageCount: number;
+  requestCount: number;
+  verifiedLimit: number;
+  hasMoreRemaining: boolean;
+  limitVerification?: VerifyJustTcgRequestLimitResult;
+};
+
 export function createJustTcgCaptureRunId(startedAt: string, game: string): string {
   const datePrefix = new Date(startedAt).toISOString().slice(0, 10);
   return `justtcg-capture-${datePrefix}-${sanitizeSegment(game)}`;
@@ -30,63 +76,274 @@ export async function captureJustTcgCardsSample(
   config: JustTcgConfig,
   input: CaptureJustTcgSampleInput = {}
 ): Promise<CaptureJustTcgSampleResult> {
+  const result = await captureJustTcgCardsCatalog(layout, config, {
+    game: input.game,
+    limit: input.limit ?? config.defaultLimit,
+    verifyLimit: false,
+    includePriceHistory: input.includePriceHistory,
+    includeStatistics: input.includeStatistics,
+    startedAt: input.startedAt,
+    maxPages: 1,
+    maxRequests: 1,
+    requestDelayMs: 0
+  });
+
+  return {
+    runId: result.runId,
+    rawCaptureCount: result.rawCaptureCount,
+    relativePayloadPaths: result.relativePayloadPaths,
+    cardCount: result.cardCount
+  };
+}
+
+export async function verifyJustTcgRequestLimit(
+  config: JustTcgConfig,
+  input: VerifyJustTcgRequestLimitInput = {}
+): Promise<VerifyJustTcgRequestLimitResult> {
+  const game = input.game ?? config.defaultGame;
+  const includePriceHistory = input.includePriceHistory ?? config.includePriceHistory;
+  const includeStatistics = input.includeStatistics ?? config.includeStatistics;
+  const searchUpperBound = Math.max(
+    DOCUMENTED_FREE_PLAN_LIMIT + 1,
+    input.searchUpperBound ?? DEFAULT_LIMIT_SEARCH_UPPER_BOUND
+  );
+  const testedLimits: number[] = [];
+  const probe = async (limit: number): Promise<boolean> => {
+    testedLimits.push(limit);
+
+    try {
+      await fetchJustTcgCards(config, {
+        game,
+        limit,
+        includePriceHistory,
+        includeStatistics
+      });
+      return true;
+    } catch (error) {
+      if (isUnsupportedLimitError(error)) {
+        return false;
+      }
+
+      throw error;
+    }
+  };
+
+  const documentedLimitWorked = await probe(DOCUMENTED_FREE_PLAN_LIMIT);
+
+  if (!documentedLimitWorked) {
+    const verifiedLimit = await findHighestSupportedLimit(1, DOCUMENTED_FREE_PLAN_LIMIT - 1, probe);
+    return {
+      verifiedLimit,
+      testedLimits,
+      documentedLimitWorked,
+      nextHigherLimitWorked: false,
+      searchUpperBound,
+      boundedBySearchUpperLimit: false
+    };
+  }
+
+  const nextHigherLimitWorked = await probe(DOCUMENTED_FREE_PLAN_LIMIT + 1);
+  if (!nextHigherLimitWorked) {
+    return {
+      verifiedLimit: DOCUMENTED_FREE_PLAN_LIMIT,
+      testedLimits,
+      documentedLimitWorked,
+      nextHigherLimitWorked,
+      searchUpperBound,
+      boundedBySearchUpperLimit: false
+    };
+  }
+
+  let supportedLimit = DOCUMENTED_FREE_PLAN_LIMIT + 1;
+  let failingLimit: number | undefined;
+  let candidate = supportedLimit * 2;
+
+  while (candidate <= searchUpperBound) {
+    if (await probe(candidate)) {
+      supportedLimit = candidate;
+      candidate *= 2;
+      continue;
+    }
+
+    failingLimit = candidate;
+    break;
+  }
+
+  if (!failingLimit) {
+    const verifiedLimit =
+      candidate > searchUpperBound
+        ? await findHighestSupportedLimit(supportedLimit + 1, searchUpperBound, probe, supportedLimit)
+        : supportedLimit;
+
+    return {
+      verifiedLimit,
+      testedLimits,
+      documentedLimitWorked,
+      nextHigherLimitWorked,
+      searchUpperBound,
+      boundedBySearchUpperLimit: verifiedLimit === searchUpperBound
+    };
+  }
+
+  const verifiedLimit = await findHighestSupportedLimit(
+    supportedLimit + 1,
+    failingLimit - 1,
+    probe,
+    supportedLimit
+  );
+
+  return {
+    verifiedLimit,
+    testedLimits,
+    documentedLimitWorked,
+    nextHigherLimitWorked,
+    searchUpperBound,
+    boundedBySearchUpperLimit: false
+  };
+}
+
+export async function captureJustTcgCardsCatalog(
+  layout: PriceDataLayout,
+  config: JustTcgConfig,
+  input: CaptureJustTcgCatalogInput = {}
+): Promise<CaptureJustTcgCatalogResult> {
   const startedAt = input.startedAt ?? new Date().toISOString();
   const game = input.game ?? config.defaultGame;
+  const includePriceHistory = input.includePriceHistory ?? config.includePriceHistory;
+  const includeStatistics = input.includeStatistics ?? config.includeStatistics;
   const runId = createJustTcgCaptureRunId(startedAt, game);
+  const maxPages = input.maxPages;
+  const maxRequests = input.maxRequests ?? DEFAULT_MAX_REQUESTS;
+  const requestDelayMs = input.requestDelayMs ?? 0;
 
   await writeRunStatus(
     layout,
     createRunStatus({
       runId,
+      stage: "raw-capture",
       startedAt,
       status: "running",
-      message: `Capturing bounded JustTCG card sample for ${game}.`
+      message: `Capturing paged JustTCG catalog data for ${game}.`
     })
   );
 
   try {
-    const result = await fetchJustTcgCards(config, {
-      game,
-      limit: input.limit ?? config.defaultLimit,
-      includePriceHistory: input.includePriceHistory ?? config.includePriceHistory,
-      includeStatistics: input.includeStatistics ?? config.includeStatistics
-    });
+    const limitVerification =
+      input.verifyLimit === false
+        ? undefined
+        : await verifyJustTcgRequestLimit(config, {
+            game,
+            includePriceHistory,
+            includeStatistics,
+            searchUpperBound: input.limitSearchUpperBound
+          });
+    const verifiedLimit = limitVerification?.verifiedLimit ?? input.limit ?? config.defaultLimit;
+    const effectiveLimit =
+      input.limit !== undefined ? Math.min(input.limit, verifiedLimit) : verifiedLimit;
+    const relativePayloadPaths: string[] = [];
+    const relativeMetadataPaths: string[] = [];
+    let cardCount = 0;
+    let pageCount = 0;
+    let requestCount = 0;
+    let offset = 0;
+    let hasMoreRemaining = false;
 
-    const metadata = await writeRawCapture(layout, {
-      sourceId: "justtcg",
-      capturedAt: startedAt,
-      captureKey: `${game}-cards-sample`,
-      extension: "json",
-      payload: JSON.stringify(result.data, null, 2),
-      payloadFormat: "json",
-      requestUrl: result.requestUrl,
-      notes: [
-        "live-source:justtcg",
-        `game:${game}`,
-        `requested-limit:${String(input.limit ?? config.defaultLimit)}`,
-        `include-price-history:${String(input.includePriceHistory ?? config.includePriceHistory)}`,
-        `include-statistics:${String(input.includeStatistics ?? config.includeStatistics)}`,
-        "free-plan-budgeted-capture"
-      ]
-    });
+    while (true) {
+      if (pageCount >= maxRequests) {
+        hasMoreRemaining = true;
+        break;
+      }
+
+      if (maxPages !== undefined && pageCount >= maxPages) {
+        hasMoreRemaining = true;
+        break;
+      }
+
+      const pageCapturedAt = new Date().toISOString();
+      const result = await fetchJustTcgCards(config, {
+        game,
+        limit: effectiveLimit,
+        offset,
+        includePriceHistory,
+        includeStatistics
+      });
+
+      requestCount += 1;
+      pageCount += 1;
+      const cardsThisPage = result.data.data.length;
+      cardCount += cardsThisPage;
+      const pageMetadata = await writeRawCapture(layout, {
+        sourceId: "justtcg",
+        runId,
+        capturedAt: pageCapturedAt,
+        captureKey: `${game}-cards-page-${String(pageCount).padStart(3, "0")}`,
+        extension: "json",
+        payload: JSON.stringify(result.data, null, 2),
+        payloadFormat: "json",
+        requestUrl: result.requestUrl,
+        notes: [
+          "live-source:justtcg",
+          "paged-catalog-capture",
+          `game:${game}`,
+          `page-index:${String(pageCount)}`,
+          `page-offset:${String(offset)}`,
+          `requested-limit:${String(effectiveLimit)}`,
+          `verified-limit:${String(verifiedLimit)}`,
+          `include-price-history:${String(includePriceHistory)}`,
+          `include-statistics:${String(includeStatistics)}`,
+          "free-plan-budgeted-capture"
+        ]
+      });
+
+      relativePayloadPaths.push(pageMetadata.relativePayloadPath);
+      relativeMetadataPaths.push(pageMetadata.relativePayloadPath.replace(/\.json$/u, ".meta.json"));
+
+      const hasMore = typeof result.data.meta?.hasMore === "boolean" ? result.data.meta.hasMore : false;
+      if (!hasMore) {
+        break;
+      }
+
+      if (cardsThisPage === 0) {
+        throw new Error("JustTCG pagination indicated more results, but the page returned zero cards.");
+      }
+
+      offset += cardsThisPage;
+
+      if (requestDelayMs > 0) {
+        await wait(requestDelayMs);
+      }
+    }
 
     await writeRunStatus(
       layout,
       createRunStatus({
         runId,
+        stage: "raw-capture",
         startedAt,
         status: "succeeded",
         completedAt: new Date().toISOString(),
-        rawCaptureCount: 1,
-        message: `Captured ${result.data.data.length} JustTCG cards for ${game}.`
+        rawCaptureCount: pageCount,
+        pageCount,
+        requestCount,
+        cardCount,
+        verifiedLimit,
+        message: hasMoreRemaining
+          ? `Captured ${cardCount} JustTCG cards for ${game} across ${pageCount} page(s) before hitting the configured run cap.`
+          : `Captured ${cardCount} JustTCG cards for ${game} across ${pageCount} page(s).`
       })
     );
 
     return {
       runId,
-      rawCaptureCount: 1,
-      relativePayloadPaths: [metadata.relativePayloadPath],
-      cardCount: result.data.data.length
+      rawCaptureCount: pageCount,
+      relativePayloadPaths,
+      relativeMetadataPaths,
+      cardCount,
+      pageCount,
+      requestCount,
+      verifiedLimit,
+      hasMoreRemaining,
+      limitVerification
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown JustTCG capture failure";
@@ -95,15 +352,47 @@ export async function captureJustTcgCardsSample(
       layout,
       createRunStatus({
         runId,
+        stage: "raw-capture",
         startedAt,
         status: "failed",
         completedAt: new Date().toISOString(),
-        message: `Failed to capture JustTCG sample for ${game}: ${message}`
+        message: `Failed to capture JustTCG catalog data for ${game}: ${message}`
       })
     );
 
     throw error;
   }
+}
+
+function isUnsupportedLimitError(error: unknown): boolean {
+  return (
+    error instanceof JustTcgRequestError &&
+    (error.status === 400 || error.status === 422)
+  );
+}
+
+async function findHighestSupportedLimit(
+  low: number,
+  high: number,
+  probe: (limit: number) => Promise<boolean>,
+  knownSupportedLimit = 0
+): Promise<number> {
+  let best = knownSupportedLimit;
+  let left = low;
+  let right = high;
+
+  while (left <= right) {
+    const middle = Math.floor((left + right) / 2);
+    if (await probe(middle)) {
+      best = Math.max(best, middle);
+      left = middle + 1;
+      continue;
+    }
+
+    right = middle - 1;
+  }
+
+  return best;
 }
 
 function sanitizeSegment(value: string): string {
@@ -117,18 +406,44 @@ function sanitizeSegment(value: string): string {
 }
 
 function createRunStatus(
-  input: Pick<PriceRunStatus, "runId" | "startedAt" | "status" | "message"> &
-    Partial<Pick<PriceRunStatus, "completedAt" | "rawCaptureCount">>
+  input: Pick<PriceRunStatus, "runId" | "stage" | "startedAt" | "status" | "message"> &
+    Partial<
+      Pick<
+        PriceRunStatus,
+        | "completedAt"
+        | "rawCaptureCount"
+        | "canonicalSnapshotCount"
+        | "publishedArtifactCount"
+        | "requestCount"
+        | "pageCount"
+        | "cardCount"
+        | "verifiedLimit"
+      >
+    >
 ): PriceRunStatus {
   return {
     version: 1,
     runId: input.runId,
     sourceId: "justtcg",
-    stage: "raw-capture",
+    stage: input.stage,
     status: input.status,
     startedAt: input.startedAt,
     completedAt: input.completedAt,
     rawCaptureCount: input.rawCaptureCount,
+    canonicalSnapshotCount: input.canonicalSnapshotCount,
+    publishedArtifactCount: input.publishedArtifactCount,
+    requestCount: input.requestCount,
+    pageCount: input.pageCount,
+    cardCount: input.cardCount,
+    verifiedLimit: input.verifiedLimit,
     message: input.message
   };
+}
+
+async function wait(milliseconds: number): Promise<void> {
+  if (milliseconds <= 0) {
+    return;
+  }
+
+  await new Promise((resolve) => setTimeout(resolve, milliseconds));
 }

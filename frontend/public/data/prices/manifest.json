@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "game": {
+    "slug": "riftbound-league-of-legends-trading-card-game",
+    "key": "riftbound",
+    "label": "Riftbound: League of Legends Trading Card Game"
+  },
+  "priceSource": {
+    "id": "tcgplayer",
+    "label": "TCGPlayer"
+  },
+  "publishedAt": "2026-05-07T21:44:52.126Z",
+  "sourceCapturedAt": "2026-05-07T01:04:45.650Z",
+  "snapshotPath": "riftbound/latest.json",
+  "rowCount": 21,
+  "variantCount": 21,
+  "freshness": {
+    "rowCount": 21,
+    "pricedRowCount": 21,
+    "freshestPriceAt": "2026-05-06T23:20:59.000Z",
+    "stalestPriceAt": "2025-12-10T20:24:18.000Z"
+  },
+  "provenance": {
+    "upstreamProvider": {
+      "id": "justtcg",
+      "label": "JustTCG"
+    },
+    "canonicalRelativeSnapshotPath": "canonical/justtcg/2026/05/07/2026-05-07T01-04-45.650Z--riftbound-league-of-legends-trading-card-game-cards-snapshot.json",
+    "rawRelativePayloadPaths": [
+      "raw/justtcg/2026/05/07/2026-05-07T01-04-45.650Z--riftbound-league-of-legends-trading-card-game-cards-sample.json"
+    ],
+    "rawRelativeMetadataPaths": [
+      "raw/justtcg/2026/05/07/2026-05-07T01-04-45.650Z--riftbound-league-of-legends-trading-card-game-cards-sample.meta.json"
+    ]
+  }
+}

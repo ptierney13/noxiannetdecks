@@ -7,6 +7,7 @@ import { resolveRawCapturePaths } from "./paths.js";
 
 export type WriteRawCaptureInput = {
   sourceId: string;
+  runId?: string;
   capturedAt: string;
   captureKey: string;
   extension: string;
@@ -28,6 +29,7 @@ export async function writeRawCapture(
   const metadata = rawCaptureMetadataSchema.parse({
     version: 1,
     sourceId: input.sourceId,
+    runId: input.runId,
     capturedAt: new Date(input.capturedAt).toISOString(),
     payloadFormat: input.payloadFormat,
     relativePayloadPath: paths.relativePayloadPath,
