@@ -1,7 +1,8 @@
 import { type CSSProperties, type FormEvent, type MouseEvent, type PointerEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { generateSealedPool, loadPackGeneratorOptions, loadQueryFeatures, searchCards } from "./api";
+import { generateSealedPool, getCard, loadPackGeneratorOptions, loadQueryFeatures, searchCards } from "./api";
 import DeckExplorerView from "./DeckExplorerView";
-import { normalizePathname, parseAppRoute, routeSection } from "./routes";
+import QueryBuilderView from "./QueryBuilderView";
+import { buildCardDetailPath, buildCardsSearchPath, normalizePathname, parseAppRoute, routeSection } from "./routes";
 import TierListView from "./TierListView";
 import type {
   CardRecord,
@@ -196,16 +197,118 @@ function Diagnostics({ diagnostics }: { diagnostics: QueryDiagnostic[] }) {
   );
 }
 
-function CardGrid({ cards }: { cards: CardRecord[] }) {
+type SortKey = "energy-asc" | "energy-desc" | "name-asc" | "name-desc" | "set";
+
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: "energy-asc", label: "Energy ↑" },
+  { value: "energy-desc", label: "Energy ↓" },
+  { value: "name-asc", label: "Name A→Z" },
+  { value: "name-desc", label: "Name Z→A" },
+  { value: "set", label: "Set order" },
+];
+
+function sortCardsByKey(cards: CardRecord[], sort: SortKey): CardRecord[] {
+  if (sort === "set") return cards;
+  return [...cards].sort((a, b) => {
+    switch (sort) {
+      case "energy-asc": {
+        const eA = cardEnergy(a) ?? Infinity;
+        const eB = cardEnergy(b) ?? Infinity;
+        if (eA !== eB) return eA - eB;
+        return (a.attributes.power ?? Infinity) - (b.attributes.power ?? Infinity);
+      }
+      case "energy-desc": {
+        const eA = cardEnergy(a) ?? -Infinity;
+        const eB = cardEnergy(b) ?? -Infinity;
+        if (eA !== eB) return eB - eA;
+        return (b.attributes.power ?? -Infinity) - (a.attributes.power ?? -Infinity);
+      }
+      case "name-asc":
+        return a.riot_name.localeCompare(b.riot_name);
+      case "name-desc":
+        return b.riot_name.localeCompare(a.riot_name);
+    }
+  });
+}
+
+function cardPrice(rarity: string | null): string {
+  switch (rarity?.toUpperCase()) {
+    case "C": return "$0.01";
+    case "U": return "$0.10";
+    case "R": return "$1.00";
+    case "EPIC": return "$5.00";
+    default: return "$100.00";
+  }
+}
+
+const RIFTBOUND_REGIONS = new Set([
+  "Noxus", "Freljord", "Ionia", "Demacia", "Piltover", "Zaun",
+  "Bilgewater", "Shadow Isles", "Shurima", "Mount Targon",
+  "Bandle City", "The Void", "Targon"
+]);
+
+function formatTypeline(card: CardRecord): string {
+  const { supertype, cardtype, tags } = card.type;
+  const nonRegion = tags.filter((t) => !RIFTBOUND_REGIONS.has(t));
+  const region = tags.filter((t) => RIFTBOUND_REGIONS.has(t));
+  const sortedTags = [...nonRegion, ...region];
+
+  const left = [supertype, cardtype].filter(Boolean).join(" ");
+  const right = sortedTags.join(" ");
+  return right ? `${left} - ${right}` : left;
+}
+
+const SYMBOL_MAP: Record<string, string> = {
+  rb_might: "{M}",
+  rb_exhaust: "{E}",
+  rb_rune_fury: "{Fury}",
+  rb_rune_calm: "{Calm}",
+  rb_rune_mind: "{Mind}",
+  rb_rune_body: "{Body}",
+  rb_rune_chaos: "{Chaos}",
+  rb_rune_order: "{Order}",
+  rb_rune_rainbow: "{Rainbow}",
+};
+
+function formatCardText(text: string): string {
+  return text.replace(/:([a-z_]+):/g, (_, key) => SYMBOL_MAP[key] ?? `{${key}}`);
+}
+
+function formatCost(card: CardRecord): string | null {
+  if (card.attributes.cost == null) return null;
+  return `${card.attributes.cost}P`;
+}
+
+function CardGrid({ cards, onCardClick }: { cards: CardRecord[]; onCardClick?: (card: CardRecord) => void }) {
+  const [sort, setSort] = useState<SortKey>("energy-asc");
+  const sorted = useMemo(() => sortCardsByKey(cards, sort), [cards, sort]);
+
   return (
     <section className="results-section" aria-labelledby="results-heading">
       <div className="section-heading compact">
         <h2 id="results-heading">Results</h2>
-        <p>{cards.length.toLocaleString()} matching cards</p>
+        <div className="results-controls">
+          <p>{cards.length.toLocaleString()} matching cards</p>
+          <label htmlFor="sort-select" className="sort-label">Sort</label>
+          <select
+            id="sort-select"
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            className="sort-select"
+          >
+            {SORT_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
       </div>
       <div className="card-grid" data-testid="card-grid" data-columns="4">
-        {cards.map((card) => (
-          <article className="card-tile" key={card.id}>
+        {sorted.map((card) => (
+          <article
+            className={`card-tile${onCardClick ? " card-tile--clickable" : ""}`}
+            key={card.id}
+            onClick={onCardClick ? () => onCardClick(card) : undefined}
+          >
             {card.media.image_url ? (
               <img
                 src={card.media.image_url}
@@ -228,15 +331,62 @@ function CardGrid({ cards }: { cards: CardRecord[] }) {
   );
 }
 
-function buildCardsSearchPath(query: string): string {
-  const trimmedQuery = query.trim();
-  if (trimmedQuery.length === 0) {
-    return "/cards";
+function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; onClose: () => void; onNavigate: (path: string) => void }) {
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  function handleBackdropClick(event: MouseEvent<HTMLDivElement>) {
+    if (event.target === event.currentTarget) onClose();
   }
 
-  const params = new URLSearchParams();
-  params.set("q", query);
-  return `/cards?${params.toString()}`;
+  function handleViewDetails() {
+    onClose();
+    onNavigate(buildCardDetailPath(card.id));
+  }
+
+  const price = cardPrice(card.rarity);
+
+  return (
+    <div className="card-quick-look-backdrop" onClick={handleBackdropClick} role="presentation">
+      <div className="card-quick-look-dialog" role="dialog" aria-label={card.riot_name} aria-modal="true">
+        <div className="card-quick-look-image-col">
+          {card.media.image_url ? (
+            <img src={card.media.image_url} alt={card.media.accessibility_text ?? card.riot_name} />
+          ) : (
+            <div className="missing-image">{card.riot_name}</div>
+          )}
+        </div>
+        <div className="card-quick-look-info-col">
+          <div className="card-quick-look-header">
+            <h2 className="card-quick-look-name">{card.riot_name}</h2>
+            <button type="button" className="card-quick-look-close" onClick={onClose} aria-label="Close">✕</button>
+          </div>
+          <p className="card-quick-look-typeline">{formatTypeline(card)}</p>
+          <div className="card-quick-look-attrs">
+            {formatCost(card) != null && <span className="card-attr-chip">{formatCost(card)}</span>}
+            {card.attributes.might != null && <span className="card-attr-chip">{card.attributes.might}{"{M}"}</span>}
+            {card.attributes.domain.map((d) => (
+              <span key={d} className={`card-attr-chip card-attr-chip--domain card-attr-chip--domain-${d.toLowerCase()}`}>{d}</span>
+            ))}
+          </div>
+          {card.text.plain && <p className="card-quick-look-text">{formatCardText(card.text.plain)}</p>}
+          <div className="card-quick-look-meta">
+            <span>{card.set.label} · {card.set.set_id} {card.collector_number ?? "?"}</span>
+            {card.rarity && <span>{card.rarity}</span>}
+            <span className="card-quick-look-price">{price}</span>
+          </div>
+          <button type="button" className="card-quick-look-detail-link" onClick={handleViewDetails}>
+            View full details →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function SearchView({
@@ -256,6 +406,7 @@ function SearchView({
   const [normalizedQuery, setNormalizedQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [quickLookCard, setQuickLookCard] = useState<CardRecord | null>(null);
   const searchParamQuery = new URLSearchParams(locationSearch).get("q") ?? "";
 
   async function runSearch(nextQuery: string) {
@@ -347,7 +498,8 @@ function SearchView({
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const nextPath = buildCardsSearchPath(query);
+    const trimmedQuery = query.trim();
+    const nextPath = trimmedQuery.length > 0 ? `/cards?q=${encodeURIComponent(query)}` : "/cards";
     const currentPath = `${normalizePathname(window.location.pathname)}${window.location.search}`;
 
     if (nextPath === currentPath) {
@@ -388,7 +540,10 @@ function SearchView({
 
       <Diagnostics diagnostics={diagnostics} />
       <QueryLanguageTables fields={fieldGuides} syntax={syntaxGuides} />
-      {hasSearched ? <CardGrid cards={cards} /> : null}
+      {hasSearched ? <CardGrid cards={cards} onCardClick={setQuickLookCard} /> : null}
+      {quickLookCard ? (
+        <CardQuickLookModal card={quickLookCard} onClose={() => setQuickLookCard(null)} onNavigate={onNavigate} />
+      ) : null}
     </>
   );
 }
@@ -1565,12 +1720,371 @@ function ProjectNavLink({
   );
 }
 
+function HomePage({ onNavigate }: { onNavigate: (href: string) => void }) {
+  const [query, setQuery] = useState("");
+
+  function handleSearch(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const q = query.trim();
+    onNavigate(q ? `/cards?q=${encodeURIComponent(q)}` : "/cards");
+  }
+
+  return (
+    <div className="home-page">
+      <section className="hero">
+        <div className="hero-bg-wrap">
+          <svg className="hero-bg" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g transform="rotate(45, 200, 200)">
+              <polygon points="200,18 193,55 207,55" fill="#c9813a"/>
+              <rect x="195" y="55" width="10" height="220" fill="#c9813a"/>
+              <rect x="155" y="268" width="90" height="12" rx="6" fill="#c9813a"/>
+              <rect x="193" y="280" width="14" height="48" rx="7" fill="#c9813a"/>
+            </g>
+            <g transform="rotate(-45, 200, 200)">
+              <polygon points="200,18 193,55 207,55" fill="#b52038"/>
+              <rect x="195" y="55" width="10" height="220" fill="#b52038"/>
+              <rect x="155" y="268" width="90" height="12" rx="6" fill="#b52038"/>
+              <rect x="193" y="280" width="14" height="48" rx="7" fill="#b52038"/>
+            </g>
+            <circle cx="200" cy="200" r="22" stroke="#c9813a" strokeWidth="5" fill="none"/>
+            <circle cx="200" cy="200" r="10" fill="#c9813a"/>
+          </svg>
+        </div>
+        <div className="hero-content">
+          <h1 className="hero-heading">
+            <span className="plain">The complete</span><br/>
+            <span className="gradient">Riftbound archive.</span>
+          </h1>
+          <p className="hero-sub">Search cards, study tournament decks, simulate sealed pools.</p>
+          <form className="hero-search-box" onSubmit={handleSearch}>
+            <div className="hero-search-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <circle cx="11" cy="11" r="7"/>
+                <path d="m21 21-4.35-4.35"/>
+              </svg>
+            </div>
+            <input
+              className="hero-search-input"
+              placeholder="Search for cards…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <button type="submit" className="hero-search-btn">Search</button>
+          </form>
+        </div>
+      </section>
+
+      <hr className="home-divider" />
+
+      <div className="home-section">
+        <div className="home-feature-grid">
+          <a
+            href="/cards"
+            className="home-feature-card"
+            onClick={(e) => { e.preventDefault(); onNavigate("/cards"); }}
+          >
+            <div className="home-feature-icon-row">
+              <div className="home-feature-icon-tile">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <ellipse cx="11" cy="11" rx="7.5" ry="7.5" stroke="white" strokeWidth="2"/>
+                  <path d="M7.5 8.5 Q9 7 11.5 7.5" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" fill="none"/>
+                  <line x1="16.5" y1="16.5" x2="24" y2="24" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                  <line x1="18.8" y1="18.2" x2="20.4" y2="19.8" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2"/>
+                  <line x1="20.5" y1="19.9" x2="22.1" y2="21.5" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2"/>
+                </svg>
+              </div>
+              <span className="home-feature-arrow">→</span>
+            </div>
+            <div className="home-feature-title">Card Search</div>
+            <div className="home-feature-desc">Full database. Filter by cost, domain, type, and more.</div>
+          </a>
+
+          <a
+            href="/deck-explorer"
+            className="home-feature-card"
+            onClick={(e) => { e.preventDefault(); onNavigate("/deck-explorer"); }}
+          >
+            <div className="home-feature-icon-row">
+              <div className="home-feature-icon-tile">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="7" width="14" height="18" rx="2" transform="rotate(-14 10 16)" stroke="rgba(255,255,255,0.45)" strokeWidth="1.8" fill="rgba(255,255,255,0.06)"/>
+                  <rect x="5" y="6" width="14" height="18" rx="2" transform="rotate(-5 12 15)" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8" fill="rgba(255,255,255,0.08)"/>
+                  <rect x="9" y="5" width="14" height="18" rx="2" stroke="white" strokeWidth="2" fill="rgba(255,255,255,0.10)"/>
+                  <line x1="12" y1="9" x2="20" y2="9" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2"/>
+                  <line x1="12" y1="12" x2="20" y2="12" stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
+                </svg>
+              </div>
+              <span className="home-feature-arrow">→</span>
+            </div>
+            <div className="home-feature-title">Deck Explorer</div>
+            <div className="home-feature-desc">Tournament decks by event, legend, and player.</div>
+          </a>
+
+          <a
+            href="/tools/sealed-pools"
+            className="home-feature-card"
+            onClick={(e) => { e.preventDefault(); onNavigate("/tools/sealed-pools"); }}
+          >
+            <div className="home-feature-icon-row">
+              <div className="home-feature-icon-tile">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="10" width="9" height="13" rx="1.5" transform="rotate(-28 6.5 16.5)" stroke="rgba(255,255,255,0.4)" strokeWidth="1.6" fill="rgba(255,255,255,0.05)"/>
+                  <rect x="5" y="9" width="9" height="13" rx="1.5" transform="rotate(-12 9.5 15.5)" stroke="rgba(255,255,255,0.65)" strokeWidth="1.8" fill="rgba(255,255,255,0.07)"/>
+                  <rect x="9" y="8" width="9" height="13" rx="1.5" stroke="white" strokeWidth="2" fill="rgba(255,255,255,0.10)"/>
+                  <rect x="7" y="18" width="14" height="8" rx="2" stroke="rgba(255,255,255,0.85)" strokeWidth="2" fill="rgba(255,255,255,0.12)"/>
+                  <line x1="9" y1="20.5" x2="19" y2="20.5" stroke="rgba(255,255,255,0.4)" strokeWidth="1"/>
+                  <path d="M7 18 Q10 16.5 14 18 Q18 16.5 21 18" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" fill="none"/>
+                </svg>
+              </div>
+              <span className="home-feature-arrow">→</span>
+            </div>
+            <div className="home-feature-title">Sealed Pools</div>
+            <div className="home-feature-desc">Generate pools from any format. Build and save decks.</div>
+          </a>
+        </div>
+      </div>
+
+      <hr className="home-divider" />
+
+      <div className="home-section" style={{ paddingTop: "48px" }}>
+        <div className="home-promo-grid">
+          <a
+            href="/tools/tier-list"
+            className="home-promo-card"
+            onClick={(e) => { e.preventDefault(); onNavigate("/tools/tier-list"); }}
+          >
+            <div className="home-promo-label">Tool</div>
+            <h3>Tier List Builder</h3>
+            <p>Rank any card set by dragging into tiers.</p>
+          </a>
+          <div className="home-promo-card" style={{ cursor: "default", opacity: 0.6 }}>
+            <div className="home-promo-label">Archive</div>
+            <h3>Tournament Results</h3>
+            <p>Events, legend win rates, top-placing decks.</p>
+          </div>
+        </div>
+      </div>
+
+      <footer className="home-footer">NoxianNet Decks · Riftbound</footer>
+    </div>
+  );
+}
+
+function CardDetailView({
+  cardId,
+  onError,
+  onNavigate
+}: {
+  cardId: string;
+  onError: (message: string | null) => void;
+  onNavigate: (path: string) => void;
+}) {
+  const [card, setCard] = useState<CardRecord | null>(null);
+  const [allPrintings, setAllPrintings] = useState<CardRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let ignore = false;
+    setLoading(true);
+    setCard(null);
+    setAllPrintings([]);
+    onError(null);
+
+    async function load() {
+      try {
+        const loaded = await getCard(cardId);
+        if (ignore) return;
+        setCard(loaded);
+
+        if (loaded.clean_name) {
+          try {
+            const result = await searchCards(`n:"${loaded.clean_name}" unique:prints`);
+            if (!ignore) {
+              setAllPrintings(result.items);
+            }
+          } catch {
+            // printings are best-effort
+          }
+        }
+      } catch (caught) {
+        if (!ignore) onError(caught instanceof Error ? caught.message : "Failed to load card.");
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+
+    void load();
+    return () => { ignore = true; };
+  }, [cardId, onError]);
+
+  if (loading) {
+    return (
+      <section className="card-detail-view">
+        <p className="card-detail-loading">Loading…</p>
+      </section>
+    );
+  }
+
+  if (!card) return null;
+
+  const price = cardPrice(card.rarity);
+  const apiUrl = `/api/cards/${encodeURIComponent(card.id)}`;
+
+  return (
+    <section className="card-detail-view">
+      <nav className="card-detail-breadcrumb">
+        <button type="button" className="text-button" onClick={() => onNavigate("/cards")}>
+          ← Card Search
+        </button>
+      </nav>
+
+      <div className="card-detail-layout">
+        <div className="card-detail-image-col">
+          {card.media.image_url ? (
+            <img
+              className="card-detail-image"
+              src={card.media.image_url}
+              alt={card.media.accessibility_text ?? card.riot_name}
+            />
+          ) : (
+            <div className="missing-image card-detail-image">{card.riot_name}</div>
+          )}
+
+          {allPrintings.length > 0 && (() => {
+            type PrintingRow = { key: string; cardRec: CardRecord; finish: string; variantTags: string[]; isCurrent: boolean };
+            const rows: PrintingRow[] = [];
+            for (const p of allPrintings) {
+              const variantTags: string[] = [];
+              if (p.variant.alternate_art) variantTags.push("Alt Art");
+              if (p.variant.signed) variantTags.push("Signed");
+              if (p.variant.overnumbered) variantTags.push("Overnumbered");
+              for (const finish of p.finishes) {
+                rows.push({ key: `${p.id}-${finish}`, cardRec: p, finish, variantTags, isCurrent: p.id === card.id });
+              }
+            }
+            function rowLabel(r: PrintingRow) {
+              const parts = [r.finish === "foil" ? "Foil" : "Nonfoil", ...r.variantTags];
+              return parts.join(", ");
+            }
+            return (
+              <div className="card-detail-versions">
+                <p className="card-detail-versions-heading">Printings</p>
+                {rows.map((r) => {
+                  const barPrice = cardPrice(r.cardRec.rarity);
+                  if (r.isCurrent) {
+                    return (
+                      <div key={r.key} className="card-detail-version-bar card-detail-version-bar--active" aria-current="page">
+                        <span className="card-detail-version-set">{r.cardRec.set.set_id} #{r.cardRec.collector_number ?? "?"}</span>
+                        <span className="card-detail-version-name">{rowLabel(r)}</span>
+                        <span className="card-detail-version-price">{barPrice}</span>
+                      </div>
+                    );
+                  }
+                  const href = buildCardDetailPath(r.cardRec.id);
+                  return (
+                    <a
+                      key={r.key}
+                      href={href}
+                      className="card-detail-version-bar"
+                      onClick={(event) => {
+                        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+                        event.preventDefault();
+                        onNavigate(href);
+                      }}
+                    >
+                      <span className="card-detail-version-set">{r.cardRec.set.set_id} #{r.cardRec.collector_number ?? "?"}</span>
+                      <span className="card-detail-version-name">{rowLabel(r)}</span>
+                      <span className="card-detail-version-price">{barPrice}</span>
+                    </a>
+                  );
+                })}
+              </div>
+            );
+          })()}
+        </div>
+
+        <div className="card-detail-info-col">
+          <div className="card-detail-name-row">
+            <h1 className="card-detail-name">{card.riot_name}</h1>
+            <span className="card-detail-price">{price}</span>
+          </div>
+
+          <p className="card-detail-typeline">{formatTypeline(card)}</p>
+
+          <div className="card-detail-attrs">
+            {formatCost(card) != null && (
+              <div className="card-attr-block"><span className="card-attr-label">Cost</span><span className="card-attr-value">{formatCost(card)}</span></div>
+            )}
+            {card.attributes.might != null && (
+              <div className="card-attr-block"><span className="card-attr-label">Might</span><span className="card-attr-value">{card.attributes.might}{"{M}"}</span></div>
+            )}
+            {card.attributes.domain.length > 0 && (
+              <div className="card-attr-block">
+                <span className="card-attr-label">Domain</span>
+                <span className="card-attr-value">{card.attributes.domain.join(", ")}</span>
+              </div>
+            )}
+          </div>
+
+          {card.text.plain && (
+            <div className="card-detail-section">
+              <p className="card-detail-body-text">{formatCardText(card.text.plain)}</p>
+            </div>
+          )}
+
+          {card.text.flavour && (
+            <div className="card-detail-section">
+              <p className="card-detail-flavour">"{card.text.flavour}"</p>
+            </div>
+          )}
+
+          <div className="card-detail-section card-detail-facts">
+            <div className="card-fact-row"><span>Set</span><span>{card.set.label} ({card.set.set_id})</span></div>
+            <div className="card-fact-row"><span>Number</span><span>{card.collector_number ?? "—"}</span></div>
+            {card.rarity && <div className="card-fact-row"><span>Rarity</span><span>{card.rarity}</span></div>}
+            <div className="card-fact-row"><span>Market Price</span><span>{price}</span></div>
+            <div className="card-fact-row"><span>Finishes</span><span>{card.finishes.join(", ")}</span></div>
+            {card.media.artist && <div className="card-fact-row"><span>Artist</span><span>{card.media.artist}</span></div>}
+            <div className="card-fact-row"><span>Language</span><span>{card.language}</span></div>
+            {card.variant.alternate_art && <div className="card-fact-row"><span>Variant</span><span>Alternate Art</span></div>}
+            {card.variant.signed && <div className="card-fact-row"><span>Variant</span><span>Signed</span></div>}
+            {card.variant.overnumbered && <div className="card-fact-row"><span>Variant</span><span>Overnumbered</span></div>}
+          </div>
+
+          <div className="card-detail-links">
+            <a
+              className="card-detail-json-link"
+              href={apiUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Card JSON ↗
+            </a>
+            {card.tcgplayer_id && (
+              <a
+                className="card-detail-json-link"
+                href={`https://www.tcgplayer.com/product/${card.tcgplayer_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                TCGPlayer ↗
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function App() {
   const [route, setRoute] = useState(() => parseAppRoute(window.location.pathname));
   const [locationSearch, setLocationSearch] = useState(() => window.location.search);
   const [error, setError] = useState<string | null>(null);
   const [showToolsMenu, setShowToolsMenu] = useState(false);
   const toolsMenuRef = useRef<HTMLDivElement | null>(null);
+  const [showCardsMenu, setShowCardsMenu] = useState(false);
+  const cardsMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function handlePopState() {
@@ -1578,6 +2092,7 @@ export default function App() {
       setLocationSearch(window.location.search);
       setError(null);
       setShowToolsMenu(false);
+      setShowCardsMenu(false);
     }
 
     window.addEventListener("popstate", handlePopState);
@@ -1588,16 +2103,18 @@ export default function App() {
 
   useEffect(() => {
     function handlePointerDown(event: globalThis.PointerEvent) {
-      if (!toolsMenuRef.current || toolsMenuRef.current.contains(event.target as Node)) {
-        return;
+      if (toolsMenuRef.current && !toolsMenuRef.current.contains(event.target as Node)) {
+        setShowToolsMenu(false);
       }
-
-      setShowToolsMenu(false);
+      if (cardsMenuRef.current && !cardsMenuRef.current.contains(event.target as Node)) {
+        setShowCardsMenu(false);
+      }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setShowToolsMenu(false);
+        setShowCardsMenu(false);
       }
     }
 
@@ -1610,84 +2127,136 @@ export default function App() {
   }, []);
 
   function navigate(nextPath: string) {
-    const nextUrl = new URL(nextPath, window.location.origin);
-    const normalizedPath = normalizePathname(nextUrl.pathname);
-    const nextLocation = `${normalizedPath}${nextUrl.search}`;
-    const currentLocation = `${normalizePathname(window.location.pathname)}${window.location.search}`;
+    const normalizedPath = normalizePathname(nextPath.split("?")[0]);
+    const search = nextPath.includes("?") ? nextPath.slice(nextPath.indexOf("?")) : "";
+    const fullPath = normalizedPath + search;
 
-    if (nextLocation !== currentLocation) {
-      window.history.pushState({}, "", nextLocation);
+    if (fullPath !== window.location.pathname + window.location.search) {
+      window.history.pushState({}, "", fullPath);
       setRoute(parseAppRoute(normalizedPath));
-      setLocationSearch(nextUrl.search);
+      setLocationSearch(search);
     }
 
     setError(null);
     setShowToolsMenu(false);
+    setShowCardsMenu(false);
   }
 
   const activeSection = routeSection(route);
+  const isHome = route.kind === "home";
+
+  const navContent = (
+    <nav className="nav" aria-label="Primary navigation">
+      <button
+        type="button"
+        className="nav-brand"
+        onClick={() => navigate("/")}
+        aria-label="NoxianNet Decks home"
+      >
+        <div className="nav-logo">N</div>
+        <span className="nav-wordmark">NoxianNet Decks</span>
+      </button>
+      <div className="nav-links">
+        <div className="nav-tools-menu" ref={cardsMenuRef}>
+          <button
+            type="button"
+            className={`nav-link${activeSection === "cards" ? " active" : ""}`}
+            aria-expanded={showCardsMenu}
+            aria-haspopup="menu"
+            onClick={() => setShowCardsMenu((current) => !current)}
+          >
+            Cards
+            <ChevronIcon expanded={showCardsMenu} />
+          </button>
+          {showCardsMenu ? (
+            <div className="nav-tools-popover" role="menu" aria-label="Cards">
+              <ProjectNavLink href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
+                Search
+              </ProjectNavLink>
+              <ProjectNavLink href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
+                Query Builder
+              </ProjectNavLink>
+            </div>
+          ) : null}
+        </div>
+        <ProjectNavLink
+          href="/deck-explorer"
+          current={activeSection === "deck-explorer"}
+          onNavigate={navigate}
+        >
+          <span className={`nav-link${activeSection === "deck-explorer" ? " active" : ""}`}>Deck Explorer</span>
+        </ProjectNavLink>
+        <div className="nav-tools-menu" ref={toolsMenuRef}>
+          <button
+            type="button"
+            className={`nav-link${activeSection === "tools-tier-list" || activeSection === "tools-sealed-pools" ? " active" : ""}`}
+            aria-expanded={showToolsMenu}
+            aria-haspopup="menu"
+            onClick={() => setShowToolsMenu((current) => !current)}
+          >
+            Tools
+            <ChevronIcon expanded={showToolsMenu} />
+          </button>
+          {showToolsMenu ? (
+            <div className="nav-tools-popover" role="menu" aria-label="Tools">
+              <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
+                Tier List
+              </ProjectNavLink>
+              <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
+                Sealed Pools
+              </ProjectNavLink>
+            </div>
+          ) : null}
+        </div>
+      </div>
+      <div />
+    </nav>
+  );
+
+  if (isHome) {
+    return (
+      <>
+        {navContent}
+        <HomePage onNavigate={navigate} />
+      </>
+    );
+  }
 
   return (
-    <main className="app-shell">
-      <header className="app-header">
-        <nav className="project-tabs" aria-label="Primary navigation">
-          <ProjectNavLink href="/cards" current={activeSection === "cards"} onNavigate={navigate}>
-            Cards
-          </ProjectNavLink>
-          <ProjectNavLink href="/deck-explorer" current={activeSection === "deck-explorer"} onNavigate={navigate}>
-            Deck Explorer
-          </ProjectNavLink>
-          <div className="project-menu" ref={toolsMenuRef}>
-            <button
-              type="button"
-              className="project-menu-trigger"
-              aria-expanded={showToolsMenu}
-              aria-haspopup="menu"
-              aria-pressed={activeSection === "tools-tier-list" || activeSection === "tools-sealed-pools"}
-              onClick={() => setShowToolsMenu((current) => !current)}
-            >
-              Tools
-              <ChevronIcon expanded={showToolsMenu} />
-            </button>
-            {showToolsMenu ? (
-              <div className="project-menu-popover" role="menu" aria-label="Tools">
-                <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
-                  Tier List
-                </ProjectNavLink>
-                <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
-                  Sealed Pools
-                </ProjectNavLink>
-              </div>
-            ) : null}
-          </div>
-        </nav>
-      </header>
-      {error ? <div className="error-banner">{error}</div> : null}
-      {route.kind === "cards" ? (
-        <SearchView onError={setError} locationSearch={locationSearch} onNavigate={navigate} />
-      ) : route.kind === "tools-tier-list" ? (
-        <TierListView onError={setError} />
-      ) : route.kind === "tools-sealed-pools" ? (
-        <SealedSimulator onError={setError} />
-      ) : route.kind.startsWith("deck-explorer") ? (
-        <DeckExplorerView route={route} onError={setError} onNavigate={navigate} />
-      ) : (
-        <section className="route-panel route-panel--not-found">
-          <div className="section-heading">
-            <p className="eyebrow">Not Found</p>
-            <h1>That page does not exist</h1>
-            <p>The current URL is not mapped to Cards, Deck Explorer, or one of the Tools routes.</p>
-          </div>
-          <nav className="view-tabs" aria-label="Recovery navigation">
-            <ProjectNavLink href="/cards" current={false} onNavigate={navigate}>
-              Back to Cards
-            </ProjectNavLink>
-            <ProjectNavLink href="/deck-explorer" current={false} onNavigate={navigate}>
-              Open Deck Explorer
-            </ProjectNavLink>
-          </nav>
-        </section>
-      )}
-    </main>
+    <>
+      {navContent}
+      <main className="app-shell">
+        {error ? <div className="error-banner">{error}</div> : null}
+        {route.kind === "cards" ? (
+          <SearchView onError={setError} locationSearch={locationSearch} onNavigate={navigate} />
+        ) : route.kind === "cards-query-builder" ? (
+          <QueryBuilderView onNavigate={navigate} />
+        ) : route.kind === "card-detail" ? (
+          <CardDetailView cardId={route.cardId} onError={setError} onNavigate={navigate} />
+        ) : route.kind === "tools-tier-list" ? (
+          <TierListView onError={setError} />
+        ) : route.kind === "tools-sealed-pools" ? (
+          <SealedSimulator onError={setError} />
+        ) : route.kind.startsWith("deck-explorer") ? (
+          <DeckExplorerView route={route} onError={setError} onNavigate={navigate} />
+        ) : (
+          <section className="route-panel route-panel--not-found">
+            <div className="section-heading">
+              <p className="eyebrow">Not Found</p>
+              <h1>That page does not exist</h1>
+              <p>The current URL is not mapped to Cards, Deck Explorer, or one of the Tools routes.</p>
+            </div>
+            <nav className="view-tabs" aria-label="Recovery navigation">
+              <ProjectNavLink href="/cards" current={false} onNavigate={navigate}>
+                Back to Cards
+              </ProjectNavLink>
+              <ProjectNavLink href="/deck-explorer" current={false} onNavigate={navigate}>
+                Open Deck Explorer
+              </ProjectNavLink>
+            </nav>
+          </section>
+        )}
+      </main>
+    </>
   );
 }
