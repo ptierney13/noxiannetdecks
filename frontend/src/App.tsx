@@ -196,15 +196,65 @@ function Diagnostics({ diagnostics }: { diagnostics: QueryDiagnostic[] }) {
   );
 }
 
+type SortKey = "energy-asc" | "energy-desc" | "name-asc" | "name-desc" | "set";
+
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: "energy-asc", label: "Energy ↑" },
+  { value: "energy-desc", label: "Energy ↓" },
+  { value: "name-asc", label: "Name A→Z" },
+  { value: "name-desc", label: "Name Z→A" },
+  { value: "set", label: "Set order" },
+];
+
+function sortCardsByKey(cards: CardRecord[], sort: SortKey): CardRecord[] {
+  if (sort === "set") return cards;
+  return [...cards].sort((a, b) => {
+    switch (sort) {
+      case "energy-asc": {
+        const eA = cardEnergy(a) ?? Infinity;
+        const eB = cardEnergy(b) ?? Infinity;
+        if (eA !== eB) return eA - eB;
+        return (a.attributes.power ?? Infinity) - (b.attributes.power ?? Infinity);
+      }
+      case "energy-desc": {
+        const eA = cardEnergy(a) ?? -Infinity;
+        const eB = cardEnergy(b) ?? -Infinity;
+        if (eA !== eB) return eB - eA;
+        return (b.attributes.power ?? -Infinity) - (a.attributes.power ?? -Infinity);
+      }
+      case "name-asc":
+        return a.riot_name.localeCompare(b.riot_name);
+      case "name-desc":
+        return b.riot_name.localeCompare(a.riot_name);
+    }
+  });
+}
+
 function CardGrid({ cards }: { cards: CardRecord[] }) {
+  const [sort, setSort] = useState<SortKey>("energy-asc");
+  const sorted = useMemo(() => sortCardsByKey(cards, sort), [cards, sort]);
+
   return (
     <section className="results-section" aria-labelledby="results-heading">
       <div className="section-heading compact">
         <h2 id="results-heading">Results</h2>
-        <p>{cards.length.toLocaleString()} matching cards</p>
+        <div className="results-controls">
+          <p>{cards.length.toLocaleString()} matching cards</p>
+          <label htmlFor="sort-select" className="sort-label">Sort</label>
+          <select
+            id="sort-select"
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            className="sort-select"
+          >
+            {SORT_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
       </div>
       <div className="card-grid" data-testid="card-grid" data-columns="4">
-        {cards.map((card) => (
+        {sorted.map((card) => (
           <article className="card-tile" key={card.id}>
             {card.media.image_url ? (
               <img

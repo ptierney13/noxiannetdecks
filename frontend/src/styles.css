@@ -1357,6 +1357,35 @@ code {
   color: var(--text-muted);
 }
 
+.results-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sort-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sort-select {
+  min-height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--border-mid);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text-strong);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.sort-select:focus {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
 /* ── COLLAPSIBLE FEATURE TABLE ── */
 
 .feature-table-group {
