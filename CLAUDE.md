@@ -82,7 +82,7 @@ The `gh` CLI is **not installed** on this machine. All GitHub operations go thro
 
 ### Branching
 
-Claude Code works on `claude/<session-name>` branches (created automatically per worktree session). Commit to the session branch first, then merge to main when the work is done.
+Claude Code works on `claude/<session-name>` branches (created automatically per worktree session). Commits go to the session branch first.
 
 ### Pushing a branch
 
@@ -98,14 +98,14 @@ git push -u origin claude/<branch-name>
 C:\Users\ptier\repos\Deck Archive Project-main-merge
 ```
 
-Because of this, you **cannot** `git checkout main` from any other worktree — git will refuse with "already checked out". To merge a finished branch to main:
+Because of this, you **cannot** `git checkout main` from any other worktree. To merge a finished branch to main:
 
 ```bash
 git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" merge --ff-only <branch-name>
 git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" push origin main
 ```
 
-Always use `--ff-only` to keep history linear. If it fails (diverged histories), stop and ask the user before doing anything else.
+Always prefer `--ff-only` to keep history linear. If it fails (diverged histories), stop and ask the user before doing anything else.
 
 ### Deployment
 

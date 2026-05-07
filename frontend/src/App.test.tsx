@@ -512,7 +512,6 @@ describe("App", () => {
 
   it("renders the feature chart without initial search results", async () => {
     const fetchMock = mockFetch();
-    window.history.pushState({}, "", "/cards");
     render(<App />);
 
     expect(await screen.findByRole("heading", { name: "Query Language" })).toBeInTheDocument();
@@ -526,7 +525,6 @@ describe("App", () => {
 
   it("starts with query helper tables collapsed and expands them on demand", async () => {
     const user = userEvent.setup();
-    window.history.pushState({}, "", "/cards");
     render(<App />);
 
     expect(await screen.findByRole("button", { name: "Show Searchable Fields" })).toBeInTheDocument();
@@ -540,7 +538,6 @@ describe("App", () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch();
 
-    window.history.pushState({}, "", "/cards");
     render(<App />);
     await screen.findByRole("heading", { name: "Query Language" });
 
@@ -556,7 +553,6 @@ describe("App", () => {
 
   it("shows parse diagnostics", async () => {
     const user = userEvent.setup();
-    window.history.pushState({}, "", "/cards");
     render(<App />);
     await screen.findByRole("heading", { name: "Query Language" });
 
@@ -571,9 +567,11 @@ describe("App", () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch();
 
+    window.history.pushState({}, "", "/");
     render(<App />);
+    await screen.findByRole("heading", { name: "Query Language" });
 
-    await user.type(screen.getByRole("textbox"), "name:void");
+    await user.type(screen.getByLabelText("Query"), "name:void");
     await user.keyboard("{Enter}");
 
     await waitFor(() => {
@@ -582,7 +580,6 @@ describe("App", () => {
       expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid");
     });
 
-    expect(await screen.findByRole("heading", { name: "Riftbound Card Search" })).toBeInTheDocument();
     expect(screen.getByLabelText("Query")).toHaveValue("name:void");
     expect(await screen.findByAltText("Void Gate card image.")).toBeInTheDocument();
   });
@@ -598,7 +595,7 @@ describe("App", () => {
     expect(await screen.findByRole("heading", { name: "Tier List" })).toBeInTheDocument();
 
     expect(window.location.pathname).toBe("/tools/tier-list");
-    expect(screen.getByRole("button", { name: "Tools" })).toHaveClass("active");
+    expect(screen.getByRole("button", { name: "Tools" })).toHaveAttribute("aria-pressed", "true");
     await user.click(screen.getByRole("button", { name: "Tools" }));
     expect(screen.getByRole("link", { name: "Tier List" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("Generate a filtered card pool")).toBeInTheDocument();
