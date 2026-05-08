@@ -11,6 +11,9 @@ function createCard({
   setId,
   setLabel,
   collectorNumber,
+  tcgplayerId = null,
+  rarity = "Rare",
+  finishes = ["foil"],
   cardtype = "Unit",
   supertype = null,
   tags = [],
@@ -28,6 +31,9 @@ function createCard({
   setId: string;
   setLabel: string;
   collectorNumber: string;
+  tcgplayerId?: string | null;
+  rarity?: string;
+  finishes?: Array<"foil" | "nonfoil">;
   cardtype?: string;
   supertype?: string | null;
   tags?: string[];
@@ -44,12 +50,12 @@ function createCard({
     riot_name: riotName,
     clean_name: cleanName,
     riftbound_id: id,
-    tcgplayer_id: null,
+    tcgplayer_id: tcgplayerId,
     collector_number: collectorNumber,
     language: "en",
-    rarity: "Rare",
+    rarity,
     variant: { alternate_art: false, overnumbered: false, signed: false },
-    finishes: ["foil"],
+    finishes,
     attributes: { cost, energy, might, power, domain },
     type: { cardtype, supertype, tags, typeline },
     text: { rich: `${riotName} rules text.`, plain: `${riotName} rules text.`, flavour: null, keywords: [] },
@@ -70,6 +76,8 @@ const voidGate = createCard({
   setId: "OGN",
   setLabel: "Origins",
   collectorNumber: "1",
+  tcgplayerId: "1001",
+  finishes: ["foil", "nonfoil"],
   tags: ["Dragon"],
   typeline: "Unit - Dragon"
 });
@@ -378,6 +386,127 @@ const syntax = [
   }
 ];
 
+const priceManifest = {
+  version: 1,
+  game: { slug: "riftbound", key: "riftbound", label: "Riftbound" },
+  priceSource: { id: "tcgplayer", label: "TCGPlayer" },
+  publishedAt: "2026-05-07T23:11:01.327Z",
+  sourceCapturedAt: "2026-05-07T22:55:56.911Z",
+  snapshotPath: "riftbound/latest.json",
+  rowCount: 5,
+  variantCount: 5,
+  freshness: {
+    rowCount: 5,
+    pricedRowCount: 5,
+    freshestPriceAt: "2026-05-07T19:20:43.000Z",
+    stalestPriceAt: "2026-05-01T00:00:00.000Z"
+  },
+  provenance: {
+    upstreamProvider: { id: "justtcg", label: "JustTCG" },
+    canonicalRelativeSnapshotPath: "canonical/justtcg/test.json",
+    rawRelativePayloadPaths: [],
+    rawRelativeMetadataPaths: []
+  }
+};
+
+function buildHistory(amounts: number[], startDay = 1) {
+  return amounts.map((amount, index) => ({
+    observedAt: `2026-05-${String(startDay + index).padStart(2, "0")}T00:00:00.000Z`,
+    amount
+  }));
+}
+
+const priceSnapshot = {
+  version: 1,
+  game: { slug: "riftbound", key: "riftbound", label: "Riftbound" },
+  priceSource: { id: "tcgplayer", label: "TCGPlayer" },
+  publishedAt: "2026-05-07T23:11:01.327Z",
+  sourceCapturedAt: "2026-05-07T22:55:56.911Z",
+  freshness: {
+    rowCount: 5,
+    pricedRowCount: 5,
+    freshestPriceAt: "2026-05-07T19:20:43.000Z",
+    stalestPriceAt: "2026-05-01T00:00:00.000Z"
+  },
+  rows: [
+    {
+      rowId: "void-gate-foil-nm",
+      cardName: "Void Gate",
+      sourceCardId: "void-gate",
+      sourceVariantId: "void-gate-foil-nm",
+      set: { slug: "origins", label: "Origins" },
+      collectorNumber: "1/300",
+      rarity: "Rare",
+      language: "English",
+      condition: "Near Mint",
+      printing: "Foil",
+      externalIds: { tcgplayerId: "1001", tcgplayerSkuId: "1001-foil-nm" },
+      currentPrice: { currency: "USD", amount: 12.34, lastUpdatedAt: "2026-05-07T19:20:43.000Z" },
+      priceHistory: buildHistory([11.1, 11.4, 11.6, 11.9, 12.0, 12.2, 12.34])
+    },
+    {
+      rowId: "void-gate-foil-lp",
+      cardName: "Void Gate",
+      sourceCardId: "void-gate",
+      sourceVariantId: "void-gate-foil-lp",
+      set: { slug: "origins", label: "Origins" },
+      collectorNumber: "1/300",
+      rarity: "Rare",
+      language: "English",
+      condition: "Lightly Played",
+      printing: "Foil",
+      externalIds: { tcgplayerId: "1001", tcgplayerSkuId: "1001-foil-lp" },
+      currentPrice: { currency: "USD", amount: 10.5, lastUpdatedAt: "2026-05-07T19:20:43.000Z" },
+      priceHistory: buildHistory([10.8, 10.7, 10.6, 10.55, 10.52, 10.51, 10.5])
+    },
+    {
+      rowId: "void-gate-normal-nm",
+      cardName: "Void Gate",
+      sourceCardId: "void-gate",
+      sourceVariantId: "void-gate-normal-nm",
+      set: { slug: "origins", label: "Origins" },
+      collectorNumber: "1/300",
+      rarity: "Rare",
+      language: "English",
+      condition: "Near Mint",
+      printing: "Normal",
+      externalIds: { tcgplayerId: "1001", tcgplayerSkuId: "1001-normal-nm" },
+      currentPrice: { currency: "USD", amount: 8.9, lastUpdatedAt: "2026-05-07T19:20:43.000Z" },
+      priceHistory: buildHistory([8.1, 8.2, 8.35, 8.4, 8.55, 8.7, 8.9])
+    },
+    {
+      rowId: "void-gate-normal-dmg",
+      cardName: "Void Gate",
+      sourceCardId: "void-gate",
+      sourceVariantId: "void-gate-normal-dmg",
+      set: { slug: "origins", label: "Origins" },
+      collectorNumber: "1/300",
+      rarity: "Rare",
+      language: "English",
+      condition: "Damaged",
+      printing: "Normal",
+      externalIds: { tcgplayerId: "1001", tcgplayerSkuId: "1001-normal-dmg" },
+      currentPrice: { currency: "USD", amount: 3.25, lastUpdatedAt: "2026-05-07T19:20:43.000Z" },
+      priceHistory: buildHistory([3.25], 7)
+    },
+    {
+      rowId: "other-card-foil-nm",
+      cardName: "Other Card",
+      sourceCardId: "other-card",
+      sourceVariantId: "other-card-foil-nm",
+      set: { slug: "origins", label: "Origins" },
+      collectorNumber: "2/300",
+      rarity: "Rare",
+      language: "English",
+      condition: "Near Mint",
+      printing: "Foil",
+      externalIds: { tcgplayerId: "2002", tcgplayerSkuId: "2002-foil-nm" },
+      currentPrice: { currency: "USD", amount: 9.99, lastUpdatedAt: "2026-05-07T19:20:43.000Z" },
+      priceHistory: buildHistory([9.1, 9.2, 9.3, 9.5, 9.7, 9.8, 9.99])
+    }
+  ]
+};
+
 function normalized(value: string | null | undefined): string {
   return (value ?? "").toLowerCase();
 }
@@ -420,6 +549,14 @@ function mockFetch(poolFactory = generatedPool) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
 
+    if (url === "/data/prices/manifest.json") {
+      return Response.json(priceManifest);
+    }
+
+    if (url === "/data/prices/riftbound/latest.json") {
+      return Response.json(priceSnapshot);
+    }
+
     if (url === "/api/query/features") {
       return Response.json({ fields, syntax });
     }
@@ -433,6 +570,12 @@ function mockFetch(poolFactory = generatedPool) {
       return Response.json(poolFactory(body));
     }
 
+    if (/^\/api\/cards\/[^/?]+$/.test(url)) {
+      const cardId = decodeURIComponent(url.slice("/api/cards/".length));
+      const found = cards.find((card) => card.id === cardId);
+      return found ? Response.json(found) : new Response(null, { status: 404 });
+    }
+
     if (url.startsWith("/api/cards")) {
       const parsedUrl = new URL(url, "https://example.test");
       const query = parsedUrl.searchParams.get("q") ?? "";
@@ -443,6 +586,17 @@ function mockFetch(poolFactory = generatedPool) {
           normalizedQuery: "energy>>3",
           diagnostics: [{ message: "Expected value after operator \">\"." }],
           items: []
+        });
+      }
+
+      if (query.includes("unique:prints")) {
+        const matchedName = /n:"([^"]+)"/i.exec(query)?.[1]?.toLowerCase() ?? "";
+        const items = cards.filter((card) => normalized(card.clean_name) === matchedName);
+        return Response.json({
+          total: items.length,
+          normalizedQuery: query,
+          diagnostics: [],
+          items
         });
       }
 
@@ -552,6 +706,52 @@ describe("App", () => {
     });
     expect(await screen.findByAltText("Void Gate card image.")).toBeInTheDocument();
     expect(screen.getByTestId("card-grid")).toHaveAttribute("data-columns", "4");
+  });
+
+  it("shows the published near mint market price in the quick-look modal", async () => {
+    const user = userEvent.setup();
+
+    window.history.pushState({}, "", "/cards");
+    render(<App />);
+    await screen.findByRole("heading", { name: "Query Language" });
+
+    await user.type(screen.getByLabelText("Query"), "name:void");
+    await user.click(screen.getByRole("button", { name: "Search" }));
+    await screen.findByAltText("Void Gate card image.");
+
+    await user.click(screen.getByText("Void Gate"));
+
+    expect(await screen.findByRole("dialog", { name: "Void Gate" })).toBeInTheDocument();
+    expect(screen.getAllByText("Near Mint $12.34").length).toBeGreaterThan(0);
+  });
+
+  it("uses published price rows on the card detail page and shows a toggleable history chart", async () => {
+    const user = userEvent.setup();
+
+    window.history.pushState({}, "", "/cards/card-1");
+    render(<App />);
+
+    expect(await screen.findByRole("heading", { name: "Void Gate" })).toBeInTheDocument();
+    expect(screen.getAllByText("Near Mint $12.34").length).toBeGreaterThan(0);
+    expect(screen.getByText("$8.90")).toBeInTheDocument();
+    expect(screen.queryByText(/^Market Price$/)).not.toBeInTheDocument();
+
+    expect(screen.getByRole("heading", { name: "Pricing" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Near Mint $12.34" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Lightly Played $10.50" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Damaged $3.25" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByTestId("price-history-chart")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Near Mint $12.34" }));
+    expect(await screen.findByTestId("price-history-chart")).toBeInTheDocument();
+    expect(screen.getByText("Foil • Near Mint")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Lightly Played $10.50" }));
+    expect(screen.getByText("Foil • Lightly Played")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Near Mint $12.34" }));
+    await user.click(screen.getByRole("button", { name: "Lightly Played $10.50" }));
+    expect(screen.queryByTestId("price-history-chart")).not.toBeInTheDocument();
   });
 
   it("shows parse diagnostics", async () => {

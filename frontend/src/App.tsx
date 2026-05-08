@@ -1,6 +1,16 @@
 import { type CSSProperties, type FormEvent, type MouseEvent, type PointerEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { generateSealedPool, getCard, loadPackGeneratorOptions, loadQueryFeatures, searchCards } from "./api";
 import DeckExplorerView from "./DeckExplorerView";
+import {
+  formatPrintingLabel,
+  formatUsdPrice,
+  getPublishedRowsForCard,
+  normalizePrinting,
+  resolveNearMintMarketPrice,
+  sortPriceRows,
+  usePublishedPriceIndex,
+  type PublishedPriceRow
+} from "./priceData";
 import QueryBuilderView from "./QueryBuilderView";
 import { buildCardDetailPath, buildCardsSearchPath, normalizePathname, parseAppRoute, routeSection } from "./routes";
 import TierListView from "./TierListView";
@@ -231,16 +241,6 @@ function sortCardsByKey(cards: CardRecord[], sort: SortKey): CardRecord[] {
   });
 }
 
-function cardPrice(rarity: string | null): string {
-  switch (rarity?.toUpperCase()) {
-    case "C": return "$0.01";
-    case "U": return "$0.10";
-    case "R": return "$1.00";
-    case "EPIC": return "$5.00";
-    default: return "$100.00";
-  }
-}
-
 const RIFTBOUND_REGIONS = new Set([
   "Noxus", "Freljord", "Ionia", "Demacia", "Piltover", "Zaun",
   "Bilgewater", "Shadow Isles", "Shurima", "Mount Targon",
@@ -277,6 +277,180 @@ function formatCardText(text: string): string {
 function formatCost(card: CardRecord): string | null {
   if (card.attributes.cost == null) return null;
   return `${card.attributes.cost}P`;
+}
+
+const PRICE_SERIES_COLORS = ["#f59e0b", "#ef4444", "#38bdf8", "#a78bfa", "#34d399", "#f472b6"] as const;
+
+type PricePrintingGroup = {
+  key: string;
+  label: string;
+  rows: PublishedPriceRow[];
+};
+
+function formatHeadlinePrice(row: PublishedPriceRow | null): string | null {
+  const price = formatUsdPrice(row?.currentPrice.amount);
+  if (!price || !row?.condition) {
+    return null;
+  }
+
+  return `${row.condition} ${price}`;
+}
+
+function formatSeriesToggleLabel(row: PublishedPriceRow): string {
+  const condition = row.condition ?? "Unknown";
+  const price = formatUsdPrice(row.currentPrice.amount);
+  return price ? `${condition} ${price}` : condition;
+}
+
+function formatSeriesLegendLabel(row: PublishedPriceRow): string {
+  const printing = formatPrintingLabel(row.printing);
+  const condition = row.condition ?? "Unknown";
+  return `${printing} • ${condition}`;
+}
+
+function groupRowsByPrinting(rows: PublishedPriceRow[]): PricePrintingGroup[] {
+  const groups = new Map<string, PublishedPriceRow[]>();
+
+  for (const row of rows) {
+    const key = normalizePrinting(row.printing) || "other";
+    groups.set(key, [...(groups.get(key) ?? []), row]);
+  }
+
+  const orderedKeys = ["foil", "normal", ...[...groups.keys()].filter((key) => key !== "foil" && key !== "normal").sort()];
+
+  return orderedKeys
+    .filter((key) => groups.has(key))
+    .map((key) => ({
+      key,
+      label: formatPrintingLabel(key),
+      rows: groups.get(key) ?? []
+    }));
+}
+
+function PriceHistoryChart({ rows }: { rows: PublishedPriceRow[] }) {
+  const series = rows
+    .map((row, index) => ({
+      row,
+      color: PRICE_SERIES_COLORS[index % PRICE_SERIES_COLORS.length],
+      points: [...row.priceHistory].sort((left, right) => left.observedAt.localeCompare(right.observedAt))
+    }))
+    .filter((entry) => entry.points.length > 0);
+
+  if (series.length === 0) {
+    return (
+      <div className="price-chart-empty">
+        Selected price rows do not have enough 7-day history to plot yet.
+      </div>
+    );
+  }
+
+  const allDates = [...new Set(series.flatMap((entry) => entry.points.map((point) => point.observedAt)))].sort();
+  const allAmounts = series.flatMap((entry) => entry.points.map((point) => point.amount));
+  const minAmount = Math.min(...allAmounts);
+  const maxAmount = Math.max(...allAmounts);
+  const padding = minAmount === maxAmount ? Math.max(minAmount * 0.1, 1) : (maxAmount - minAmount) * 0.12;
+  const chartMin = Math.max(0, minAmount - padding);
+  const chartMax = maxAmount + padding;
+  const width = 680;
+  const height = 240;
+  const margin = { top: 20, right: 20, bottom: 34, left: 54 };
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+  const dateSpan = Math.max(allDates.length - 1, 1);
+  const amountSpan = Math.max(chartMax - chartMin, 1);
+
+  function xForDate(observedAt: string): number {
+    const index = allDates.indexOf(observedAt);
+    return margin.left + (chartWidth * (index < 0 ? 0 : index)) / dateSpan;
+  }
+
+  function yForAmount(amount: number): number {
+    return margin.top + chartHeight - ((amount - chartMin) / amountSpan) * chartHeight;
+  }
+
+  const axisLabels = [chartMin, chartMax].map((value) => ({
+    value,
+    label: formatUsdPrice(value) ?? "$0.00",
+    y: yForAmount(value)
+  }));
+  const dateLabels = allDates.map((value, index) => {
+    const parsed = new Date(value);
+    const label = Number.isNaN(parsed.getTime())
+      ? value
+      : new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" }).format(parsed);
+
+    return {
+      key: value,
+      label,
+      x: margin.left + (chartWidth * index) / dateSpan
+    };
+  });
+
+  return (
+    <div className="price-chart" data-testid="price-history-chart">
+      <div className="price-chart-legend">
+        {series.map((entry) => (
+          <div key={entry.row.rowId} className="price-chart-legend-item">
+            <span className="price-chart-legend-swatch" style={{ backgroundColor: entry.color }} />
+            <span>{formatSeriesLegendLabel(entry.row)}</span>
+          </div>
+        ))}
+      </div>
+
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Seven day market price history chart">
+        <rect x={margin.left} y={margin.top} width={chartWidth} height={chartHeight} className="price-chart-frame" />
+
+        {axisLabels.map((label) => (
+          <g key={label.label}>
+            <line
+              x1={margin.left}
+              y1={label.y}
+              x2={margin.left + chartWidth}
+              y2={label.y}
+              className="price-chart-gridline"
+            />
+            <text x={margin.left - 10} y={label.y + 4} textAnchor="end" className="price-chart-axis-label">
+              {label.label}
+            </text>
+          </g>
+        ))}
+
+        {dateLabels.map((label) => (
+          <text key={label.key} x={label.x} y={height - 10} textAnchor="middle" className="price-chart-axis-label">
+            {label.label}
+          </text>
+        ))}
+
+        {series.map((entry) => {
+          const polylinePoints = entry.points.map((point) => `${xForDate(point.observedAt)},${yForAmount(point.amount)}`).join(" ");
+
+          return (
+            <g key={entry.row.rowId}>
+              {entry.points.length > 1 ? (
+                <polyline
+                  fill="none"
+                  stroke={entry.color}
+                  strokeWidth="2.5"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  points={polylinePoints}
+                />
+              ) : null}
+              {entry.points.map((point) => (
+                <circle
+                  key={`${entry.row.rowId}-${point.observedAt}`}
+                  cx={xForDate(point.observedAt)}
+                  cy={yForAmount(point.amount)}
+                  r="3.5"
+                  fill={entry.color}
+                />
+              ))}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
 }
 
 function CardGrid({ cards, onCardClick }: { cards: CardRecord[]; onCardClick?: (card: CardRecord) => void }) {
@@ -332,6 +506,7 @@ function CardGrid({ cards, onCardClick }: { cards: CardRecord[]; onCardClick?: (
 }
 
 function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; onClose: () => void; onNavigate: (path: string) => void }) {
+  const { index: publishedPriceIndex } = usePublishedPriceIndex();
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
@@ -349,7 +524,15 @@ function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; o
     onNavigate(buildCardDetailPath(card.id));
   }
 
-  const price = cardPrice(card.rarity);
+  const priceRows = useMemo(
+    () => getPublishedRowsForCard(publishedPriceIndex, card.tcgplayer_id),
+    [publishedPriceIndex, card.tcgplayer_id]
+  );
+  const nearMintPrice = useMemo(
+    () => resolveNearMintMarketPrice(priceRows),
+    [priceRows]
+  );
+  const headlinePrice = formatHeadlinePrice(nearMintPrice);
 
   return (
     <div className="card-quick-look-backdrop" onClick={handleBackdropClick} role="presentation">
@@ -378,7 +561,7 @@ function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; o
           <div className="card-quick-look-meta">
             <span>{card.set.label} · {card.set.set_id} {card.collector_number ?? "?"}</span>
             {card.rarity && <span>{card.rarity}</span>}
-            <span className="card-quick-look-price">{price}</span>
+            {headlinePrice ? <span className="card-quick-look-price">{headlinePrice}</span> : null}
           </div>
           <button type="button" className="card-quick-look-detail-link" onClick={handleViewDetails}>
             View full details →
@@ -1010,6 +1193,7 @@ function DecklistPanel({
             <span>Spells {spellCount}</span>
             <span>Gear {gearCount}</span>
           </div>
+
         </div>
         <button type="button" className="text-button strong" onClick={onClearDeck} disabled={!hasDeckSelection}>
           Clear
@@ -1881,13 +2065,16 @@ function CardDetailView({
 }) {
   const [card, setCard] = useState<CardRecord | null>(null);
   const [allPrintings, setAllPrintings] = useState<CardRecord[]>([]);
+  const [selectedPriceRowIds, setSelectedPriceRowIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const { index: publishedPriceIndex } = usePublishedPriceIndex();
 
   useEffect(() => {
     let ignore = false;
     setLoading(true);
     setCard(null);
     setAllPrintings([]);
+    setSelectedPriceRowIds([]);
     onError(null);
 
     async function load() {
@@ -1917,6 +2104,31 @@ function CardDetailView({
     return () => { ignore = true; };
   }, [cardId, onError]);
 
+  const apiUrl = card ? `/api/cards/${encodeURIComponent(card.id)}` : "";
+  const currentPriceRows = useMemo(
+    () => getPublishedRowsForCard(publishedPriceIndex, card?.tcgplayer_id),
+    [publishedPriceIndex, card?.tcgplayer_id]
+  );
+  const currentNearMintPrice = useMemo(
+    () => resolveNearMintMarketPrice(currentPriceRows),
+    [currentPriceRows]
+  );
+  const currentHeadlinePrice = formatHeadlinePrice(currentNearMintPrice);
+  const pricingGroups = useMemo(
+    () => groupRowsByPrinting(currentPriceRows),
+    [currentPriceRows]
+  );
+  const selectedPriceRows = useMemo(
+    () => currentPriceRows.filter((row) => selectedPriceRowIds.includes(row.rowId)),
+    [currentPriceRows, selectedPriceRowIds]
+  );
+
+  function togglePriceRow(rowId: string) {
+    setSelectedPriceRowIds((current) =>
+      current.includes(rowId) ? current.filter((candidate) => candidate !== rowId) : [...current, rowId]
+    );
+  }
+
   if (loading) {
     return (
       <section className="card-detail-view">
@@ -1926,9 +2138,6 @@ function CardDetailView({
   }
 
   if (!card) return null;
-
-  const price = cardPrice(card.rarity);
-  const apiUrl = `/api/cards/${encodeURIComponent(card.id)}`;
 
   return (
     <section className="card-detail-view">
@@ -1970,13 +2179,17 @@ function CardDetailView({
               <div className="card-detail-versions">
                 <p className="card-detail-versions-heading">Printings</p>
                 {rows.map((r) => {
-                  const barPrice = cardPrice(r.cardRec.rarity);
+                  const barPriceRow = resolveNearMintMarketPrice(
+                    getPublishedRowsForCard(publishedPriceIndex, r.cardRec.tcgplayer_id),
+                    r.finish
+                  );
+                  const barPrice = formatUsdPrice(barPriceRow?.currentPrice.amount);
                   if (r.isCurrent) {
                     return (
                       <div key={r.key} className="card-detail-version-bar card-detail-version-bar--active" aria-current="page">
                         <span className="card-detail-version-set">{r.cardRec.set.set_id} #{r.cardRec.collector_number ?? "?"}</span>
                         <span className="card-detail-version-name">{rowLabel(r)}</span>
-                        <span className="card-detail-version-price">{barPrice}</span>
+                        {barPrice ? <span className="card-detail-version-price">{barPrice}</span> : null}
                       </div>
                     );
                   }
@@ -1994,7 +2207,7 @@ function CardDetailView({
                     >
                       <span className="card-detail-version-set">{r.cardRec.set.set_id} #{r.cardRec.collector_number ?? "?"}</span>
                       <span className="card-detail-version-name">{rowLabel(r)}</span>
-                      <span className="card-detail-version-price">{barPrice}</span>
+                      {barPrice ? <span className="card-detail-version-price">{barPrice}</span> : null}
                     </a>
                   );
                 })}
@@ -2006,7 +2219,7 @@ function CardDetailView({
         <div className="card-detail-info-col">
           <div className="card-detail-name-row">
             <h1 className="card-detail-name">{card.riot_name}</h1>
-            <span className="card-detail-price">{price}</span>
+            {currentHeadlinePrice ? <span className="card-detail-price">{currentHeadlinePrice}</span> : null}
           </div>
 
           <p className="card-detail-typeline">{formatTypeline(card)}</p>
@@ -2042,7 +2255,6 @@ function CardDetailView({
             <div className="card-fact-row"><span>Set</span><span>{card.set.label} ({card.set.set_id})</span></div>
             <div className="card-fact-row"><span>Number</span><span>{card.collector_number ?? "—"}</span></div>
             {card.rarity && <div className="card-fact-row"><span>Rarity</span><span>{card.rarity}</span></div>}
-            <div className="card-fact-row"><span>Market Price</span><span>{price}</span></div>
             <div className="card-fact-row"><span>Finishes</span><span>{card.finishes.join(", ")}</span></div>
             {card.media.artist && <div className="card-fact-row"><span>Artist</span><span>{card.media.artist}</span></div>}
             <div className="card-fact-row"><span>Language</span><span>{card.language}</span></div>
@@ -2069,6 +2281,39 @@ function CardDetailView({
               >
                 TCGPlayer ↗
               </a>
+            )}
+          </div>
+
+          <div className="card-detail-section card-price-panel">
+            <h2 className="card-detail-section-heading">Pricing</h2>
+            {pricingGroups.length === 0 ? (
+              <p className="price-panel-empty">No published market prices are available for this version yet.</p>
+            ) : (
+              <>
+                {pricingGroups.map((group) => (
+                  <div key={group.key} className="price-toggle-group">
+                    <p className="price-toggle-group-label">{group.label}</p>
+                    <div className="price-toggle-row">
+                      {group.rows.map((row) => {
+                        const selected = selectedPriceRowIds.includes(row.rowId);
+                        return (
+                          <button
+                            key={row.rowId}
+                            type="button"
+                            className={selected ? "price-toggle-button price-toggle-button--selected" : "price-toggle-button"}
+                            onClick={() => togglePriceRow(row.rowId)}
+                            aria-pressed={selected}
+                          >
+                            {formatSeriesToggleLabel(row)}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+
+                {selectedPriceRows.length > 0 ? <PriceHistoryChart rows={selectedPriceRows} /> : null}
+              </>
             )}
           </div>
         </div>
