@@ -169,7 +169,7 @@ describe("searchCards", () => {
 
   it("matches collector suffixes and variant flag aliases", () => {
     expect(namesFor("number=3a")).toEqual(["Alternate Gate"]);
-    expect(namesFor("c:3a")).toEqual(["Alternate Gate"]);
+    expect(namesFor("cn:3a")).toEqual(["Alternate Gate"]);
     expect(namesFor("is:AA")).toEqual(["Alternate Gate"]);
     expect(namesFor("is:altart")).toEqual(["Alternate Gate"]);
     expect(namesFor("is:alternateart")).toEqual(["Alternate Gate"]);

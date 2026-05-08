@@ -101,7 +101,9 @@ function stringValuesForField(card: CardRecord, canonicalField: string): string[
     case "clean_name":
       return card.clean_name ? [card.clean_name] : [];
     case "text":
-      return [card.text.plain, card.text.rich, card.text.flavour ?? "", ...card.text.keywords].filter(Boolean);
+      return [card.text.plain, card.text.rich, ...card.text.keywords].filter(Boolean);
+    case "flavour":
+      return card.text.flavour ? [card.text.flavour] : [];
     case "t":
       return [card.type.typeline];
     case "cardtype":

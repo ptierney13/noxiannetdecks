@@ -26,7 +26,7 @@ describe("parseQuery", () => {
     ["finish field", "finish:foil variant:nonfoil"],
     ["unique option", "unique:legal"],
     ["keywords and cost", "keyword:Action k:Action cost>=3"],
-    ["collector suffix", "number=200a c:200a"]
+    ["collector suffix", "number=200a cn:200a"]
   ])("parses %s", (_label, query) => {
     expect(parseQuery(query).diagnostics).toEqual([]);
   });

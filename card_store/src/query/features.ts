@@ -28,6 +28,13 @@ export const queryFieldGuides: QueryFieldGuide[] = [
     example: 'r:"draw a card"'
   },
   {
+    property: "Flavor text",
+    query: "flavour:<text>",
+    shorthand: "ft:<text> or flavor:<text>",
+    searches: "text.flavour",
+    example: 'ft:"brave"'
+  },
+  {
     property: "Type line",
     query: "t:<text>",
     shorthand: "type:<text>",
@@ -36,8 +43,8 @@ export const queryFieldGuides: QueryFieldGuide[] = [
   },
   {
     property: "Card type",
-    query: "ct:<text>",
-    shorthand: null,
+    query: "cardtype:<text>",
+    shorthand: "ct:<text>",
     searches: "type.cardtype",
     example: "ct:unit"
   },
@@ -51,7 +58,7 @@ export const queryFieldGuides: QueryFieldGuide[] = [
   {
     property: "Tag",
     query: "tag:<text>",
-    shorthand: null,
+    shorthand: "g:<text>",
     searches: "type.tags",
     example: "tag:Dragon"
   },
@@ -93,9 +100,9 @@ export const queryFieldGuides: QueryFieldGuide[] = [
   {
     property: "Cost",
     query: "cost<number comparison>",
-    shorthand: null,
+    shorthand: "c<number comparison>",
     searches: "attributes.cost",
-    example: "cost>=3"
+    example: "c>=3"
   },
   {
     property: "Energy",
@@ -121,9 +128,9 @@ export const queryFieldGuides: QueryFieldGuide[] = [
   {
     property: "Collector number",
     query: "number=<collector number>",
-    shorthand: "c=<collector number>",
+    shorthand: "cn=<collector number>",
     searches: "collector_number",
-    example: "c=200a"
+    example: "cn=200a"
   },
   {
     property: "Finish or treatment flag",
@@ -168,7 +175,7 @@ export const querySyntaxGuides: QuerySyntaxGuide[] = [
   },
   {
     operation: "Numeric comparisons",
-    examples: ["cost>=3", "e>=3", "m<5", "p=1"],
+    examples: ["c>=3", "e>=3", "m<5", "p=1"],
     behavior: "Supports =, <, <=, >, >= on numeric fields."
   },
   {
@@ -216,9 +223,4 @@ export const querySyntaxGuides: QuerySyntaxGuide[] = [
     examples: ["is:foil", "is:ON", "is:Signed", "is:altart"],
     behavior: "Matches finishes plus treatment flags: foil, nonfoil, normal, overnumbered, signed, and alternate art."
   },
-  {
-    operation: "Diagnostics",
-    examples: ["energy>>3", "(type:unit"],
-    behavior: "Malformed queries return parse errors instead of crashing."
-  }
 ];

@@ -5,7 +5,7 @@ type Props = {
 };
 
 const DOMAIN_ORDER = ["Fury", "Calm", "Mind", "Body", "Chaos", "Order"] as const;
-const CARD_TYPES = ["Unit", "Spell", "Gear", "Battlefield", "Legend"] as const;
+const CARD_TYPES = ["Unit", "Spell", "Gear", "Rune", "Battlefield", "Legend"] as const;
 const RARITIES = ["Common", "Uncommon", "Rare", "Epic", "Showcase", "Promo"] as const;
 const QB_SETS = [
   { id: "OGN", label: "Origins" },
@@ -182,7 +182,7 @@ export default function QueryBuilderView({ onNavigate }: Props) {
     if (energyVal.trim()) parts.push(`e${energyOp}${energyVal.trim()}`);
     if (mightVal.trim()) parts.push(`m${mightOp}${mightVal.trim()}`);
     if (powerVal.trim()) parts.push(`p${powerOp}${powerVal.trim()}`);
-    if (costVal.trim()) parts.push(`cost${costOp}${costVal.trim()}`);
+    if (costVal.trim()) parts.push(`c${costOp}${costVal.trim()}`);
     for (const finish of selectedFinishes) parts.push(`is:${finish}`);
 
     return parts.join(" ");
@@ -367,7 +367,7 @@ export default function QueryBuilderView({ onNavigate }: Props) {
           <StatRow label="Energy" hint="e>=3" op={energyOp} onOpChange={setEnergyOp} val={energyVal} onValChange={setEnergyVal} />
           <StatRow label="Might"  hint="m>=2" op={mightOp}  onOpChange={setMightOp}  val={mightVal}  onValChange={setMightVal}  />
           <StatRow label="Power"  hint="p>=1 or p=ff" op={powerOp}  onOpChange={setPowerOp}  val={powerVal}  onValChange={setPowerVal}  />
-          <StatRow label="Cost"   hint="cost=3" op={costOp}   onOpChange={setCostOp}   val={costVal}   onValChange={setCostVal}   />
+          <StatRow label="Cost"   hint="c>=3" op={costOp}   onOpChange={setCostOp}   val={costVal}   onValChange={setCostVal}   />
         </div>
       </div>
 
