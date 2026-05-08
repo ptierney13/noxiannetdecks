@@ -1406,7 +1406,8 @@ code {
 .csg-card-frame {
   flex: 0 0 auto;
   position: relative;
-  width: 260px;
+  width: 455px;   /* 260 × 1.75 */
+  margin-left: 25%;
   /* 744:1039 aspect ratio preserves the full card face */
   aspect-ratio: 744 / 1039;
   border-radius: 8px;
@@ -1416,7 +1417,8 @@ code {
 
 @media (max-width: 600px) {
   .csg-card-frame {
-    width: min(260px, 80vw);
+    width: min(455px, 85vw);
+    margin-left: 0;
   }
 }
 
