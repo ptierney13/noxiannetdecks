@@ -37,9 +37,7 @@ export function resolveJustTcgLocalEnvPath(packageRoot: string = resolvePriceSto
   return join(packageRoot, ".env.local");
 }
 
-export function loadJustTcgConfig(environment: JustTcgEnvironment = process.env): JustTcgConfig {
-  applyLocalEnvFile(resolveJustTcgLocalEnvPath(), environment as NodeJS.ProcessEnv);
-
+export function parseJustTcgConfig(environment: JustTcgEnvironment): JustTcgConfig {
   const defaultLimit = Number(environment.JUSTTCG_DEFAULT_LIMIT?.trim() ?? "20");
 
   return justTcgConfigSchema.parse({
@@ -52,6 +50,11 @@ export function loadJustTcgConfig(environment: JustTcgEnvironment = process.env)
     includePriceHistory: parseBooleanFlag(environment.JUSTTCG_INCLUDE_PRICE_HISTORY, true),
     includeStatistics: parseBooleanFlag(environment.JUSTTCG_INCLUDE_STATISTICS, false)
   });
+}
+
+export function loadJustTcgConfig(environment: JustTcgEnvironment = process.env): JustTcgConfig {
+  applyLocalEnvFile(resolveJustTcgLocalEnvPath(), environment as NodeJS.ProcessEnv);
+  return parseJustTcgConfig(environment);
 }
 
 function parseBooleanFlag(value: string | undefined, defaultValue: boolean): boolean {

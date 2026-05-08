@@ -1,5 +1,5 @@
 export type { JustTcgConfig, JustTcgEnvironment } from "./config.js";
-export { loadJustTcgConfig, resolveJustTcgLocalEnvPath } from "./config.js";
+export { loadJustTcgConfig, parseJustTcgConfig, resolveJustTcgLocalEnvPath } from "./config.js";
 export type { JustTcgCard, JustTcgCardsResponse, JustTcgVariant } from "./schema.js";
 export { justTcgCardSchema, justTcgCardsResponseSchema, justTcgVariantSchema } from "./schema.js";
 export type {

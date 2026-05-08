@@ -11,8 +11,9 @@ with the app and read by the frontend without live marketplace calls or runtime
 write access.
 
 After the local-first published artifact flow is working, later stages should
-automate daily refreshes in Cloudflare using the same published artifact shape
-so local maintenance is no longer required.
+first move refresh generation into a Cloudflare-hosted manually triggered
+worker, then add an every-2-days scheduled cadence against that same hosted
+path once the manual worker flow is proven.
 
 Each implementation stage requires its own detailed approved plan before code
 for that stage begins. The goal is to keep architectural decisions visible,
@@ -33,8 +34,9 @@ commits.
   `card_store` and frontend-facing shapes deliberately instead of prematurely.
 - Make the first app-readable publish target repo-tracked files that can be
   deployed alongside the frontend.
-- Reserve Cloudflare automation for a later stage that updates the same
-  published artifact contract daily without local operator steps.
+- Reserve Cloudflare hosting for later stages that first expose a manually run
+  worker and then add the same published artifact contract on a 2-day schedule
+  once the manual workflow is proven.
 - Defer affiliate-link setup until a final dedicated stage after the rest of
   the price-store pipeline and operations work is already in place.
 - Require a detailed approved plan for each implementation stage before code
@@ -50,9 +52,10 @@ commits.
 4. Stage 4: JustTCG-driven contracts and repositories
 5. Stage 5: JustTCG publishable snapshot pipeline
 6. Stage 6: frontend static read integration
-7. Stage 7: Cloudflare worker automation and hosted publishing
-8. Stage 8: monitoring and runbooks
-9. Stage 9: affiliate-link setup and rollout
+7. Stage 7: Cloudflare-hosted manual refresh worker and hosted publishing
+8. Stage 8: every-2-days scheduled refresh setup and operator walkthrough
+9. Stage 9: monitoring and runbooks
+10. Stage 10: affiliate-link setup and rollout
 
 Each stage should have its own detailed plan document written immediately
 before implementation starts for that stage.
@@ -80,7 +83,8 @@ constraints, or changed assumptions.
   - TCGplayer Stage 2 as historical context rather than the shipping plan
   - published snapshots as the serving model
   - repo-tracked deployable artifacts as the first frontend-readable output
-  - Cloudflare automation as a later no-local-maintenance step
+  - a Cloudflare-hosted manual worker before any scheduled automation
+  - a later every-2-days scheduler stage after the manual worker path
   - affiliate setup as the literal last stage
   - the requirement for a detailed approved plan per stage
   - stage-by-stage branch-based delivery

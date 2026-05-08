@@ -13,10 +13,12 @@
   },
   "include": [
     "functions/**/*.ts",
+    "workers/**/*.ts",
     "card_store/src/api/service.ts",
     "card_store/src/data/**/*.ts",
     "card_store/src/pack_generator/**/*.ts",
     "card_store/src/query/**/*.ts",
-    "card_store/data/cards.json"
+    "card_store/data/cards.json",
+    "price_store/src/**/*.ts"
   ]
 }

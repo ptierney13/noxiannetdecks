@@ -1,0 +1,7 @@
+name = "price-store-publish"
+main = "workers/price-store-publish.ts"
+compatibility_date = "2026-05-07"
+
+[[r2_buckets]]
+binding = "PRICE_STORE_BUCKET"
+bucket_name = "replace-with-your-price-store-bucket"

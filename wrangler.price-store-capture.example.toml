@@ -1,0 +1,13 @@
+name = "price-store-capture"
+main = "workers/price-store-capture.ts"
+compatibility_date = "2026-05-07"
+
+[[r2_buckets]]
+binding = "PRICE_STORE_BUCKET"
+bucket_name = "replace-with-your-price-store-bucket"
+
+[vars]
+JUSTTCG_DEFAULT_GAME = "riftbound-league-of-legends-trading-card-game"
+JUSTTCG_DEFAULT_LIMIT = "20"
+JUSTTCG_INCLUDE_PRICE_HISTORY = "true"
+JUSTTCG_INCLUDE_STATISTICS = "false"
