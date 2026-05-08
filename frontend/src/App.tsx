@@ -12,6 +12,7 @@ import {
   type PublishedPriceRow
 } from "./priceData";
 import QueryBuilderView from "./QueryBuilderView";
+import TradeBalancerView from "./TradeBalancerView";
 import { buildCardDetailPath, buildCardsSearchPath, normalizePathname, parseAppRoute, routeSection } from "./routes";
 import TierListView from "./TierListView";
 import type {
@@ -724,7 +725,7 @@ function SearchView({
     <>
       <section className="search-panel" aria-labelledby="search-heading">
         <div className="search-copy">
-          <p className="eyebrow">Noxiannet Decks</p>
+          <p className="eyebrow">Noxian Netdecks</p>
           <h1 id="search-heading">Riftbound Card Search</h1>
         </div>
         <form className="search-form" onSubmit={handleSubmit}>
@@ -1801,8 +1802,8 @@ function SealedSimulator({ onError }: { onError: (message: string | null) => voi
     <>
       <section className="simulator-hero" aria-labelledby="simulator-heading">
         <div className="search-copy">
-          <p className="eyebrow">Noxiannet Decks</p>
-          <h1 id="simulator-heading">Sealed Pools</h1>
+          <p className="eyebrow">Noxian Netdecks</p>
+          <h1 id="simulator-heading">Sealed Simulator</h1>
         </div>
         <div className="simulator-actions">
           <label className="pool-mode-select">
@@ -2051,7 +2052,7 @@ function HomePage({ onNavigate }: { onNavigate: (href: string) => void }) {
               </div>
               <span className="home-feature-arrow">→</span>
             </div>
-            <div className="home-feature-title">Sealed Pools</div>
+            <div className="home-feature-title">Sealed Simulator</div>
             <div className="home-feature-desc">Generate pools from any format. Build and save decks.</div>
           </a>
         </div>
@@ -2067,7 +2068,7 @@ function HomePage({ onNavigate }: { onNavigate: (href: string) => void }) {
             onClick={(e) => { e.preventDefault(); onNavigate("/tools/tier-list"); }}
           >
             <div className="home-promo-label">Tool</div>
-            <h3>Tier List Builder</h3>
+            <h3>Tier List Generator</h3>
             <p>Rank any card set by dragging into tiers.</p>
           </a>
           <div className="home-promo-card" style={{ cursor: "default", opacity: 0.6 }}>
@@ -2078,7 +2079,7 @@ function HomePage({ onNavigate }: { onNavigate: (href: string) => void }) {
         </div>
       </div>
 
-      <footer className="home-footer">NoxianNet Decks · Riftbound</footer>
+      <footer className="home-footer">Noxian Netdecks · Riftbound</footer>
     </div>
   );
 }
@@ -2450,10 +2451,10 @@ export default function App() {
         type="button"
         className="nav-brand"
         onClick={() => navigate("/")}
-        aria-label="NoxianNet Decks home"
+        aria-label="Noxian Netdecks home"
       >
         <div className="nav-logo">N</div>
-        <span className="nav-wordmark">NoxianNet Decks</span>
+        <span className="nav-wordmark">Noxian Netdecks</span>
       </button>
       <div className="nav-links">
         <div className="nav-tools-menu" ref={cardsMenuRef}>
@@ -2488,7 +2489,7 @@ export default function App() {
         <div className="nav-tools-menu" ref={toolsMenuRef}>
           <button
             type="button"
-            className={`nav-link${activeSection === "tools-tier-list" || activeSection === "tools-sealed-pools" ? " active" : ""}`}
+            className={`nav-link${activeSection === "tools-tier-list" || activeSection === "tools-sealed-pools" || activeSection === "tools-trade-balancer" ? " active" : ""}`}
             aria-expanded={showToolsMenu}
             aria-haspopup="menu"
             onClick={() => setShowToolsMenu((current) => !current)}
@@ -2499,10 +2500,13 @@ export default function App() {
           {showToolsMenu ? (
             <div className="nav-tools-popover" role="menu" aria-label="Tools">
               <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
-                Tier List
+                Tier List Generator
               </ProjectNavLink>
               <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
-                Sealed Pools
+                Sealed Simulator
+              </ProjectNavLink>
+              <ProjectNavLink href="/tools/trade-balancer" current={activeSection === "tools-trade-balancer"} onNavigate={navigate}>
+                Trade Balancer
               </ProjectNavLink>
             </div>
           ) : null}
@@ -2536,6 +2540,8 @@ export default function App() {
           <TierListView onError={setError} />
         ) : route.kind === "tools-sealed-pools" ? (
           <SealedSimulator onError={setError} />
+        ) : route.kind === "tools-trade-balancer" ? (
+          <TradeBalancerView />
         ) : route.kind.startsWith("deck-explorer") ? (
           <DeckExplorerView route={route} onError={setError} onNavigate={navigate} />
         ) : (

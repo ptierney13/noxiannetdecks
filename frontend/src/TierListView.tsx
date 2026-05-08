@@ -599,7 +599,7 @@ export default function TierListView({ onError }: TierViewProps) {
     <>
       <section className="search-panel tier-generator-panel" aria-labelledby="tier-list-heading">
         <div className="search-copy">
-          <p className="eyebrow">Noxiannet Decks</p>
+          <p className="eyebrow">Noxian Netdecks</p>
           <h1 id="tier-list-heading">Tier List</h1>
         </div>
         <form className="search-form" onSubmit={handleSubmit}>

@@ -295,7 +295,7 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
       <>
         <section className="route-hero">
           <div className="search-copy">
-            <p className="eyebrow">Noxiannet Decks</p>
+            <p className="eyebrow">Noxian Netdecks</p>
             <h1>Deck Explorer</h1>
             <p>
               Browse hand-authored tournament data locally, starting with event lists and legend pages.

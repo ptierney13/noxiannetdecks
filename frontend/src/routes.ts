@@ -12,9 +12,10 @@ export type AppRoute =
   | { kind: "deck-explorer-legend"; path: string; legendSlug: string }
   | { kind: "tools-tier-list"; path: "/tools/tier-list" }
   | { kind: "tools-sealed-pools"; path: "/tools/sealed-pools" }
+  | { kind: "tools-trade-balancer"; path: "/tools/trade-balancer" }
   | { kind: "not-found"; path: string };
 
-export type NavSection = "home" | "cards" | "deck-explorer" | "tools-tier-list" | "tools-sealed-pools" | "not-found";
+export type NavSection = "home" | "cards" | "deck-explorer" | "tools-tier-list" | "tools-sealed-pools" | "tools-trade-balancer" | "not-found";
 
 export function normalizePathname(pathname: string): string {
   if (!pathname || pathname === "/") {
@@ -113,6 +114,10 @@ export function parseAppRoute(pathname: string): AppRoute {
     return { kind: "tools-sealed-pools", path: "/tools/sealed-pools" };
   }
 
+  if (normalizedPath === "/tools/trade-balancer") {
+    return { kind: "tools-trade-balancer", path: "/tools/trade-balancer" };
+  }
+
   return { kind: "not-found", path: normalizedPath };
 }
 
@@ -136,6 +141,8 @@ export function routeSection(route: AppRoute): NavSection {
       return "tools-tier-list";
     case "tools-sealed-pools":
       return "tools-sealed-pools";
+    case "tools-trade-balancer":
+      return "tools-trade-balancer";
     default:
       return "not-found";
   }
