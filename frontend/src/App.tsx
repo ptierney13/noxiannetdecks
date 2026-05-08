@@ -264,7 +264,7 @@ function formatTypeline(card: CardRecord): string {
 }
 
 const SYMBOL_MAP: Record<string, string> = {
-  rb_might: "{M}",
+  rb_might: "{T}",
   rb_exhaust: "{E}",
   rb_rune_fury: "{F}",
   rb_rune_calm: "{C}",
@@ -275,6 +275,88 @@ const SYMBOL_MAP: Record<string, string> = {
   rb_rune_rainbow: "{P}",
 };
 
+type InlineSymbolVariant = "white" | "black";
+type InlineSymbolSize = "text" | "stat" | "chip";
+
+function inlineSymbolSrc(token: string, variant: InlineSymbolVariant = "white"): string | null {
+  if (/^\d+$/.test(token)) {
+    const value = Number(token);
+    if (!Number.isInteger(value) || value < 0 || value > 12) {
+      return null;
+    }
+    return `/assets/riftbound/symbols/energy/energy-cost-${String(value).padStart(2, "0")}-badge.png`;
+  }
+
+  switch (token) {
+    case "T":
+      return `/assets/riftbound/symbols/stats/might-${variant}.png`;
+    case "E":
+      return `/assets/riftbound/symbols/actions/exhaust-${variant}.png`;
+    case "F":
+      return "/assets/riftbound/symbols/runes/rune-fury-inline.png";
+    case "C":
+      return "/assets/riftbound/symbols/runes/rune-calm-inline.png";
+    case "M":
+      return "/assets/riftbound/symbols/runes/rune-mind-inline.png";
+    case "B":
+      return "/assets/riftbound/symbols/runes/rune-body-inline.png";
+    case "H":
+      return "/assets/riftbound/symbols/runes/rune-chaos-inline.png";
+    case "O":
+      return "/assets/riftbound/symbols/runes/rune-order-inline.png";
+    case "P":
+      return "/assets/riftbound/symbols/power/wild-power-inline.png";
+    default:
+      return null;
+  }
+}
+
+function renderMultilineText(text: string, keyPrefix: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  const lines = text.split("\n");
+  for (const [index, line] of lines.entries()) {
+    nodes.push(line);
+    if (index < lines.length - 1) {
+      nodes.push(<br key={`${keyPrefix}-br-${index}`} />);
+    }
+  }
+  return nodes;
+}
+
+function renderTokenizedText(
+  text: string,
+  { variant = "white", size = "text" }: { variant?: InlineSymbolVariant; size?: InlineSymbolSize } = {}
+): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  for (const [index, part] of text.split(/(\{[^}]+\})/g).entries()) {
+    const tokenMatch = part.match(/^\{([^}]+)\}$/);
+    if (!tokenMatch) {
+      nodes.push(...renderMultilineText(part, `text-${index}`));
+      continue;
+    }
+
+    const token = tokenMatch[1];
+    const src = inlineSymbolSrc(token, variant);
+    if (!src) {
+      nodes.push(...renderMultilineText(part, `unknown-${index}`));
+      continue;
+    }
+
+    nodes.push(
+      <img
+        key={`symbol-${index}-${token}`}
+        className={`card-inline-symbol card-inline-symbol--${size}`}
+        src={src}
+        alt=""
+        aria-hidden="true"
+        data-symbol-token={token}
+        data-symbol-variant={variant}
+      />
+    );
+  }
+  return nodes;
+}
+
 function applySymbols(text: string): string {
   return text
     // Energy costs: :rb_energy_N: → {N}
@@ -283,7 +365,7 @@ function applySymbols(text: string): string {
     .replace(/:([a-z_]+):/g, (_, key) => SYMBOL_MAP[key] ?? `{${key}}`);
 }
 
-function formatCardText(richText: string): string {
+function normalizeCardText(richText: string): string {
   const stripped = richText
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<[^>]+>/g, "")
@@ -295,11 +377,18 @@ function formatCardText(richText: string): string {
   return applySymbols(stripped).trim();
 }
 
-function formatCost(card: CardRecord): string | null {
+function formatCostTokens(card: CardRecord): string | null {
   const energy = card.attributes.energy;
   const power = card.attributes.power;
   if (energy == null) return null;
-  return `${energy}${"P".repeat(power ?? 0)}`;
+  return `{${energy}}${"{P}".repeat(power ?? 0)}`;
+}
+
+function domainChipClass(domains: string[]): string {
+  if (domains.length === 1) {
+    return `card-attr-chip card-attr-chip--domain card-attr-chip--domain-${domains[0].toLowerCase()}`;
+  }
+  return "card-attr-chip card-attr-chip--domain card-attr-chip--domain-multicolor";
 }
 
 const PRICE_SERIES_COLORS = ["#f59e0b", "#ef4444", "#38bdf8", "#a78bfa", "#34d399", "#f472b6"] as const;
@@ -579,13 +668,24 @@ function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; o
           </div>
           <p className="card-quick-look-typeline">{formatTypeline(card)}</p>
           <div className="card-quick-look-attrs">
-            {formatCost(card) != null && <span className="card-attr-chip">{formatCost(card)}</span>}
-            {card.attributes.might != null && <span className="card-attr-chip">{card.attributes.might}</span>}
-            {card.attributes.domain.map((d) => (
-              <span key={d} className={`card-attr-chip card-attr-chip--domain card-attr-chip--domain-${d.toLowerCase()}`}>{d}</span>
-            ))}
+            {formatCostTokens(card) != null && (
+              <span className="card-attr-chip card-attr-chip--symbolic">
+                {renderTokenizedText(formatCostTokens(card) ?? "", { size: "chip" })}
+              </span>
+            )}
+            {card.attributes.might != null && (
+              <span className="card-attr-chip card-attr-chip--symbolic">
+                <span className="card-inline-metric">
+                  <span>{card.attributes.might}</span>
+                  {renderTokenizedText("{T}", { size: "chip" })}
+                </span>
+              </span>
+            )}
+            {card.attributes.domain.length > 0 && (
+              <span className={domainChipClass(card.attributes.domain)}>{card.attributes.domain.join(", ")}</span>
+            )}
           </div>
-          {card.text.rich && <p className="card-quick-look-text">{formatCardText(card.text.rich)}</p>}
+          {card.text.rich && <p className="card-quick-look-text">{renderTokenizedText(normalizeCardText(card.text.rich))}</p>}
           <div className="card-quick-look-meta">
             <span>{card.set.label} · {card.set.set_id} {card.collector_number ?? "?"}</span>
             {card.rarity && <span>{card.rarity}</span>}
@@ -2280,11 +2380,24 @@ function CardDetailView({
           <p className="card-detail-typeline">{formatTypeline(card)}</p>
 
           <div className="card-detail-attrs">
-            {formatCost(card) != null && (
-              <div className="card-attr-block"><span className="card-attr-label">Cost</span><span className="card-attr-value">{formatCost(card)}</span></div>
+            {formatCostTokens(card) != null && (
+              <div className="card-attr-block">
+                <span className="card-attr-label">Cost</span>
+                <span className="card-attr-value card-attr-value--symbols">
+                  {renderTokenizedText(formatCostTokens(card) ?? "", { size: "stat" })}
+                </span>
+              </div>
             )}
             {card.attributes.might != null && (
-              <div className="card-attr-block"><span className="card-attr-label">Might</span><span className="card-attr-value">{card.attributes.might}</span></div>
+              <div className="card-attr-block">
+                <span className="card-attr-label">Might</span>
+                <span className="card-attr-value card-attr-value--symbols">
+                  <span className="card-inline-metric">
+                    <span>{card.attributes.might}</span>
+                    {renderTokenizedText("{T}", { size: "stat" })}
+                  </span>
+                </span>
+              </div>
             )}
             {card.attributes.domain.length > 0 && (
               <div className="card-attr-block">
@@ -2296,7 +2409,7 @@ function CardDetailView({
 
           {card.text.rich && (
             <div className="card-detail-section">
-              <p className="card-detail-body-text">{formatCardText(card.text.rich)}</p>
+              <p className="card-detail-body-text">{renderTokenizedText(normalizeCardText(card.text.rich))}</p>
             </div>
           )}
 

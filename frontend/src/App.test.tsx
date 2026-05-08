@@ -23,7 +23,9 @@ function createCard({
   cost = "{3}",
   energy = 3,
   might = 4,
-  power = 2
+  power = 2,
+  richText = null,
+  plainText = null
 }: {
   id: string;
   riotName: string;
@@ -44,6 +46,8 @@ function createCard({
   energy?: number | null;
   might?: number | null;
   power?: number | null;
+  richText?: string | null;
+  plainText?: string | null;
 }): CardRecord {
   return {
     id,
@@ -58,7 +62,12 @@ function createCard({
     finishes,
     attributes: { cost, energy, might, power, domain },
     type: { cardtype, supertype, tags, typeline },
-    text: { rich: `${riotName} rules text.`, plain: `${riotName} rules text.`, flavour: null, keywords: [] },
+    text: {
+      rich: richText ?? `${riotName} rules text.`,
+      plain: plainText ?? `${riotName} rules text.`,
+      flavour: null,
+      keywords: []
+    },
     set: { set_id: setId, label: setLabel },
     media: {
       image_url: `https://example.test/${id}.png`,
@@ -79,7 +88,9 @@ const voidGate = createCard({
   tcgplayerId: "1001",
   finishes: ["foil", "nonfoil"],
   tags: ["Dragon"],
-  typeline: "Unit - Dragon"
+  typeline: "Unit - Dragon",
+  richText: "<p>:rb_exhaust:: Deal +2 :rb_might: this turn. Pay :rb_energy_3::rb_rune_chaos:.</p>",
+  plainText: ":rb_exhaust:: Deal +2 :rb_might: this turn. Pay :rb_energy_3::rb_rune_chaos:."
 });
 
 const legendCard = createCard({
@@ -270,6 +281,9 @@ const cards: CardRecord[] = [
   voidGate,
   legendCard,
   championCard,
+  spellCard,
+  multicolorSpellCard,
+  gearCard,
   ognRune,
   battlefieldCard,
   unlLegend,
@@ -619,14 +633,25 @@ function mockFetch(poolFactory = generatedPool) {
 
 async function openTierListGenerator(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole("button", { name: "Tools" }));
-  await user.click(screen.getByRole("link", { name: "Tier List" }));
+  await user.click(screen.getByRole("link", { name: "Tier List Generator" }));
   expect(await screen.findByRole("heading", { name: "Tier List" })).toBeInTheDocument();
 }
 
 async function openSealedPools(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole("button", { name: "Tools" }));
-  await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
-  expect(await screen.findByRole("heading", { name: "Sealed Pools" })).toBeInTheDocument();
+  await user.click(screen.getByRole("link", { name: "Sealed Simulator" }));
+  expect(await screen.findByRole("heading", { name: "Sealed Simulator" })).toBeInTheDocument();
+}
+
+async function submitCardsSearch(user: ReturnType<typeof userEvent.setup>, query: string) {
+  const input = screen.getByLabelText("Query");
+  await user.clear(input);
+  if (query) {
+    await user.type(input, query);
+  }
+  const form = input.closest("form");
+  expect(form).not.toBeNull();
+  await user.click(within(form as HTMLFormElement).getByRole("button", { name: "Search" }));
 }
 
 async function generateTierList(user: ReturnType<typeof userEvent.setup>, query: string) {
@@ -698,8 +723,7 @@ describe("App", () => {
     render(<App />);
     await screen.findByRole("heading", { name: "Query Language" });
 
-    await user.type(screen.getByLabelText("Query"), "name:void");
-    await user.click(screen.getByRole("button", { name: "Search" }));
+    await submitCardsSearch(user, "name:void");
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid");
@@ -715,8 +739,7 @@ describe("App", () => {
     render(<App />);
     await screen.findByRole("heading", { name: "Query Language" });
 
-    await user.type(screen.getByLabelText("Query"), "name:void");
-    await user.click(screen.getByRole("button", { name: "Search" }));
+    await submitCardsSearch(user, "name:void");
     await screen.findByAltText("Void Gate card image.");
 
     await user.click(screen.getByText("Void Gate"));
@@ -727,6 +750,37 @@ describe("App", () => {
     expect(within(dialog).queryByText("Near Mint $12.34")).not.toBeInTheDocument();
   });
 
+  it("renders inline symbols in quick-look card text and combines multi-domain chips", async () => {
+    const user = userEvent.setup();
+
+    window.history.pushState({}, "", "/cards");
+    render(<App />);
+    await screen.findByRole("heading", { name: "Query Language" });
+
+    await submitCardsSearch(user, "name:twin");
+    await screen.findByAltText("Twin Paths card image.");
+
+    await user.click(screen.getByText("Twin Paths"));
+
+    const dialog = await screen.findByRole("dialog", { name: "Twin Paths" });
+    const domainChips = dialog.querySelectorAll(".card-attr-chip--domain");
+    expect(domainChips).toHaveLength(1);
+    expect(within(dialog).getByText("Calm, Mind")).toBeInTheDocument();
+
+    await user.click(screen.getByLabelText("Close"));
+    await user.clear(screen.getByLabelText("Query"));
+    await submitCardsSearch(user, "name:void");
+    await screen.findByAltText("Void Gate card image.");
+
+    await user.click(screen.getByText("Void Gate"));
+
+    const symbolDialog = await screen.findByRole("dialog", { name: "Void Gate" });
+    expect(symbolDialog.querySelector('[data-symbol-token="E"]')).not.toBeNull();
+    expect(symbolDialog.querySelector('[data-symbol-token="T"]')).not.toBeNull();
+    expect(symbolDialog.querySelector('[data-symbol-token="3"]')).not.toBeNull();
+    expect(symbolDialog.querySelector('[data-symbol-token="H"]')).not.toBeNull();
+  });
+
   it("uses published price rows on the card detail page and shows a toggleable history chart", async () => {
     const user = userEvent.setup();
 
@@ -735,7 +789,7 @@ describe("App", () => {
 
     expect(await screen.findByRole("heading", { name: "Void Gate" })).toBeInTheDocument();
     expect(screen.getAllByText("Near Mint $12.34").length).toBeGreaterThan(0);
-    expect(screen.getByText("$8.90")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Near Mint $8.90" })).toBeInTheDocument();
     expect(screen.queryByText(/^Market Price$/)).not.toBeInTheDocument();
 
     expect(screen.getByRole("heading", { name: "Pricing" })).toBeInTheDocument();
@@ -754,6 +808,22 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Near Mint $12.34" }));
     await user.click(screen.getByRole("button", { name: "Lightly Played $10.50" }));
     expect(screen.queryByTestId("price-history-chart")).not.toBeInTheDocument();
+  });
+
+  it("renders inline cost, might, and text symbols on the card detail page", async () => {
+    window.history.pushState({}, "", "/cards/card-1");
+    render(<App />);
+
+    const heading = await screen.findByRole("heading", { name: "Void Gate" });
+    expect(heading).toBeInTheDocument();
+
+    const detailView = heading.closest(".card-detail-view");
+    expect(detailView).not.toBeNull();
+    expect(detailView?.querySelector('.card-attr-value [data-symbol-token="3"]')).not.toBeNull();
+    expect(detailView?.querySelector('.card-attr-value [data-symbol-token="P"]')).not.toBeNull();
+    expect(detailView?.querySelector('.card-attr-value [data-symbol-token="T"]')).not.toBeNull();
+    expect(detailView?.querySelector('.card-detail-body-text [data-symbol-token="E"]')).not.toBeNull();
+    expect(detailView?.querySelector('.card-detail-body-text [data-symbol-token="H"]')).not.toBeNull();
   });
 
   it("keeps a selected price series color stable while other series are toggled", async () => {
@@ -785,8 +855,7 @@ describe("App", () => {
     render(<App />);
     await screen.findByRole("heading", { name: "Query Language" });
 
-    await user.type(screen.getByLabelText("Query"), "energy>>3");
-    await user.click(screen.getByRole("button", { name: "Search" }));
+    await submitCardsSearch(user, "energy>>3");
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText(/Expected value/)).toBeInTheDocument();
@@ -817,15 +886,15 @@ describe("App", () => {
 
     render(<App />);
     await user.click(screen.getByRole("button", { name: "Tools" }));
-    expect(screen.getByRole("link", { name: "Tier List" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Sealed Pools" })).toBeInTheDocument();
-    await user.click(screen.getByRole("link", { name: "Tier List" }));
+    expect(screen.getByRole("link", { name: "Tier List Generator" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Sealed Simulator" })).toBeInTheDocument();
+    await user.click(screen.getByRole("link", { name: "Tier List Generator" }));
     expect(await screen.findByRole("heading", { name: "Tier List" })).toBeInTheDocument();
 
     expect(window.location.pathname).toBe("/tools/tier-list");
     expect(screen.getByRole("button", { name: "Tools" })).toHaveClass("active");
     await user.click(screen.getByRole("button", { name: "Tools" }));
-    expect(screen.getByRole("link", { name: "Tier List" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Tier List Generator" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("Generate a filtered card pool")).toBeInTheDocument();
   });
 
@@ -854,9 +923,9 @@ describe("App", () => {
 
     render(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Sealed Pools" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Sealed Simulator" })).toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole("button", { name: "Tools" }));
-    expect(screen.getByRole("link", { name: "Sealed Pools" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Sealed Simulator" })).toHaveAttribute("aria-current", "page");
   });
 
   it("closes the tools menu after navigation and when clicking away", async () => {
@@ -865,16 +934,16 @@ describe("App", () => {
     render(<App />);
 
     await user.click(screen.getByRole("button", { name: "Tools" }));
-    expect(screen.getByRole("link", { name: "Sealed Pools" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Sealed Simulator" })).toBeInTheDocument();
 
     await user.click(document.body);
-    expect(screen.queryByRole("link", { name: "Sealed Pools" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Sealed Simulator" })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Tools" }));
-    await user.click(screen.getByRole("link", { name: "Sealed Pools" }));
+    await user.click(screen.getByRole("link", { name: "Sealed Simulator" }));
 
-    expect(await screen.findByRole("heading", { name: "Sealed Pools" })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Tier List" })).not.toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Sealed Simulator" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Tier List Generator" })).not.toBeInTheDocument();
   });
 
   it("keeps the generated query fixed until Generate is clicked again", async () => {

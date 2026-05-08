@@ -3089,6 +3089,45 @@ code {
   white-space: nowrap;
 }
 
+.card-attr-chip--symbolic {
+  padding-inline: 10px;
+}
+
+.card-attr-chip--domain-multicolor {
+  border-color: rgba(154, 180, 232, 0.3);
+  background: linear-gradient(135deg, rgba(78, 205, 196, 0.16), rgba(168, 85, 247, 0.16));
+}
+
+.card-inline-symbol {
+  display: inline-block;
+  vertical-align: text-bottom;
+  object-fit: contain;
+  image-rendering: auto;
+  flex: 0 0 auto;
+}
+
+.card-inline-symbol--text {
+  width: 1.05em;
+  height: 1.05em;
+  margin: 0 0.08em;
+}
+
+.card-inline-symbol--stat {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.card-inline-symbol--chip {
+  width: 1em;
+  height: 1em;
+}
+
+.card-inline-metric {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+}
+
 .card-quick-look-text {
   margin: 0;
   color: var(--text);
@@ -3238,6 +3277,13 @@ code {
   color: var(--text-strong);
   font-size: 1.05rem;
   font-weight: 700;
+}
+
+.card-attr-value--symbols {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22em;
+  flex-wrap: wrap;
 }
 
 .card-detail-section {
