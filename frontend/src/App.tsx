@@ -279,14 +279,6 @@ type InlineSymbolVariant = "white" | "black";
 type InlineSymbolSize = "text" | "stat" | "chip";
 
 function inlineSymbolSrc(token: string, variant: InlineSymbolVariant = "white"): string | null {
-  if (/^\d+$/.test(token)) {
-    const value = Number(token);
-    if (!Number.isInteger(value) || value < 0 || value > 12) {
-      return null;
-    }
-    return `/assets/riftbound/symbols/energy/energy-cost-${String(value).padStart(2, "0")}-badge.png`;
-  }
-
   switch (token) {
     case "T":
       return `/assets/riftbound/symbols/stats/might-${variant}.png`;
@@ -360,7 +352,7 @@ function renderTokenizedText(
 function applySymbols(text: string): string {
   return text
     // Energy costs: :rb_energy_N: → {N}
-    .replace(/:rb_energy_(\d+):/g, (_, n) => `{${n}}`)
+    .replace(/:rb_energy_(\d+):/g, (_, n) => String(n))
     // Known named symbols
     .replace(/:([a-z_]+):/g, (_, key) => SYMBOL_MAP[key] ?? `{${key}}`);
 }
@@ -377,11 +369,10 @@ function normalizeCardText(richText: string): string {
   return applySymbols(stripped).trim();
 }
 
-function formatCostTokens(card: CardRecord): string | null {
-  const energy = card.attributes.energy;
-  const power = card.attributes.power;
-  if (energy == null) return null;
-  return `{${energy}}${"{P}".repeat(power ?? 0)}`;
+function formatCostText(card: CardRecord): string | null {
+  const cost = card.attributes.cost ?? card.attributes.energy;
+  if (cost == null) return null;
+  return String(cost);
 }
 
 function domainChipClass(domains: string[]): string {
@@ -668,9 +659,9 @@ function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; o
           </div>
           <p className="card-quick-look-typeline">{formatTypeline(card)}</p>
           <div className="card-quick-look-attrs">
-            {formatCostTokens(card) != null && (
+            {formatCostText(card) != null && (
               <span className="card-attr-chip card-attr-chip--symbolic">
-                {renderTokenizedText(formatCostTokens(card) ?? "", { size: "chip" })}
+                {formatCostText(card)}
               </span>
             )}
             {card.attributes.might != null && (
@@ -2380,11 +2371,11 @@ function CardDetailView({
           <p className="card-detail-typeline">{formatTypeline(card)}</p>
 
           <div className="card-detail-attrs">
-            {formatCostTokens(card) != null && (
+            {formatCostText(card) != null && (
               <div className="card-attr-block">
                 <span className="card-attr-label">Cost</span>
                 <span className="card-attr-value card-attr-value--symbols">
-                  {renderTokenizedText(formatCostTokens(card) ?? "", { size: "stat" })}
+                  {formatCostText(card)}
                 </span>
               </div>
             )}

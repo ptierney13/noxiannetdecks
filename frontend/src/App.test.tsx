@@ -777,8 +777,8 @@ describe("App", () => {
     const symbolDialog = await screen.findByRole("dialog", { name: "Void Gate" });
     expect(symbolDialog.querySelector('[data-symbol-token="E"]')).not.toBeNull();
     expect(symbolDialog.querySelector('[data-symbol-token="T"]')).not.toBeNull();
-    expect(symbolDialog.querySelector('[data-symbol-token="3"]')).not.toBeNull();
     expect(symbolDialog.querySelector('[data-symbol-token="H"]')).not.toBeNull();
+    expect(within(symbolDialog).getByText(/Pay 3/)).toBeInTheDocument();
   });
 
   it("uses published price rows on the card detail page and shows a toggleable history chart", async () => {
@@ -819,11 +819,12 @@ describe("App", () => {
 
     const detailView = heading.closest(".card-detail-view");
     expect(detailView).not.toBeNull();
-    expect(detailView?.querySelector('.card-attr-value [data-symbol-token="3"]')).not.toBeNull();
-    expect(detailView?.querySelector('.card-attr-value [data-symbol-token="P"]')).not.toBeNull();
+    expect(within(detailView as HTMLElement).getByText("3")).toBeInTheDocument();
+    expect(detailView?.querySelector('.card-attr-value [data-symbol-token="P"]')).toBeNull();
     expect(detailView?.querySelector('.card-attr-value [data-symbol-token="T"]')).not.toBeNull();
     expect(detailView?.querySelector('.card-detail-body-text [data-symbol-token="E"]')).not.toBeNull();
     expect(detailView?.querySelector('.card-detail-body-text [data-symbol-token="H"]')).not.toBeNull();
+    expect(within(detailView as HTMLElement).getByText(/Pay 3/)).toBeInTheDocument();
   });
 
   it("keeps a selected price series color stable while other series are toggled", async () => {
