@@ -38,6 +38,33 @@ function matchesText(candidate: string, expected: string, operator: QueryOperato
   return normalizedCandidate.includes(normalizedExpected);
 }
 
+// Domain letter-code mappings
+const DOMAIN_PRIMARY: Record<string, string> = {
+  m: "Mind", f: "Fury", c: "Calm", b: "Body", h: "Chaos", o: "Order"
+};
+const DOMAIN_COLOR: Record<string, string> = {
+  u: "Mind", r: "Fury", g: "Calm", o: "Body", p: "Chaos", y: "Order"
+};
+
+function parseDomainCodes(value: string): Set<string> | null {
+  const chars = value.toLowerCase().split("");
+  if (chars.length === 0 || chars.length > 8) return null;
+
+  // Try all-primary first
+  const allPrimary = chars.every((ch) => ch in DOMAIN_PRIMARY);
+  if (allPrimary) {
+    return new Set(chars.map((ch) => DOMAIN_PRIMARY[ch]));
+  }
+
+  // Fall back to color-based for all chars
+  const allColor = chars.every((ch) => ch in DOMAIN_COLOR);
+  if (allColor) {
+    return new Set(chars.map((ch) => DOMAIN_COLOR[ch]));
+  }
+
+  return null;
+}
+
 function typeLineTerms(card: CardRecord): string[] {
   return [card.type.cardtype, card.type.supertype, ...card.type.tags]
     .filter((value): value is string => Boolean(value))
@@ -77,13 +104,10 @@ function stringValuesForField(card: CardRecord, canonicalField: string): string[
       return [card.text.plain, card.text.rich, card.text.flavour ?? "", ...card.text.keywords].filter(Boolean);
     case "t":
       return [card.type.typeline];
-    case "type":
     case "cardtype":
       return card.type.cardtype ? [card.type.cardtype] : [];
     case "supertype":
       return card.type.supertype ? [card.type.supertype] : [];
-    case "typeline":
-      return card.type.typeline ? [card.type.typeline] : [];
     case "tag":
       return card.type.tags;
     case "keyword":
@@ -138,6 +162,23 @@ function compareNumber(candidate: number, operator: QueryOperator, expected: num
     case "gte":
       return candidate >= expected;
   }
+}
+
+function matchesDomainWithLetterCodes(cardDomains: string[], domainSet: Set<string>): boolean {
+  if (cardDomains.length === 0) return false;
+  return cardDomains.every((d) => domainSet.has(d));
+}
+
+function matchesPowerLetterCodes(card: CardRecord, operator: QueryOperator, value: string): boolean | null {
+  const codes = parseDomainCodes(value);
+  if (!codes) return null;
+
+  const count = value.length;
+  const actualPower = card.attributes.power ?? 0;
+
+  if (!compareNumber(actualPower, operator, count)) return false;
+  if (actualPower === 0) return true;
+  return matchesDomainWithLetterCodes(card.attributes.domain, codes);
 }
 
 function collectorNumberParts(value: string | null): { number: number; suffix: string; raw: string } {
@@ -284,9 +325,18 @@ function matchesPredicate(card: CardRecord, fieldName: string, operator: QueryOp
   }
 
   if (field.kind === "number") {
+    if (field.canonical === "power") {
+      // Try letter-based domain codes first (e.g. p=ff, p<=f, p=oo)
+      const letterResult = matchesPowerLetterCodes(card, operator, value);
+      if (letterResult !== null) return letterResult;
+      // Treat null power as 0 (no power cost)
+      const expected = Number(value);
+      if (Number.isNaN(expected)) return false;
+      return compareNumber(card.attributes.power ?? 0, operator, expected);
+    }
+
     const candidate = numberValueForField(card, field.canonical);
     if (candidate === null) return false;
-
     const expected = Number(value);
     if (Number.isNaN(expected)) return false;
     return compareNumber(candidate, operator, expected);
@@ -294,6 +344,20 @@ function matchesPredicate(card: CardRecord, fieldName: string, operator: QueryOp
 
   if (field.canonical === "t") {
     return matchesTypeLine(card, value, operator);
+  }
+
+  // Domain field: try letter-code subset matching before standard string matching
+  if (field.canonical === "domain") {
+    const domainSet = parseDomainCodes(value);
+    if (domainSet) {
+      return matchesDomainWithLetterCodes(card.attributes.domain, domainSet);
+    }
+  }
+
+  // Keyword field: require whole-word (exact per-entry) match for contains operator
+  if (field.canonical === "keyword" && operator === "contains" && !value.includes("*")) {
+    const normalized = normalizeText(value);
+    return card.text.keywords.some((kw) => normalizeText(kw) === normalized);
   }
 
   return stringValuesForField(card, field.canonical).some((candidate) => matchesText(candidate, value, operator));

@@ -416,7 +416,8 @@ function validateNode(node: QueryNode, diagnostics: QueryDiagnostic[]): void {
         diagnostics.push({ message: `Field "${field.canonical}" does not support numeric comparisons.` });
       }
 
-      if (field.kind === "number" && !isMissingCheck && Number.isNaN(Number(node.value))) {
+      const isPowerLetterCode = field.canonical === "power" && /^[mfcbhourgopy]+$/i.test(node.value);
+      if (field.kind === "number" && !isMissingCheck && !isPowerLetterCode && Number.isNaN(Number(node.value))) {
         diagnostics.push({ message: `Field "${field.canonical}" requires a numeric value or "none".` });
       }
     }

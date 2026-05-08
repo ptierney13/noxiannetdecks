@@ -20,13 +20,15 @@ const FINISHES = [
   { value: "overnumbered", label: "Overnumbered" },
 ] as const;
 const OPERATORS = [">=", ">", "=", "<", "<="] as const;
+const SUPERTYPES = ["Champion", "Signature"] as const;
 
+// Colors: Mind=blue, Fury=red, Calm=green, Body=orange, Chaos=purple, Order=yellow
 const DOMAIN_DATA: Record<string, { color: string; bg: string; bgHover: string }> = {
   Fury:  { color: "#e53935", bg: "rgba(229,57,53,0.15)",   bgHover: "rgba(229,57,53,0.24)"  },
-  Calm:  { color: "#1e88e5", bg: "rgba(30,136,229,0.15)",  bgHover: "rgba(30,136,229,0.24)" },
-  Mind:  { color: "#8e24aa", bg: "rgba(142,36,170,0.15)",  bgHover: "rgba(142,36,170,0.24)" },
-  Body:  { color: "#43a047", bg: "rgba(67,160,71,0.15)",   bgHover: "rgba(67,160,71,0.24)"  },
-  Chaos: { color: "#fb8c00", bg: "rgba(251,140,0,0.15)",   bgHover: "rgba(251,140,0,0.24)"  },
+  Calm:  { color: "#43a047", bg: "rgba(67,160,71,0.15)",   bgHover: "rgba(67,160,71,0.24)"  },
+  Mind:  { color: "#1e88e5", bg: "rgba(30,136,229,0.15)",  bgHover: "rgba(30,136,229,0.24)" },
+  Body:  { color: "#fb8c00", bg: "rgba(251,140,0,0.15)",   bgHover: "rgba(251,140,0,0.24)"  },
+  Chaos: { color: "#8e24aa", bg: "rgba(142,36,170,0.15)",  bgHover: "rgba(142,36,170,0.24)" },
   Order: { color: "#e6c100", bg: "rgba(230,193,0,0.15)",   bgHover: "rgba(230,193,0,0.24)"  },
 };
 
@@ -91,8 +93,7 @@ function StatRow({ label, hint, op, onOpChange, val, onValChange }: StatRowProps
           ))}
         </select>
         <input
-          type="number"
-          min="0"
+          type="text"
           className="qb-stat-input"
           value={val}
           onChange={(e) => onValChange(e.target.value)}
@@ -134,13 +135,14 @@ function TextField({ label, hint, placeholder, value, onChange }: TextFieldProps
 
 export default function QueryBuilderView({ onNavigate }: Props) {
   const [selectedTypes, setSelectedTypes] = useState<Set<string>>(new Set());
+  const [selectedSupertypes, setSelectedSupertypes] = useState<Set<string>>(new Set());
   const [selectedDomains, setSelectedDomains] = useState<Set<string>>(new Set());
   const [selectedRarities, setSelectedRarities] = useState<Set<string>>(new Set());
-  const [includeChampion, setIncludeChampion] = useState(false);
   const [selectedSets, setSelectedSets] = useState<Set<string>>(new Set());
+  const [typelineText, setTypelineText] = useState("");
+  const [tagText, setTagText] = useState("");
   const [nameText, setNameText] = useState("");
   const [rulesText, setRulesText] = useState("");
-  const [tagText, setTagText] = useState("");
   const [keywordText, setKeywordText] = useState("");
   const [artistText, setArtistText] = useState("");
   const [energyOp, setEnergyOp] = useState(">=");
@@ -157,24 +159,25 @@ export default function QueryBuilderView({ onNavigate }: Props) {
     const parts: string[] = [];
 
     if (selectedTypes.size > 0) {
-      parts.push(orGroup([...selectedTypes].map((t) => `type:${t}`)));
+      parts.push(orGroup([...selectedTypes].map((t) => `ct:${t}`)));
     }
+    if (selectedSupertypes.size > 0) {
+      parts.push(orGroup([...selectedSupertypes].map((u) => `u:${u}`)));
+    }
+    if (typelineText.trim()) parts.push(`t:${quoteValue(typelineText.trim())}`);
+    if (tagText.trim()) parts.push(`tag:${quoteValue(tagText.trim())}`);
     if (selectedDomains.size > 0) {
       parts.push(orGroup([...selectedDomains].map((d) => `d:${d}`)));
     }
     if (selectedRarities.size > 0) {
-      parts.push(orGroup([...selectedRarities].map((r) => `r:${r}`)));
-    }
-    if (includeChampion) {
-      parts.push("u:Champion");
+      parts.push(orGroup([...selectedRarities].map((r) => `rarity:${r}`)));
     }
     if (selectedSets.size > 0) {
       parts.push(orGroup([...selectedSets].map((s) => `s:${s}`)));
     }
     if (nameText.trim()) parts.push(`n:${quoteValue(nameText.trim())}`);
-    if (rulesText.trim()) parts.push(`o:${quoteValue(rulesText.trim())}`);
-    if (tagText.trim()) parts.push(`tag:${quoteValue(tagText.trim())}`);
-    if (keywordText.trim()) parts.push(`k:${quoteValue(keywordText.trim())}`);
+    if (rulesText.trim()) parts.push(`r:${quoteValue(rulesText.trim())}`);
+    if (keywordText.trim()) parts.push(`kw:${quoteValue(keywordText.trim())}`);
     if (artistText.trim()) parts.push(`a:${quoteValue(artistText.trim())}`);
     if (energyVal.trim()) parts.push(`e${energyOp}${energyVal.trim()}`);
     if (mightVal.trim()) parts.push(`m${mightOp}${mightVal.trim()}`);
@@ -184,8 +187,8 @@ export default function QueryBuilderView({ onNavigate }: Props) {
 
     return parts.join(" ");
   }, [
-    selectedTypes, selectedDomains, selectedRarities, includeChampion, selectedSets,
-    nameText, rulesText, tagText, keywordText, artistText,
+    selectedTypes, selectedSupertypes, selectedDomains, selectedRarities, selectedSets,
+    typelineText, tagText, nameText, rulesText, keywordText, artistText,
     energyOp, energyVal, mightOp, mightVal, powerOp, powerVal, costOp, costVal,
     selectedFinishes,
   ]);
@@ -213,12 +216,25 @@ export default function QueryBuilderView({ onNavigate }: Props) {
         </output>
       </div>
 
-      {/* Card Type */}
+      {/* Card Type, Supertype & Tag */}
       <div className="qb-section">
         <h2 className="qb-section-title">
-          Card Type
-          <code className="qb-hint">type:Unit</code>
+          Card Type &amp; Tags
+          <code className="qb-hint">ct:Unit · u:Champion · tag:Dragon</code>
         </h2>
+
+        {/* Typeline search at top of section */}
+        <div className="qb-text-fields" style={{ marginBottom: "0.75rem" }}>
+          <TextField
+            label="Typeline"
+            hint="t:Champion"
+            placeholder="e.g. Champion Unit, Dragon"
+            value={typelineText}
+            onChange={setTypelineText}
+          />
+        </div>
+
+        <p className="qb-subsection-label">Card Type</p>
         <div className="qb-chips">
           {CARD_TYPES.map((type) => (
             <button
@@ -232,6 +248,33 @@ export default function QueryBuilderView({ onNavigate }: Props) {
             </button>
           ))}
         </div>
+
+        <p className="qb-subsection-label" style={{ marginTop: "0.75rem" }}>Supertype</p>
+        <div className="qb-chips">
+          {SUPERTYPES.map((st) => (
+            <button
+              key={st}
+              type="button"
+              className={`qb-chip${selectedSupertypes.has(st) ? " qb-chip--on" : ""}`}
+              onClick={() => setSelectedSupertypes(toggle(selectedSupertypes, st))}
+              aria-pressed={selectedSupertypes.has(st)}
+            >
+              {st}
+            </button>
+          ))}
+        </div>
+
+        <p className="qb-subsection-label" style={{ marginTop: "0.75rem" }}>Tag</p>
+        <div className="qb-text-fields">
+          <TextField
+            label="Tag"
+            hint="tag:Dragon"
+            placeholder="e.g. Dragon, Follower, Celestial"
+            value={tagText}
+            onChange={setTagText}
+          />
+        </div>
+        <p className="qb-note">Tags are subtypes like Dragon or Follower. Supertypes are Champion, Signature, etc.</p>
       </div>
 
       {/* Domain */}
@@ -269,7 +312,7 @@ export default function QueryBuilderView({ onNavigate }: Props) {
       <div className="qb-section">
         <h2 className="qb-section-title">
           Rarity
-          <code className="qb-hint">r:Rare</code>
+          <code className="qb-hint">rarity:Rare</code>
         </h2>
         <div className="qb-chips">
           {RARITIES.map((rarity) => {
@@ -293,25 +336,6 @@ export default function QueryBuilderView({ onNavigate }: Props) {
             );
           })}
         </div>
-      </div>
-
-      {/* Supertype */}
-      <div className="qb-section">
-        <h2 className="qb-section-title">
-          Supertype
-          <code className="qb-hint">u:Champion</code>
-        </h2>
-        <div className="qb-chips">
-          <button
-            type="button"
-            className={`qb-chip${includeChampion ? " qb-chip--on" : ""}`}
-            onClick={() => setIncludeChampion((c) => !c)}
-            aria-pressed={includeChampion}
-          >
-            Champion
-          </button>
-        </div>
-        <p className="qb-note">Champions are the legendary units you build your deck around.</p>
       </div>
 
       {/* Set */}
@@ -342,7 +366,7 @@ export default function QueryBuilderView({ onNavigate }: Props) {
         <div className="qb-stats-grid">
           <StatRow label="Energy" hint="e>=3" op={energyOp} onOpChange={setEnergyOp} val={energyVal} onValChange={setEnergyVal} />
           <StatRow label="Might"  hint="m>=2" op={mightOp}  onOpChange={setMightOp}  val={mightVal}  onValChange={setMightVal}  />
-          <StatRow label="Power"  hint="p>=1" op={powerOp}  onOpChange={setPowerOp}  val={powerVal}  onValChange={setPowerVal}  />
+          <StatRow label="Power"  hint="p>=1 or p=ff" op={powerOp}  onOpChange={setPowerOp}  val={powerVal}  onValChange={setPowerVal}  />
           <StatRow label="Cost"   hint="cost=3" op={costOp}   onOpChange={setCostOp}   val={costVal}   onValChange={setCostVal}   />
         </div>
       </div>
@@ -360,21 +384,14 @@ export default function QueryBuilderView({ onNavigate }: Props) {
           />
           <TextField
             label="Rules Text"
-            hint='o:"draw a card"'
+            hint='r: or o:"draw a card"'
             placeholder='e.g. draw a card'
             value={rulesText}
             onChange={setRulesText}
           />
           <TextField
-            label="Tag"
-            hint="tag:Dragon"
-            placeholder="e.g. Dragon, Follower, Celestial"
-            value={tagText}
-            onChange={setTagText}
-          />
-          <TextField
             label="Keyword"
-            hint="k:Action"
+            hint="kw:Action or k:Action"
             placeholder="e.g. Action, Resolve, Allegiance"
             value={keywordText}
             onChange={setKeywordText}
@@ -388,7 +405,7 @@ export default function QueryBuilderView({ onNavigate }: Props) {
           />
         </div>
         <p className="qb-note">
-          Tags are subtypes like Dragon or Follower. Keywords are mechanics like Action, Resolve, or Allegiance. Use quotes around multi-word values.
+          Keywords are mechanics like Action, Resolve, or Allegiance. Use quotes around multi-word values.
         </p>
       </div>
 

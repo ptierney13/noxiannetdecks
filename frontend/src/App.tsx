@@ -249,9 +249,10 @@ const RIFTBOUND_REGIONS = new Set([
 
 function formatTypeline(card: CardRecord): string {
   const { supertype, cardtype, tags } = card.type;
-  const nonRegion = tags.filter((t) => !RIFTBOUND_REGIONS.has(t));
+  // Region tags appear first (after unit name), then other type tags
   const region = tags.filter((t) => RIFTBOUND_REGIONS.has(t));
-  const sortedTags = [...nonRegion, ...region];
+  const nonRegion = tags.filter((t) => !RIFTBOUND_REGIONS.has(t));
+  const sortedTags = [...region, ...nonRegion];
 
   const left = [supertype, cardtype].filter(Boolean).join(" ");
   const right = sortedTags.join(" ");
@@ -261,22 +262,40 @@ function formatTypeline(card: CardRecord): string {
 const SYMBOL_MAP: Record<string, string> = {
   rb_might: "{M}",
   rb_exhaust: "{E}",
-  rb_rune_fury: "{Fury}",
-  rb_rune_calm: "{Calm}",
-  rb_rune_mind: "{Mind}",
-  rb_rune_body: "{Body}",
-  rb_rune_chaos: "{Chaos}",
-  rb_rune_order: "{Order}",
-  rb_rune_rainbow: "{Rainbow}",
+  rb_rune_fury: "{F}",
+  rb_rune_calm: "{C}",
+  rb_rune_mind: "{M}",
+  rb_rune_body: "{B}",
+  rb_rune_chaos: "{H}",
+  rb_rune_order: "{O}",
+  rb_rune_rainbow: "{P}",
 };
 
-function formatCardText(text: string): string {
-  return text.replace(/:([a-z_]+):/g, (_, key) => SYMBOL_MAP[key] ?? `{${key}}`);
+function applySymbols(text: string): string {
+  return text
+    // Energy costs: :rb_energy_N: → {N}
+    .replace(/:rb_energy_(\d+):/g, (_, n) => `{${n}}`)
+    // Known named symbols
+    .replace(/:([a-z_]+):/g, (_, key) => SYMBOL_MAP[key] ?? `{${key}}`);
+}
+
+function formatCardText(richText: string): string {
+  const stripped = richText
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&gt;/g, ">")
+    .replace(/&lt;/g, "<")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/\[>\]/g, "");
+  return applySymbols(stripped).trim();
 }
 
 function formatCost(card: CardRecord): string | null {
-  if (card.attributes.cost == null) return null;
-  return `${card.attributes.cost}P`;
+  const energy = card.attributes.energy;
+  const power = card.attributes.power;
+  if (energy == null) return null;
+  return `${energy}${"P".repeat(power ?? 0)}`;
 }
 
 const PRICE_SERIES_COLORS = ["#f59e0b", "#ef4444", "#38bdf8", "#a78bfa", "#34d399", "#f472b6"] as const;
@@ -556,12 +575,12 @@ function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; o
           <p className="card-quick-look-typeline">{formatTypeline(card)}</p>
           <div className="card-quick-look-attrs">
             {formatCost(card) != null && <span className="card-attr-chip">{formatCost(card)}</span>}
-            {card.attributes.might != null && <span className="card-attr-chip">{card.attributes.might}{"{M}"}</span>}
+            {card.attributes.might != null && <span className="card-attr-chip">{card.attributes.might}</span>}
             {card.attributes.domain.map((d) => (
               <span key={d} className={`card-attr-chip card-attr-chip--domain card-attr-chip--domain-${d.toLowerCase()}`}>{d}</span>
             ))}
           </div>
-          {card.text.plain && <p className="card-quick-look-text">{formatCardText(card.text.plain)}</p>}
+          {card.text.rich && <p className="card-quick-look-text">{formatCardText(card.text.rich)}</p>}
           <div className="card-quick-look-meta">
             <span>{card.set.label} · {card.set.set_id} {card.collector_number ?? "?"}</span>
             {card.rarity && <span>{card.rarity}</span>}
@@ -713,6 +732,7 @@ function SearchView({
               onChange={(event) => setQuery(event.target.value)}
               placeholder='t:unit d:body e>=3'
               autoComplete="off"
+              autoCapitalize="none"
             />
             <button type="submit" disabled={isSearching}>
               <SearchIcon />
@@ -1956,6 +1976,7 @@ function HomePage({ onNavigate }: { onNavigate: (href: string) => void }) {
               placeholder="Search for cards…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              autoCapitalize="none"
             />
             <button type="submit" className="hero-search-btn">Search</button>
           </form>
@@ -2251,7 +2272,7 @@ function CardDetailView({
               <div className="card-attr-block"><span className="card-attr-label">Cost</span><span className="card-attr-value">{formatCost(card)}</span></div>
             )}
             {card.attributes.might != null && (
-              <div className="card-attr-block"><span className="card-attr-label">Might</span><span className="card-attr-value">{card.attributes.might}{"{M}"}</span></div>
+              <div className="card-attr-block"><span className="card-attr-label">Might</span><span className="card-attr-value">{card.attributes.might}</span></div>
             )}
             {card.attributes.domain.length > 0 && (
               <div className="card-attr-block">
@@ -2261,9 +2282,9 @@ function CardDetailView({
             )}
           </div>
 
-          {card.text.plain && (
+          {card.text.rich && (
             <div className="card-detail-section">
-              <p className="card-detail-body-text">{formatCardText(card.text.plain)}</p>
+              <p className="card-detail-body-text">{formatCardText(card.text.rich)}</p>
             </div>
           )}
 

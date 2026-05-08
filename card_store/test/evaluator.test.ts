@@ -141,7 +141,7 @@ describe("searchCards", () => {
   });
 
   it("matches exact fields and aliases", () => {
-    expect(namesFor("set=OGN r:rare")).toEqual(["Void Gate"]);
+    expect(namesFor("set=OGN rarity:rare")).toEqual(["Void Gate"]);
   });
 
   it("matches numeric comparisons and aliases", () => {
@@ -205,7 +205,7 @@ describe("searchCards", () => {
 
   it("allows unique:id to preserve all matched records", () => {
     const result = searchCards(uniqueFixtureCards, "type:rune unique:id");
-    expect(result.normalizedQuery).toBe("type:rune unique:id");
+    expect(result.normalizedQuery).toBe("t:rune unique:id");
     expect(result.uniqueMode).toBe("id");
     expect(result.items.map((card) => card.id)).toEqual(["rune-base", "rune-aa", "rune-reprint"]);
   });

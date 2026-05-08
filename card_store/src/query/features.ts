@@ -21,25 +21,25 @@ export const queryFieldGuides: QueryFieldGuide[] = [
     example: "n:jinx"
   },
   {
-    property: "Rules, flavour, or keyword text",
+    property: "Rules text",
     query: "text:<text>",
-    shorthand: "o:<text>",
-    searches: "text.plain, text.rich, text.flavour, and text.keywords",
-    example: "o:\"draw a card\""
+    shorthand: "r:<text> or o:<text>",
+    searches: "text.plain and text.rich",
+    example: 'r:"draw a card"'
   },
   {
     property: "Type line",
-    query: "Use shorthand t:<text>",
-    shorthand: "t:<text>",
+    query: "t:<text>",
+    shorthand: "type:<text>",
     searches: "type.typeline, with multiword type terms matched in any order",
-    example: "t:\"Champion Unit\""
+    example: 't:"Champion Unit"'
   },
   {
-    property: "Card type only",
-    query: "type:<text>",
+    property: "Card type",
+    query: "ct:<text>",
     shorthand: null,
     searches: "type.cardtype",
-    example: "type:unit"
+    example: "ct:unit"
   },
   {
     property: "Supertype",
@@ -49,32 +49,25 @@ export const queryFieldGuides: QueryFieldGuide[] = [
     example: "u:Champion"
   },
   {
-    property: "Typeline",
-    query: "typeline:<text>",
-    shorthand: null,
-    searches: "type.typeline",
-    example: "typeline:Champion"
-  },
-  {
-    property: "Tag only",
+    property: "Tag",
     query: "tag:<text>",
     shorthand: null,
     searches: "type.tags",
     example: "tag:Dragon"
   },
   {
-    property: "Keyword only",
+    property: "Keyword",
     query: "keyword:<text>",
-    shorthand: "k:<text>",
-    searches: "text.keywords",
+    shorthand: "k:<text> or kw:<text>",
+    searches: "text.keywords (whole-word match)",
     example: "k:Action"
   },
   {
     property: "Domain",
     query: "domain:<text>",
     shorthand: "d:<text>",
-    searches: "attributes.domain",
-    example: "d:Body"
+    searches: "attributes.domain; single letters or multi-letter codes select by domain (e.g. d:mf = Mind or Fury)",
+    example: "d:Body or d:mf"
   },
   {
     property: "Set",
@@ -86,16 +79,16 @@ export const queryFieldGuides: QueryFieldGuide[] = [
   {
     property: "Rarity",
     query: "rarity:<text>",
-    shorthand: "r:<text>",
+    shorthand: null,
     searches: "rarity",
-    example: "r:Rare"
+    example: "rarity:Rare"
   },
   {
     property: "Artist",
     query: "artist:<text>",
     shorthand: "a:<text>",
     searches: "media.artist",
-    example: "a:\"Six More Vodka\""
+    example: 'a:"Six More Vodka"'
   },
   {
     property: "Cost",
@@ -120,10 +113,10 @@ export const queryFieldGuides: QueryFieldGuide[] = [
   },
   {
     property: "Power",
-    query: "power<number comparison>",
-    shorthand: "p<number comparison>",
-    searches: "attributes.power",
-    example: "p=1"
+    query: "power<operator>",
+    shorthand: "p<operator>",
+    searches: "attributes.power; accepts numbers or domain letter codes (p=ff = two Fury, p<=f = at most one Fury)",
+    example: "p=1 or p=ff or p<=f"
   },
   {
     property: "Collector number",
@@ -170,7 +163,7 @@ export const querySyntaxGuides: QuerySyntaxGuide[] = [
   },
   {
     operation: "Exact match",
-    examples: ["name=\"Jinx - Loose Cannon\"", "set=OGN"],
+    examples: ['name="Jinx - Loose Cannon"', "set=OGN"],
     behavior: "Exact normalized match."
   },
   {
@@ -190,7 +183,7 @@ export const querySyntaxGuides: QuerySyntaxGuide[] = [
   },
   {
     operation: "Negation",
-    examples: ["not tag:Dragon", "-r:Common"],
+    examples: ["not tag:Dragon", "-rarity:Common"],
     behavior: "Excludes matching cards."
   },
   {
@@ -200,7 +193,7 @@ export const querySyntaxGuides: QuerySyntaxGuide[] = [
   },
   {
     operation: "Quoted values",
-    examples: ["a:\"Six More Vodka\""],
+    examples: ['a:"Six More Vodka"'],
     behavior: "Use quotes for spaces or punctuation-heavy values."
   },
   {
