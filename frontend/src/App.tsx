@@ -2381,6 +2381,7 @@ export default function App() {
   const [route, setRoute] = useState(() => parseAppRoute(window.location.pathname));
   const [locationSearch, setLocationSearch] = useState(() => window.location.search);
   const [error, setError] = useState<string | null>(null);
+  const [headerSearchQuery, setHeaderSearchQuery] = useState("");
   const [showToolsMenu, setShowToolsMenu] = useState(false);
   const toolsMenuRef = useRef<HTMLDivElement | null>(null);
   const [showCardsMenu, setShowCardsMenu] = useState(false);
@@ -2426,6 +2427,17 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (route.kind === "cards") {
+      setHeaderSearchQuery(new URLSearchParams(locationSearch).get("q") ?? "");
+      return;
+    }
+
+    if (route.kind === "home") {
+      setHeaderSearchQuery("");
+    }
+  }, [locationSearch, route.kind]);
+
   function navigate(nextPath: string) {
     const normalizedPath = normalizePathname(nextPath.split("?")[0]);
     const search = nextPath.includes("?") ? nextPath.slice(nextPath.indexOf("?")) : "";
@@ -2445,6 +2457,11 @@ export default function App() {
   const activeSection = routeSection(route);
   const isHome = route.kind === "home";
 
+  function handleHeaderSearchSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    navigate(buildCardsSearchPath(headerSearchQuery));
+  }
+
   const navContent = (
     <nav className="nav" aria-label="Primary navigation">
       <button
@@ -2456,6 +2473,23 @@ export default function App() {
         <div className="nav-logo">N</div>
         <span className="nav-wordmark">Noxian Netdecks</span>
       </button>
+      <form className="nav-search-form" onSubmit={handleHeaderSearchSubmit} role="search" aria-label="Site card search">
+        <div className="nav-search-icon" aria-hidden="true">
+          <SearchIcon />
+        </div>
+        <input
+          className="nav-search-input"
+          type="search"
+          placeholder="Search cards..."
+          value={headerSearchQuery}
+          onChange={(event) => setHeaderSearchQuery(event.target.value)}
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          aria-label="Search cards"
+        />
+        <button type="submit" className="nav-search-btn">Search</button>
+      </form>
       <div className="nav-links">
         <div className="nav-tools-menu" ref={cardsMenuRef}>
           <button
@@ -2512,7 +2546,6 @@ export default function App() {
           ) : null}
         </div>
       </div>
-      <div />
     </nav>
   );
 
