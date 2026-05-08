@@ -721,8 +721,10 @@ describe("App", () => {
 
     await user.click(screen.getByText("Void Gate"));
 
-    expect(await screen.findByRole("dialog", { name: "Void Gate" })).toBeInTheDocument();
-    expect(screen.getAllByText("Near Mint $12.34").length).toBeGreaterThan(0);
+    const dialog = await screen.findByRole("dialog", { name: "Void Gate" });
+    expect(dialog).toBeInTheDocument();
+    expect(within(dialog).getByText("$12.34")).toBeInTheDocument();
+    expect(within(dialog).queryByText("Near Mint $12.34")).not.toBeInTheDocument();
   });
 
   it("uses published price rows on the card detail page and shows a toggleable history chart", async () => {
@@ -752,6 +754,29 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Near Mint $12.34" }));
     await user.click(screen.getByRole("button", { name: "Lightly Played $10.50" }));
     expect(screen.queryByTestId("price-history-chart")).not.toBeInTheDocument();
+  });
+
+  it("keeps a selected price series color stable while other series are toggled", async () => {
+    const user = userEvent.setup();
+
+    window.history.pushState({}, "", "/cards/card-1");
+    render(<App />);
+
+    expect(await screen.findByRole("heading", { name: "Void Gate" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Near Mint $12.34" }));
+    expect(await screen.findByTestId("price-history-chart")).toBeInTheDocument();
+
+    const nearMintLegend = screen.getByText(/Foil .* Near Mint/).parentElement;
+    const initialNearMintColor = (nearMintLegend?.querySelector(".price-chart-legend-swatch") as HTMLElement | null)?.style.backgroundColor;
+
+    await user.click(screen.getByRole("button", { name: "Lightly Played $10.50" }));
+    const colorAfterAddingSecondSeries = (screen.getByText(/Foil .* Near Mint/).parentElement?.querySelector(".price-chart-legend-swatch") as HTMLElement | null)?.style.backgroundColor;
+    expect(colorAfterAddingSecondSeries).toBe(initialNearMintColor);
+
+    await user.click(screen.getByRole("button", { name: "Lightly Played $10.50" }));
+    const colorAfterRemovingSecondSeries = (screen.getByText(/Foil .* Near Mint/).parentElement?.querySelector(".price-chart-legend-swatch") as HTMLElement | null)?.style.backgroundColor;
+    expect(colorAfterRemovingSecondSeries).toBe(initialNearMintColor);
   });
 
   it("shows parse diagnostics", async () => {

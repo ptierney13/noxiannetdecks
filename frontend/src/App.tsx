@@ -296,6 +296,10 @@ function formatHeadlinePrice(row: PublishedPriceRow | null): string | null {
   return `${row.condition} ${price}`;
 }
 
+function formatPriceOnly(row: PublishedPriceRow | null): string | null {
+  return formatUsdPrice(row?.currentPrice.amount);
+}
+
 function formatSeriesToggleLabel(row: PublishedPriceRow): string {
   const condition = row.condition ?? "Unknown";
   const price = formatUsdPrice(row.currentPrice.amount);
@@ -327,11 +331,11 @@ function groupRowsByPrinting(rows: PublishedPriceRow[]): PricePrintingGroup[] {
     }));
 }
 
-function PriceHistoryChart({ rows }: { rows: PublishedPriceRow[] }) {
+function PriceHistoryChart({ rows, colorsByRowId }: { rows: PublishedPriceRow[]; colorsByRowId: Record<string, string> }) {
   const series = rows
     .map((row, index) => ({
       row,
-      color: PRICE_SERIES_COLORS[index % PRICE_SERIES_COLORS.length],
+      color: colorsByRowId[row.rowId] ?? PRICE_SERIES_COLORS[index % PRICE_SERIES_COLORS.length],
       points: [...row.priceHistory].sort((left, right) => left.observedAt.localeCompare(right.observedAt))
     }))
     .filter((entry) => entry.points.length > 0);
@@ -532,7 +536,7 @@ function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; o
     () => resolveNearMintMarketPrice(priceRows),
     [priceRows]
   );
-  const headlinePrice = formatHeadlinePrice(nearMintPrice);
+  const headlinePrice = formatPriceOnly(nearMintPrice);
 
   return (
     <div className="card-quick-look-backdrop" onClick={handleBackdropClick} role="presentation">
@@ -2068,6 +2072,8 @@ function CardDetailView({
   const [selectedPriceRowIds, setSelectedPriceRowIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const { index: publishedPriceIndex } = usePublishedPriceIndex();
+  const priceSeriesColorsRef = useRef<Record<string, string>>({});
+  const nextPriceSeriesColorIndexRef = useRef(0);
 
   useEffect(() => {
     let ignore = false;
@@ -2075,6 +2081,8 @@ function CardDetailView({
     setCard(null);
     setAllPrintings([]);
     setSelectedPriceRowIds([]);
+    priceSeriesColorsRef.current = {};
+    nextPriceSeriesColorIndexRef.current = 0;
     onError(null);
 
     async function load() {
@@ -2122,6 +2130,20 @@ function CardDetailView({
     () => currentPriceRows.filter((row) => selectedPriceRowIds.includes(row.rowId)),
     [currentPriceRows, selectedPriceRowIds]
   );
+  const selectedPriceRowColors = useMemo(() => {
+    const colorsByRowId = priceSeriesColorsRef.current;
+    let nextIndex = nextPriceSeriesColorIndexRef.current;
+
+    for (const rowId of selectedPriceRowIds) {
+      if (!colorsByRowId[rowId]) {
+        colorsByRowId[rowId] = PRICE_SERIES_COLORS[nextIndex % PRICE_SERIES_COLORS.length];
+        nextIndex += 1;
+      }
+    }
+
+    nextPriceSeriesColorIndexRef.current = nextIndex;
+    return { ...colorsByRowId };
+  }, [selectedPriceRowIds]);
 
   function togglePriceRow(rowId: string) {
     setSelectedPriceRowIds((current) =>
@@ -2312,7 +2334,7 @@ function CardDetailView({
                   </div>
                 ))}
 
-                {selectedPriceRows.length > 0 ? <PriceHistoryChart rows={selectedPriceRows} /> : null}
+                {selectedPriceRows.length > 0 ? <PriceHistoryChart rows={selectedPriceRows} colorsByRowId={selectedPriceRowColors} /> : null}
               </>
             )}
           </div>
