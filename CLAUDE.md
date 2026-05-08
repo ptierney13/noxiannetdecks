@@ -109,7 +109,13 @@ Always use `--ff-only` to keep history linear. If it fails (diverged histories),
 
 ### Deployment
 
-Cloudflare Pages is connected to the `main` branch and deploys automatically on push. There is no manual deploy step.
+Cloudflare Pages auto-deploys **every branch** pushed to origin, not just `main`. The preferred working pattern is:
+
+1. Push the session branch to origin (`git push -u origin claude/<branch-name>`)
+2. The user tests on the Cloudflare preview URL for that branch
+3. Merge to main when approved
+
+There is no manual deploy step for either branches or main.
 
 ## Plan-first development
 
