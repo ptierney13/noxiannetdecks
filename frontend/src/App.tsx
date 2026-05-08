@@ -761,7 +761,7 @@ function SearchView({
 }
 
 function cardEnergy(card: CardRecord): number | null {
-  return card.attributes.energy ?? card.attributes.cost;
+  return card.attributes.energy;
 }
 
 function legalCardKey(entry: GeneratedPoolCard): string {

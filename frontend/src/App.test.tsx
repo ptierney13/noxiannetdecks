@@ -20,7 +20,7 @@ function createCard({
   typeline = "Unit",
   domain = ["Body"],
   layout = "portrait",
-  cost = 3,
+  cost = "{3}",
   energy = 3,
   might = 4,
   power = 2
@@ -40,7 +40,7 @@ function createCard({
   typeline?: string;
   domain?: string[];
   layout?: "portrait" | "landscape";
-  cost?: number | null;
+  cost?: string | null;
   energy?: number | null;
   might?: number | null;
   power?: number | null;
@@ -110,7 +110,7 @@ const championCard = createCard({
   tags: ["Jinx"],
   typeline: "Unit - Champion - Jinx",
   domain: ["Fury"],
-  cost: 4,
+  cost: "{4}",
   energy: 4,
   might: 5
 });
@@ -125,7 +125,7 @@ const spellCard = createCard({
   cardtype: "Spell",
   typeline: "Spell",
   domain: ["Mind"],
-  cost: 2,
+  cost: "{2}",
   energy: 2,
   might: null,
   power: null
@@ -141,7 +141,7 @@ const multicolorSpellCard = createCard({
   cardtype: "Spell",
   typeline: "Spell",
   domain: ["Calm", "Mind"],
-  cost: 3,
+  cost: "{3}",
   energy: 3,
   might: null,
   power: null
@@ -157,7 +157,7 @@ const gearCard = createCard({
   cardtype: "Gear",
   typeline: "Gear",
   domain: ["Body"],
-  cost: 1,
+  cost: "{1}",
   energy: 1,
   might: null,
   power: null
@@ -226,7 +226,7 @@ const unlChampion = createCard({
   tags: ["Vi"],
   typeline: "Unit - Champion - Vi",
   domain: ["Body"],
-  cost: 5,
+  cost: "{5}",
   energy: 5,
   might: 6
 });
