@@ -1,5 +1,6 @@
 import { type CSSProperties, type FormEvent, type MouseEvent, type PointerEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { generateSealedPool, getCard, loadPackGeneratorOptions, loadQueryFeatures, searchCards } from "./api";
+import { CardSearchGuide } from "./CardSearchGuide";
 import DeckExplorerView from "./DeckExplorerView";
 import {
   formatPrintingLabel,
@@ -130,6 +131,7 @@ function QueryLanguageTables({
   fields: QueryFieldGuide[];
   syntax: QuerySyntaxGuide[];
 }) {
+  const [showGuide, setShowGuide] = useState(false);
   const [showFields, setShowFields] = useState(false);
   const [showSyntax, setShowSyntax] = useState(false);
 
@@ -139,6 +141,9 @@ function QueryLanguageTables({
         <h2 id="query-language-heading">Query Language</h2>
         <p>Find cards by property, then combine searches with syntax operations.</p>
       </div>
+      <CollapsibleFeatureTable title="Search by Card Element" expanded={showGuide} onToggle={() => setShowGuide((current) => !current)}>
+        <CardSearchGuide />
+      </CollapsibleFeatureTable>
       <CollapsibleFeatureTable title="Searchable Fields" expanded={showFields} onToggle={() => setShowFields((current) => !current)}>
         <table className="feature-table">
           <thead>
