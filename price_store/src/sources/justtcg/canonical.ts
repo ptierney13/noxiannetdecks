@@ -308,7 +308,7 @@ function buildCanonicalSnapshot(
       rarity: card.rarity,
       details: card.details,
       externalIds: {
-        tcgplayerId: card.tcgplayerId
+        ...(asOptionalStringField("tcgplayerId", card.tcgplayerId))
       },
       variants: card.variants.map((variant) => ({
         sourceVariantId: variant.id,
@@ -316,7 +316,7 @@ function buildCanonicalSnapshot(
         printing: variant.printing ?? null,
         language: variant.language ?? null,
         externalIds: {
-          tcgplayerSkuId: variant.tcgplayerSkuId
+          ...(asOptionalStringField("tcgplayerSkuId", variant.tcgplayerSkuId))
         },
         currentPrice: {
           currency: "USD",
@@ -419,21 +419,51 @@ function extractPagination(meta: JustTcgCardsResponse["meta"]): {
 function mergeCanonicalCards(
   pageSnapshots: JustTcgCanonicalSnapshot[]
 ): JustTcgCanonicalCard[] {
-  const seen = new Set<string>();
-  const merged: JustTcgCanonicalCard[] = [];
+  const mergedByCardId = new Map<string, JustTcgCanonicalCard>();
 
   for (const snapshot of pageSnapshots) {
     for (const card of snapshot.cards) {
-      if (seen.has(card.sourceCardId)) {
-        throw new Error(`Duplicate JustTCG source card id encountered during canonical merge: ${card.sourceCardId}`);
+      const existing = mergedByCardId.get(card.sourceCardId);
+      if (!existing) {
+        mergedByCardId.set(card.sourceCardId, card);
+        continue;
       }
 
-      seen.add(card.sourceCardId);
-      merged.push(card);
+      mergedByCardId.set(card.sourceCardId, mergeCanonicalCard(existing, card));
     }
   }
 
-  return merged;
+  return [...mergedByCardId.values()];
+}
+
+function mergeCanonicalCard(
+  existing: JustTcgCanonicalCard,
+  incoming: JustTcgCanonicalCard
+): JustTcgCanonicalCard {
+  const variantsById = new Map<string, JustTcgCanonicalVariant>();
+  for (const variant of existing.variants) {
+    variantsById.set(variant.sourceVariantId, variant);
+  }
+  for (const variant of incoming.variants) {
+    variantsById.set(variant.sourceVariantId, variant);
+  }
+
+  return {
+    ...existing,
+    name: existing.name || incoming.name,
+    gameLabel: existing.gameLabel || incoming.gameLabel,
+    set: {
+      slug: existing.set.slug ?? incoming.set.slug ?? null,
+      label: existing.set.label ?? incoming.set.label ?? null
+    },
+    number: existing.number ?? incoming.number ?? null,
+    rarity: existing.rarity ?? incoming.rarity ?? null,
+    details: existing.details ?? incoming.details ?? null,
+    externalIds: {
+      tcgplayerId: existing.externalIds.tcgplayerId ?? incoming.externalIds.tcgplayerId
+    },
+    variants: [...variantsById.values()]
+  };
 }
 
 function readInteger(value: unknown): number | undefined {
@@ -513,6 +543,13 @@ function normalizeEpochSeconds(value: number | null | undefined): string | null 
 
 function deriveRawMetadataPath(relativePayloadPath: string): string {
   return relativePayloadPath.replace(/\.json$/u, ".meta.json");
+}
+
+function asOptionalStringField<T extends string>(
+  key: T,
+  value: string | null | undefined
+): Partial<Record<T, string>> {
+  return typeof value === "string" && value.trim().length > 0 ? { [key]: value } as Record<T, string> : {};
 }
 
 function sanitizeSegment(value: string): string {

@@ -12,14 +12,19 @@ async function main() {
   const layout = resolvePriceDataLayout(resolveDefaultPriceDataDir());
   await initializePriceDataLayout(layout);
 
-  const latestRunId = await findLatestJustTcgRunId(layout.runsDir);
-  if (!latestRunId) {
+  const latestRun = await findLatestJustTcgRun(layout.runsDir);
+  if (!latestRun?.runId) {
     throw new Error("No JustTCG raw-capture run status files were found under .price_data/runs.");
   }
 
-  const rawMetadataPaths = await findJustTcgRawMetadataPathsForRun(layout.rootDir, layout.rawDir, latestRunId);
+  const rawMetadataPaths = await findJustTcgRawMetadataPathsForRun(
+    layout.rootDir,
+    layout.rawDir,
+    latestRun.runId,
+    latestRun.pageCount
+  );
   if (rawMetadataPaths.length === 0) {
-    throw new Error(`No JustTCG raw capture metadata files were found for run ${latestRunId}.`);
+    throw new Error(`No JustTCG raw capture metadata files were found for run ${latestRun.runId}.`);
   }
 
   const rawMetadatas = await Promise.all(
@@ -30,7 +35,7 @@ async function main() {
   console.log(
     JSON.stringify(
       {
-        runId: latestRunId,
+        runId: latestRun.runId,
         rawRelativeMetadataPaths: rawMetadataPaths,
         canonicalRelativeSnapshotPath: result.canonicalMetadata.relativeSnapshotPath,
         cardCount: result.snapshot.cards.length,
@@ -42,34 +47,77 @@ async function main() {
   );
 }
 
-async function findLatestJustTcgRunId(runsDir: string): Promise<string | undefined> {
+async function findLatestJustTcgRun(runsDir: string): Promise<
+  | {
+      runId?: string;
+      pageCount?: number;
+    }
+  | undefined
+> {
   const entries = await readdir(runsDir, { withFileTypes: true });
   const candidates = entries
     .filter((entry) => entry.isFile() && entry.name.startsWith("justtcg-capture-") && entry.name.endsWith(".json"))
-    .map((entry) => entry.name)
-    .sort();
-  const latest = candidates.at(-1);
-  return latest ? latest.slice(0, -".json".length) : undefined;
+    .map((entry) => join(runsDir, entry.name));
+  const runStatuses = await Promise.all(
+    candidates.map(async (path) => {
+      const content = await import("node:fs/promises").then(({ readFile }) => readFile(path, "utf8"));
+      const parsed = JSON.parse(content) as {
+        runId?: string;
+        stage?: string;
+        status?: string;
+        completedAt?: string;
+        startedAt?: string;
+        pageCount?: number;
+      };
+
+      return {
+        runId: parsed.runId,
+        stage: parsed.stage,
+        status: parsed.status,
+        completedAt: parsed.completedAt,
+        startedAt: parsed.startedAt,
+        pageCount: parsed.pageCount
+      };
+    })
+  );
+  const latest = runStatuses
+    .filter((entry) => entry.runId && entry.stage === "raw-capture" && entry.status === "succeeded")
+    .sort((left, right) =>
+      (left.completedAt ?? left.startedAt ?? "").localeCompare(right.completedAt ?? right.startedAt ?? "")
+    )
+    .at(-1);
+
+  return latest ? { runId: latest.runId, pageCount: latest.pageCount } : undefined;
 }
 
 async function findJustTcgRawMetadataPathsForRun(
   rootDir: string,
   rawDir: string,
-  runId: string
+  runId: string,
+  pageCount?: number
 ): Promise<string[]> {
   const files = await collectFiles(join(rawDir, "justtcg"));
   const metadataPaths = files.filter((path) => path.endsWith(".meta.json")).sort();
-  const matches: string[] = [];
+  const matches: Array<{
+    relativePath: string;
+    capturedAt: string;
+  }> = [];
 
   for (const absolutePath of metadataPaths) {
     const content = await import("node:fs/promises").then(({ readFile }) => readFile(absolutePath, "utf8"));
-    const candidate = JSON.parse(content) as { runId?: string };
+    const candidate = JSON.parse(content) as { runId?: string; capturedAt?: string };
     if (candidate.runId === runId) {
-      matches.push(relative(rootDir, absolutePath).replaceAll("\\", "/"));
+      matches.push({
+        relativePath: relative(rootDir, absolutePath).replaceAll("\\", "/"),
+        capturedAt: candidate.capturedAt ?? ""
+      });
     }
   }
 
-  return matches;
+  matches.sort((left, right) => left.capturedAt.localeCompare(right.capturedAt));
+  const trimmed = pageCount && matches.length > pageCount ? matches.slice(-pageCount) : matches;
+
+  return trimmed.map((entry) => entry.relativePath);
 }
 
 async function collectFiles(directory: string): Promise<string[]> {
