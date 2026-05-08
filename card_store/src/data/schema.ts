@@ -21,7 +21,7 @@ export const cardRecordSchema = z.object({
   }),
   finishes: z.array(finishSchema).min(1),
   attributes: z.object({
-    cost: nullableNumber,
+    cost: z.string().nullable(),
     energy: nullableNumber,
     might: nullableNumber,
     power: nullableNumber,

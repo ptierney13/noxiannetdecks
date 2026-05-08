@@ -3309,12 +3309,27 @@ code {
   font-size: 0.84rem;
   font-weight: 600;
   text-decoration: none;
+  cursor: pointer;
   transition: border-color 0.12s ease, color 0.12s ease;
 }
 
 .card-detail-json-link:hover {
   border-color: var(--border-strong);
   color: var(--text-strong);
+}
+
+.card-detail-json-block {
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px solid var(--border-mid);
+  border-radius: 6px;
+  background: var(--surface-1);
+  color: var(--text);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  white-space: pre;
+  overflow-x: auto;
+  user-select: text;
 }
 
 .card-detail-versions {

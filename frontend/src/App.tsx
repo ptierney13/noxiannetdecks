@@ -2321,7 +2321,7 @@ function CardDetailView({
           <div className="card-detail-links">
             <a
               className="card-detail-json-link"
-              href={apiUrl}
+              href={`${apiUrl}?pretty=1`}
               target="_blank"
               rel="noopener noreferrer"
             >

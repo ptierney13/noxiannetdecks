@@ -50,9 +50,13 @@ export async function createApp({ cards, loadMetagamePilotBundle = loadMetagameP
     return api.search(request.query.q ?? "");
   });
 
-  app.get<{ Params: { id: string } }>("/api/cards/:id", async (request, reply) => {
+  app.get<{ Params: { id: string }; Querystring: { pretty?: string } }>("/api/cards/:id", async (request, reply) => {
     try {
-      return api.cardById(request.params.id);
+      const card = api.cardById(request.params.id);
+      if (request.query.pretty) {
+        return reply.type("text/plain").send(JSON.stringify(card, null, 2));
+      }
+      return card;
     } catch (caught) {
       if (caught instanceof CardApiError) {
         return reply.status(caught.status).send({ message: caught.message });

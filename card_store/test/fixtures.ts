@@ -19,7 +19,7 @@ export function makeCard(overrides: FixtureOverrides = {}): CardRecord {
     },
     finishes: ["foil"],
     attributes: {
-      cost: 3,
+      cost: "{3}{B}{B}",
       energy: 3,
       might: 4,
       power: 2,
@@ -79,7 +79,7 @@ export const fixtureCards: CardRecord[] = [
     collector_number: "3",
     rarity: "Uncommon",
     finishes: ["nonfoil", "foil"],
-    attributes: { cost: 1, energy: 1, might: null, power: null, domain: ["Calm"] },
+    attributes: { cost: "{1}", energy: 1, might: null, power: 0, domain: ["Calm"] },
     type: { cardtype: "Gear", supertype: null, tags: [], typeline: "Gear" },
     text: {
       rich: "[Action] Buff a friendly unit.",
@@ -97,7 +97,7 @@ export const fixtureCards: CardRecord[] = [
     collector_number: "3a",
     rarity: "Showcase",
     variant: { alternate_art: true, overnumbered: false, signed: false },
-    attributes: { cost: 4, energy: 4, might: 5, power: 2, domain: ["Chaos"] },
+    attributes: { cost: "{4}{H}{H}", energy: 4, might: 5, power: 2, domain: ["Chaos"] },
     type: { cardtype: "Spell", supertype: null, tags: ["Alternate"], typeline: "Spell - Alternate" },
     text: {
       rich: "Alternate art promo.",
@@ -115,7 +115,7 @@ export const fixtureCards: CardRecord[] = [
     collector_number: "4",
     rarity: "Promo",
     variant: { alternate_art: false, overnumbered: true, signed: true },
-    attributes: { cost: 2, energy: 2, might: null, power: null, domain: ["Mind"] },
+    attributes: { cost: "{2}", energy: 2, might: null, power: 0, domain: ["Mind"] },
     type: { cardtype: "Spell", supertype: null, tags: [], typeline: "Spell" },
     text: {
       rich: "Signed promo.",
@@ -133,7 +133,7 @@ export const fixtureCards: CardRecord[] = [
     collector_number: "5",
     rarity: "Promo",
     variant: { alternate_art: false, overnumbered: true, signed: false },
-    attributes: { cost: 2, energy: 2, might: null, power: null, domain: ["Order"] },
+    attributes: { cost: "{2}", energy: 2, might: null, power: 0, domain: ["Order"] },
     type: { cardtype: "Gear", supertype: null, tags: [], typeline: "Gear" },
     text: {
       rich: "Overnumbered promo.",
@@ -151,7 +151,7 @@ export const fixtureCards: CardRecord[] = [
     collector_number: "6",
     rarity: "Promo",
     variant: { alternate_art: false, overnumbered: false, signed: false },
-    attributes: { cost: 1, energy: 1, might: null, power: null, domain: ["Body"] },
+    attributes: { cost: "{1}", energy: 1, might: null, power: 0, domain: ["Body"] },
     type: { cardtype: "Spell", supertype: null, tags: [], typeline: "Spell" },
     text: {
       rich: "Foil promo.",

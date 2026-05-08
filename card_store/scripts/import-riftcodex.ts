@@ -90,8 +90,22 @@ function typelineFromSource(card: SourceCard): string {
   return [card.classification.type, card.classification.supertype, ...card.tags].filter(Boolean).join(" - ");
 }
 
-function costFromSource(card: SourceCard): number | null {
-  return card.stats?.cost ?? card.attributes.cost ?? card.attributes.energy;
+const DOMAIN_SYMBOL: Record<string, string> = {
+  Mind: "M", Fury: "F", Calm: "C", Body: "B", Chaos: "H", Order: "O"
+};
+
+function powerSymbolForDomains(domains: string[]): string {
+  const letters = domains.map((d) => DOMAIN_SYMBOL[d] ?? d[0].toUpperCase()).sort().join("/");
+  return `{${letters}}`;
+}
+
+function costFromSource(card: SourceCard): string | null {
+  const energy = card.stats?.cost ?? card.attributes.cost ?? card.attributes.energy;
+  if (energy === null) return null;
+  const power = card.attributes.power ?? 0;
+  if (power === 0) return `{${energy}}`;
+  const symbol = powerSymbolForDomains(card.classification.domain);
+  return `{${energy}}${symbol.repeat(power)}`;
 }
 
 function sourceValidationMessage(error: z.ZodError): string {
@@ -136,7 +150,9 @@ function normalizeSourceCard(card: SourceCard): CardRecord {
       cost: costFromSource(card),
       energy: card.attributes.energy,
       might: card.attributes.might,
-      power: card.attributes.power,
+      power: (card.attributes.energy !== null || card.attributes.might !== null)
+        ? (card.attributes.power ?? 0)
+        : null,
       domain: card.classification.domain
     },
     type: {

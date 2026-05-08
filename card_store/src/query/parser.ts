@@ -18,7 +18,7 @@ const Minus = createToken({ name: "Minus", pattern: /-/ });
 const QuotedString = createToken({ name: "QuotedString", pattern: /"([^"\\]|\\.)*"/ });
 const BareWord = createToken({
   name: "BareWord",
-  pattern: /[A-Za-z0-9_*][A-Za-z0-9_.*\/',-]*/
+  pattern: /[A-Za-z0-9_{*][{}A-Za-z0-9_.*\/',-]*/
 });
 const NumberLiteral = createToken({ name: "NumberLiteral", pattern: /\d+/, longer_alt: BareWord });
 const And = createToken({ name: "And", pattern: /and/i, longer_alt: BareWord });
@@ -417,7 +417,12 @@ function validateNode(node: QueryNode, diagnostics: QueryDiagnostic[]): void {
       }
 
       const isPowerLetterCode = field.canonical === "power" && /^[mfcbhourgopy]+$/i.test(node.value);
-      if (field.kind === "number" && !isMissingCheck && !isPowerLetterCode && Number.isNaN(Number(node.value))) {
+      const isCostSpec = field.canonical === "cost" && (
+        /^\d+$/.test(node.value) ||
+        /^\d*[mfcbhourgopy]+$/i.test(node.value) ||
+        /^\d*(\{[a-z](?:\/[a-z])*\})+$/i.test(node.value)
+      );
+      if (field.kind === "number" && !isMissingCheck && !isPowerLetterCode && !isCostSpec && Number.isNaN(Number(node.value))) {
         diagnostics.push({ message: `Field "${field.canonical}" requires a numeric value or "none".` });
       }
     }
