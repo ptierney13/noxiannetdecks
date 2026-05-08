@@ -83,5 +83,4 @@ git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" merge --ff-only <b
 git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" push origin main
 ```
 
-Use `--ff-only` to keep history linear. Cloudflare Pages deploys automatically when `main` is pushed — there is no separate deploy step.
-
+Use `--ff-only` to keep history linear. Cloudflare Pages deploys automatically when `main` is pushed - there is no separate deploy step.
