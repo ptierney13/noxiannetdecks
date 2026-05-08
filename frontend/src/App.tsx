@@ -507,6 +507,7 @@ function CardGrid({ cards, onCardClick }: { cards: CardRecord[]; onCardClick?: (
           <article
             className={`card-tile${onCardClick ? " card-tile--clickable" : ""}`}
             key={card.id}
+            data-layout={card.media.layout}
             onClick={onCardClick ? () => onCardClick(card) : undefined}
           >
             {card.media.image_url ? (

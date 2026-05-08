@@ -1456,6 +1456,15 @@ code {
   min-width: 0;
 }
 
+.card-tile[data-layout="landscape"] {
+  grid-column: span 2;
+}
+
+.card-tile[data-layout="landscape"] img,
+.card-tile[data-layout="landscape"] .missing-image {
+  aspect-ratio: 1038 / 744;
+}
+
 .card-tile img,
 .missing-image {
   display: block;
@@ -2465,6 +2474,10 @@ code {
 @media (max-width: 480px) {
   .card-grid {
     grid-template-columns: 1fr;
+  }
+
+  .card-tile[data-layout="landscape"] {
+    grid-column: span 1;
   }
 }
 
