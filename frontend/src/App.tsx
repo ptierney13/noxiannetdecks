@@ -249,10 +249,13 @@ const RIFTBOUND_REGIONS = new Set([
 
 function formatTypeline(card: CardRecord): string {
   const { supertype, cardtype, tags } = card.type;
-  // Region tags appear first (after unit name), then other type tags
-  const region = tags.filter((t) => RIFTBOUND_REGIONS.has(t));
-  const nonRegion = tags.filter((t) => !RIFTBOUND_REGIONS.has(t));
-  const sortedTags = [...region, ...nonRegion];
+  // A tag is a "name tag" if it matches the start of the card's clean_name
+  // (e.g. "Vex" in "Vex Apathetic", "Heimerdinger" in "Heimerdinger Inventor")
+  const baseName = (card.clean_name ?? card.riot_name).toLowerCase();
+  const nameTags = tags.filter((t) => baseName.startsWith(t.toLowerCase()));
+  const regionTags = tags.filter((t) => RIFTBOUND_REGIONS.has(t) && !nameTags.includes(t));
+  const otherTags = tags.filter((t) => !nameTags.includes(t) && !RIFTBOUND_REGIONS.has(t));
+  const sortedTags = [...nameTags, ...regionTags, ...otherTags];
 
   const left = [supertype, cardtype].filter(Boolean).join(" ");
   const right = sortedTags.join(" ");
@@ -2112,9 +2115,16 @@ function CardDetailView({
         if (ignore) return;
         setCard(loaded);
 
-        if (loaded.clean_name) {
+        // Use riftbound_id (exact legal identity) to find all printings.
+        // Falling back to exact clean_name match avoids substring false-positives.
+        const printingsQuery = loaded.riftbound_id
+          ? `riftbound_id="${loaded.riftbound_id}" unique:prints`
+          : loaded.clean_name
+          ? `n="${loaded.clean_name}" unique:prints`
+          : null;
+        if (printingsQuery) {
           try {
-            const result = await searchCards(`n:"${loaded.clean_name}" unique:prints`);
+            const result = await searchCards(printingsQuery);
             if (!ignore) {
               setAllPrintings(result.items);
             }
