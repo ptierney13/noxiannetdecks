@@ -1,4 +1,4 @@
-# Price Store Cloudflare Manual Workers
+# Price Store Cloudflare Scheduled Workers
 
 ## Purpose
 
@@ -10,27 +10,37 @@ that you can:
 - see what must be configured in Cloudflare
 - complete the remaining Cloudflare-side setup yourself without guessing
 
-Stage 7 is manual-trigger only. It does **not** add the every-2-days schedule
-yet. Stage 8 will layer the schedule on top of the same two-worker setup.
+Stage 7 now includes the real scheduled Cloudflare flow. Cloudflare owns the
+routine execution of the pipeline. There is no human-facing bearer-token
+trigger in the normal design.
 
 ## Architecture
 
-The hosted pipeline now has two workers:
+The hosted pipeline has two workers:
 
 1. **Capture worker**
    - file: [workers/price-store-capture.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/price-store-capture.ts)
    - shared handler: [workers/shared/price-store-worker.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/shared/price-store-worker.ts)
    - orchestration logic: [price_store/src/hosted/workers.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/price_store/src/hosted/workers.ts)
-   - responsibility: call JustTCG, page through results, write hosted raw payloads, write a canonical snapshot, and mark the capture run status
+   - responsibility: run on a Cloudflare Cron Trigger, call JustTCG, page
+     through results, write hosted raw payloads, write a canonical snapshot,
+     and mark capture run status
 
 2. **Publish worker**
    - file: [workers/price-store-publish.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/price-store-publish.ts)
    - shared handler: [workers/shared/price-store-worker.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/shared/price-store-worker.ts)
    - orchestration logic: [price_store/src/hosted/workers.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/price_store/src/hosted/workers.ts)
-   - responsibility: read the latest completed capture, generate the publishable manifest and snapshot, and write the frontend-facing artifact contract
+   - responsibility: publish the latest completed capture into the
+     frontend-facing manifest/snapshot artifact shape
 
-The workers coordinate through one shared R2 bucket. The publish worker does
-not call JustTCG directly.
+The workers coordinate through:
+
+- one shared R2 bucket
+- run-status and state files written into that bucket
+- one **Cloudflare Service Binding** from the capture worker to the publish
+  worker
+
+The publish worker does not call JustTCG directly.
 
 ## What Lives Where
 
@@ -39,18 +49,16 @@ not call JustTCG directly.
 These specifications are defined in code and should be treated as the source of
 truth:
 
-- Worker request auth model:
-  - both workers require a bearer token in `Authorization`
+- Capture worker behavior:
+  - schedule-driven entrypoint
+  - no public run endpoint
+  - code: [workers/price-store-capture.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/price-store-capture.ts)
+- Publish worker behavior:
+  - accepts internal `POST /publish`
+  - code: [workers/price-store-publish.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/price-store-publish.ts)
+- Service-binding handoff:
+  - capture invokes publish through `PRICE_STORE_PUBLISHER.fetch(...)`
   - code: [workers/shared/price-store-worker.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/shared/price-store-worker.ts)
-- Capture request body:
-  - `mode: "incremental" | "full"`
-  - optional `updatedAfter`
-  - optional `maxRequests`
-  - optional `requestDelayMs`
-  - code: [price_store/src/hosted/schema.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/price_store/src/hosted/schema.ts)
-- Publish request body:
-  - optional `captureRunId`
-  - code: [price_store/src/hosted/schema.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/price_store/src/hosted/schema.ts)
 - Hosted storage key layout:
   - `raw/...`
   - `canonical/...`
@@ -73,6 +81,9 @@ truth:
   - manifest/snapshot schema consumed by the frontend
   - code: [price_store/src/published/schema.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/price_store/src/published/schema.ts)
   - publish transform: [price_store/src/sources/justtcg/publish.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/price_store/src/sources/justtcg/publish.ts)
+- Example Cloudflare config:
+  - [wrangler.price-store-capture.example.toml](C:/Users/ptier/repos/Deck%20Archive%20Project/wrangler.price-store-capture.example.toml)
+  - [wrangler.price-store-publish.example.toml](C:/Users/ptier/repos/Deck%20Archive%20Project/wrangler.price-store-publish.example.toml)
 
 ### In Cloudflare
 
@@ -82,34 +93,37 @@ confirmed in Cloudflare:
 - the actual worker objects
 - the R2 bucket name
 - the JustTCG API key secret
-- the trigger bearer token secret
-- the binding from each worker to the shared R2 bucket
-- the deployed worker URLs
+- the Service Binding from capture to publish
+- the Cron Trigger attached to the capture worker
+- whether the publish worker is exposed publicly or kept internal-only in your
+  deployment setup
 
 ## How The System Works
 
-### Capture flow
+### Scheduled capture flow
 
-1. You send a `POST` request to the capture worker with a bearer token.
-2. The capture worker validates the request body.
-3. It writes `state/active-capture.json` to mark the worker as busy.
-4. It calls JustTCG page by page.
-5. For each page it writes:
+1. Cloudflare fires the capture worker's `scheduled()` handler from its Cron
+   Trigger.
+2. The capture worker creates `state/active-capture.json`.
+3. It calls JustTCG page by page.
+4. For each page it writes:
    - raw payload JSON under `raw/...`
-   - raw metadata JSON under the matching `.meta.json`
-6. After all pages are fetched, it creates one canonical snapshot from the page
+   - raw metadata JSON beside it
+5. After all pages are fetched, it creates one canonical snapshot from the page
    set.
-7. It writes:
+6. It writes:
    - canonical snapshot JSON under `canonical/...`
    - canonical metadata JSON beside it
    - capture run status under `runs/raw-capture/<runId>.json`
-8. It updates `state/latest-successful-capture.json`.
-9. It deletes `state/active-capture.json`.
+7. It updates `state/latest-successful-capture.json`.
+8. It clears `state/active-capture.json`.
+9. It calls the publish worker through the Cloudflare Service Binding.
 
-### Publish flow
+### Internal publish flow
 
-1. You send a `POST` request to the publish worker with a bearer token.
-2. The publish worker first checks `state/active-capture.json`.
+1. The capture worker makes an internal request to the publish worker through
+   `PRICE_STORE_PUBLISHER.fetch(...)`.
+2. The publish worker checks `state/active-capture.json`.
 3. If capture is still running, publish stops immediately.
 4. Otherwise it reads `state/latest-successful-capture.json`.
 5. It loads the canonical metadata and canonical snapshot for that run.
@@ -129,44 +143,32 @@ The split is intentional:
 - publish owns the frontend-facing artifact shape
 - publish can be rerun after code changes without spending more JustTCG calls
 - partial or failed capture data is never silently published
+- Cloudflare Service Bindings remove the need for bearer-token auth between
+  workers
 
-## Trigger Shapes
+## Scheduled Behavior
 
-### Capture worker request
+The capture worker is scheduled through a Cron Trigger, not a public manual run
+endpoint.
 
-`POST` body:
+The example configuration uses:
 
-```json
-{
-  "mode": "incremental",
-  "updatedAfter": "2026-05-05T00:00:00.000Z",
-  "maxRequests": 55,
-  "requestDelayMs": 6500
-}
+```toml
+[triggers]
+crons = [ "0 9 */2 * *" ]
 ```
 
-Notes:
+That means:
 
-- `mode: "incremental"` uses `updated_after`
-- `mode: "full"` ignores `updatedAfter`
-- if incremental omits `updatedAfter`, the code defaults to the latest
-  successful capture timestamp
+- run at `09:00 UTC`
+- on every second calendar day-of-month
 
-### Publish worker request
+Important:
 
-`POST` body:
-
-```json
-{}
-```
-
-Optional explicit run targeting:
-
-```json
-{
-  "captureRunId": "justtcg-capture-2026-05-07-riftbound-league-of-legends-trading-card-game"
-}
-```
+- Cron Triggers run on UTC time
+- this is "every second calendar day" behavior, not a perfect rolling 48-hour
+  interval
+- if you want a different UTC hour, you will change that in Cloudflare config
 
 ## Repo Files You Should Know
 
@@ -181,9 +183,6 @@ Optional explicit run targeting:
   - [price_store/src/hosted/paths.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/price_store/src/hosted/paths.ts)
 - Hosted storage repository helpers:
   - [price_store/src/hosted/repository.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/price_store/src/hosted/repository.ts)
-- Example Wrangler configs:
-  - [wrangler.price-store-capture.example.toml](C:/Users/ptier/repos/Deck%20Archive%20Project/wrangler.price-store-capture.example.toml)
-  - [wrangler.price-store-publish.example.toml](C:/Users/ptier/repos/Deck%20Archive%20Project/wrangler.price-store-publish.example.toml)
 
 ## Cloudflare Setup Steps
 
@@ -205,99 +204,36 @@ Steps:
 What comes from code:
 - both workers expect one shared binding named `PRICE_STORE_BUCKET`
 
-What you choose:
-- the actual bucket name
-
 Verify before moving on:
 - the bucket appears in the R2 bucket list
 - you can open the bucket details page
 
-### 2. Workers & Pages page: create the capture worker
+### 2. Workers & Pages page: create the publish worker first
 
 Cloudflare dashboard area:
 - `Workers & Pages`
+
+Why first:
+- the capture worker's Service Binding points to the publish worker
+- Cloudflare requires the target worker to exist before the caller binding can
+  be configured cleanly
 
 Steps:
 1. Open `Workers & Pages`.
 2. Click `Create application`.
 3. Choose `Worker`.
-4. Create a worker for the capture runtime.
-   Recommended name: `price-store-capture`
-5. Deploy the worker code from [workers/price-store-capture.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/price-store-capture.ts) using your normal Worker deployment flow.
-
-What comes from code:
-- worker filename
-- expected binding names
-- request body shape
-
-What you choose:
-- final worker name if you do not use the recommended one
-
-Verify before moving on:
-- the worker exists in `Workers & Pages`
-- the worker has a deployed version
-
-### 3. Workers & Pages page: create the publish worker
-
-Cloudflare dashboard area:
-- `Workers & Pages`
-
-Steps:
-1. Stay in `Workers & Pages`.
-2. Click `Create application`.
-3. Choose `Worker`.
 4. Create a worker for the publish runtime.
    Recommended name: `price-store-publish`
-5. Deploy the worker code from [workers/price-store-publish.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/price-store-publish.ts) using your normal Worker deployment flow.
+5. Deploy the worker code from [workers/price-store-publish.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/price-store-publish.ts).
 
 Verify before moving on:
 - the publish worker exists
-- the publish worker has a deployed version
+- it has a deployed version
 
-### 4. Capture worker Settings > Variables and Secrets page
-
-Cloudflare dashboard area:
-- `Workers & Pages` -> `price-store-capture` -> `Settings` -> `Variables and Secrets`
-
-Add these secrets/variables:
-
-- Secret: `JUSTTCG_API_KEY`
-  - value: your real JustTCG API key
-- Secret: `PRICE_STORE_TRIGGER_TOKEN`
-  - value: a strong random token you will use as the bearer token when manually triggering the worker
-- Variable: `JUSTTCG_DEFAULT_GAME`
-  - value from code default:
-    `riftbound-league-of-legends-trading-card-game`
-- Variable: `JUSTTCG_DEFAULT_LIMIT`
-  - value from code default: `20`
-- Variable: `JUSTTCG_INCLUDE_PRICE_HISTORY`
-  - value from code default: `true`
-- Variable: `JUSTTCG_INCLUDE_STATISTICS`
-  - value from code default: `false`
-
-Verify before moving on:
-- all variables/secrets are saved
-- the names match exactly
-
-### 5. Publish worker Settings > Variables and Secrets page
+### 3. Publish worker Settings > Bindings page
 
 Cloudflare dashboard area:
-- `Workers & Pages` -> `price-store-publish` -> `Settings` -> `Variables and Secrets`
-
-Add this secret:
-
-- Secret: `PRICE_STORE_TRIGGER_TOKEN`
-  - use the same token as the capture worker unless you intentionally want two
-    different manual trigger tokens
-
-Verify before moving on:
-- the secret is saved
-- the name matches exactly
-
-### 6. Capture worker Settings > Bindings page
-
-Cloudflare dashboard area:
-- `Workers & Pages` -> `price-store-capture` -> `Settings` -> `Bindings`
+- `Workers & Pages` -> `price-store-publish` -> `Settings` -> `Bindings`
 
 Steps:
 1. Add an `R2 bucket` binding.
@@ -309,149 +245,166 @@ Verify before moving on:
 - the binding name is exactly `PRICE_STORE_BUCKET`
 - it points at the intended bucket
 
-### 7. Publish worker Settings > Bindings page
+### 4. Workers & Pages page: create the capture worker
 
 Cloudflare dashboard area:
-- `Workers & Pages` -> `price-store-publish` -> `Settings` -> `Bindings`
+- `Workers & Pages`
+
+Steps:
+1. Return to `Workers & Pages`.
+2. Click `Create application`.
+3. Choose `Worker`.
+4. Create a worker for the capture runtime.
+   Recommended name: `price-store-capture`
+5. Deploy the worker code from [workers/price-store-capture.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/price-store-capture.ts).
+
+Verify before moving on:
+- the capture worker exists
+- it has a deployed version
+
+### 5. Capture worker Settings > Variables and Secrets page
+
+Cloudflare dashboard area:
+- `Workers & Pages` -> `price-store-capture` -> `Settings` -> `Variables and Secrets`
+
+Add these secrets/variables:
+
+- Secret: `JUSTTCG_API_KEY`
+  - value: your real JustTCG API key
+- Variable: `JUSTTCG_DEFAULT_GAME`
+  - value from code default:
+    `riftbound-league-of-legends-trading-card-game`
+- Variable: `JUSTTCG_DEFAULT_LIMIT`
+  - value from code default: `20`
+- Variable: `JUSTTCG_INCLUDE_PRICE_HISTORY`
+  - value from code default: `true`
+- Variable: `JUSTTCG_INCLUDE_STATISTICS`
+  - value from code default: `false`
+- Variable: `PRICE_STORE_CAPTURE_MAX_REQUESTS`
+  - example value from code/docs: `55`
+- Variable: `PRICE_STORE_CAPTURE_REQUEST_DELAY_MS`
+  - example value from code/docs: `6500`
+
+Verify before moving on:
+- all variables/secrets are saved
+- the names match exactly
+
+### 6. Capture worker Settings > Bindings page
+
+Cloudflare dashboard area:
+- `Workers & Pages` -> `price-store-capture` -> `Settings` -> `Bindings`
 
 Steps:
 1. Add an `R2 bucket` binding.
 2. Binding name must be:
    `PRICE_STORE_BUCKET`
-3. Choose the same shared bucket as the capture worker.
+3. Choose the shared bucket.
+4. Add a `Service binding`.
+5. Binding name must be:
+   `PRICE_STORE_PUBLISHER`
+6. Target service must be:
+   your publish worker
 
 Verify before moving on:
-- both workers point at the same bucket
+- the R2 binding name is exactly `PRICE_STORE_BUCKET`
+- the Service Binding name is exactly `PRICE_STORE_PUBLISHER`
+- the Service Binding points to the publish worker you created
 
-### 8. Worker overview page: confirm manual trigger URLs
+### 7. Capture worker Settings > Triggers > Cron Triggers page
+
+Cloudflare dashboard area:
+- `Workers & Pages` -> `price-store-capture` -> `Settings` -> `Triggers` -> `Cron Triggers`
+
+Steps:
+1. Open `Cron Triggers`.
+2. Add the production cron expression you want.
+3. If you want the repo example cadence exactly, use:
+   `0 9 */2 * *`
+4. Save the trigger.
+
+What comes from code:
+- the worker has a `scheduled()` handler and is ready to receive cron events
+
+What you choose:
+- the exact cron expression
+- the UTC hour that best matches your desired run time
+
+Verify before moving on:
+- the Cron Trigger appears in the trigger list
+- the cron expression matches your intent
+
+### 8. Worker overview pages: confirm deployed worker identities
 
 Cloudflare dashboard area:
 - `Workers & Pages` -> each worker overview page
 
 Steps:
 1. Open the capture worker overview page.
-2. Note the deployed worker URL.
+2. Confirm it shows a deployed version and the cron trigger.
 3. Open the publish worker overview page.
-4. Note the deployed worker URL.
+4. Confirm it shows a deployed version.
 
 Verify before moving on:
-- you have one URL for capture
-- you have one URL for publish
+- capture is deployed and has the cron trigger
+- publish is deployed and available as a binding target
 
-### 9. Manual trigger test: capture worker
-
-Use your preferred HTTP client with:
-
-- method: `POST`
-- header: `Authorization: Bearer <PRICE_STORE_TRIGGER_TOKEN>`
-- header: `Content-Type: application/json`
-
-Incremental example:
-
-```json
-{
-  "mode": "incremental",
-  "updatedAfter": "2026-05-05T00:00:00.000Z",
-  "maxRequests": 55,
-  "requestDelayMs": 6500
-}
-```
-
-Full example:
-
-```json
-{
-  "mode": "full",
-  "maxRequests": 55,
-  "requestDelayMs": 6500
-}
-```
-
-Verify before moving on:
-- the response is `200`
-- it returns a `runId`
-- it reports canonical output paths
-
-### 10. R2 bucket page: verify capture artifacts
+### 9. R2 bucket page: verify scheduled artifacts after the first run
 
 Cloudflare dashboard area:
 - `R2` -> your bucket -> object browser
 
-After a successful capture, confirm these categories now exist:
+After the first successful scheduled run, confirm these categories exist:
 
 - `raw/justtcg/...`
 - `canonical/justtcg/...`
 - `runs/raw-capture/...`
+- `runs/publish/...`
 - `state/latest-successful-capture.json`
-
-Also verify:
-- `state/active-capture.json` is gone after the run completes
-
-### 11. Manual trigger test: publish worker
-
-Use your preferred HTTP client with:
-
-- method: `POST`
-- header: `Authorization: Bearer <PRICE_STORE_TRIGGER_TOKEN>`
-- header: `Content-Type: application/json`
-
-Body:
-
-```json
-{}
-```
-
-Verify before moving on:
-- the response is `200`
-- it returns manifest/snapshot output paths
-- it names the capture run it published from
-
-### 12. R2 bucket page: verify publish artifacts
-
-Cloudflare dashboard area:
-- `R2` -> your bucket -> object browser
-
-After publish, confirm these objects exist:
-
 - `published/prices/manifest.json`
 - `published/prices/riftbound/latest.json`
 - `published/prices/riftbound/latest.publish.meta.json`
-- `runs/publish/...`
+
+Also verify:
+- `state/active-capture.json` is gone after the run completes
 
 ## What To Look At If Something Fails
 
 ### Capture fails
 
 Check:
-- capture worker response body
+
+- the capture worker logs
 - `runs/raw-capture/<runId>.json`
 - whether `state/active-capture.json` still exists
 
 Common causes:
+
 - missing `JUSTTCG_API_KEY`
-- wrong bearer token
 - missing R2 binding
+- missing Service Binding
 - request cap hit
 
 ### Publish fails
 
 Check:
-- publish worker response body
+
+- the publish worker logs
 - `runs/publish/<publishRunId>.json`
 - whether `state/active-capture.json` exists
 - whether `state/latest-successful-capture.json` points to a real canonical
   snapshot
 
 Common causes:
+
 - capture is still running
 - no successful capture exists yet
 - missing R2 binding
+- capture worker cannot reach publish worker through the Service Binding
 
 ## What Stage 8 Will Add
 
-Stage 8 should not change this architecture. It should only:
+Stage 8 should not change the fundamental architecture. It should focus on:
 
-- trigger the **capture worker** on a 2-day cadence
-- decide when publish runs after successful capture
-- document the schedule-specific Cloudflare settings on top of the same worker,
-  secret, and bucket setup
+- monitoring and stale-data detection
+- runbook guidance for scheduled failures
+- budget visibility for the scheduled pipeline

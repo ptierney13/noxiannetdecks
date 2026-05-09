@@ -6,8 +6,17 @@ compatibility_date = "2026-05-07"
 binding = "PRICE_STORE_BUCKET"
 bucket_name = "replace-with-your-price-store-bucket"
 
+[[services]]
+binding = "PRICE_STORE_PUBLISHER"
+service = "price-store-publish"
+
 [vars]
 JUSTTCG_DEFAULT_GAME = "riftbound-league-of-legends-trading-card-game"
 JUSTTCG_DEFAULT_LIMIT = "20"
 JUSTTCG_INCLUDE_PRICE_HISTORY = "true"
 JUSTTCG_INCLUDE_STATISTICS = "false"
+PRICE_STORE_CAPTURE_MAX_REQUESTS = "55"
+PRICE_STORE_CAPTURE_REQUEST_DELAY_MS = "6500"
+
+[triggers]
+crons = [ "0 9 */2 * *" ]

@@ -1,4 +1,4 @@
-# DRAFT: Price Store Stage 8 Every-2-Days Scheduled Refresh Setup
+# DRAFT: Price Store Stage 8 Monitoring And Runbooks
 
 ## Draft Status
 
@@ -11,16 +11,15 @@ decisions.
 
 ## Summary
 
-Stage 8 takes the manually runnable Cloudflare capture and publish workers from
-Stage 7 and turns them into the intended every-2-days scheduled refresh path,
-while also producing the operator-facing setup walkthrough for the user's
-Cloudflare-side configuration.
+Stage 8 makes the scheduled JustTCG-backed Cloudflare price pipeline
+supportable in production with monitoring, runbook guidance, and clear
+operator recovery paths.
 
 ## Pertinent Details So Far
 
 - Stage 7 should already provide:
-  - a Cloudflare-hosted manual capture worker
-  - a Cloudflare-hosted manual publish worker
+  - a Cloudflare-hosted scheduled capture worker
+  - a Cloudflare-hosted internal publish worker
   - a coordination contract where publish only runs from completed capture
     outputs
 - JustTCG plan limits and rate limits are an operational concern that should be
@@ -39,40 +38,31 @@ Cloudflare-side configuration.
 
 ## Expected Outputs
 
-- finalized every-2-days trigger shape for the Cloudflare capture worker
-- Cloudflare-side setup walkthrough tailored for the user to complete
-- request-budget guidance for the scheduled cadence
-- documented fallback guidance for when an incremental run is too large and a
-  full refresh must remain manual
-- a clear scheduled orchestration rule for when publish should run after a
-  successful capture
+- failure-mode inventory and operator runbook
+- monitoring or status signals for stale snapshots and failed runs
+- request-budget visibility for scheduled runs
+- documented manual recovery procedures for auth, rate-limit, capture, and
+  publish failures
 
 ## Explicit Non-Goals
 
-- no monitoring/runbook hardening yet
 - no second-source failover design
 - no large architectural redesign
 
 ## Questions To Finalize In The Real Stage Plan
 
-- what exact scheduled trigger boundary Cloudflare should own versus what stays
-  as operator-managed configuration
-- whether the scheduled path should always run incremental or first run a cheap
-  count/probe and abort when the projected request cost is too high
-- what threshold should distinguish an acceptable incremental run from a
-  manual-only full refresh case
-- what setup materials are sufficient for the user to complete the Cloudflare
-  configuration confidently on their end
+- which health signals are most actionable
+- how stale-data thresholds should be defined
+- how much request-usage telemetry should be retained from scheduled runs
+- whether schedule drift or missed publish runs should have their own
+  operator-visible indicators
 
 ## Test Plan
 
-- verify the scheduled trigger invokes the same capture worker path as the
-  manual run
-- verify publish runs only after successful completed capture output exists
-- verify the setup walkthrough matches the implemented worker configuration
-- verify the scheduled path preserves the same published artifact shape
+- verify monitorable failure paths can be simulated or inspected
+- verify runbook steps are accurate against the implemented scheduled pipeline
+- verify stale-data conditions are detectable
 
 ## Assumptions
 
-- The user wants help wiring the every-2-days schedule in Cloudflare, but some
-  final setup actions will still be completed on the user's side.
+- The scheduled capture/publish flow already exists by the time Stage 8 begins.

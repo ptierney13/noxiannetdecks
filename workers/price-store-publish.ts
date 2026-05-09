@@ -1,7 +1,7 @@
-import { handlePublishWorkerRequest, jsonResponse, type PriceStoreWorkerEnv } from "./shared/price-store-worker.js";
+import { handlePublishWorkerRequest, jsonResponse, type PriceStorePublishWorkerEnv } from "./shared/price-store-worker.js";
 
 export default {
-  async fetch(request: Request, env: PriceStoreWorkerEnv): Promise<Response> {
+  async fetch(request: Request, env: PriceStorePublishWorkerEnv): Promise<Response> {
     try {
       return await handlePublishWorkerRequest(request, env);
     } catch (caught) {
