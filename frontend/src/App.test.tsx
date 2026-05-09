@@ -89,6 +89,7 @@ const voidGate = createCard({
   finishes: ["foil", "nonfoil"],
   tags: ["Dragon"],
   typeline: "Unit - Dragon",
+  cost: "{3}{B}{B}",
   richText: "<p>:rb_exhaust:: Deal +2 :rb_might: this turn. Pay :rb_energy_3::rb_rune_chaos:.</p>",
   plainText: ":rb_exhaust:: Deal +2 :rb_might: this turn. Pay :rb_energy_3::rb_rune_chaos:."
 });
@@ -152,7 +153,7 @@ const multicolorSpellCard = createCard({
   cardtype: "Spell",
   typeline: "Spell",
   domain: ["Calm", "Mind"],
-  cost: "{3}",
+  cost: "{3}{C/M}{C/M}",
   energy: 3,
   might: null,
   power: null
@@ -766,6 +767,7 @@ describe("App", () => {
     const domainChips = dialog.querySelectorAll(".card-attr-chip--domain");
     expect(domainChips).toHaveLength(1);
     expect(within(dialog).getByText("Calm, Mind")).toBeInTheDocument();
+    expect(dialog.querySelectorAll('[data-symbol-token="P"]')).toHaveLength(2);
 
     await user.click(screen.getByLabelText("Close"));
     await user.clear(screen.getByLabelText("Query"));
@@ -777,6 +779,7 @@ describe("App", () => {
     const symbolDialog = await screen.findByRole("dialog", { name: "Void Gate" });
     expect(symbolDialog.querySelector('[data-symbol-token="E"]')).not.toBeNull();
     expect(symbolDialog.querySelector('[data-symbol-token="T"]')).not.toBeNull();
+    expect(symbolDialog.querySelectorAll('.card-attr-chip [data-symbol-token="B"]')).toHaveLength(2);
     expect(symbolDialog.querySelector('[data-symbol-token="H"]')).not.toBeNull();
     expect(within(symbolDialog).getByText(/Pay 3/)).toBeInTheDocument();
   });
@@ -820,7 +823,7 @@ describe("App", () => {
     const detailView = heading.closest(".card-detail-view");
     expect(detailView).not.toBeNull();
     expect(within(detailView as HTMLElement).getByText("3")).toBeInTheDocument();
-    expect(detailView?.querySelector('.card-attr-value [data-symbol-token="P"]')).toBeNull();
+    expect(detailView?.querySelectorAll('.card-attr-value [data-symbol-token="B"]')).toHaveLength(2);
     expect(detailView?.querySelector('.card-attr-value [data-symbol-token="T"]')).not.toBeNull();
     expect(detailView?.querySelector('.card-detail-body-text [data-symbol-token="E"]')).not.toBeNull();
     expect(detailView?.querySelector('.card-detail-body-text [data-symbol-token="H"]')).not.toBeNull();

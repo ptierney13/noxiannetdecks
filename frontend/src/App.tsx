@@ -328,9 +328,14 @@ function renderTokenizedText(
     }
 
     const token = tokenMatch[1];
+    if (/^\d+$/.test(token)) {
+      nodes.push(...renderMultilineText(token, `number-${index}`));
+      continue;
+    }
+
     const src = inlineSymbolSrc(token, variant);
     if (!src) {
-      nodes.push(...renderMultilineText(part, `unknown-${index}`));
+      nodes.push(...renderMultilineText(token, `unknown-${index}`));
       continue;
     }
 
@@ -352,7 +357,7 @@ function renderTokenizedText(
 function applySymbols(text: string): string {
   return text
     // Energy costs: :rb_energy_N: → {N}
-    .replace(/:rb_energy_(\d+):/g, (_, n) => String(n))
+    .replace(/:rb_energy_(\d+):/g, (_, n) => `{${n}}`)
     // Known named symbols
     .replace(/:([a-z_]+):/g, (_, key) => SYMBOL_MAP[key] ?? `{${key}}`);
 }
@@ -370,9 +375,19 @@ function normalizeCardText(richText: string): string {
 }
 
 function formatCostText(card: CardRecord): string | null {
-  const cost = card.attributes.cost ?? card.attributes.energy;
-  if (cost == null) return null;
-  return String(cost);
+  const rawCost = card.attributes.cost;
+  if (rawCost) {
+    return rawCost.replace(/\{([^}]+)\}/g, (match, token: string) => {
+      if (/^\d+$/.test(token)) return match;
+      return inlineSymbolSrc(token) ? match : "{P}";
+    });
+  }
+
+  if (card.attributes.energy != null) {
+    return `{${card.attributes.energy}}`;
+  }
+
+  return null;
 }
 
 function domainChipClass(domains: string[]): string {
@@ -661,7 +676,7 @@ function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; o
           <div className="card-quick-look-attrs">
             {formatCostText(card) != null && (
               <span className="card-attr-chip card-attr-chip--symbolic">
-                {formatCostText(card)}
+                {renderTokenizedText(formatCostText(card) ?? "", { size: "chip" })}
               </span>
             )}
             {card.attributes.might != null && (
@@ -2375,7 +2390,7 @@ function CardDetailView({
               <div className="card-attr-block">
                 <span className="card-attr-label">Cost</span>
                 <span className="card-attr-value card-attr-value--symbols">
-                  {formatCostText(card)}
+                  {renderTokenizedText(formatCostText(card) ?? "", { size: "stat" })}
                 </span>
               </div>
             )}
