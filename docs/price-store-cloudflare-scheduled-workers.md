@@ -14,6 +14,44 @@ Stage 7 now includes the real scheduled Cloudflare flow. Cloudflare owns the
 routine execution of the pipeline. There is no human-facing bearer-token
 trigger in the normal design.
 
+## Deployment Pattern
+
+Use **Wrangler as the primary deployment mechanism** for these two Workers.
+Use the Cloudflare dashboard to create account resources when needed and to
+verify what was deployed.
+
+This matters because the repository already defines:
+
+- worker names
+- entrypoints
+- R2 bindings
+- the Service Binding on the capture worker
+- the cron trigger on the capture worker
+- the non-public deployment posture for both workers
+
+If you try to treat the dashboard as the primary place where code and bindings
+are authored, you will be manually re-entering configuration that already
+exists in the repo, and it is easier for the dashboard and codebase to drift.
+
+For Stage 7, the safest first deployment path is:
+
+1. create or confirm the shared R2 bucket
+2. update the Wrangler config files with your real bucket name and any desired
+   naming changes
+3. deploy the publish worker with Wrangler
+4. deploy the capture worker with Wrangler
+5. add the JustTCG API key secret to the capture worker with Wrangler
+6. use the Cloudflare dashboard to verify bindings, triggers, versions, logs,
+   and R2 artifacts
+
+Cloudflare's current docs support this pattern:
+
+- Cron Triggers are supported through a `scheduled()` handler and Wrangler
+  `triggers.crons`
+- Service Bindings are configured on the caller worker
+- R2 bindings are configured in the worker config
+- `wrangler deploy` is the standard deployment path for Worker code
+
 ## Architecture
 
 The hosted pipeline has two workers:
@@ -208,66 +246,95 @@ Verify before moving on:
 - the bucket appears in the R2 bucket list
 - you can open the bucket details page
 
-### 2. Workers & Pages page: create the publish worker first
+### 2. Local repo step: update the Wrangler config files before first deploy
+
+Files:
+- [wrangler.price-store-publish.example.toml](C:/Users/ptier/repos/Deck%20Archive%20Project/wrangler.price-store-publish.example.toml)
+- [wrangler.price-store-capture.example.toml](C:/Users/ptier/repos/Deck%20Archive%20Project/wrangler.price-store-capture.example.toml)
+
+What to edit locally:
+
+- replace `bucket_name = "replace-with-your-price-store-bucket"` with your real
+  bucket name in both files
+- keep `binding = "PRICE_STORE_BUCKET"` unchanged
+- keep `binding = "PRICE_STORE_PUBLISHER"` unchanged in the capture config
+- keep `service = "price-store-publish"` aligned with the actual publish worker
+  name
+- keep `workers_dev = false`
+- keep `preview_urls = false`
+- keep the cron expression unless you intentionally want a different UTC
+  schedule
+
+Recommended first-deploy commands:
+
+```bash
+npx wrangler deploy --config wrangler.price-store-publish.example.toml
+npx wrangler deploy --config wrangler.price-store-capture.example.toml
+npx wrangler secret put JUSTTCG_API_KEY --config wrangler.price-store-capture.example.toml
+```
+
+Why this is the recommended path:
+
+- it deploys the real repo code directly
+- it applies the binding and trigger configuration from the same source of
+  truth
+- it keeps the workers from accidentally being exposed on `workers.dev` or
+  Preview URLs when using the sample config
+- it matches Cloudflare's documented deploy/config model better than trying to
+  recreate the same setup manually in the dashboard editor
+
+Verify before moving on:
+- both config files contain your real bucket name
+- the capture config still references the publish worker by the correct service
+  name
+- both config files still set `workers_dev = false`
+- both config files still set `preview_urls = false`
+
+### 3. Workers & Pages page: confirm the publish worker exists after deploy
 
 Cloudflare dashboard area:
 - `Workers & Pages`
 
-Why first:
-- the capture worker's Service Binding points to the publish worker
-- Cloudflare requires the target worker to exist before the caller binding can
-  be configured cleanly
-
 Steps:
 1. Open `Workers & Pages`.
-2. Click `Create application`.
-3. Choose `Worker`.
-4. Create a worker for the publish runtime.
-   Recommended name: `price-store-publish`
-5. Deploy the worker code from [workers/price-store-publish.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/price-store-publish.ts).
+2. Confirm a worker named `price-store-publish` exists after the Wrangler
+   deploy.
+3. Open that worker.
 
 Verify before moving on:
 - the publish worker exists
 - it has a deployed version
 
-### 3. Publish worker Settings > Bindings page
+### 4. Publish worker Settings > Bindings page
 
 Cloudflare dashboard area:
 - `Workers & Pages` -> `price-store-publish` -> `Settings` -> `Bindings`
-
-Steps:
-1. Add an `R2 bucket` binding.
-2. Binding name must be:
-   `PRICE_STORE_BUCKET`
-3. Choose the bucket you created earlier.
 
 Verify before moving on:
 - the binding name is exactly `PRICE_STORE_BUCKET`
 - it points at the intended bucket
 
-### 4. Workers & Pages page: create the capture worker
+### 5. Workers & Pages page: confirm the capture worker exists after deploy
 
 Cloudflare dashboard area:
 - `Workers & Pages`
 
 Steps:
 1. Return to `Workers & Pages`.
-2. Click `Create application`.
-3. Choose `Worker`.
-4. Create a worker for the capture runtime.
-   Recommended name: `price-store-capture`
-5. Deploy the worker code from [workers/price-store-capture.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/workers/price-store-capture.ts).
+2. Confirm a worker named `price-store-capture` exists after the Wrangler
+   deploy.
+3. Open that worker.
 
 Verify before moving on:
 - the capture worker exists
 - it has a deployed version
 
-### 5. Capture worker Settings > Variables and Secrets page
+### 6. Capture worker Settings > Variables and Secrets page
 
 Cloudflare dashboard area:
 - `Workers & Pages` -> `price-store-capture` -> `Settings` -> `Variables and Secrets`
 
-Add these secrets/variables:
+The deploy config plus Wrangler secret command should already establish these:
 
 - Secret: `JUSTTCG_API_KEY`
   - value: your real JustTCG API key
@@ -289,51 +356,38 @@ Verify before moving on:
 - all variables/secrets are saved
 - the names match exactly
 
-### 6. Capture worker Settings > Bindings page
+### 7. Capture worker Settings > Bindings page
 
 Cloudflare dashboard area:
 - `Workers & Pages` -> `price-store-capture` -> `Settings` -> `Bindings`
-
-Steps:
-1. Add an `R2 bucket` binding.
-2. Binding name must be:
-   `PRICE_STORE_BUCKET`
-3. Choose the shared bucket.
-4. Add a `Service binding`.
-5. Binding name must be:
-   `PRICE_STORE_PUBLISHER`
-6. Target service must be:
-   your publish worker
 
 Verify before moving on:
 - the R2 binding name is exactly `PRICE_STORE_BUCKET`
 - the Service Binding name is exactly `PRICE_STORE_PUBLISHER`
 - the Service Binding points to the publish worker you created
 
-### 7. Capture worker Settings > Triggers > Cron Triggers page
+### 8. Capture worker Settings > Triggers > Cron Triggers page
 
 Cloudflare dashboard area:
 - `Workers & Pages` -> `price-store-capture` -> `Settings` -> `Triggers` -> `Cron Triggers`
 
-Steps:
-1. Open `Cron Triggers`.
-2. Add the production cron expression you want.
-3. If you want the repo example cadence exactly, use:
-   `0 9 */2 * *`
-4. Save the trigger.
+The Wrangler deploy should already apply the cron trigger from config.
 
 What comes from code:
 - the worker has a `scheduled()` handler and is ready to receive cron events
+- the example config supplies:
+  `0 9 */2 * *`
 
 What you choose:
-- the exact cron expression
+- whether to keep the repo cron expression or update it in the config file and
+  redeploy
 - the UTC hour that best matches your desired run time
 
 Verify before moving on:
 - the Cron Trigger appears in the trigger list
 - the cron expression matches your intent
 
-### 8. Worker overview pages: confirm deployed worker identities
+### 9. Worker overview pages: confirm deployed worker identities
 
 Cloudflare dashboard area:
 - `Workers & Pages` -> each worker overview page
@@ -348,7 +402,43 @@ Verify before moving on:
 - capture is deployed and has the cron trigger
 - publish is deployed and available as a binding target
 
-### 9. R2 bucket page: verify scheduled artifacts after the first run
+### 10. Worker Settings > Domains & Routes page: confirm neither worker is
+publicly exposed
+
+Cloudflare dashboard areas:
+- `Workers & Pages` -> `price-store-capture` -> `Settings` -> `Domains & Routes`
+- `Workers & Pages` -> `price-store-publish` -> `Settings` -> `Domains & Routes`
+
+Why this matters:
+
+- the capture worker is meant to run from Cron Triggers, not a public URL
+- the publish worker is meant to be called through a Service Binding, not by
+  arbitrary internet clients
+
+Verify before moving on:
+- `workers.dev` is disabled for both workers
+- Preview URLs are disabled for both workers
+- no unexpected custom domains or routes are attached
+
+### 11. Worker logs / Trigger Events pages: verify first execution
+
+Cloudflare dashboard areas:
+- `Workers & Pages` -> `price-store-capture` -> `Logs`
+- `Workers & Pages` -> `price-store-capture` -> `Settings` -> `Trigger Events`
+- `Workers & Pages` -> `price-store-publish` -> `Logs`
+
+What to expect:
+
+- the capture worker should log one scheduled run
+- the publish worker should log one internal publish run after capture succeeds
+- Cloudflare notes that new or changed cron triggers may take several minutes,
+  and up to about 15 minutes, to propagate
+
+Verify before moving on:
+- at least one capture run appears
+- publish logs appear only after a successful capture
+
+### 12. R2 bucket page: verify scheduled artifacts after the first run
 
 Cloudflare dashboard area:
 - `R2` -> your bucket -> object browser
