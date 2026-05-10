@@ -1,6 +1,7 @@
 import type { CardRecord } from "../data/schema.js";
 import { normalizeVariantQuery } from "../data/variant.js";
 import type { ParsedQuery, QueryNode, QueryOperator } from "./ast.js";
+import { compareDomainSet, parseDomainQueryValue, DOMAIN_PRIMARY } from "./domain.js";
 import { resolveField } from "./fields.js";
 import { normalizeText } from "./normalize.js";
 import { parseQuery } from "./parser.js";
@@ -36,33 +37,6 @@ function matchesText(candidate: string, expected: string, operator: QueryOperato
   }
 
   return normalizedCandidate.includes(normalizedExpected);
-}
-
-// Domain letter-code mappings
-const DOMAIN_PRIMARY: Record<string, string> = {
-  m: "Mind", f: "Fury", c: "Calm", b: "Body", h: "Chaos", o: "Order"
-};
-const DOMAIN_COLOR: Record<string, string> = {
-  u: "Mind", r: "Fury", g: "Calm", o: "Body", p: "Chaos", y: "Order"
-};
-
-function parseDomainCodes(value: string): Set<string> | null {
-  const chars = value.toLowerCase().split("");
-  if (chars.length === 0 || chars.length > 8) return null;
-
-  // Try all-primary first
-  const allPrimary = chars.every((ch) => ch in DOMAIN_PRIMARY);
-  if (allPrimary) {
-    return new Set(chars.map((ch) => DOMAIN_PRIMARY[ch]));
-  }
-
-  // Fall back to color-based for all chars
-  const allColor = chars.every((ch) => ch in DOMAIN_COLOR);
-  if (allColor) {
-    return new Set(chars.map((ch) => DOMAIN_COLOR[ch]));
-  }
-
-  return null;
 }
 
 function typeLineTerms(card: CardRecord): string[] {
@@ -166,11 +140,6 @@ function compareNumber(candidate: number, operator: QueryOperator, expected: num
   }
 }
 
-function matchesDomainWithLetterCodes(cardDomains: string[], domainSet: Set<string>): boolean {
-  if (cardDomains.length === 0) return false;
-  return cardDomains.every((d) => domainSet.has(d));
-}
-
 type PowerSpec = { count: number; domains: Set<string> };
 
 // Parse a power symbol string: bare letters ("ff", "bb") or braced hybrids ("{f/m}", "{f/m}{f/m}").
@@ -194,7 +163,7 @@ function parsePowerSymbols(value: string): PowerSpec | null {
     return { count: tokens.length, domains };
   }
 
-  const codes = parseDomainCodes(lower);
+  const codes = parseDomainQueryValue(lower);
   if (!codes) return null;
   return { count: lower.length, domains: codes };
 }
@@ -436,9 +405,9 @@ function matchesPredicate(card: CardRecord, fieldName: string, operator: QueryOp
 
   // Domain field: try letter-code subset matching before standard string matching
   if (field.canonical === "domain") {
-    const domainSet = parseDomainCodes(value);
+    const domainSet = parseDomainQueryValue(value);
     if (domainSet) {
-      return matchesDomainWithLetterCodes(card.attributes.domain, domainSet);
+      return compareDomainSet(card.attributes.domain, domainSet, operator);
     }
   }
 

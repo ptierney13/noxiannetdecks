@@ -73,8 +73,8 @@ export const queryFieldGuides: QueryFieldGuide[] = [
     property: "Domain",
     query: "domain:<text>",
     shorthand: "d:<text>",
-    searches: "attributes.domain; single letters or multi-letter codes select by domain (e.g. d:mf = Mind or Fury)",
-    example: "d:Body or d:mf"
+    searches: "attributes.domain; supports domain names, color aliases like purple/yellow, and domain-set codes where parsed `:` queries use subset-or-equal semantics",
+    example: "d:Body or d:purp or d<=mf"
   },
   {
     property: "Set",
@@ -167,6 +167,11 @@ export const querySyntaxGuides: QuerySyntaxGuide[] = [
     operation: "Contains match",
     examples: ["name:jinx", "tag:Dragon", "keyword:Action"],
     behavior: "Case-insensitive normalized contains match."
+  },
+  {
+    operation: "Domain set comparisons",
+    examples: ["d:mf", "d=mf", "d<pu", "d>p", "d:purple"],
+    behavior: "Recognized domain names, color aliases, and domain codes use set semantics uniformly: : and <= are subset-or-equal, = is exact, < is strict subset, > is strict superset."
   },
   {
     operation: "Exact match",

@@ -1,6 +1,7 @@
 import { createToken, Lexer, type IToken, type TokenType } from "chevrotain";
 import { normalizeVariantQuery } from "../data/variant.js";
 import type { ParsedQuery, QueryDiagnostic, QueryNode, QueryOperator } from "./ast.js";
+import { parseDomainQueryValue } from "./domain.js";
 import { resolveField } from "./fields.js";
 import { quoteIfNeeded, unquote } from "./normalize.js";
 import { defaultSearchUniqueMode, normalizeUniqueMode, type SearchUniqueMode } from "./unique.js";
@@ -413,7 +414,10 @@ function validateNode(node: QueryNode, diagnostics: QueryDiagnostic[]): void {
       }
 
       if (field.kind === "string" && isNumericOperator) {
-        diagnostics.push({ message: `Field "${field.canonical}" does not support numeric comparisons.` });
+        const supportsDomainSetComparison = field.canonical === "domain" && parseDomainQueryValue(node.value) !== null;
+        if (!supportsDomainSetComparison) {
+          diagnostics.push({ message: `Field "${field.canonical}" does not support numeric comparisons.` });
+        }
       }
 
       const isPowerLetterCode = field.canonical === "power" && /^[mfcbhourgopy]+$/i.test(node.value);

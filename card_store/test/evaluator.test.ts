@@ -153,6 +153,55 @@ function costNamesFor(query: string): string[] {
   return searchCards(costFixtureCards, query).items.map((card) => card.riot_name);
 }
 
+const domainOperatorFixtureCards = [
+  makeCard({
+    id: "d1",
+    riftbound_id: "d1",
+    riot_name: "Chaos Solo",
+    collector_number: "d1",
+    attributes: { cost: "{1}{H}", energy: 1, might: null, power: 1, domain: ["Chaos"] }
+  }),
+  makeCard({
+    id: "d2",
+    riftbound_id: "d2",
+    riot_name: "Mind Solo",
+    collector_number: "d2",
+    attributes: { cost: "{1}{M}", energy: 1, might: null, power: 1, domain: ["Mind"] }
+  }),
+  makeCard({
+    id: "d3",
+    riftbound_id: "d3",
+    riot_name: "Chaos Mind Hybrid",
+    collector_number: "d3",
+    attributes: { cost: "{1}{H/M}", energy: 1, might: null, power: 1, domain: ["Chaos", "Mind"] }
+  }),
+  makeCard({
+    id: "d4",
+    riftbound_id: "d4",
+    riot_name: "Chaos Body Hybrid",
+    collector_number: "d4",
+    attributes: { cost: "{1}{H/B}", energy: 1, might: null, power: 1, domain: ["Chaos", "Body"] }
+  }),
+  makeCard({
+    id: "d5",
+    riftbound_id: "d5",
+    riot_name: "Order Solo",
+    collector_number: "d5",
+    attributes: { cost: "{1}{O}", energy: 1, might: null, power: 1, domain: ["Order"] }
+  }),
+  makeCard({
+    id: "d6",
+    riftbound_id: "d6",
+    riot_name: "Chaos Fury Hybrid",
+    collector_number: "d6",
+    attributes: { cost: "{1}{H/F}", energy: 1, might: null, power: 1, domain: ["Chaos", "Fury"] }
+  })
+];
+
+function domainNamesFor(query: string): string[] {
+  return searchCards(domainOperatorFixtureCards, query).items.map((card) => card.riot_name);
+}
+
 describe("searchCards", () => {
   it("returns every card for an empty query", () => {
     expect(namesFor("")).toEqual([
@@ -334,5 +383,29 @@ describe("cost and power query semantics", () => {
   it("hybrid card does not match single-domain power query", () => {
     expect(costNamesFor("p=f")).not.toContain("FM Hybrid 1/1");
     expect(costNamesFor("p=m")).not.toContain("FM Hybrid 1/1");
+  });
+});
+
+describe("domain set query semantics", () => {
+  it("supports explicit color aliases and curated substrings", () => {
+    expect(namesFor("d:purple")).toEqual(["Alternate Gate"]);
+    expect(namesFor("d:purp")).toEqual(["Alternate Gate"]);
+    expect(namesFor("d:yellow")).toEqual(["Overnumbered Gate"]);
+    expect(namesFor("d:oran")).toEqual(["Void Gate", "Foil Gate"]);
+  });
+
+  it("treats parsed domain values as set comparisons", () => {
+    expect(domainNamesFor("d=p")).toEqual(["Chaos Solo"]);
+    expect(domainNamesFor("d>p")).toEqual(["Chaos Mind Hybrid", "Chaos Body Hybrid", "Chaos Fury Hybrid"]);
+    expect(domainNamesFor("d<pu")).toEqual(["Chaos Solo", "Mind Solo"]);
+    expect(domainNamesFor("d<=pu")).toEqual(["Chaos Solo", "Mind Solo", "Chaos Mind Hybrid"]);
+    expect(domainNamesFor("d:pu")).toEqual(["Chaos Solo", "Mind Solo", "Chaos Mind Hybrid"]);
+    expect(domainNamesFor("d:rp")).toEqual(["Chaos Solo", "Chaos Fury Hybrid"]);
+    expect(domainNamesFor("d>=pu")).toEqual(["Chaos Mind Hybrid"]);
+  });
+
+  it("falls back to plain string matching for unrecognized domain text", () => {
+    expect(domainNamesFor("d:cha")).toEqual(["Chaos Solo", "Chaos Mind Hybrid", "Chaos Body Hybrid", "Chaos Fury Hybrid"]);
+    expect(searchCards(domainOperatorFixtureCards, "d>mystery").diagnostics.length).toBeGreaterThan(0);
   });
 });
