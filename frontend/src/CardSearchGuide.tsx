@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { ReactNode } from "react";
 
 type ZoneId =
   | "name" | "cost" | "energy" | "power" | "might"
@@ -33,7 +34,62 @@ const ZONES: Record<ZoneId, ZoneInfo> = {
   artist:           { label: "Artist",      query: 'artist:"league splash team"',  shorthand: 'a:"league splash"',        description: "Searches by illustrator name." },
 };
 
+// ── Symbol rendering ──────────────────────────────────────────────────────────
+
+const RUNE_SRCS: Record<string, string> = {
+  C: "/assets/riftbound/symbols/runes/rune-calm-inline.png",
+  F: "/assets/riftbound/symbols/runes/rune-fury-inline.png",
+  M: "/assets/riftbound/symbols/runes/rune-mind-inline.png",
+  B: "/assets/riftbound/symbols/runes/rune-body-inline.png",
+  H: "/assets/riftbound/symbols/runes/rune-chaos-inline.png",
+  O: "/assets/riftbound/symbols/runes/rune-order-inline.png",
+  P: "/assets/riftbound/symbols/power/wild-power-inline.png",
+};
+
+function energyBadgeSrc(n: number): string | null {
+  if (n < 0 || n > 12 || n === 11) return null;
+  return `/assets/riftbound/symbols/energy/energy-cost-${String(n).padStart(2, "0")}-badge.png`;
+}
+
+/** Renders a cost string like "{5}{C}" as badge + rune images. */
+function CostSymbols({ cost }: { cost: string }): ReactNode {
+  const tokens = [...cost.matchAll(/\{([^}]+)\}/g)].map(m => m[1]);
+  return (
+    <span className="csg-cost-symbols">
+      {tokens.map((token, i) => {
+        if (/^\d+$/.test(token)) {
+          const src = energyBadgeSrc(parseInt(token));
+          return src
+            ? <img key={i} src={src} alt={token} className="csg-sym csg-sym--badge" />
+            : <span key={i} className="csg-stat-num">{token}</span>;
+        }
+        const src = RUNE_SRCS[token];
+        return src
+          ? <img key={i} src={src} alt={`{${token}}`} className="csg-sym csg-sym--rune" />
+          : <span key={i}>{`{${token}}`}</span>;
+      })}
+    </span>
+  );
+}
+
+/** Renders a numeric energy value as its badge image. */
+function EnergyBadge({ value }: { value: number }): ReactNode {
+  const src = energyBadgeSrc(value);
+  return src
+    ? <img src={src} alt={String(value)} className="csg-sym csg-sym--badge" />
+    : <span className="csg-stat-num">{value}</span>;
+}
+
+// ── Card data constants ───────────────────────────────────────────────────────
+
+// Blitzcrank – Impassive (OGN #067/298, Foil Rare, Calm domain)
 const CARD_IMAGE = "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/654dcc4aef0a0b5a0c6e928d7aae397a52c3ab17-744x1039.png?accountingTag=RB";
+const CARD_COST    = "{5}{C}";
+const CARD_ENERGY  = 5;
+const CARD_POWER   = 1;
+const CARD_MIGHT   = 5;
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export function CardSearchGuide() {
   const [active, setActive] = useState<ZoneId | null>(null);
@@ -67,25 +123,25 @@ export function CardSearchGuide() {
       {/* ── CARD DIAGRAM ── */}
       <div className="csg-card" role="group" aria-label="Interactive card diagram — click any element for its query">
 
-        {/* Header: left column (Cost / Energy / Power) + right column (Might) */}
+        {/* Header: Cost · Energy · Power on the left, Might on the right */}
         <div className="csg-card-header">
-          <div className="csg-left-stats">
+          <div className="csg-stat-row">
             <button className={zc("cost", "csg-cost")} {...zh("cost")} aria-pressed={active === "cost"}>
-              <span className="csg-stat-num">5</span>
               <span className="csg-stat-key">Cost</span>
+              <CostSymbols cost={CARD_COST} />
             </button>
             <button className={zc("energy", "csg-energy")} {...zh("energy")} aria-pressed={active === "energy"}>
-              <span className="csg-stat-num">5</span>
               <span className="csg-stat-key">Energy</span>
+              <EnergyBadge value={CARD_ENERGY} />
             </button>
             <button className={zc("power", "csg-power")} {...zh("power")} aria-pressed={active === "power"}>
-              <span className="csg-stat-num">1</span>
               <span className="csg-stat-key">Power</span>
+              <span className="csg-stat-num">{CARD_POWER}</span>
             </button>
           </div>
           <button className={zc("might", "csg-might")} {...zh("might")} aria-pressed={active === "might"}>
-            <span className="csg-stat-num">5</span>
             <span className="csg-stat-key">Might</span>
+            <span className="csg-stat-num">{CARD_MIGHT}</span>
           </button>
         </div>
 
@@ -134,19 +190,21 @@ export function CardSearchGuide() {
           </div>
         </div>
 
-        {/* Footer: set · rarity (centred) · number, then artist */}
+        {/* Footer: [Set · #/total] [◆ Rarity] [Artist →] */}
         <div className="csg-footer">
-          <div className="csg-footer-meta">
-            <button className={zc("set", "csg-set")} {...zh("set")} aria-pressed={active === "set"}>OGN</button>
+          <div className="csg-footer-row">
+            <div className="csg-footer-left">
+              <button className={zc("set", "csg-set")} {...zh("set")} aria-pressed={active === "set"}>OGN</button>
+              <button className={zc("number", "csg-number")} {...zh("number")} aria-pressed={active === "number"}>067/298</button>
+            </div>
             <button className={zc("rarity", "csg-rarity")} {...zh("rarity")} aria-pressed={active === "rarity"}>◆ Rare</button>
-            <button className={zc("number", "csg-number")} {...zh("number")} aria-pressed={active === "number"}>#67</button>
+            <button className={zc("artist", "csg-artist")} {...zh("artist")} aria-pressed={active === "artist"}>
+              <svg aria-hidden="true" viewBox="0 0 16 16" width="11" height="11" fill="currentColor" style={{ flexShrink: 0 }}>
+                <path d="M11.5 1a3.5 3.5 0 0 1 2.538 5.908L5.414 15.536A2 2 0 0 1 4 16H2a2 2 0 0 1-2-2v-2a2 2 0 0 1 .464-1.278L9.09 1.962A3.5 3.5 0 0 1 11.5 1Zm0 2a1.5 1.5 0 0 0-1.09.474L9.81 4.1l2.09 2.09.626-.59A1.5 1.5 0 0 0 11.5 3ZM8.4 5.5 2.27 12.31A.5.5 0 0 0 2 12.7V14h1.3a.5.5 0 0 0 .39-.192L10.49 7.59 8.4 5.5Z"/>
+              </svg>
+              League Splash Team
+            </button>
           </div>
-          <button className={zc("artist", "csg-artist")} {...zh("artist")} aria-pressed={active === "artist"}>
-            <svg aria-hidden="true" viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
-              <path d="M11.5 1a3.5 3.5 0 0 1 2.538 5.908L5.414 15.536A2 2 0 0 1 4 16H2a2 2 0 0 1-2-2v-2a2 2 0 0 1 .464-1.278L9.09 1.962A3.5 3.5 0 0 1 11.5 1Zm0 2a1.5 1.5 0 0 0-1.09.474L9.81 4.1l2.09 2.09.626-.59A1.5 1.5 0 0 0 11.5 3ZM8.4 5.5 2.27 12.31A.5.5 0 0 0 2 12.7V14h1.3a.5.5 0 0 0 .39-.192L10.49 7.59 8.4 5.5Z"/>
-            </svg>
-            League Splash Team
-          </button>
         </div>
       </div>
 

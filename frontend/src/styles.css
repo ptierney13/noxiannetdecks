@@ -1470,9 +1470,9 @@ code {
   }
 }
 
-/* Card frame */
+/* Card frame — wider than before to give the art more room */
 .csg-card {
-  flex: 0 0 240px;
+  flex: 0 0 300px;
   background: var(--surface-2);
   border: 1px solid var(--border-strong);
   border-radius: 12px;
@@ -1480,11 +1480,11 @@ code {
   font-size: 0.82rem;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .csg-card {
     flex: none;
     width: 100%;
-    max-width: 320px;
+    max-width: 360px;
     align-self: center;
   }
 }
@@ -1514,21 +1514,22 @@ code {
   outline-color: var(--red);
 }
 
-/* Header: left column (Cost/Energy/Power) + right column (Might) */
+/* Header: Cost · Energy · Power in a row on the left, Might on the right */
 .csg-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 8px;
+  padding: 6px 8px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+  gap: 4px;
 }
 
-/* Left stats column: Cost stacked above Energy stacked above Power */
-.csg-left-stats {
+/* Horizontal row holding Cost, Energy, Power */
+.csg-stat-row {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  gap: 3px;
+  align-items: flex-start;
 }
 
 .csg-cost,
@@ -1538,41 +1539,44 @@ code {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 4px 7px;
   border-radius: 8px;
 }
 
-/* Cost is the primary stat — larger padding */
-.csg-cost {
-  padding: 6px 10px;
-  min-width: 58px;
+/* Symbol images (energy badges + rune glyphs) */
+.csg-cost-symbols {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  margin-top: 2px;
 }
 
-/* Energy and Power are secondary — slightly more compact */
-.csg-energy,
-.csg-power {
-  padding: 4px 10px;
-  min-width: 52px;
+.csg-sym--badge {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
 }
 
-/* Might stands alone in the top-right */
-.csg-might {
-  padding: 6px 10px;
-  min-width: 52px;
+.csg-sym--rune {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  opacity: 0.9;
 }
 
 .csg-stat-num {
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--text-strong);
   line-height: 1;
+  margin-top: 2px;
 }
 
 .csg-stat-key {
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   text-transform: uppercase;
   letter-spacing: 0.09em;
   color: var(--text-muted);
-  margin-top: 2px;
 }
 
 /* Art */
@@ -1673,51 +1677,55 @@ code {
   color: var(--text-strong);
 }
 
-/* Footer */
+/* Footer: [Set · #/total] [◆ Rarity centered] [Artist →] */
 .csg-footer {
   border-top: 1px solid var(--border);
   background: var(--surface);
-  padding: 5px 7px 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+  padding: 5px 4px 6px;
 }
 
-.csg-footer-meta {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+.csg-footer-row {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 2px;
+}
+
+/* Set code + collector number inline on the left */
+.csg-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
 }
 
 .csg-set,
 .csg-number {
-  padding: 2px 5px;
-  font-size: 0.7rem;
+  padding: 2px 4px;
+  font-size: 0.68rem;
   color: var(--text-muted);
 }
 
-.csg-number {
-  justify-self: end;
-}
-
+/* Rarity stays centered */
 .csg-rarity {
-  justify-self: center;
-  padding: 2px 7px;
-  font-size: 0.7rem;
+  padding: 2px 6px;
+  font-size: 0.68rem;
   color: var(--amber);
 }
 
+/* Artist on the right */
 .csg-artist {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 5px;
-  font-size: 0.7rem;
+  gap: 3px;
+  padding: 2px 4px;
+  font-size: 0.68rem;
   color: var(--text-muted);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 /* Query panel */
