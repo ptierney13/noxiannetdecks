@@ -22,6 +22,9 @@ operator recovery paths.
   - a Cloudflare-hosted internal publish worker
   - a coordination contract where publish only runs from completed capture
     outputs
+  - a D1-backed source of truth for capture state, canonical data, and
+    published artifacts
+  - completion of a local dual-price validation pass before the live rollout
 - JustTCG plan limits and rate limits are an operational concern that should be
   visible to maintainers.
 - The intended cadence is every 2 days, not daily.
@@ -35,6 +38,8 @@ operator recovery paths.
 - Stage 5 verified the current key's live request-size cap as `20`, which is a
   concrete operational invariant worth monitoring for drift or revalidation.
 - V0 remains single-source, so upstream availability is a concentrated risk.
+- D1 row counts, write patterns, and storage growth are now operational
+  concerns worth observing alongside JustTCG request usage.
 
 ## Expected Outputs
 

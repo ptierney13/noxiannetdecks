@@ -52,6 +52,9 @@ commits.
 5. Stage 5: JustTCG publishable snapshot pipeline
 6. Stage 6: frontend static read integration
 7. Stage 7: Cloudflare-hosted scheduled capture and internal publish
+   - Stage 7.1: D1 conversion, local worker validation, and local dual-price display
+   - Stage 7.2: live worker/D1 rollout with the new hosted path enabled
+   - Stage 7.3: removal of the old price method after verification
 8. Stage 8: monitoring and runbooks
 9. Stage 9: affiliate-link setup and rollout
 
