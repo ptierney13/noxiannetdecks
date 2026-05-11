@@ -10,4 +10,5 @@ coverage/
 .dev-*.log
 frontend/test-results/
 playwright-report/
+scripts/out/
 *.local

@@ -34,38 +34,39 @@ const ZONES: Record<ZoneId, ZoneInfo> = {
 };
 
 // Hotspot positions as [left%, top%, width%, height%] relative to the 744×1039 card image.
+// Calibrated via 2%-increment pixel ruler overlays: 60% = top of name, 70% = top of rules.
 // Zone order matters for z-index: later entries render on top (higher z-index).
 const HOTSPOT_DEFS: { id: ZoneId; pos: [number, number, number, number] }[] = [
   // Background zones first (lower z-index)
-  { id: "typeline",         pos: [2,   59.5, 96,  7.5] },  // full gold type strip
-  { id: "text",             pos: [2,   76.5, 96,  13 ] },  // full rules text area
+  { id: "typeline",         pos: [2,   53,   96,  7   ] },  // full type strip (53–60%)
+  { id: "text",             pos: [2,   70,   96,  18  ] },  // full rules text area (70–88%)
 
   // Stats — top corners
-  { id: "cost",             pos: [1.5, 1,    15,  13 ] },  // top-left gold circle
-  { id: "energy",           pos: [83,  1,    15,  13 ] },  // top-right blue circle
+  { id: "cost",             pos: [1.5, 1,    15,  13  ] },  // top-left gold circle
+  { id: "energy",           pos: [83,  1,    15,  13  ] },  // top-right blue circle
 
   // Stats — bottom corners (power/might appear as small stat gems)
-  { id: "power",            pos: [2,   89,   11,  8  ] },  // bottom-left
-  { id: "might",            pos: [87,  89,   11,  8  ] },  // bottom-right
+  { id: "power",            pos: [2,   89,   11,  8   ] },  // bottom-left
+  { id: "might",            pos: [87,  89,   11,  8   ] },  // bottom-right
 
-  // Name plate
-  { id: "name",             pos: [2,   67.5, 74,  8.5] },
+  // Name plate (60–70%)
+  { id: "name",             pos: [2,   60,   74,  10  ] },
 
-  // Typeline tokens (on top of the typeline background)
-  { id: "supertype",        pos: [4,   59.5, 15,  7.5] },  // "CHAMPION"
-  { id: "cardtype",         pos: [19,  59.5, 13,  7.5] },  // "UNIT"
-  { id: "tag-blitzcrank",   pos: [35,  59.5, 21,  7.5] },  // "BLITZCRANK"
-  { id: "tag-zaun",         pos: [58,  59.5, 12,  7.5] },  // "ZAUN"
-  { id: "tag-mech",         pos: [72,  59.5, 11,  7.5] },  // "MECH"
+  // Typeline tokens (on top of typeline background, 53–60%)
+  { id: "supertype",        pos: [4,   53,   15,  7   ] },  // "CHAMPION"
+  { id: "cardtype",         pos: [19,  53,   13,  7   ] },  // "UNIT"
+  { id: "tag-blitzcrank",   pos: [35,  53,   21,  7   ] },  // "BLITZCRANK"
+  { id: "tag-zaun",         pos: [58,  53,   12,  7   ] },  // "ZAUN"
+  { id: "tag-mech",         pos: [72,  53,   11,  7   ] },  // "MECH"
 
-  // Keyword (on top of the rules text background)
-  { id: "keyword",          pos: [2,   76.5, 17,  5  ] },  // [TANK] highlight
+  // Keyword (on top of rules text background, 70–76%)
+  { id: "keyword",          pos: [2,   70,   17,  6   ] },  // [TANK] highlight
 
-  // Footer metadata
-  { id: "set",              pos: [2,   91.5, 12,  6.5] },  // "OGN"
-  { id: "number",           pos: [15,  91.5, 19,  6.5] },  // "067/216"
-  { id: "rarity",           pos: [42,  90.5, 16,  8  ] },  // centre rarity diamond
-  { id: "artist",           pos: [57,  91.5, 40,  6.5] },  // "League Splash Team"
+  // Footer metadata (~90–97%)
+  { id: "set",              pos: [2,   90,   12,  7   ] },  // "OGN"
+  { id: "number",           pos: [15,  90,   19,  7   ] },  // "067/216"
+  { id: "rarity",           pos: [42,  89,   16,  8   ] },  // centre rarity diamond
+  { id: "artist",           pos: [57,  90,   40,  7   ] },  // "League Splash Team"
 ];
 
 const CARD_IMAGE = "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/654dcc4aef0a0b5a0c6e928d7aae397a52c3ab17-744x1039.png?accountingTag=RB";
