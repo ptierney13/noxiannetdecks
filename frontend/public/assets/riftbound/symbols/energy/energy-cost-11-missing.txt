@@ -1,0 +1,2 @@
+No current public source found in the local Riftbound card dataset for energy 11.
+The current dataset includes costs 0-10 and 12, but no cost-11 card image to extract from.

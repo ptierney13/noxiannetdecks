@@ -94,7 +94,7 @@ const uniqueFixtureCards = [
     rarity: "Common",
     variant: { alternate_art: false, overnumbered: false, signed: false },
     finishes: ["nonfoil", "foil"],
-    attributes: { cost: 1, energy: 1, might: 1, power: null, domain: ["Calm"] },
+    attributes: { cost: "{1}", energy: 1, might: 1, power: 0, domain: ["Calm"] },
     type: { cardtype: "Unit", supertype: null, tags: ["Poro"], typeline: "Unit - Poro" },
     media: { image_url: "https://example.test/poro.png", artist: "Poro Artist", accessibility_text: null, layout: "portrait" }
   }),
@@ -107,7 +107,7 @@ const uniqueFixtureCards = [
     rarity: "Promo",
     variant: { alternate_art: false, overnumbered: true, signed: false },
     finishes: ["foil"],
-    attributes: { cost: 1, energy: 1, might: 1, power: null, domain: ["Calm"] },
+    attributes: { cost: "{1}", energy: 1, might: 1, power: 0, domain: ["Calm"] },
     type: { cardtype: "Unit", supertype: null, tags: ["Poro"], typeline: "Unit - Poro" },
     set: { set_id: "PR", label: "Riftbound Promotional Cards" },
     media: { image_url: "https://example.test/poro-on.png", artist: "Poro Artist", accessibility_text: null, layout: "portrait" }
@@ -116,6 +116,90 @@ const uniqueFixtureCards = [
 
 function uniqueIdsFor(query: string): string[] {
   return searchCards(uniqueFixtureCards, query).items.map((card) => card.id);
+}
+
+// Cards for cost-query semantic tests — each needs a unique riftbound_id to survive legal rollup
+const costFixtureCards = [
+  // energy=1, power=1, Fury — cost: {1}{F}
+  makeCard({ id: "c1", riftbound_id: "c1", riot_name: "Fury 1/1", collector_number: "c1",
+    attributes: { cost: "{1}{F}", energy: 1, might: null, power: 1, domain: ["Fury"] } }),
+  // energy=2, power=1, Fury — cost: {2}{F}
+  makeCard({ id: "c2", riftbound_id: "c2", riot_name: "Fury 2/1", collector_number: "c2",
+    attributes: { cost: "{2}{F}", energy: 2, might: null, power: 1, domain: ["Fury"] } }),
+  // energy=3, power=1, Fury — cost: {3}{F}
+  makeCard({ id: "c3", riftbound_id: "c3", riot_name: "Fury 3/1", collector_number: "c3",
+    attributes: { cost: "{3}{F}", energy: 3, might: null, power: 1, domain: ["Fury"] } }),
+  // energy=3, power=2, Fury — cost: {3}{F}{F}
+  makeCard({ id: "c4", riftbound_id: "c4", riot_name: "Fury 3/2", collector_number: "c4",
+    attributes: { cost: "{3}{F}{F}", energy: 3, might: null, power: 2, domain: ["Fury"] } }),
+  // energy=4, power=2, Fury — cost: {4}{F}{F}
+  makeCard({ id: "c5", riftbound_id: "c5", riot_name: "Fury 4/2", collector_number: "c5",
+    attributes: { cost: "{4}{F}{F}", energy: 4, might: null, power: 2, domain: ["Fury"] } }),
+  // energy=2, power=0, Fury — cost: {2}
+  makeCard({ id: "c6", riftbound_id: "c6", riot_name: "Fury 2/0", collector_number: "c6",
+    attributes: { cost: "{2}", energy: 2, might: null, power: 0, domain: ["Fury"] } }),
+  // energy=3, power=0, Fury — cost: {3}
+  makeCard({ id: "c7", riftbound_id: "c7", riot_name: "Fury 3/0", collector_number: "c7",
+    attributes: { cost: "{3}", energy: 3, might: null, power: 0, domain: ["Fury"] } }),
+  // energy=1, power=1, Fury/Mind hybrid — cost: {1}{F/M}
+  makeCard({ id: "c8", riftbound_id: "c8", riot_name: "FM Hybrid 1/1", collector_number: "c8",
+    attributes: { cost: "{1}{F/M}", energy: 1, might: null, power: 1, domain: ["Fury", "Mind"] } }),
+  // Costless
+  makeCard({ id: "c9", riftbound_id: "c9", riot_name: "Costless", collector_number: "c9",
+    attributes: { cost: null, energy: null, might: null, power: null, domain: ["Fury"] } }),
+];
+
+function costNamesFor(query: string): string[] {
+  return searchCards(costFixtureCards, query).items.map((card) => card.riot_name);
+}
+
+const domainOperatorFixtureCards = [
+  makeCard({
+    id: "d1",
+    riftbound_id: "d1",
+    riot_name: "Chaos Solo",
+    collector_number: "d1",
+    attributes: { cost: "{1}{H}", energy: 1, might: null, power: 1, domain: ["Chaos"] }
+  }),
+  makeCard({
+    id: "d2",
+    riftbound_id: "d2",
+    riot_name: "Mind Solo",
+    collector_number: "d2",
+    attributes: { cost: "{1}{M}", energy: 1, might: null, power: 1, domain: ["Mind"] }
+  }),
+  makeCard({
+    id: "d3",
+    riftbound_id: "d3",
+    riot_name: "Chaos Mind Hybrid",
+    collector_number: "d3",
+    attributes: { cost: "{1}{H/M}", energy: 1, might: null, power: 1, domain: ["Chaos", "Mind"] }
+  }),
+  makeCard({
+    id: "d4",
+    riftbound_id: "d4",
+    riot_name: "Chaos Body Hybrid",
+    collector_number: "d4",
+    attributes: { cost: "{1}{H/B}", energy: 1, might: null, power: 1, domain: ["Chaos", "Body"] }
+  }),
+  makeCard({
+    id: "d5",
+    riftbound_id: "d5",
+    riot_name: "Order Solo",
+    collector_number: "d5",
+    attributes: { cost: "{1}{O}", energy: 1, might: null, power: 1, domain: ["Order"] }
+  }),
+  makeCard({
+    id: "d6",
+    riftbound_id: "d6",
+    riot_name: "Chaos Fury Hybrid",
+    collector_number: "d6",
+    attributes: { cost: "{1}{H/F}", energy: 1, might: null, power: 1, domain: ["Chaos", "Fury"] }
+  })
+];
+
+function domainNamesFor(query: string): string[] {
+  return searchCards(domainOperatorFixtureCards, query).items.map((card) => card.riot_name);
 }
 
 describe("searchCards", () => {
@@ -169,7 +253,7 @@ describe("searchCards", () => {
 
   it("matches collector suffixes and variant flag aliases", () => {
     expect(namesFor("number=3a")).toEqual(["Alternate Gate"]);
-    expect(namesFor("c:3a")).toEqual(["Alternate Gate"]);
+    expect(namesFor("cn:3a")).toEqual(["Alternate Gate"]);
     expect(namesFor("is:AA")).toEqual(["Alternate Gate"]);
     expect(namesFor("is:altart")).toEqual(["Alternate Gate"]);
     expect(namesFor("is:alternateart")).toEqual(["Alternate Gate"]);
@@ -225,5 +309,103 @@ describe("searchCards", () => {
 
   it("prefers non-promo records for the default legal rollup", () => {
     expect(uniqueIdsFor("name:poro")).toEqual(["poro-base"]);
+  });
+});
+
+describe("cost and power query semantics", () => {
+  // c<3f = c<=2: only energy comparison for < operator
+  it("c<3f returns same results as c<=2 (energy-only for < operator)", () => {
+    const lt3f = costNamesFor("c<3f");
+    const lte2 = costNamesFor("c<=2");
+    expect(lt3f).toEqual(lte2);
+    // Should include energy=1 and energy=2 cards, exclude energy=3+
+    expect(lt3f).not.toContain("Fury 3/1");
+    expect(lt3f).not.toContain("Fury 3/0");
+    expect(lt3f).toContain("Fury 1/1");
+    expect(lt3f).toContain("Fury 2/1");
+    expect(lt3f).toContain("Fury 2/0");
+    expect(lt3f).toContain("FM Hybrid 1/1");
+    expect(lt3f).not.toContain("Costless");
+  });
+
+  // c>3f = (c>=ff and e>=4): both energy and power conditions for > operator
+  it("c>3f returns cards with energy>3 AND power>1 Fury (same as c>=ff and e>=4)", () => {
+    const gt3f = costNamesFor("c>3f");
+    const combined = costNamesFor("c>=ff e>=4");
+    expect(gt3f).toEqual(combined);
+    expect(gt3f).toContain("Fury 4/2");   // energy=4, power=2, Fury ✓
+    expect(gt3f).not.toContain("Fury 3/2"); // energy=3 not >3
+    expect(gt3f).not.toContain("Fury 3/1"); // energy=3 not >3
+    expect(gt3f).not.toContain("Fury 3/0"); // energy=3 not >3, power=0 not >1
+  });
+
+  // c=3f: exact energy=3 AND power=1 Fury
+  it("c=3f returns cards with exactly energy=3, power=1, domain=Fury", () => {
+    const eq3f = costNamesFor("c=3f");
+    const combined = costNamesFor("p=1 e=3 d:f");
+    expect(eq3f).toEqual(combined);
+    expect(eq3f).toEqual(["Fury 3/1"]);
+    expect(eq3f).not.toContain("Fury 3/2"); // power=2 not =1
+    expect(eq3f).not.toContain("Fury 3/0"); // power=0 not =1
+  });
+
+  // c>={f/m}: hybrid power comparison, only power=symbol notation
+  it("c>={f/m} returns cards with Fury/Mind hybrid power >= 1", () => {
+    const result = costNamesFor("c>={f/m}");
+    expect(result).toEqual(["FM Hybrid 1/1"]);
+    expect(result).not.toContain("Fury 1/1"); // pure Fury, not hybrid
+  });
+
+  // Pure power symbol query: p=ff = power=2 AND domain=Fury
+  it("p=ff matches cards with exactly 2 Fury pips", () => {
+    expect(costNamesFor("p=ff")).toEqual(["Fury 3/2", "Fury 4/2"]);
+  });
+
+  // p=f matches power=1 Fury
+  it("p=f matches cards with exactly 1 Fury pip", () => {
+    expect(costNamesFor("p=f")).toEqual(["Fury 1/1", "Fury 2/1", "Fury 3/1"]);
+  });
+
+  // p=0 matches costed cards with power=0 (not costless)
+  it("p=0 matches costed cards with zero power cost", () => {
+    const result = costNamesFor("p=0");
+    expect(result).toContain("Fury 2/0");
+    expect(result).toContain("Fury 3/0");
+    expect(result).not.toContain("Costless"); // null power, not 0
+  });
+
+  // p:none matches costless cards only
+  it("p:none matches only costless cards", () => {
+    expect(costNamesFor("p:none")).toEqual(["Costless"]);
+  });
+
+  // Hybrid domain doesn't match single-domain power query
+  it("hybrid card does not match single-domain power query", () => {
+    expect(costNamesFor("p=f")).not.toContain("FM Hybrid 1/1");
+    expect(costNamesFor("p=m")).not.toContain("FM Hybrid 1/1");
+  });
+});
+
+describe("domain set query semantics", () => {
+  it("supports explicit color aliases and curated substrings", () => {
+    expect(namesFor("d:purple")).toEqual(["Alternate Gate"]);
+    expect(namesFor("d:purp")).toEqual(["Alternate Gate"]);
+    expect(namesFor("d:yellow")).toEqual(["Overnumbered Gate"]);
+    expect(namesFor("d:oran")).toEqual(["Void Gate", "Foil Gate"]);
+  });
+
+  it("treats parsed domain values as set comparisons", () => {
+    expect(domainNamesFor("d=p")).toEqual(["Chaos Solo"]);
+    expect(domainNamesFor("d>p")).toEqual(["Chaos Mind Hybrid", "Chaos Body Hybrid", "Chaos Fury Hybrid"]);
+    expect(domainNamesFor("d<pu")).toEqual(["Chaos Solo", "Mind Solo"]);
+    expect(domainNamesFor("d<=pu")).toEqual(["Chaos Solo", "Mind Solo", "Chaos Mind Hybrid"]);
+    expect(domainNamesFor("d:pu")).toEqual(["Chaos Solo", "Mind Solo", "Chaos Mind Hybrid"]);
+    expect(domainNamesFor("d:rp")).toEqual(["Chaos Solo", "Chaos Fury Hybrid"]);
+    expect(domainNamesFor("d>=pu")).toEqual(["Chaos Mind Hybrid"]);
+  });
+
+  it("falls back to plain string matching for unrecognized domain text", () => {
+    expect(domainNamesFor("d:cha")).toEqual(["Chaos Solo", "Chaos Mind Hybrid", "Chaos Body Hybrid", "Chaos Fury Hybrid"]);
+    expect(searchCards(domainOperatorFixtureCards, "d>mystery").diagnostics.length).toBeGreaterThan(0);
   });
 });

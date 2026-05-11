@@ -2,7 +2,6 @@ import {
   parseJustTcgConfig,
   runHostedJustTcgCaptureWorker,
   runHostedJustTcgPublishWorker,
-  type HostedCaptureWorkerInput,
   type HostedObjectStore,
   type HostedPublishWorkerInput,
   type JustTcgEnvironment
@@ -23,9 +22,19 @@ export interface R2BucketLike {
   }>;
 }
 
-export type PriceStoreWorkerEnv = JustTcgEnvironment & {
+export interface ServiceBindingLike {
+  fetch(request: Request): Promise<Response>;
+}
+
+export type PriceStoreCaptureWorkerEnv = JustTcgEnvironment & {
   PRICE_STORE_BUCKET: R2BucketLike;
-  PRICE_STORE_TRIGGER_TOKEN: string;
+  PRICE_STORE_PUBLISHER: ServiceBindingLike;
+  PRICE_STORE_CAPTURE_MAX_REQUESTS?: string;
+  PRICE_STORE_CAPTURE_REQUEST_DELAY_MS?: string;
+};
+
+export type PriceStorePublishWorkerEnv = {
+  PRICE_STORE_BUCKET: R2BucketLike;
 };
 
 export function createR2HostedObjectStore(bucket: R2BucketLike): HostedObjectStore {
@@ -61,44 +70,62 @@ export function createR2HostedObjectStore(bucket: R2BucketLike): HostedObjectSto
   };
 }
 
-export function authorizeWorkerRequest(request: Request, token: string): Response | undefined {
-  const expected = token.trim();
-  const provided = request.headers.get("authorization")?.replace(/^Bearer\s+/iu, "").trim();
-  if (!expected || provided !== expected) {
-    return jsonResponse(401, {
-      message: "Unauthorized."
-    });
-  }
-
-  return undefined;
-}
-
-export async function handleCaptureWorkerRequest(
-  request: Request,
-  env: PriceStoreWorkerEnv
+export async function handleCaptureWorkerScheduled(
+  env: PriceStoreCaptureWorkerEnv,
+  options: {
+    runCapture?: typeof runHostedJustTcgCaptureWorker;
+    publishFetch?: (request: Request) => Promise<Response>;
+  } = {}
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return jsonResponse(405, {
-      message: "Capture worker only supports POST."
-    });
-  }
-
-  const unauthorized = authorizeWorkerRequest(request, env.PRICE_STORE_TRIGGER_TOKEN);
-  if (unauthorized) {
-    return unauthorized;
-  }
-
-  const body = await parseJsonBody<HostedCaptureWorkerInput>(request);
   const store = createR2HostedObjectStore(env.PRICE_STORE_BUCKET);
   const config = parseJustTcgConfig(env);
-  const result = await runHostedJustTcgCaptureWorker(store, config, body);
+  const runCapture = options.runCapture ?? runHostedJustTcgCaptureWorker;
+  const publishFetch = options.publishFetch ?? ((request: Request) => env.PRICE_STORE_PUBLISHER.fetch(request));
+  const captureResult = await runCapture(store, config, {
+    mode: "incremental",
+    maxRequests: parseOptionalPositiveInteger(env.PRICE_STORE_CAPTURE_MAX_REQUESTS),
+    requestDelayMs: parseOptionalNonNegativeInteger(env.PRICE_STORE_CAPTURE_REQUEST_DELAY_MS)
+  });
 
-  return jsonResponse(200, result);
+  const publishResponse = await publishFetch(
+    new Request("https://price-store.internal/publish", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        captureRunId: captureResult.runId
+      } satisfies HostedPublishWorkerInput)
+    })
+  );
+
+  if (!publishResponse.ok) {
+    const detail = await publishResponse.text();
+    throw new Error(
+      `Capture succeeded for ${captureResult.runId}, but internal publish failed with ${publishResponse.status}: ${detail}`
+    );
+  }
+
+  const publishResult = await publishResponse.json();
+
+  return jsonResponse(200, {
+    capture: captureResult,
+    publish: publishResult
+  });
+}
+
+export async function handleCaptureWorkerFetch(): Promise<Response> {
+  return jsonResponse(405, {
+    message: "This worker is schedule-driven. Use Cloudflare Cron Triggers to run it."
+  });
 }
 
 export async function handlePublishWorkerRequest(
   request: Request,
-  env: PriceStoreWorkerEnv
+  env: PriceStorePublishWorkerEnv,
+  options: {
+    runPublish?: typeof runHostedJustTcgPublishWorker;
+  } = {}
 ): Promise<Response> {
   if (request.method !== "POST") {
     return jsonResponse(405, {
@@ -106,14 +133,17 @@ export async function handlePublishWorkerRequest(
     });
   }
 
-  const unauthorized = authorizeWorkerRequest(request, env.PRICE_STORE_TRIGGER_TOKEN);
-  if (unauthorized) {
-    return unauthorized;
+  const url = new URL(request.url);
+  if (url.pathname !== "/publish") {
+    return jsonResponse(404, {
+      message: `Worker route "${url.pathname}" was not found.`
+    });
   }
 
   const body = await parseJsonBody<HostedPublishWorkerInput>(request);
   const store = createR2HostedObjectStore(env.PRICE_STORE_BUCKET);
-  const result = await runHostedJustTcgPublishWorker(store, body);
+  const runPublish = options.runPublish ?? runHostedJustTcgPublishWorker;
+  const result = await runPublish(store, body);
 
   return jsonResponse(200, result);
 }
@@ -134,4 +164,30 @@ async function parseJsonBody<T>(request: Request): Promise<T> {
   }
 
   return request.json() as Promise<T>;
+}
+
+function parseOptionalPositiveInteger(value: string | undefined): number | undefined {
+  if (!value?.trim()) {
+    return undefined;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`Expected a positive integer environment value, received: ${value}`);
+  }
+
+  return parsed;
+}
+
+function parseOptionalNonNegativeInteger(value: string | undefined): number | undefined {
+  if (!value?.trim()) {
+    return undefined;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(`Expected a non-negative integer environment value, received: ${value}`);
+  }
+
+  return parsed;
 }

@@ -17,7 +17,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -71,10 +71,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -126,10 +126,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -179,10 +179,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -233,10 +233,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -286,10 +286,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -338,10 +338,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -489,7 +489,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -541,7 +541,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{F}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -593,10 +593,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -648,7 +648,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{F}",
       "energy": 8,
       "might": 8,
       "power": 1,
@@ -700,10 +700,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -755,10 +755,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -809,7 +809,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{F}",
       "energy": 8,
       "might": null,
       "power": 1,
@@ -861,7 +861,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F}",
       "energy": 4,
       "might": 5,
       "power": 1,
@@ -916,10 +916,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -971,10 +971,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -1021,10 +1021,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -1076,10 +1076,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -1132,7 +1132,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{F}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -1187,7 +1187,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -1239,7 +1239,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{F}{F}",
       "energy": 5,
       "might": null,
       "power": 2,
@@ -1291,10 +1291,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -1341,7 +1341,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{F}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -1392,7 +1392,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F}{F}",
       "energy": 4,
       "might": null,
       "power": 2,
@@ -1443,10 +1443,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -1494,7 +1494,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{F}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -1547,7 +1547,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{F}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -1600,7 +1600,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{F}",
       "energy": 5,
       "might": 3,
       "power": 1,
@@ -1652,7 +1652,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F}{F}",
       "energy": 2,
       "might": null,
       "power": 2,
@@ -1701,7 +1701,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{F}",
       "energy": 3,
       "might": 4,
       "power": 1,
@@ -1756,7 +1756,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{F}",
       "energy": 3,
       "might": 4,
       "power": 1,
@@ -1811,7 +1811,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{F}",
       "energy": 6,
       "might": 4,
       "power": 1,
@@ -1863,10 +1863,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -1912,7 +1912,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -1963,7 +1963,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{F}{F}",
       "energy": 7,
       "might": 8,
       "power": 2,
@@ -2015,7 +2015,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F}",
       "energy": 4,
       "might": 2,
       "power": 1,
@@ -2069,7 +2069,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F}",
       "energy": 2,
       "might": 3,
       "power": 1,
@@ -2123,7 +2123,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{F}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -2176,7 +2176,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 9,
+      "cost": "{9}{F}{F}",
       "energy": 9,
       "might": 9,
       "power": 2,
@@ -2230,10 +2230,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -2284,10 +2284,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -2338,7 +2338,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{F}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -2390,7 +2390,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 10,
+      "cost": "{10}{F}{F}",
       "energy": 10,
       "might": 9,
       "power": 2,
@@ -2444,7 +2444,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 10,
+      "cost": "{10}{F}{F}",
       "energy": 10,
       "might": 9,
       "power": 2,
@@ -2598,7 +2598,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{C}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -2648,10 +2648,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -2700,7 +2700,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{C}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -2752,10 +2752,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -2804,10 +2804,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -2856,10 +2856,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -2908,10 +2908,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -2961,7 +2961,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{C}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -3013,10 +3013,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -3065,10 +3065,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -3119,10 +3119,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -3172,10 +3172,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -3227,10 +3227,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -3279,10 +3279,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -3332,10 +3332,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -3387,10 +3387,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -3439,7 +3439,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{C}",
       "energy": 7,
       "might": 7,
       "power": 1,
@@ -3492,10 +3492,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -3542,7 +3542,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -3594,10 +3594,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -3644,7 +3644,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{C}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -3696,7 +3696,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}{C}",
       "energy": 3,
       "might": null,
       "power": 2,
@@ -3748,10 +3748,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -3799,7 +3799,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -3851,7 +3851,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -3903,7 +3903,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -3958,7 +3958,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -4010,7 +4010,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -4062,7 +4062,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{C}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -4113,10 +4113,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -4162,10 +4162,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -4211,7 +4211,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -4263,7 +4263,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -4318,10 +4318,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}",
       "energy": 7,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -4373,7 +4373,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{C}{C}",
       "energy": 6,
       "might": 6,
       "power": 2,
@@ -4425,7 +4425,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{C}{C}",
       "energy": 6,
       "might": 6,
       "power": 2,
@@ -4477,10 +4477,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -4528,7 +4528,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -4582,7 +4582,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -4636,7 +4636,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{C}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -4688,7 +4688,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{C}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -4740,7 +4740,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C}{C}{C}",
       "energy": 4,
       "might": null,
       "power": 3,
@@ -4791,7 +4791,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{C}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -4843,7 +4843,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{C}{C}",
       "energy": 8,
       "might": 8,
       "power": 2,
@@ -4896,10 +4896,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -4949,10 +4949,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5001,10 +5001,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5053,10 +5053,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5108,10 +5108,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5163,10 +5163,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}",
       "energy": 7,
       "might": 8,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5315,10 +5315,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5365,10 +5365,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5417,7 +5417,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{M}{M}",
       "energy": 6,
       "might": 6,
       "power": 2,
@@ -5470,7 +5470,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{M}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -5522,10 +5522,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5576,10 +5576,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5628,10 +5628,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5682,7 +5682,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{M}",
       "energy": 2,
       "might": 2,
       "power": 1,
@@ -5737,10 +5737,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5790,10 +5790,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5840,7 +5840,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -5894,10 +5894,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -5944,7 +5944,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -5996,10 +5996,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -6048,10 +6048,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -6100,7 +6100,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{M}{M}",
       "energy": 6,
       "might": null,
       "power": 2,
@@ -6150,7 +6150,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -6203,10 +6203,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -6256,7 +6256,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{M}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -6307,7 +6307,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{M}{M}",
       "energy": 8,
       "might": 6,
       "power": 2,
@@ -6359,7 +6359,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{M}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -6414,7 +6414,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -6467,7 +6467,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{M}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -6521,7 +6521,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{M}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -6575,10 +6575,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -6630,7 +6630,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{M}",
       "energy": 6,
       "might": null,
       "power": 1,
@@ -6679,7 +6679,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{M}",
       "energy": 5,
       "might": null,
       "power": 1,
@@ -6728,7 +6728,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{M}",
       "energy": 7,
       "might": 7,
       "power": 1,
@@ -6781,7 +6781,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -6833,7 +6833,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -6885,7 +6885,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{M}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -6937,7 +6937,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -6989,7 +6989,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -7041,7 +7041,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{M}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -7093,7 +7093,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{M}",
       "energy": 2,
       "might": 2,
       "power": 1,
@@ -7148,7 +7148,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{M}",
       "energy": 2,
       "might": 2,
       "power": 1,
@@ -7203,7 +7203,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 10,
+      "cost": "{10}{M}{M}{M}{M}",
       "energy": 10,
       "might": null,
       "power": 4,
@@ -7252,7 +7252,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{M}{M}",
       "energy": 7,
       "might": null,
       "power": 2,
@@ -7302,10 +7302,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -7352,10 +7352,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -7505,7 +7505,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{B}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -7557,7 +7557,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{B}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -7609,10 +7609,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -7661,10 +7661,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -7714,10 +7714,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -7767,10 +7767,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -7820,10 +7820,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -7872,10 +7872,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -7922,10 +7922,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -7977,10 +7977,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -8029,10 +8029,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}",
       "energy": 7,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -8083,10 +8083,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -8133,10 +8133,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -8186,10 +8186,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -8238,7 +8238,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{B}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -8290,10 +8290,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 9,
+      "cost": "{9}",
       "energy": 9,
       "might": 10,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -8342,10 +8342,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -8392,7 +8392,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{B}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -8444,7 +8444,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{B}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -8496,10 +8496,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -8548,10 +8548,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -8599,7 +8599,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{B}{B}",
       "energy": 7,
       "might": 8,
       "power": 2,
@@ -8652,7 +8652,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}{B}",
       "energy": 5,
       "might": 6,
       "power": 2,
@@ -8703,7 +8703,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{B}{B}",
       "energy": 3,
       "might": 5,
       "power": 2,
@@ -8758,10 +8758,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -8812,10 +8812,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -8866,10 +8866,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -8915,7 +8915,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}{B}",
       "energy": 5,
       "might": null,
       "power": 2,
@@ -8966,7 +8966,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{B}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -9017,7 +9017,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{B}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -9071,7 +9071,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{B}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -9120,7 +9120,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{B}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -9174,7 +9174,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 12,
+      "cost": "{12}{B}{B}",
       "energy": 12,
       "might": 10,
       "power": 2,
@@ -9229,7 +9229,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 12,
+      "cost": "{12}{B}{B}",
       "energy": 12,
       "might": 10,
       "power": 2,
@@ -9284,7 +9284,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{B}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -9337,7 +9337,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 9,
+      "cost": "{9}{B}{B}",
       "energy": 9,
       "might": null,
       "power": 2,
@@ -9386,7 +9386,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{B}{B}",
       "energy": 8,
       "might": 8,
       "power": 2,
@@ -9439,7 +9439,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -9495,7 +9495,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -9551,7 +9551,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{B}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -9603,7 +9603,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -9655,7 +9655,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -9708,7 +9708,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{H}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -9860,10 +9860,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -9914,10 +9914,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -9967,10 +9967,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10019,10 +10019,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10071,10 +10071,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10125,7 +10125,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{H}{H}",
       "energy": 2,
       "might": null,
       "power": 2,
@@ -10177,7 +10177,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{H}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -10229,10 +10229,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10283,10 +10283,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10336,10 +10336,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10389,7 +10389,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -10441,7 +10441,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -10493,10 +10493,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10545,7 +10545,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -10597,10 +10597,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10647,10 +10647,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10697,10 +10697,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10749,10 +10749,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10799,10 +10799,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10851,10 +10851,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -10901,7 +10901,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{H}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -10951,7 +10951,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}{H}",
       "energy": 4,
       "might": 2,
       "power": 2,
@@ -11002,7 +11002,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{H}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -11056,7 +11056,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{H}",
       "energy": 3,
       "might": 1,
       "power": 1,
@@ -11110,10 +11110,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -11164,7 +11164,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{H}{H}",
       "energy": 7,
       "might": 7,
       "power": 2,
@@ -11216,7 +11216,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -11269,7 +11269,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -11322,7 +11322,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -11375,7 +11375,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 10,
+      "cost": "{10}{H}",
       "energy": 10,
       "might": 6,
       "power": 1,
@@ -11427,7 +11427,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{H}{H}",
       "energy": 8,
       "might": 5,
       "power": 2,
@@ -11479,10 +11479,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -11534,10 +11534,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -11589,7 +11589,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{H}{H}",
       "energy": 6,
       "might": null,
       "power": 2,
@@ -11638,10 +11638,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -11691,10 +11691,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -11743,7 +11743,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{H}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -11792,7 +11792,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -11844,7 +11844,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -11896,7 +11896,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{H}{H}{H}",
       "energy": 8,
       "might": null,
       "power": 3,
@@ -11947,7 +11947,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{H}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -11999,7 +11999,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -12053,7 +12053,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -12108,10 +12108,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -12160,10 +12160,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -12212,10 +12212,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -12264,7 +12264,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{O}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -12314,10 +12314,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -12368,10 +12368,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -12420,10 +12420,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -12470,7 +12470,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{O}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -12622,10 +12622,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -12677,10 +12677,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -12732,10 +12732,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -12787,7 +12787,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{O}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -12842,10 +12842,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -12895,10 +12895,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -12948,7 +12948,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}{O}",
       "energy": 5,
       "might": null,
       "power": 2,
@@ -13000,10 +13000,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -13053,7 +13053,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -13105,7 +13105,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{O}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -13157,7 +13157,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -13209,7 +13209,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}{O}",
       "energy": 4,
       "might": 4,
       "power": 2,
@@ -13262,10 +13262,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -13312,10 +13312,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -13362,7 +13362,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}{O}",
       "energy": 4,
       "might": null,
       "power": 2,
@@ -13411,10 +13411,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -13462,7 +13462,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}{O}{O}{O}",
       "energy": 6,
       "might": 8,
       "power": 4,
@@ -13517,10 +13517,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -13574,7 +13574,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}{O}{O}",
       "energy": 6,
       "might": null,
       "power": 3,
@@ -13625,7 +13625,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{O}{O}",
       "energy": 8,
       "might": 6,
       "power": 2,
@@ -13677,7 +13677,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -13731,7 +13731,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{O}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -13786,7 +13786,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}{O}",
       "energy": 6,
       "might": null,
       "power": 2,
@@ -13835,7 +13835,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -13889,7 +13889,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -13943,7 +13943,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -13996,7 +13996,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 5,
       "power": 1,
@@ -14050,7 +14050,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 5,
       "power": 1,
@@ -14104,7 +14104,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{O}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -14160,10 +14160,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -14209,7 +14209,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -14264,7 +14264,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -14319,7 +14319,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{O}{O}",
       "energy": 7,
       "might": null,
       "power": 2,
@@ -14368,7 +14368,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{O}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -14420,7 +14420,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -14472,7 +14472,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -14579,7 +14579,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{F/M}{F/M}{F/M}",
       "energy": 7,
       "might": null,
       "power": 3,
@@ -14685,7 +14685,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{B/F}{B/F}",
       "energy": 6,
       "might": null,
       "power": 2,
@@ -14789,7 +14789,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F/H}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -14897,7 +14897,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F/O}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -15004,10 +15004,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm",
         "Mind"
@@ -15111,7 +15111,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{B/C}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -15215,7 +15215,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C/H}{C/H}",
       "energy": 3,
       "might": null,
       "power": 2,
@@ -15321,7 +15321,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C/O}{C/O}",
       "energy": 3,
       "might": null,
       "power": 2,
@@ -15429,7 +15429,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{H/M}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -15535,7 +15535,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{M/O}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -15643,10 +15643,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body",
         "Chaos"
@@ -15749,7 +15749,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{B/O}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -15805,7 +15805,7 @@
       "cost": null,
       "energy": null,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Colorless"
       ]
@@ -15857,7 +15857,7 @@
       "cost": null,
       "energy": null,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Colorless"
       ]
@@ -15909,7 +15909,7 @@
       "cost": null,
       "energy": null,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Colorless"
       ]
@@ -15961,7 +15961,7 @@
       "cost": null,
       "energy": null,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Colorless"
       ]
@@ -18489,7 +18489,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{F}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -18541,7 +18541,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{F}",
       "energy": 6,
       "might": null,
       "power": 1,
@@ -18590,10 +18590,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -18641,7 +18641,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -18693,7 +18693,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{C}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -18747,7 +18747,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{M}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -18799,7 +18799,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{B}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -18855,7 +18855,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{B}",
       "energy": 6,
       "might": null,
       "power": 1,
@@ -18906,7 +18906,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{B}",
       "energy": 7,
       "might": 6,
       "power": 1,
@@ -18960,7 +18960,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -19012,10 +19012,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -19063,7 +19063,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": null,
       "power": 1,
@@ -19114,7 +19114,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -19167,10 +19167,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -19222,10 +19222,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -19273,7 +19273,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -19310,8 +19310,8 @@
   {
     "id": "69bc5bd9d308c64675ca8826",
     "riot_name": "Annie - Dark Child (Starter)",
-    "clean_name": "Annie Dark Child Starter",
-    "riftbound_id": "0b9a26aa-1838-5b6c-8982-e93a97cd68d0",
+    "clean_name": "Annie Dark Child",
+    "riftbound_id": "f3bd7134-df68-5098-87c6-a38d799a5cdd",
     "tcgplayer_id": "653152",
     "collector_number": "17",
     "language": "en",
@@ -19377,7 +19377,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{F/H}{F/H}",
       "energy": 8,
       "might": 7,
       "power": 2,
@@ -19414,8 +19414,8 @@
   {
     "id": "69bc5bd9d308c64675ca8828",
     "riot_name": "Master Yi - Wuju Bladesman (Starter)",
-    "clean_name": "Master Yi Wuju Bladesman Starter",
-    "riftbound_id": "e76e331f-9580-5a4b-ac1e-7bd87d77a11c",
+    "clean_name": "Master Yi Wuju Bladesman",
+    "riftbound_id": "961dcced-d75f-53bf-83db-fd3e8f2d1823",
     "tcgplayer_id": "653154",
     "collector_number": "19",
     "language": "en",
@@ -19481,10 +19481,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm",
         "Body"
@@ -19520,8 +19520,8 @@
   {
     "id": "69bc5bd9d308c64675ca882a",
     "riot_name": "Lux - Lady of Luminosity (Starter)",
-    "clean_name": "Lux Lady of Luminosity Starter",
-    "riftbound_id": "84caacd2-f0c7-5757-8f24-7c9310c79baf",
+    "clean_name": "Lux Lady of Luminosity",
+    "riftbound_id": "483acca8-06f0-5142-9f5d-dae390bf58b0",
     "tcgplayer_id": "653156",
     "collector_number": "21",
     "language": "en",
@@ -19587,10 +19587,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}",
       "energy": 8,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind",
         "Order"
@@ -19626,8 +19626,8 @@
   {
     "id": "69bc5bd9d308c64675ca882c",
     "riot_name": "Garen - Might of Demacia (Starter)",
-    "clean_name": "Garen Might of Demacia Starter",
-    "riftbound_id": "5ef80b71-9f59-5211-b7e1-983c1804f64a",
+    "clean_name": "Garen Might of Demacia",
+    "riftbound_id": "99f85771-f107-5107-a8b1-dc04445c3354",
     "tcgplayer_id": "653158",
     "collector_number": "23",
     "language": "en",
@@ -19693,7 +19693,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B/O}",
       "energy": 5,
       "might": null,
       "power": 1,
@@ -19747,7 +19747,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{F}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -19799,10 +19799,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -19853,7 +19853,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -19905,7 +19905,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{M}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -19957,7 +19957,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{B}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -20013,10 +20013,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -20116,10 +20116,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -20169,7 +20169,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{B}",
       "energy": 7,
       "might": 6,
       "power": 1,
@@ -20223,7 +20223,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -20275,10 +20275,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -20326,10 +20326,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -20379,7 +20379,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -20432,10 +20432,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -20524,8 +20524,8 @@
   {
     "id": "69bc5bf2d308c64675ca89fd",
     "riot_name": "Annie - Dark Child (Metal)",
-    "clean_name": "Annie Dark Child Metal",
-    "riftbound_id": "9aaae3a2-6fc1-56b9-b6ae-b854f9dde34c",
+    "clean_name": "Annie Dark Child",
+    "riftbound_id": "f3bd7134-df68-5098-87c6-a38d799a5cdd",
     "tcgplayer_id": "669265",
     "collector_number": "17",
     "language": "en",
@@ -20591,7 +20591,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{F/H}{F/H}",
       "energy": 8,
       "might": 7,
       "power": 2,
@@ -20628,8 +20628,8 @@
   {
     "id": "69bc5bf2d308c64675ca89fe",
     "riot_name": "Master Yi - Wuju Bladesman (Metal)",
-    "clean_name": "Master Yi Wuju Bladesman Metal",
-    "riftbound_id": "e9b131c9-1c30-5329-aed4-20ecfe661184",
+    "clean_name": "Master Yi Wuju Bladesman",
+    "riftbound_id": "961dcced-d75f-53bf-83db-fd3e8f2d1823",
     "tcgplayer_id": "669266",
     "collector_number": "19",
     "language": "en",
@@ -20747,10 +20747,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm",
         "Body"
@@ -20838,8 +20838,8 @@
   {
     "id": "69bc5bf2d308c64675ca89ff",
     "riot_name": "Lux - Lady of Luminosity (Metal)",
-    "clean_name": "Lux Lady of Luminosity Metal",
-    "riftbound_id": "4d7b141c-ed9e-56eb-8e3e-8c820d125019",
+    "clean_name": "Lux Lady of Luminosity",
+    "riftbound_id": "483acca8-06f0-5142-9f5d-dae390bf58b0",
     "tcgplayer_id": "669267",
     "collector_number": "21",
     "language": "en",
@@ -20905,10 +20905,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}",
       "energy": 8,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind",
         "Order"
@@ -20944,8 +20944,8 @@
   {
     "id": "69bc5bf2d308c64675ca8a00",
     "riot_name": "Garen - Might of Demacia (Metal)",
-    "clean_name": "Garen Might of Demacia Metal",
-    "riftbound_id": "a4020bbb-63b5-5d66-85b0-8dbefae4bc61",
+    "clean_name": "Garen Might of Demacia",
+    "riftbound_id": "99f85771-f107-5107-a8b1-dc04445c3354",
     "tcgplayer_id": "669268",
     "collector_number": "23",
     "language": "en",
@@ -21063,7 +21063,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B/O}",
       "energy": 5,
       "might": null,
       "power": 1,
@@ -21117,7 +21117,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{F}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -21168,10 +21168,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -21221,7 +21221,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{F}{F}",
       "energy": 7,
       "might": 8,
       "power": 2,
@@ -21273,10 +21273,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -21376,10 +21376,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -21427,10 +21427,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -21480,10 +21480,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -21531,10 +21531,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -21582,10 +21582,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -21637,10 +21637,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -21689,7 +21689,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -21744,7 +21744,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -21793,7 +21793,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -21847,10 +21847,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -21899,10 +21899,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -22001,7 +22001,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{M}{M}",
       "energy": 6,
       "might": 6,
       "power": 2,
@@ -22053,10 +22053,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -22106,10 +22106,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -22158,7 +22158,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{B}",
       "energy": 7,
       "might": 7,
       "power": 1,
@@ -22211,10 +22211,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -22262,7 +22262,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -22318,10 +22318,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -22371,10 +22371,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -22473,7 +22473,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{B}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -22524,10 +22524,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -22575,10 +22575,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -22629,10 +22629,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}",
       "energy": 7,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -22682,10 +22682,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -22734,10 +22734,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -22787,10 +22787,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -22889,10 +22889,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -22944,7 +22944,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -22980,8 +22980,8 @@
   {
     "id": "69bff35b58d0fbca04e93743",
     "riot_name": "Rumble - Mechanized Menace (Metal)",
-    "clean_name": "Rumble Mechanized Menace Metal",
-    "riftbound_id": "ed1d3c15-c79d-5c53-a63f-3568e74fc68d",
+    "clean_name": "Rumble Mechanized Menace",
+    "riftbound_id": "fe946f5d-7c33-5f35-84fc-92a3f897a5f5",
     "tcgplayer_id": "684996",
     "collector_number": "181",
     "language": "en",
@@ -23034,8 +23034,8 @@
   {
     "id": "69bff35b58d0fbca04e93740",
     "riot_name": "Lucian - Purifier (Metal)",
-    "clean_name": "Lucian Purifier Metal",
-    "riftbound_id": "9de47662-ea29-584f-9fc0-983efee6c5b6",
+    "clean_name": "Lucian Purifier",
+    "riftbound_id": "2f64acd8-612f-5308-8b75-fd493c0d7bd1",
     "tcgplayer_id": "684990",
     "collector_number": "183",
     "language": "en",
@@ -23103,10 +23103,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -23139,8 +23139,8 @@
   {
     "id": "69bff35b58d0fbca04e9373b",
     "riot_name": "Draven - Glorious Executioner (Metal)",
-    "clean_name": "Draven Glorious Executioner Metal",
-    "riftbound_id": "18167d52-dda4-54a8-82d6-de999e87f679",
+    "clean_name": "Draven Glorious Executioner",
+    "riftbound_id": "36c0e076-b554-5e58-9912-21f1066162d6",
     "tcgplayer_id": "684755",
     "collector_number": "185",
     "language": "en",
@@ -23191,8 +23191,8 @@
   {
     "id": "69bff35b58d0fbca04e93742",
     "riot_name": "Rek'sai - Void Burrower (Metal)",
-    "clean_name": "Reksai Void Burrower Metal",
-    "riftbound_id": "7cc506f1-51c1-55bc-9031-9fd41b6b3ab8",
+    "clean_name": "Reksai Void Burrower",
+    "riftbound_id": "17e8d140-dacc-5141-864b-6f87a4c47782",
     "tcgplayer_id": "684993",
     "collector_number": "187",
     "language": "en",
@@ -23243,8 +23243,8 @@
   {
     "id": "69bff35b58d0fbca04e93741",
     "riot_name": "Ornn - Fire Below the Mountain (Metal)",
-    "clean_name": "Ornn Fire Below the Mountain Metal",
-    "riftbound_id": "de067ed9-b724-5511-b856-42a4ab0acbc9",
+    "clean_name": "Ornn Fire Below the Mountain",
+    "riftbound_id": "7d434d1b-3727-5457-89d1-097e93ef6022",
     "tcgplayer_id": "684992",
     "collector_number": "189",
     "language": "en",
@@ -23298,8 +23298,8 @@
   {
     "id": "69bff35b58d0fbca04e9373f",
     "riot_name": "Jax - Grandmaster At Arms (Metal)",
-    "clean_name": "Jax Grandmaster At Arms Metal",
-    "riftbound_id": "75e3e7c4-ee03-5df1-bc45-475df99118df",
+    "clean_name": "Jax Grandmaster At Arms",
+    "riftbound_id": "a9dad490-dfc4-59f1-a670-1f3a86c3a68b",
     "tcgplayer_id": "684988",
     "collector_number": "193",
     "language": "en",
@@ -23365,7 +23365,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -23403,8 +23403,8 @@
   {
     "id": "69bff35b58d0fbca04e9373e",
     "riot_name": "Irelia - Blade Dancer (Metal)",
-    "clean_name": "Irelia Blade Dancer Metal",
-    "riftbound_id": "249b0ef7-92fc-5731-9798-e0c83d73d443",
+    "clean_name": "Irelia Blade Dancer",
+    "riftbound_id": "a031ee14-d0be-5d33-ade8-e0370b84b3e6",
     "tcgplayer_id": "684986",
     "collector_number": "195",
     "language": "en",
@@ -23455,8 +23455,8 @@
   {
     "id": "69bff35a58d0fbca04e9373a",
     "riot_name": "Azir - Emperor of the Sands (Metal)",
-    "clean_name": "Azir Emperor of the Sands Metal",
-    "riftbound_id": "ae1b14a5-5207-5733-8fbc-5c2435f747fc",
+    "clean_name": "Azir Emperor of the Sands",
+    "riftbound_id": "f549875d-44bc-52e0-a427-7062e3810d11",
     "tcgplayer_id": "684753",
     "collector_number": "197",
     "language": "en",
@@ -23524,10 +23524,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -23564,8 +23564,8 @@
   {
     "id": "69bff35b58d0fbca04e9373c",
     "riot_name": "Ezreal - Prodigal Explorer (Metal)",
-    "clean_name": "Ezreal Prodigal Explorer Metal",
-    "riftbound_id": "0fb68aa7-e6c6-5383-8060-9af3103c55fb",
+    "clean_name": "Ezreal Prodigal Explorer",
+    "riftbound_id": "7ef794b3-7ff6-54b2-82b7-bc3e305dd01e",
     "tcgplayer_id": "684756",
     "collector_number": "199",
     "language": "en",
@@ -23618,8 +23618,8 @@
   {
     "id": "69bc5bf4d308c64675ca8a25",
     "riot_name": "Renata Glasc - Chem-Baroness (Metal)",
-    "clean_name": "Renata Glasc Chem Baroness Metal",
-    "riftbound_id": "7b22c64d-1bbd-53a5-8ef7-02a8c8cbb8ba",
+    "clean_name": "Renata Glasc Chem Baroness",
+    "riftbound_id": "a88c3a63-74e9-55eb-9553-7a3ccdfd1b5c",
     "tcgplayer_id": "682995",
     "collector_number": "201",
     "language": "en",
@@ -23687,7 +23687,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -23724,8 +23724,8 @@
   {
     "id": "69bff35b58d0fbca04e93744",
     "riot_name": "Sivir - Battle Mistress (Metal)",
-    "clean_name": "Sivir Battle Mistress Metal",
-    "riftbound_id": "e17755fa-1e06-5b1d-8f6e-b43f6182a000",
+    "clean_name": "Sivir Battle Mistress",
+    "riftbound_id": "b4fa9308-6470-5d9a-bb98-e233a4dba758",
     "tcgplayer_id": "684997",
     "collector_number": "203",
     "language": "en",
@@ -23776,8 +23776,8 @@
   {
     "id": "69bff35b58d0fbca04e9373d",
     "riot_name": "Fiora - Grand Duelist (Metal)",
-    "clean_name": "Fiora Grand Duelist Metal",
-    "riftbound_id": "3a17c8f2-2d60-5015-9318-978c4f558525",
+    "clean_name": "Fiora Grand Duelist",
+    "riftbound_id": "b84a10f1-e7c5-5c00-bcec-8d032b25d924",
     "tcgplayer_id": "684973",
     "collector_number": "205",
     "language": "en",
@@ -23845,10 +23845,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -23947,7 +23947,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{O}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -24001,7 +24001,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}{O}",
       "energy": 4,
       "might": null,
       "power": 2,
@@ -24050,7 +24050,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -24142,8 +24142,8 @@
   {
     "id": "69bc5bf1d308c64675ca89f1",
     "riot_name": "Kai'Sa - Daughter of the Void (Metal)",
-    "clean_name": "KaiSa Daughter of the Void Metal",
-    "riftbound_id": "d124f404-3b1e-56f5-b9fc-98846eede71b",
+    "clean_name": "KaiSa Daughter of the Void",
+    "riftbound_id": "da7beab9-7871-5c62-9b32-bbde83a6a799",
     "tcgplayer_id": "669250",
     "collector_number": "247",
     "language": "en",
@@ -24251,8 +24251,8 @@
   {
     "id": "69bc5bf1d308c64675ca89f2",
     "riot_name": "Volibear - Relentless Storm (Metal)",
-    "clean_name": "Volibear Relentless Storm Metal",
-    "riftbound_id": "97c20147-a58c-5f28-a43f-287cf9cbc5b9",
+    "clean_name": "Volibear Relentless Storm",
+    "riftbound_id": "707d65e3-bb34-56ee-b484-c02d6bc53105",
     "tcgplayer_id": "669251",
     "collector_number": "249",
     "language": "en",
@@ -24357,8 +24357,8 @@
   {
     "id": "69bc5bf1d308c64675ca89f3",
     "riot_name": "Jinx - Loose Cannon (Metal)",
-    "clean_name": "Jinx Loose Cannon Metal",
-    "riftbound_id": "1d51d97a-35e7-5df4-8711-9dd2b7a7f8ef",
+    "clean_name": "Jinx Loose Cannon",
+    "riftbound_id": "25f2351d-4b83-5d41-851e-40c64f5200c2",
     "tcgplayer_id": "669252",
     "collector_number": "251",
     "language": "en",
@@ -24465,8 +24465,8 @@
   {
     "id": "69bc5bf1d308c64675ca89f4",
     "riot_name": "Darius - Hand of Noxus (Metal)",
-    "clean_name": "Darius Hand of Noxus Metal",
-    "riftbound_id": "01a39ee5-a913-5b0a-bceb-1101b167f124",
+    "clean_name": "Darius Hand of Noxus",
+    "riftbound_id": "e65b7381-786a-5e64-a7a2-360766177ba7",
     "tcgplayer_id": "669253",
     "collector_number": "253",
     "language": "en",
@@ -24573,8 +24573,8 @@
   {
     "id": "69bc5bf1d308c64675ca89f5",
     "riot_name": "Ahri - Nine-Tailed Fox (Metal)",
-    "clean_name": "Ahri Nine Tailed Fox Metal",
-    "riftbound_id": "a92da9b1-4dba-5733-a859-6189a49f0ef4",
+    "clean_name": "Ahri Nine Tailed Fox",
+    "riftbound_id": "3b0688d6-f1b1-5afa-9820-dea102746c0f",
     "tcgplayer_id": "669254",
     "collector_number": "255",
     "language": "en",
@@ -24677,8 +24677,8 @@
   {
     "id": "69bc5bf1d308c64675ca89f6",
     "riot_name": "Lee Sin - Blind Monk (Metal)",
-    "clean_name": "Lee Sin Blind Monk Metal",
-    "riftbound_id": "a37ad253-db41-5af4-801b-ab52f741b850",
+    "clean_name": "Lee Sin Blind Monk",
+    "riftbound_id": "8ff87c69-bff6-5c9b-9ea0-23a30d0d48ab",
     "tcgplayer_id": "669256",
     "collector_number": "257",
     "language": "en",
@@ -24781,8 +24781,8 @@
   {
     "id": "69bc5bf1d308c64675ca89f7",
     "riot_name": "Yasuo - Unforgiven (Metal)",
-    "clean_name": "Yasuo Unforgiven Metal",
-    "riftbound_id": "7c045c69-f32a-5c5b-a3b0-a5db67a01040",
+    "clean_name": "Yasuo Unforgiven",
+    "riftbound_id": "ef9fcd51-6b4b-5711-b53a-28ef08c20ff7",
     "tcgplayer_id": "669257",
     "collector_number": "259",
     "language": "en",
@@ -24885,8 +24885,8 @@
   {
     "id": "69bc5bf2d308c64675ca89f8",
     "riot_name": "Leona - Radiant Dawn (Metal)",
-    "clean_name": "Leona Radiant Dawn Metal",
-    "riftbound_id": "d8cd0fb4-e189-5c84-a5c8-14f22920520e",
+    "clean_name": "Leona Radiant Dawn",
+    "riftbound_id": "6caef511-3f57-5088-851b-53cd717eed82",
     "tcgplayer_id": "669258",
     "collector_number": "261",
     "language": "en",
@@ -24991,8 +24991,8 @@
   {
     "id": "69bc5bf2d308c64675ca89f9",
     "riot_name": "Teemo - Swift Scout (Metal)",
-    "clean_name": "Teemo Swift Scout Metal",
-    "riftbound_id": "f21daccd-a016-5e4a-9b88-be29d4173ed1",
+    "clean_name": "Teemo Swift Scout",
+    "riftbound_id": "54a78411-a359-52d2-82a8-724421545a27",
     "tcgplayer_id": "669259",
     "collector_number": "263",
     "language": "en",
@@ -25097,8 +25097,8 @@
   {
     "id": "69bc5bf2d308c64675ca89fa",
     "riot_name": "Viktor - Herald of the Arcane (Metal)",
-    "clean_name": "Viktor Herald of the Arcane Metal",
-    "riftbound_id": "148bc38a-56fe-53be-b5ec-52130db5a33a",
+    "clean_name": "Viktor Herald of the Arcane",
+    "riftbound_id": "5027c29c-6841-5b39-848a-dd710b730f66",
     "tcgplayer_id": "669260",
     "collector_number": "265",
     "language": "en",
@@ -25203,8 +25203,8 @@
   {
     "id": "69bc5bf2d308c64675ca89fb",
     "riot_name": "Miss Fortune - Bounty Hunter (Metal)",
-    "clean_name": "Miss Fortune Bounty Hunter Metal",
-    "riftbound_id": "4890b4b7-9e96-5fe8-9a80-c8cac9090203",
+    "clean_name": "Miss Fortune Bounty Hunter",
+    "riftbound_id": "92916227-03c2-5529-8b46-b5066cf44755",
     "tcgplayer_id": "669261",
     "collector_number": "267",
     "language": "en",
@@ -25309,8 +25309,8 @@
   {
     "id": "69bc5bf2d308c64675ca89fc",
     "riot_name": "Sett - The Boss (Metal)",
-    "clean_name": "Sett The Boss Metal",
-    "riftbound_id": "73f67ae3-b9b2-51df-9c7b-eb400f10f73c",
+    "clean_name": "Sett The Boss",
+    "riftbound_id": "580e7d10-a79c-5799-a847-09ed8702d73a",
     "tcgplayer_id": "669263",
     "collector_number": "269",
     "language": "en",
@@ -25376,7 +25376,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F}",
       "energy": 2,
       "might": 3,
       "power": 1,
@@ -25430,7 +25430,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -25482,7 +25482,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -25534,7 +25534,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -25587,7 +25587,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{B}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -25640,10 +25640,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -25695,7 +25695,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -25747,7 +25747,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -26001,10 +26001,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26053,7 +26053,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{F}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -26109,10 +26109,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26216,7 +26216,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -26268,7 +26268,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{F}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -26318,7 +26318,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{F}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -26372,10 +26372,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26427,10 +26427,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26483,10 +26483,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26537,10 +26537,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26589,10 +26589,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26641,10 +26641,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26694,10 +26694,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26746,10 +26746,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26798,10 +26798,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26851,10 +26851,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26905,10 +26905,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -26958,10 +26958,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -27009,10 +27009,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -27058,10 +27058,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -27110,10 +27110,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -27162,7 +27162,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{F}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -27217,7 +27217,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -27272,7 +27272,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -27323,10 +27323,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -27377,7 +27377,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{F}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -27433,10 +27433,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -27489,10 +27489,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -27545,7 +27545,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{F}",
       "energy": 7,
       "might": 7,
       "power": 1,
@@ -27596,10 +27596,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -27651,10 +27651,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -27706,10 +27706,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -27761,10 +27761,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -27816,10 +27816,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -27870,10 +27870,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -27922,7 +27922,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}",
       "energy": 3,
       "might": 2,
       "power": 1,
@@ -27974,10 +27974,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -28028,10 +28028,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -28081,10 +28081,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -28134,10 +28134,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -28189,10 +28189,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -28244,10 +28244,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -28296,7 +28296,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}",
       "energy": 3,
       "might": 4,
       "power": 1,
@@ -28348,10 +28348,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -28401,10 +28401,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -28453,10 +28453,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -28507,10 +28507,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -28560,10 +28560,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -28613,7 +28613,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{C}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -28665,7 +28665,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{C}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -28715,7 +28715,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -28767,10 +28767,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -28818,7 +28818,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -28870,7 +28870,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{C}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -28925,7 +28925,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{C}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -28980,10 +28980,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -29033,7 +29033,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -29082,7 +29082,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -29136,7 +29136,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -29192,7 +29192,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -29248,7 +29248,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 10,
+      "cost": "{10}{C}{C}{C}",
       "energy": 10,
       "might": 5,
       "power": 3,
@@ -29303,7 +29303,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}{C}",
       "energy": 3,
       "might": null,
       "power": 2,
@@ -29358,10 +29358,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -29412,10 +29412,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -29466,7 +29466,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -29518,7 +29518,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -29570,7 +29570,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -29623,7 +29623,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{C}{C}",
       "energy": 7,
       "might": 4,
       "power": 2,
@@ -29678,7 +29678,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -29730,10 +29730,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -29784,10 +29784,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -29834,10 +29834,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -29890,10 +29890,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -29946,10 +29946,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -29999,10 +29999,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -30052,10 +30052,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -30106,10 +30106,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -30160,10 +30160,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -30213,7 +30213,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{M}{M}",
       "energy": 8,
       "might": 7,
       "power": 2,
@@ -30270,10 +30270,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -30322,10 +30322,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -30376,10 +30376,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -30428,7 +30428,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -30481,7 +30481,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -30531,7 +30531,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -30583,10 +30583,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -30634,7 +30634,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -30685,7 +30685,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{M}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -30737,10 +30737,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -30788,7 +30788,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -30842,7 +30842,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -30896,7 +30896,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -30948,10 +30948,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -31000,10 +31000,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -31056,10 +31056,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -31112,10 +31112,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -31165,7 +31165,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{M}{M}{M}",
       "energy": 2,
       "might": null,
       "power": 3,
@@ -31216,10 +31216,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -31268,10 +31268,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -31320,7 +31320,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{M}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -31374,7 +31374,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{M}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -31428,10 +31428,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -31482,7 +31482,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{B}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -31534,10 +31534,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -31589,7 +31589,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{B}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -31642,10 +31642,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}",
       "energy": 7,
       "might": 7,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -31695,10 +31695,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -31749,10 +31749,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -31801,7 +31801,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{B}{B}",
       "energy": 1,
       "might": null,
       "power": 2,
@@ -31853,10 +31853,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -31906,10 +31906,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -31962,10 +31962,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -32015,7 +32015,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{B}",
       "energy": 7,
       "might": 7,
       "power": 1,
@@ -32069,10 +32069,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -32123,7 +32123,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{B}{B}",
       "energy": 7,
       "might": 6,
       "power": 2,
@@ -32178,10 +32178,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -32231,10 +32231,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -32283,7 +32283,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{B}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -32336,7 +32336,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{B}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -32386,10 +32386,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -32439,10 +32439,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -32494,7 +32494,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{B}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -32546,7 +32546,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{B}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -32598,7 +32598,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{B}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -32650,7 +32650,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{B}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -32703,10 +32703,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -32759,10 +32759,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -32815,10 +32815,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -32867,10 +32867,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -32920,7 +32920,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -32976,7 +32976,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{B}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -33028,10 +33028,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -33081,7 +33081,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{B}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -33136,7 +33136,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{B}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -33191,7 +33191,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{B}{B}{B}",
       "energy": 6,
       "might": 7,
       "power": 3,
@@ -33245,7 +33245,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{B}{B}{B}",
       "energy": 6,
       "might": 7,
       "power": 3,
@@ -33300,10 +33300,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -33352,7 +33352,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{H}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -33405,7 +33405,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{H}",
       "energy": 3,
       "might": 4,
       "power": 1,
@@ -33457,10 +33457,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -33511,10 +33511,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -33564,10 +33564,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -33617,10 +33617,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -33672,10 +33672,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -33724,10 +33724,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -33776,10 +33776,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -33828,10 +33828,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -33884,7 +33884,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{H}{H}",
       "energy": 7,
       "might": 8,
       "power": 2,
@@ -33936,10 +33936,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -33990,10 +33990,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -34044,10 +34044,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -34096,10 +34096,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -34149,10 +34149,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -34202,10 +34202,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -34253,10 +34253,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -34307,7 +34307,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{H}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -34360,7 +34360,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -34412,7 +34412,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -34464,7 +34464,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}{H}",
       "energy": 5,
       "might": 5,
       "power": 2,
@@ -34515,7 +34515,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -34570,7 +34570,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -34625,10 +34625,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -34674,7 +34674,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{H}{H}",
       "energy": 2,
       "might": null,
       "power": 2,
@@ -34726,7 +34726,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -34779,7 +34779,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{H}{H}",
       "energy": 8,
       "might": null,
       "power": 2,
@@ -34828,7 +34828,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{H}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -34882,7 +34882,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{H}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -34936,7 +34936,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{H}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -34988,7 +34988,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{H}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -35040,10 +35040,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -35094,10 +35094,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35147,10 +35147,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35199,10 +35199,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35253,10 +35253,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35305,10 +35305,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35359,10 +35359,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35413,10 +35413,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35465,7 +35465,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}{O}",
       "energy": 5,
       "might": 6,
       "power": 2,
@@ -35517,10 +35517,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35571,10 +35571,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35623,10 +35623,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35677,10 +35677,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35729,10 +35729,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35781,7 +35781,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}",
       "energy": 5,
       "might": null,
       "power": 1,
@@ -35833,7 +35833,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -35887,10 +35887,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35939,10 +35939,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -35995,7 +35995,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{O}",
       "energy": 7,
       "might": null,
       "power": 1,
@@ -36044,10 +36044,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -36093,7 +36093,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -36145,7 +36145,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -36197,7 +36197,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -36249,7 +36249,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -36301,7 +36301,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{O}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -36354,7 +36354,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -36406,7 +36406,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{O}{O}",
       "energy": 8,
       "might": 9,
       "power": 2,
@@ -36457,7 +36457,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -36510,7 +36510,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{O}",
       "energy": 3,
       "might": 4,
       "power": 1,
@@ -36564,10 +36564,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -36619,10 +36619,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -36674,7 +36674,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{O}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -36727,7 +36727,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{O}",
       "energy": 7,
       "might": 6,
       "power": 1,
@@ -36780,10 +36780,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -36834,10 +36834,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -36942,7 +36942,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{F/M}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -37051,7 +37051,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{B/F}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -37157,7 +37157,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F/H}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -37267,7 +37267,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F/O}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -37374,7 +37374,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C/M}{C/M}",
       "energy": 4,
       "might": null,
       "power": 2,
@@ -37430,7 +37430,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C/M}{C/M}",
       "energy": 4,
       "might": null,
       "power": 2,
@@ -37486,7 +37486,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C/M}{C/M}",
       "energy": 4,
       "might": null,
       "power": 2,
@@ -37594,7 +37594,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{B/C}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -37700,7 +37700,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{C/H}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -37808,7 +37808,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{C/O}",
       "energy": 6,
       "might": null,
       "power": 1,
@@ -37914,7 +37914,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{H/M}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -38022,7 +38022,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{M/O}{M/O}",
       "energy": 5,
       "might": null,
       "power": 2,
@@ -38128,7 +38128,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{B/H}{B/H}",
       "energy": 1,
       "might": null,
       "power": 2,
@@ -38234,7 +38234,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{B/O}{B/O}",
       "energy": 2,
       "might": null,
       "power": 2,
@@ -39042,7 +39042,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{F}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -39094,7 +39094,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F}",
       "energy": 4,
       "might": 2,
       "power": 1,
@@ -39149,7 +39149,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F}",
       "energy": 4,
       "might": 2,
       "power": 1,
@@ -39204,7 +39204,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -39256,7 +39256,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -39308,10 +39308,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -39362,10 +39362,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -39416,7 +39416,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{C}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -39468,7 +39468,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -39519,7 +39519,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -39570,7 +39570,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -39621,7 +39621,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -39672,7 +39672,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{M}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -39724,7 +39724,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{M}",
       "energy": 2,
       "might": 2,
       "power": 1,
@@ -39778,7 +39778,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{M}",
       "energy": 2,
       "might": 2,
       "power": 1,
@@ -39832,7 +39832,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{B}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -39884,7 +39884,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -39935,7 +39935,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -39986,7 +39986,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -40042,7 +40042,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -40098,7 +40098,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{H}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -40150,7 +40150,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -40203,7 +40203,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -40256,7 +40256,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -40310,7 +40310,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -40364,7 +40364,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -40417,7 +40417,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -40470,7 +40470,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 0,
+      "cost": "{0}{O}",
       "energy": 0,
       "might": null,
       "power": 1,
@@ -40522,7 +40522,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -40574,7 +40574,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -41267,10 +41267,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -41320,10 +41320,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -41376,10 +41376,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -41430,10 +41430,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -41482,7 +41482,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{F}",
       "energy": 7,
       "might": 7,
       "power": 1,
@@ -41536,10 +41536,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -41591,7 +41591,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -41643,10 +41643,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -41697,10 +41697,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -41749,7 +41749,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{F}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -41803,10 +41803,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -41853,7 +41853,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{F}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -41909,10 +41909,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -41962,7 +41962,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{F}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -42014,7 +42014,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{F}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -42064,7 +42064,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{F}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -42120,10 +42120,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -42173,10 +42173,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -42227,10 +42227,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -42280,7 +42280,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{F}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -42329,10 +42329,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -42383,7 +42383,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -42439,7 +42439,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -42495,7 +42495,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{F}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -42547,7 +42547,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -42605,7 +42605,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -42663,10 +42663,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -42717,10 +42717,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -42769,7 +42769,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{F}{F}",
       "energy": 8,
       "might": 8,
       "power": 2,
@@ -42821,10 +42821,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -42876,10 +42876,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -42931,7 +42931,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -42985,7 +42985,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -43037,10 +43037,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -43091,10 +43091,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -43146,10 +43146,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -43199,10 +43199,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -43251,10 +43251,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -43306,7 +43306,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -43360,10 +43360,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -43412,10 +43412,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -43468,7 +43468,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C}",
       "energy": 4,
       "might": 5,
       "power": 1,
@@ -43520,7 +43520,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{C}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -43573,10 +43573,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -43627,10 +43627,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -43682,10 +43682,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -43737,10 +43737,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -43791,10 +43791,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -43847,7 +43847,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C}{C}",
       "energy": 4,
       "might": null,
       "power": 2,
@@ -43900,10 +43900,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -43952,10 +43952,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -44004,7 +44004,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -44061,10 +44061,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -44116,10 +44116,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -44169,7 +44169,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{C}",
       "energy": 7,
       "might": 6,
       "power": 1,
@@ -44220,7 +44220,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -44274,7 +44274,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -44328,10 +44328,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -44383,10 +44383,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 0,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -44436,7 +44436,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{C}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -44485,7 +44485,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -44542,7 +44542,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{C}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -44599,7 +44599,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{C}",
       "energy": 3,
       "might": 1,
       "power": 1,
@@ -44655,7 +44655,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{C}{C}",
       "energy": 6,
       "might": 7,
       "power": 2,
@@ -44709,10 +44709,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -44764,10 +44764,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -44819,7 +44819,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 12,
+      "cost": "{12}{C}{C}{C}",
       "energy": 12,
       "might": 12,
       "power": 3,
@@ -44876,7 +44876,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 12,
+      "cost": "{12}{C}{C}{C}",
       "energy": 12,
       "might": 12,
       "power": 3,
@@ -44933,7 +44933,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{C}{C}",
       "energy": 8,
       "might": 8,
       "power": 2,
@@ -44988,7 +44988,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{C}{C}",
       "energy": 8,
       "might": 8,
       "power": 2,
@@ -45043,10 +45043,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45096,10 +45096,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45151,10 +45151,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45204,10 +45204,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45256,10 +45256,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45308,10 +45308,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}",
       "energy": 7,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45360,7 +45360,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{M}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -45414,10 +45414,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45467,10 +45467,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45519,10 +45519,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45571,10 +45571,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45627,7 +45627,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -45679,10 +45679,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45732,10 +45732,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45782,7 +45782,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -45839,10 +45839,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45894,10 +45894,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -45946,7 +45946,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{M}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -45998,10 +45998,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -46052,10 +46052,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -46106,7 +46106,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{M}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -46158,10 +46158,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -46212,10 +46212,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -46268,10 +46268,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -46324,10 +46324,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -46377,7 +46377,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{M}",
       "energy": 7,
       "might": 6,
       "power": 1,
@@ -46431,10 +46431,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -46483,7 +46483,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{M}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -46535,7 +46535,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -46589,7 +46589,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{M}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -46641,10 +46641,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -46692,10 +46692,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -46746,10 +46746,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -46800,10 +46800,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -46855,10 +46855,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -46911,10 +46911,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -46964,10 +46964,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47016,10 +47016,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47071,10 +47071,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47127,10 +47127,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47179,10 +47179,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47233,10 +47233,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47285,10 +47285,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47339,10 +47339,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47394,10 +47394,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47448,10 +47448,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47498,10 +47498,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47553,10 +47553,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47605,10 +47605,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}",
       "energy": 8,
       "might": 8,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47658,10 +47658,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47710,7 +47710,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{B}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -47762,10 +47762,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47812,10 +47812,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47865,10 +47865,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -47914,7 +47914,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{B}{B}",
       "energy": 6,
       "might": null,
       "power": 2,
@@ -47963,10 +47963,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -48015,10 +48015,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -48067,10 +48067,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -48124,10 +48124,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -48181,7 +48181,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{B}",
       "energy": 3,
       "might": 4,
       "power": 1,
@@ -48237,7 +48237,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{B}",
       "energy": 3,
       "might": 4,
       "power": 1,
@@ -48293,10 +48293,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -48348,10 +48348,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -48403,7 +48403,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{B}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -48457,7 +48457,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 12,
+      "cost": "{12}{B}{B}{B}{B}",
       "energy": 12,
       "might": 10,
       "power": 4,
@@ -48509,7 +48509,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 12,
+      "cost": "{12}{B}{B}{B}{B}",
       "energy": 12,
       "might": 10,
       "power": 4,
@@ -48560,7 +48560,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -48614,7 +48614,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -48668,7 +48668,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 6,
       "power": 1,
@@ -48724,7 +48724,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{B}",
       "energy": 5,
       "might": 6,
       "power": 1,
@@ -48780,10 +48780,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -48833,10 +48833,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -48885,10 +48885,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -48937,10 +48937,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -48987,10 +48987,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -49039,10 +49039,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -49093,10 +49093,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -49148,7 +49148,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{H}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -49200,10 +49200,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -49252,10 +49252,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -49306,10 +49306,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -49359,7 +49359,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -49411,7 +49411,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -49463,7 +49463,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}{H}",
       "energy": 1,
       "might": null,
       "power": 1,
@@ -49517,10 +49517,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -49569,10 +49569,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -49621,7 +49621,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{H}",
       "energy": 2,
       "might": 1,
       "power": 1,
@@ -49674,10 +49674,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -49723,7 +49723,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{H}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -49775,7 +49775,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{H}{H}",
       "energy": 5,
       "might": null,
       "power": 2,
@@ -49824,10 +49824,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -49879,7 +49879,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{H}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -49930,7 +49930,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -49985,7 +49985,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 4,
       "power": 1,
@@ -50039,7 +50039,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 7,
+      "cost": "{7}{H}",
       "energy": 7,
       "might": 6,
       "power": 1,
@@ -50090,10 +50090,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -50147,10 +50147,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -50202,7 +50202,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{H}",
       "energy": 6,
       "might": 6,
       "power": 1,
@@ -50256,7 +50256,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 10,
+      "cost": "{10}{H}{H}{H}",
       "energy": 10,
       "might": 12,
       "power": 3,
@@ -50307,7 +50307,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 10,
+      "cost": "{10}{H}{H}{H}",
       "energy": 10,
       "might": 12,
       "power": 3,
@@ -50358,7 +50358,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -50407,7 +50407,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -50462,7 +50462,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{H}",
       "energy": 4,
       "might": 3,
       "power": 1,
@@ -50516,10 +50516,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -50572,10 +50572,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -50629,7 +50629,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 5,
       "power": 1,
@@ -50684,10 +50684,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -50739,10 +50739,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 1,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -50795,10 +50795,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -50848,10 +50848,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -50901,10 +50901,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -50956,10 +50956,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -51009,10 +51009,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -51063,7 +51063,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{O}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -51113,10 +51113,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}",
       "energy": 5,
       "might": 5,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -51168,10 +51168,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -51221,10 +51221,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -51277,10 +51277,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": 4,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -51329,7 +51329,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}",
       "energy": 5,
       "might": 3,
       "power": 1,
@@ -51382,10 +51382,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -51434,7 +51434,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{O}",
       "energy": 4,
       "might": 6,
       "power": 1,
@@ -51490,7 +51490,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}",
       "energy": 5,
       "might": 6,
       "power": 1,
@@ -51543,7 +51543,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{O}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -51592,7 +51592,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}",
       "energy": 5,
       "might": 4,
       "power": 1,
@@ -51644,7 +51644,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 10,
+      "cost": "{10}{O}{O}{O}",
       "energy": 10,
       "might": 7,
       "power": 3,
@@ -51698,7 +51698,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{O}",
       "energy": 3,
       "might": 6,
       "power": 1,
@@ -51753,7 +51753,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{O}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -51808,7 +51808,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{O}",
       "energy": 3,
       "might": 3,
       "power": 1,
@@ -51863,10 +51863,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 1,
+      "cost": "{1}",
       "energy": 1,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -51915,10 +51915,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -51964,10 +51964,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -52015,7 +52015,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -52071,7 +52071,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 5,
+      "cost": "{5}{O}",
       "energy": 5,
       "might": 5,
       "power": 1,
@@ -52126,10 +52126,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -52178,10 +52178,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}",
       "energy": 6,
       "might": 6,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -52230,7 +52230,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -52287,7 +52287,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 6,
+      "cost": "{6}{O}",
       "energy": 6,
       "might": 5,
       "power": 1,
@@ -52343,7 +52343,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{O}",
       "energy": 8,
       "might": 7,
       "power": 1,
@@ -52396,7 +52396,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 8,
+      "cost": "{8}{O}",
       "energy": 8,
       "might": 7,
       "power": 1,
@@ -52449,7 +52449,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 9,
+      "cost": "{9}{O}{O}{O}",
       "energy": 9,
       "might": null,
       "power": 3,
@@ -52550,10 +52550,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}",
       "energy": 4,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury",
         "Mind"
@@ -52656,7 +52656,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{B/F}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -52765,7 +52765,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 4,
+      "cost": "{4}{F/H}",
       "energy": 4,
       "might": null,
       "power": 1,
@@ -52869,10 +52869,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": null,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury",
         "Order"
@@ -52978,7 +52978,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{C/M}{C/M}",
       "energy": 2,
       "might": null,
       "power": 2,
@@ -53087,7 +53087,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{B/C}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -53193,10 +53193,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}",
       "energy": 3,
       "might": 3,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm",
         "Chaos"
@@ -53301,7 +53301,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 9,
+      "cost": "{9}{C/O}{C/O}",
       "energy": 9,
       "might": 8,
       "power": 2,
@@ -53411,7 +53411,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{H/M}",
       "energy": 3,
       "might": null,
       "power": 1,
@@ -53519,7 +53519,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 3,
+      "cost": "{3}{M/O}{M/O}",
       "energy": 3,
       "might": null,
       "power": 2,
@@ -53627,7 +53627,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{B/H}",
       "energy": 2,
       "might": null,
       "power": 1,
@@ -53731,7 +53731,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}{B/O}{B/O}",
       "energy": 2,
       "might": null,
       "power": 2,
@@ -54546,10 +54546,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Fury"
       ]
@@ -54599,10 +54599,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Calm"
       ]
@@ -54653,10 +54653,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Mind"
       ]
@@ -54706,10 +54706,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Body"
       ]
@@ -54760,10 +54760,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Chaos"
       ]
@@ -54813,10 +54813,10 @@
       "foil"
     ],
     "attributes": {
-      "cost": 2,
+      "cost": "{2}",
       "energy": 2,
       "might": 2,
-      "power": null,
+      "power": 0,
       "domain": [
         "Order"
       ]
@@ -56138,7 +56138,7 @@
       "foil"
     ],
     "attributes": {
-      "cost": 10,
+      "cost": "{10}{H}{H}{H}",
       "energy": 10,
       "might": 12,
       "power": 3,

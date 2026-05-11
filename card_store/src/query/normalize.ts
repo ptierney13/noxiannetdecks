@@ -18,7 +18,7 @@ export function unquote(value: string): string {
 }
 
 export function quoteIfNeeded(value: string): string {
-  if (/^[A-Za-z0-9_.*'/-]+$/.test(value)) {
+  if (/^[{}A-Za-z0-9_.*'/-]+$/.test(value)) {
     return value;
   }
 

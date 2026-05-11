@@ -14,7 +14,8 @@
     "dev:api": "npm run dev -w @noxiannet/card-store",
     "dev:web": "npm run dev -w @noxiannet/frontend",
     "build": "npm run build -w @noxiannet/card-store && npm run build -w @noxiannet/deck-store && npm run build -w @noxiannet/price-store && npm run build -w @noxiannet/frontend",
-    "test": "npm run test -w @noxiannet/card-store && npm run test -w @noxiannet/deck-store && npm run test -w @noxiannet/price-store && npm run test -w @noxiannet/frontend"
+    "test": "npm run test -w @noxiannet/card-store && npm run test -w @noxiannet/deck-store && npm run test -w @noxiannet/price-store && npm run test -w @noxiannet/frontend",
+    "preview:url": "node scripts/print-cloudflare-preview-url.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

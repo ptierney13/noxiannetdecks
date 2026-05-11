@@ -129,6 +129,10 @@ through the Pages Functions entrypoint.
 
 - Preview deployments should be the default validation path for branches and
   pull requests.
+- Branch preview URLs can be derived locally with `npm run preview:url`.
+  This repo assumes the Pages project name is `noxiannetdecks`, and follows
+  Cloudflare's documented branch-alias rule where aliases are lowercased and
+  non-alphanumeric branch characters are replaced with `-`.
 - Production serves the same app shape at `noxiannetdecks.com`:
   - static frontend assets from Pages
   - same-origin API routes from Pages Functions

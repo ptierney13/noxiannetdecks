@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 
 const DECKLIST_ID_NAMESPACE = "noxiannet:rdf:decklist-card:v1";
-const PRESENTATION_SUFFIX_PATTERN = /\s+(?:alternate art|alt art|overnumbered|signed|signature)$/i;
-const RIOT_PRESENTATION_SUFFIX_PATTERN = /\s+\((?:alternate art|alt art|overnumbered|signed|signature)\)$/i;
+const PRESENTATION_SUFFIX_PATTERN = /\s+(?:alternate art|alt art|overnumbered|signed|signature|starter|metal)$/i;
+const RIOT_PRESENTATION_SUFFIX_PATTERN = /\s+\((?:alternate art|alt art|overnumbered|signed|signature|starter|metal)\)$/i;
 
 function formatGuid(bytes: Buffer): string {
   const hash = Buffer.from(bytes.subarray(0, 16));

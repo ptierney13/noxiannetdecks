@@ -17,6 +17,7 @@ describe("parseQuery", () => {
     ["explicit and", "type:unit and domain:body"],
     ["implicit and", "type:unit domain:body"],
     ["or", "domain:body or domain:fury"],
+    ["domain set comparisons", "domain>p domain<=pu d:purple d:purp d=yellow"],
     ["not", "not type:gear"],
     ["minus negation", "-rarity:common"],
     ["grouping", "(domain:body or domain:fury) type:unit"],
@@ -26,7 +27,7 @@ describe("parseQuery", () => {
     ["finish field", "finish:foil variant:nonfoil"],
     ["unique option", "unique:legal"],
     ["keywords and cost", "keyword:Action k:Action cost>=3"],
-    ["collector suffix", "number=200a c:200a"]
+    ["collector suffix", "number=200a cn:200a"]
   ])("parses %s", (_label, query) => {
     expect(parseQuery(query).diagnostics).toEqual([]);
   });
@@ -49,6 +50,7 @@ describe("parseQuery", () => {
     "(type:unit",
     "unknown:thing",
     "name>jinx",
+    "domain>mystery",
     "is:etched",
     "unique:etched",
     "unique>id",

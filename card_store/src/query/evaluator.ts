@@ -1,6 +1,7 @@
 import type { CardRecord } from "../data/schema.js";
 import { normalizeVariantQuery } from "../data/variant.js";
 import type { ParsedQuery, QueryNode, QueryOperator } from "./ast.js";
+import { compareDomainSet, parseDomainQueryValue, DOMAIN_PRIMARY } from "./domain.js";
 import { resolveField } from "./fields.js";
 import { normalizeText } from "./normalize.js";
 import { parseQuery } from "./parser.js";
@@ -36,33 +37,6 @@ function matchesText(candidate: string, expected: string, operator: QueryOperato
   }
 
   return normalizedCandidate.includes(normalizedExpected);
-}
-
-// Domain letter-code mappings
-const DOMAIN_PRIMARY: Record<string, string> = {
-  m: "Mind", f: "Fury", c: "Calm", b: "Body", h: "Chaos", o: "Order"
-};
-const DOMAIN_COLOR: Record<string, string> = {
-  u: "Mind", r: "Fury", g: "Calm", o: "Body", p: "Chaos", y: "Order"
-};
-
-function parseDomainCodes(value: string): Set<string> | null {
-  const chars = value.toLowerCase().split("");
-  if (chars.length === 0 || chars.length > 8) return null;
-
-  // Try all-primary first
-  const allPrimary = chars.every((ch) => ch in DOMAIN_PRIMARY);
-  if (allPrimary) {
-    return new Set(chars.map((ch) => DOMAIN_PRIMARY[ch]));
-  }
-
-  // Fall back to color-based for all chars
-  const allColor = chars.every((ch) => ch in DOMAIN_COLOR);
-  if (allColor) {
-    return new Set(chars.map((ch) => DOMAIN_COLOR[ch]));
-  }
-
-  return null;
 }
 
 function typeLineTerms(card: CardRecord): string[] {
@@ -101,7 +75,9 @@ function stringValuesForField(card: CardRecord, canonicalField: string): string[
     case "clean_name":
       return card.clean_name ? [card.clean_name] : [];
     case "text":
-      return [card.text.plain, card.text.rich, card.text.flavour ?? "", ...card.text.keywords].filter(Boolean);
+      return [card.text.plain, card.text.rich, ...card.text.keywords].filter(Boolean);
+    case "flavour":
+      return card.text.flavour ? [card.text.flavour] : [];
     case "t":
       return [card.type.typeline];
     case "cardtype":
@@ -136,7 +112,7 @@ function stringValuesForField(card: CardRecord, canonicalField: string): string[
 function numberValueForField(card: CardRecord, canonicalField: string): number | null {
   switch (canonicalField) {
     case "cost":
-      return card.attributes.cost;
+      return card.attributes.energy;
     case "energy":
       return card.attributes.energy;
     case "might":
@@ -164,21 +140,92 @@ function compareNumber(candidate: number, operator: QueryOperator, expected: num
   }
 }
 
-function matchesDomainWithLetterCodes(cardDomains: string[], domainSet: Set<string>): boolean {
-  if (cardDomains.length === 0) return false;
-  return cardDomains.every((d) => domainSet.has(d));
+type PowerSpec = { count: number; domains: Set<string> };
+
+// Parse a power symbol string: bare letters ("ff", "bb") or braced hybrids ("{f/m}", "{f/m}{f/m}").
+// Each character / each {x/y} token is one pip. All tokens must have the same domain composition.
+function parsePowerSymbols(value: string): PowerSpec | null {
+  const lower = value.toLowerCase();
+
+  if (lower.includes("{")) {
+    const tokenRe = /\{([a-z](?:\/[a-z])*)\}/g;
+    const tokens = [...lower.matchAll(tokenRe)];
+    if (tokens.length === 0) return null;
+    if (tokens.map((t) => t[0]).join("") !== lower) return null; // unconsumed chars
+    const firstSpec = tokens[0][1];
+    if (!tokens.every((t) => t[1] === firstSpec)) return null; // mixed symbol types
+    const domains = new Set<string>();
+    for (const letter of firstSpec.split("/")) {
+      const domain = DOMAIN_PRIMARY[letter];
+      if (!domain) return null;
+      domains.add(domain);
+    }
+    return { count: tokens.length, domains };
+  }
+
+  const codes = parseDomainQueryValue(lower);
+  if (!codes) return null;
+  return { count: lower.length, domains: codes };
 }
 
-function matchesPowerLetterCodes(card: CardRecord, operator: QueryOperator, value: string): boolean | null {
-  const codes = parseDomainCodes(value);
-  if (!codes) return null;
+// Card's domain must exactly match the spec's domain set (sorted).
+function domainsMatchSpec(cardDomains: string[], spec: PowerSpec): boolean {
+  const sorted = [...cardDomains].sort();
+  const specSorted = [...spec.domains].sort();
+  return sorted.length === specSorted.length && sorted.every((d, i) => d === specSorted[i]);
+}
 
-  const count = value.length;
-  const actualPower = card.attributes.power ?? 0;
+function matchesPowerSpec(card: CardRecord, operator: QueryOperator, spec: PowerSpec): boolean {
+  const actualPower = card.attributes.power;
+  if (actualPower === null) return false;
+  if (!compareNumber(actualPower, operator, spec.count)) return false;
+  if (actualPower === 0) return true; // count comparison passed with 0 pips — no domain to check
+  return domainsMatchSpec(card.attributes.domain, spec);
+}
 
-  if (!compareNumber(actualPower, operator, count)) return false;
-  if (actualPower === 0) return true;
-  return matchesDomainWithLetterCodes(card.attributes.domain, codes);
+// Parse a cost query value: optional leading integer + optional power symbol string.
+// Examples: "3", "3f", "ff", "{f/m}", "3{f/m}"
+type CostSpec = { energy: number | null; powerSpec: PowerSpec | null };
+
+function parseCostSpec(value: string): CostSpec | null {
+  const numMatch = value.match(/^(\d+)/);
+  const energy = numMatch ? parseInt(numMatch[1], 10) : null;
+  const rest = numMatch ? value.slice(numMatch[0].length) : value;
+  if (rest === "") return { energy, powerSpec: null };
+  const powerSpec = parsePowerSymbols(rest);
+  if (!powerSpec) return null;
+  return { energy, powerSpec };
+}
+
+function matchesCostField(card: CardRecord, operator: QueryOperator, value: string): boolean | null {
+  const spec = parseCostSpec(value);
+  if (!spec) return null;
+  const { energy: queryEnergy, powerSpec } = spec;
+
+  // Only power symbols — treat identically to power field
+  if (queryEnergy === null && powerSpec !== null) {
+    return matchesPowerSpec(card, operator, powerSpec);
+  }
+
+  // Only a number — treat identically to energy field
+  if (queryEnergy !== null && powerSpec === null) {
+    const cardEnergy = card.attributes.energy;
+    if (cardEnergy === null) return false;
+    return compareNumber(cardEnergy, operator, queryEnergy);
+  }
+
+  // Both energy and power components:
+  // For < and <=: only the energy comparison applies (power symbols are ignored)
+  // For =, >, >=: both conditions must hold
+  if (queryEnergy !== null && powerSpec !== null) {
+    const cardEnergy = card.attributes.energy;
+    if (cardEnergy === null) return false;
+    if (!compareNumber(cardEnergy, operator, queryEnergy)) return false;
+    if (operator === "lt" || operator === "lte") return true;
+    return matchesPowerSpec(card, operator, powerSpec);
+  }
+
+  return null;
 }
 
 function collectorNumberParts(value: string | null): { number: number; suffix: string; raw: string } {
@@ -325,14 +372,24 @@ function matchesPredicate(card: CardRecord, fieldName: string, operator: QueryOp
   }
 
   if (field.kind === "number") {
-    if (field.canonical === "power") {
-      // Try letter-based domain codes first (e.g. p=ff, p<=f, p=oo)
-      const letterResult = matchesPowerLetterCodes(card, operator, value);
-      if (letterResult !== null) return letterResult;
-      // Treat null power as 0 (no power cost)
+    if (field.canonical === "cost") {
+      const result = matchesCostField(card, operator, value);
+      if (result !== null) return result;
+      const cardEnergy = card.attributes.energy;
+      if (cardEnergy === null) return false;
       const expected = Number(value);
       if (Number.isNaN(expected)) return false;
-      return compareNumber(card.attributes.power ?? 0, operator, expected);
+      return compareNumber(cardEnergy, operator, expected);
+    }
+
+    if (field.canonical === "power") {
+      const spec = parsePowerSymbols(value);
+      if (spec !== null) return matchesPowerSpec(card, operator, spec);
+      const candidate = card.attributes.power;
+      if (candidate === null) return false;
+      const expected = Number(value);
+      if (Number.isNaN(expected)) return false;
+      return compareNumber(candidate, operator, expected);
     }
 
     const candidate = numberValueForField(card, field.canonical);
@@ -348,9 +405,9 @@ function matchesPredicate(card: CardRecord, fieldName: string, operator: QueryOp
 
   // Domain field: try letter-code subset matching before standard string matching
   if (field.canonical === "domain") {
-    const domainSet = parseDomainCodes(value);
+    const domainSet = parseDomainQueryValue(value);
     if (domainSet) {
-      return matchesDomainWithLetterCodes(card.attributes.domain, domainSet);
+      return compareDomainSet(card.attributes.domain, domainSet, operator);
     }
   }
 
