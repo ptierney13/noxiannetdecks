@@ -1402,60 +1402,254 @@ code {
   }
 }
 
-/* Card frame — sized to show the full card at proper aspect ratio */
-.csg-card-frame {
-  flex: 0 0 auto;
-  position: relative;
-  width: 455px;   /* 260 × 1.75 */
-  margin-left: 25%;
-  /* 744:1039 aspect ratio preserves the full card face */
-  aspect-ratio: 744 / 1039;
-  border-radius: 8px;
+/* Card frame */
+.csg-card {
+  flex: 0 0 240px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
   overflow: hidden;
-  user-select: none;
+  font-size: 0.82rem;
 }
 
 @media (max-width: 600px) {
-  .csg-card-frame {
-    width: min(455px, 85vw);
-    margin-left: 0;
+  .csg-card {
+    flex: none;
+    width: 100%;
+    max-width: 320px;
+    align-self: center;
   }
 }
 
-.csg-card-img {
-  display: block;
+/* Zone base — reset + highlight behaviour */
+.csg-zone {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  border-radius: 5px;
+  outline: 2px solid transparent;
+  outline-offset: -1px;
+  transition: background 100ms, outline-color 100ms;
+}
+
+.csg-zone.csg-hovered {
+  background: rgba(181, 32, 56, 0.14);
+  outline-color: var(--red);
+}
+
+.csg-zone.csg-active {
+  background: rgba(181, 32, 56, 0.24);
+  outline-color: var(--red);
+}
+
+/* Header: left column (Cost/Energy/Power) + right column (Might) */
+.csg-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Left stats column: Cost stacked above Energy stacked above Power */
+.csg-left-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.csg-cost,
+.csg-energy,
+.csg-power,
+.csg-might {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 8px;
+}
+
+/* Cost is the primary stat — larger padding */
+.csg-cost {
+  padding: 6px 10px;
+  min-width: 58px;
+}
+
+/* Energy and Power are secondary — slightly more compact */
+.csg-energy,
+.csg-power {
+  padding: 4px 10px;
+  min-width: 52px;
+}
+
+/* Might stands alone in the top-right */
+.csg-might {
+  padding: 6px 10px;
+  min-width: 52px;
+}
+
+.csg-stat-num {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-strong);
+  line-height: 1;
+}
+
+.csg-stat-key {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Art */
+.csg-art {
+  width: 100%;
+  aspect-ratio: 3 / 2.2;
+  overflow: hidden;
+}
+
+.csg-art img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  pointer-events: none;
-  draggable: false;
+  object-position: top center;
+  display: block;
 }
 
-/* Hotspot buttons — invisible by default, overlay the card image */
-.csg-hotspot {
-  position: absolute;
-  background: transparent;
-  border: 2px solid transparent;
-  border-radius: 4px;
-  cursor: pointer;
-  padding: 0;
-  /* Smooth highlight transition */
-  transition: background 90ms, border-color 90ms;
+/* Name row */
+.csg-name-row {
+  display: flex;
+  align-items: center;
+  padding: 5px 6px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
 }
 
-.csg-hotspot:focus-visible {
-  outline: 2px solid var(--red);
-  outline-offset: 1px;
+.csg-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-strong);
+  padding: 4px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.csg-hotspot.csg-hovered {
-  background: rgba(181, 32, 56, 0.22);
-  border-color: var(--red);
+/* Shared section styling (typeline + rules text) */
+.csg-section {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
 }
 
-.csg-hotspot.csg-active {
-  background: rgba(181, 32, 56, 0.35);
-  border-color: var(--red);
+.csg-section-bar {
+  display: flex;
+  width: 100%;
+  padding: 4px 8px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  border-radius: 0;
+  transition: background 100ms, color 100ms;
+}
+
+.csg-section-bar:hover,
+.csg-section-bar.csg-hovered,
+.csg-section-bar.csg-active {
+  color: var(--text);
+}
+
+/* Typeline tokens */
+.csg-typeline-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1px;
+  padding: 0 7px 6px;
+}
+
+.csg-sep {
+  color: var(--text-muted);
+  user-select: none;
+  font-size: 0.78rem;
+  padding: 0 1px;
+}
+
+.csg-token {
+  padding: 2px 5px;
+  font-size: 0.78rem;
+}
+
+/* Rules text body */
+.csg-text-body {
+  padding: 1px 10px 9px;
+  font-size: 0.76rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.csg-keyword {
+  display: inline;
+  padding: 1px 5px;
+  font-weight: 700;
+  font-size: 0.76rem;
+  color: var(--text-strong);
+}
+
+/* Footer */
+.csg-footer {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding: 5px 7px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.csg-footer-meta {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 2px;
+}
+
+.csg-set,
+.csg-number {
+  padding: 2px 5px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.csg-number {
+  justify-self: end;
+}
+
+.csg-rarity {
+  justify-self: center;
+  padding: 2px 7px;
+  font-size: 0.7rem;
+  color: var(--amber);
+}
+
+.csg-artist {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 5px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* Query panel */
@@ -1466,8 +1660,7 @@ code {
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 16px;
-  /* Match the card height so they're flush on desktop */
-  min-height: 200px;
+  min-height: 140px;
   display: flex;
   flex-direction: column;
 }
