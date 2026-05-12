@@ -3925,6 +3925,17 @@ code {
   font-size: 11px;
 }
 
+.price-chart-tooltip-bg {
+  fill: var(--surface-2);
+  stroke: var(--border-mid);
+  stroke-width: 1;
+}
+.price-chart-tooltip-text {
+  fill: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
 .price-chart-empty {
   padding: 14px 16px;
   border: 1px dashed var(--border-mid);

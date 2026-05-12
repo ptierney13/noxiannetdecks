@@ -8,6 +8,7 @@ import {
   type PublishedPriceIndex,
   type PublishedPriceRow,
 } from "./priceData";
+import { buildCardDetailPath } from "./routes";
 import { useDebounce } from "./useDebounce";
 import type { CardRecord } from "./types";
 
@@ -172,6 +173,7 @@ function TradeCardBar({
   onMove,
   onDragStart,
   onDragEnd,
+  onNavigate,
 }: {
   item: TradeItem;
   side: TradeSide;
@@ -186,6 +188,7 @@ function TradeCardBar({
   onMove: () => void;
   onDragStart: () => void;
   onDragEnd: () => void;
+  onNavigate: (path: string) => void;
 }) {
   const { card } = item;
   const hasBothFinishes = card.finishes.length > 1;
@@ -278,6 +281,8 @@ function TradeCardBar({
                 src={card.media.image_url}
                 alt={card.media.accessibility_text ?? card.riot_name}
                 loading="lazy"
+                style={{ cursor: "pointer" }}
+                onClick={() => onNavigate(buildCardDetailPath(card.id))}
               />
             </div>
           )}
@@ -361,7 +366,7 @@ function TradeCardBar({
 
 // ── Main view ──────────────────────────────────────────────────────────────
 
-export default function TradeBalancerView() {
+export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: string) => void }) {
   const { index: priceIndex } = usePublishedPriceIndex();
 
   const [mine, setMine] = useState<TradeItem[]>([]);
@@ -681,6 +686,7 @@ export default function TradeBalancerView() {
                 onMove={() => moveItem(item.key, "mine")}
                 onDragStart={() => handleDragStart(item.key, "mine")}
                 onDragEnd={handleDragEnd}
+                onNavigate={onNavigate}
               />
             ))
           )}
@@ -726,6 +732,7 @@ export default function TradeBalancerView() {
                 onMove={() => moveItem(item.key, "yours")}
                 onDragStart={() => handleDragStart(item.key, "yours")}
                 onDragEnd={handleDragEnd}
+                onNavigate={onNavigate}
               />
             ))
           )}

@@ -454,7 +454,10 @@ function groupRowsByPrinting(rows: PublishedPriceRow[]): PricePrintingGroup[] {
     }));
 }
 
+type ChartTooltip = { cx: number; cy: number; amount: number; date: string };
+
 function PriceHistoryChart({ rows, colorsByRowId }: { rows: PublishedPriceRow[]; colorsByRowId: Record<string, string> }) {
+  const [tooltip, setTooltip] = useState<ChartTooltip | null>(null);
   const series = rows
     .map((row, index) => ({
       row,
@@ -563,18 +566,46 @@ function PriceHistoryChart({ rows, colorsByRowId }: { rows: PublishedPriceRow[];
                   points={polylinePoints}
                 />
               ) : null}
-              {entry.points.map((point) => (
-                <circle
-                  key={`${entry.row.rowId}-${point.observedAt}`}
-                  cx={xForDate(point.observedAt)}
-                  cy={yForAmount(point.amount)}
-                  r="3.5"
-                  fill={entry.color}
-                />
-              ))}
+              {entry.points.map((point) => {
+                const cx = xForDate(point.observedAt);
+                const cy = yForAmount(point.amount);
+                return (
+                  <circle
+                    key={`${entry.row.rowId}-${point.observedAt}`}
+                    cx={cx}
+                    cy={cy}
+                    r="5"
+                    fill={entry.color}
+                    style={{ cursor: "pointer" }}
+                    onMouseEnter={() => setTooltip({ cx, cy, amount: point.amount, date: point.observedAt })}
+                    onMouseLeave={() => setTooltip(null)}
+                  />
+                );
+              })}
             </g>
           );
         })}
+
+        {tooltip && (() => {
+          const label = formatUsdPrice(tooltip.amount) ?? "";
+          const parsed = new Date(tooltip.date);
+          const dateLabel = Number.isNaN(parsed.getTime())
+            ? tooltip.date
+            : new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" }).format(parsed);
+          const text = `${dateLabel}: ${label}`;
+          const tooltipWidth = text.length * 7.2 + 16;
+          const tooltipHeight = 24;
+          const tx = Math.min(tooltip.cx - tooltipWidth / 2, width - tooltipWidth - 4);
+          const ty = tooltip.cy - tooltipHeight - 8 < margin.top
+            ? tooltip.cy + 10
+            : tooltip.cy - tooltipHeight - 8;
+          return (
+            <g style={{ pointerEvents: "none" }}>
+              <rect x={tx} y={ty} width={tooltipWidth} height={tooltipHeight} rx="4" className="price-chart-tooltip-bg" />
+              <text x={tx + tooltipWidth / 2} y={ty + 15.5} textAnchor="middle" className="price-chart-tooltip-text">{text}</text>
+            </g>
+          );
+        })()}
       </svg>
     </div>
   );
@@ -2698,7 +2729,7 @@ export default function App() {
         ) : route.kind === "tools-sealed-pools" ? (
           <SealedSimulator onError={setError} />
         ) : route.kind === "tools-trade-balancer" ? (
-          <TradeBalancerView />
+          <TradeBalancerView onNavigate={navigate} />
         ) : route.kind.startsWith("deck-explorer") ? (
           <DeckExplorerView route={route} onError={setError} onNavigate={navigate} />
         ) : (
