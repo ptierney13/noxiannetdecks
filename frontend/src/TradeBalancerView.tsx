@@ -110,13 +110,18 @@ function SearchResultItem({
   onAdd: (card: CardRecord, side: TradeSide) => void;
 }) {
   const price = nearMintPrice(priceIndex, card);
-  const domains = card.attributes.domain;
-  const hasBothFinishes = card.finishes.length > 1;
-  const finishLabel = hasBothFinishes
-    ? "Foil / Non-foil"
-    : card.finishes.includes("foil")
-    ? "Foil"
-    : "Non-foil";
+  const finishLabel = card.finishes.includes("foil") ? "Foil" : "Non-foil";
+  const variantTags: string[] = [];
+  if (card.variant.alternate_art) variantTags.push("Alt Art");
+  if (card.variant.signed) variantTags.push("Signed");
+  else if (card.variant.overnumbered) variantTags.push("Overnumbered");
+
+  const setLine = [
+    card.set.label,
+    card.collector_number ? `#${card.collector_number}` : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className="trade-sr-item">
@@ -126,12 +131,12 @@ function SearchResultItem({
       </div>
       <div className="trade-sr-meta">
         {card.rarity && <span>{card.rarity}</span>}
-        {domains.length > 0 && <span>·</span>}
-        {domains.map((d) => (
-          <span key={d}>{d}</span>
-        ))}
+        {setLine && <><span>·</span><span>{setLine}</span></>}
         <span>·</span>
         <span>{finishLabel}</span>
+        {variantTags.map((t) => (
+          <><span key={t}>·</span><span>{t}</span></>
+        ))}
       </div>
       <div className="trade-sr-actions">
         <button
@@ -387,7 +392,7 @@ export default function TradeBalancerView() {
     let cancelled = false;
     setSearching(true);
 
-    searchCards(debouncedQuery)
+    searchCards(`${debouncedQuery} unique:id`)
       .then((resp) => {
         if (!cancelled) {
           setSearchResults(resp.items.slice(0, 15));
