@@ -37,6 +37,9 @@ operator recovery paths.
 - A live `updated_after=2026-05-05T00:00:00Z` probe on 2026-05-07 returned
   `meta.total = 946`, showing that incremental runs can still approach
   full-refresh cost and should be treated as budget-aware rather than cheap.
+- Incremental runs are expected to merge card-scoped deltas into a previously
+  established full truth, so operators should understand the baseline/full-run
+  dependency when recovering the pipeline.
 - Stage 5 verified the current key's live request-size cap as `20`, which is a
   concrete operational invariant worth monitoring for drift or revalidation.
 - V0 remains single-source, so upstream availability is a concentrated risk.

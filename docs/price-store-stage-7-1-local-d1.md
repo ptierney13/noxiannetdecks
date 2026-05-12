@@ -63,6 +63,16 @@ Environment knobs:
 - `NOXIANNET_PRICE_PROCESS_RUN_ID=<run id>` for explicit publishing
 - `NOXIANNET_PRICE_CLEANUP_BEFORE=<ISO timestamp>` for retention cleanup
 
+Incremental capture semantics:
+
+- incremental runs are treated as card-scoped deltas, not a full replacement
+- touched cards fully replace their prior rows in the merged truth
+- untouched cards are preserved from the previous successful processed truth
+- if a touched card returns fewer variants than before, the missing old variants
+  are removed
+- the first successful hosted truth should be established from a full run before
+  relying on incremental processing
+
 ## Local Data Locations
 
 - local SQLite-backed D1 file:

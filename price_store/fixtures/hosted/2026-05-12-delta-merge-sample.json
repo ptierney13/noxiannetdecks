@@ -1,0 +1,184 @@
+{
+  "previousRows": [
+    {
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-origins-blazing-scorcher-common",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-origins-blazing-scorcher-common_near-mint",
+      "tcgplayerId": "652771",
+      "tcgplayerSkuId": "8925402",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Normal",
+      "currentPriceAmount": 0.12,
+      "currentPriceLastUpdatedAt": "2026-05-07T19:20:00.000Z",
+      "priceHistory": [
+        { "amount": 0.12, "observedAt": "2026-05-01T00:00:00.000Z" },
+        { "amount": 0.11, "observedAt": "2026-05-02T00:00:00.000Z" },
+        { "amount": 0.11, "observedAt": "2026-05-03T00:00:00.000Z" },
+        { "amount": 0.13, "observedAt": "2026-05-04T00:00:00.000Z" },
+        { "amount": 0.13, "observedAt": "2026-05-05T00:00:00.000Z" },
+        { "amount": 0.12, "observedAt": "2026-05-06T00:00:00.000Z" },
+        { "amount": 0.12, "observedAt": "2026-05-07T00:00:00.000Z" }
+      ]
+    },
+    {
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-unleashed-vex-apathetic-epic",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-unleashed-vex-apathetic-epic_near-mint_foil",
+      "tcgplayerId": "685949",
+      "tcgplayerSkuId": "9199579",
+      "language": "English",
+      "condition": "Near Mint",
+      "printing": "Foil",
+      "currentPriceAmount": 14.65,
+      "currentPriceLastUpdatedAt": "2026-05-07T19:20:43.000Z",
+      "priceHistory": [
+        { "amount": 18.72, "observedAt": "2026-05-01T00:00:00.000Z" },
+        { "amount": 16.05, "observedAt": "2026-05-02T00:00:00.000Z" },
+        { "amount": 13.51, "observedAt": "2026-05-03T00:00:00.000Z" },
+        { "amount": 12.43, "observedAt": "2026-05-04T00:00:00.000Z" },
+        { "amount": 12.65, "observedAt": "2026-05-05T00:00:00.000Z" },
+        { "amount": 13.65, "observedAt": "2026-05-06T00:00:00.000Z" },
+        { "amount": 14.65, "observedAt": "2026-05-07T00:00:00.000Z" }
+      ]
+    },
+    {
+      "sourceCardId": "riftbound-league-of-legends-trading-card-game-unleashed-vex-apathetic-epic",
+      "sourceVariantId": "riftbound-league-of-legends-trading-card-game-unleashed-vex-apathetic-epic_lightly-played_foil",
+      "tcgplayerId": "685949",
+      "tcgplayerSkuId": "9199580",
+      "language": "English",
+      "condition": "Lightly Played",
+      "printing": "Foil",
+      "currentPriceAmount": 13,
+      "currentPriceLastUpdatedAt": "2026-05-07T19:20:43.000Z",
+      "priceHistory": [
+        { "amount": 13, "observedAt": "2026-05-07T00:00:00.000Z" }
+      ]
+    }
+  ],
+  "incrementalPayload": {
+    "data": [
+      {
+        "id": "riftbound-league-of-legends-trading-card-game-origins-acceptable-losses-uncommon",
+        "name": "Acceptable Losses",
+        "game": "Riftbound: League of Legends Trading Card Game",
+        "set": "origins-riftbound-league-of-legends-trading-card-game",
+        "set_name": "Origins",
+        "number": "179/298",
+        "tcgplayerId": "652968",
+        "rarity": "Uncommon",
+        "details": null,
+        "variants": [
+          {
+            "id": "riftbound-league-of-legends-trading-card-game-origins-acceptable-losses-uncommon_lightly-played",
+            "condition": "Lightly Played",
+            "printing": "Normal",
+            "language": "English",
+            "tcgplayerSkuId": "8926938",
+            "price": 0.27,
+            "lastUpdated": 1778621644,
+            "priceHistory": [
+              { "p": 0.27, "t": 1778025600 },
+              { "p": 0.27, "t": 1778112000 },
+              { "p": 0.27, "t": 1778198400 },
+              { "p": 0.26, "t": 1778284800 },
+              { "p": 0.26, "t": 1778371200 },
+              { "p": 0.26, "t": 1778457600 },
+              { "p": 0.27, "t": 1778544000 }
+            ]
+          },
+          {
+            "id": "riftbound-league-of-legends-trading-card-game-origins-acceptable-losses-uncommon_lightly-played_foil",
+            "condition": "Lightly Played",
+            "printing": "Foil",
+            "language": "English",
+            "tcgplayerSkuId": "8926943",
+            "price": 1.3,
+            "lastUpdated": 1778621644,
+            "priceHistory": [
+              { "p": 1.26, "t": 1778025600 },
+              { "p": 1.26, "t": 1778112000 },
+              { "p": 1.26, "t": 1778198400 },
+              { "p": 1.26, "t": 1778284800 },
+              { "p": 1.28, "t": 1778371200 },
+              { "p": 1.28, "t": 1778457600 },
+              { "p": 1.3, "t": 1778544000 }
+            ]
+          },
+          {
+            "id": "riftbound-league-of-legends-trading-card-game-origins-acceptable-losses-uncommon_near-mint",
+            "condition": "Near Mint",
+            "printing": "Normal",
+            "language": "English",
+            "tcgplayerSkuId": "8926937",
+            "price": 0.28,
+            "lastUpdated": 1778621644,
+            "priceHistory": [
+              { "p": 0.27, "t": 1778025600 },
+              { "p": 0.26, "t": 1778112000 },
+              { "p": 0.25, "t": 1778198400 },
+              { "p": 0.31, "t": 1778284800 },
+              { "p": 0.3, "t": 1778371200 },
+              { "p": 0.27, "t": 1778457600 },
+              { "p": 0.28, "t": 1778544000 }
+            ]
+          },
+          {
+            "id": "riftbound-league-of-legends-trading-card-game-origins-acceptable-losses-uncommon_near-mint_foil",
+            "condition": "Near Mint",
+            "printing": "Foil",
+            "language": "English",
+            "tcgplayerSkuId": "8926942",
+            "price": 1.47,
+            "lastUpdated": 1778621644,
+            "priceHistory": [
+              { "p": 1.75, "t": 1778025600 },
+              { "p": 1.75, "t": 1778112000 },
+              { "p": 1.66, "t": 1778198400 },
+              { "p": 1.67, "t": 1778284800 },
+              { "p": 1.54, "t": 1778371200 },
+              { "p": 1.46, "t": 1778457600 },
+              { "p": 1.47, "t": 1778544000 }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "riftbound-league-of-legends-trading-card-game-unleashed-vex-apathetic-epic",
+        "name": "Vex - Apathetic",
+        "game": "Riftbound: League of Legends Trading Card Game",
+        "set": "unleashed-riftbound-league-of-legends-trading-card-game",
+        "set_name": "Unleashed",
+        "number": "150/219",
+        "tcgplayerId": "685949",
+        "rarity": "Epic",
+        "details": null,
+        "variants": [
+          {
+            "id": "riftbound-league-of-legends-trading-card-game-unleashed-vex-apathetic-epic_near-mint_foil",
+            "condition": "Near Mint",
+            "printing": "Foil",
+            "language": "English",
+            "tcgplayerSkuId": "9199579",
+            "price": 15.97,
+            "lastUpdated": 1778621685,
+            "priceHistory": [
+              { "p": 13.65, "t": 1778025600 },
+              { "p": 14.65, "t": 1778112000 },
+              { "p": 9.83, "t": 1778198400 },
+              { "p": 12.13, "t": 1778284800 },
+              { "p": 14.15, "t": 1778371200 },
+              { "p": 18.04, "t": 1778457600 },
+              { "p": 15.97, "t": 1778544000 }
+            ]
+          }
+        ]
+      }
+    ],
+    "meta": {
+      "total": 910,
+      "limit": 20,
+      "offset": 0,
+      "hasMore": false
+    }
+  }
+}

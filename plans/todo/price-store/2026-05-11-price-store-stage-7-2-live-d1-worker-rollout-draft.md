@@ -32,6 +32,8 @@ path live while preserving the old price method for safety.
     - `price_publish_artifacts`
     - `price_pipeline_state`
 - D1 is the source of truth for hosted price data.
+- Incremental captures must be treated as card-scoped deltas merged into the
+  previous full truth, not as a standalone full publish source.
 - The public site should not read D1 directly for every page load.
 - A public-serving artifact layer should sit downstream of D1 truth.
 - KV is the preferred public-serving target if Stage 7.2 includes the public
@@ -45,6 +47,8 @@ path live while preserving the old price method for safety.
 - Stage 7.1 publishes the D1-backed local comparison artifacts to
   `frontend/public/data/prices-d1/` while leaving the legacy
   `frontend/public/data/prices/` path untouched.
+- The first live hosted baseline should be established from a full run before
+  relying on incremental scheduled updates.
 
 ## Expected Outputs
 

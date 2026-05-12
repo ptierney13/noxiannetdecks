@@ -27,6 +27,8 @@ price generation and serving.
 - Stage 7.2 should already provide:
   - live Cloudflare deployment of the new hosted path
   - production verification while the old path still exists
+- Incremental hosted captures should already merge card-scoped deltas into the
+  prior full truth instead of replacing the full dataset outright.
 - The old path should not be removed until the new path is accepted.
 - Stage 7.1 kept card metadata outside D1 and enriches publish output from
   `card_store`, so Stage 7.3 should remove the old method carefully without

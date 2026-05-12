@@ -47,11 +47,21 @@ export async function runHostedPriceProcess(input: RunHostedPriceProcessInput): 
       throw new Error(`Capture run ${captureRun.runId} does not have any captured pages.`);
     }
 
+    const priorProcessRun =
+      captureRun.captureMode === "incremental" ? await repository.getLatestSuccessfulProcessRun() : null;
+    if (captureRun.captureMode === "incremental" && !priorProcessRun) {
+      throw new Error(
+        `Incremental capture ${captureRun.runId} cannot be processed before a previous successful process run establishes full truth.`
+      );
+    }
+
     const byVariantId = new Map<string, HostedPriceDataRow>();
+    const touchedCardIds = new Set<string>();
 
     for (const page of pages) {
       const response = justTcgCardsResponseSchema.parse(JSON.parse(page.payloadJson));
       for (const card of response.data) {
+        touchedCardIds.add(card.id);
         for (const variant of card.variants) {
           const row = createPriceDataRow({
             processRunId,
@@ -73,9 +83,19 @@ export async function runHostedPriceProcess(input: RunHostedPriceProcessInput): 
       }
     }
 
-    const rows = [...byVariantId.values()].sort((left, right) =>
+    const currentRows = [...byVariantId.values()].sort((left, right) =>
       `${left.sourceCardId}::${left.sourceVariantId}`.localeCompare(`${right.sourceCardId}::${right.sourceVariantId}`)
     );
+    const rows =
+      captureRun.captureMode === "incremental" && priorProcessRun
+        ? mergeIncrementalPriceDataRows({
+            processRunId,
+            touchedCardIds,
+            previousRows: await repository.listPriceDataForProcessRun(priorProcessRun.processRunId),
+            currentRows
+          })
+        : currentRows;
+
     await repository.replacePriceDataForProcessRun(processRunId, rows);
     await repository.updateProcessRun({
       processRunId,
@@ -104,6 +124,31 @@ export async function runHostedPriceProcess(input: RunHostedPriceProcessInput): 
     });
     throw error;
   }
+}
+
+type MergeIncrementalPriceDataRowsInput = {
+  processRunId: string;
+  touchedCardIds: Set<string>;
+  previousRows: HostedPriceDataRow[];
+  currentRows: HostedPriceDataRow[];
+};
+
+export function mergeIncrementalPriceDataRows(input: MergeIncrementalPriceDataRowsInput): HostedPriceDataRow[] {
+  const untouchedRows = input.previousRows
+    .filter((row) => !input.touchedCardIds.has(row.sourceCardId))
+    .map((row) => carryForwardPriceDataRow(row, input.processRunId));
+
+  return [...untouchedRows, ...input.currentRows].sort((left, right) =>
+    `${left.sourceCardId}::${left.sourceVariantId}`.localeCompare(`${right.sourceCardId}::${right.sourceVariantId}`)
+  );
+}
+
+function carryForwardPriceDataRow(row: HostedPriceDataRow, processRunId: string): HostedPriceDataRow {
+  return {
+    ...row,
+    rowId: `${processRunId}::${row.sourceVariantId}`,
+    processRunId
+  };
 }
 
 export function createHostedProcessRunId(startedAt: string, captureRunId: string): string {
