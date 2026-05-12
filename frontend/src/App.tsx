@@ -2532,6 +2532,18 @@ function CardDetailView({
   );
 }
 
+function TradeBalancerQuickLookWrapper({ onNavigate }: { onNavigate: (path: string) => void }) {
+  const [quickLookCard, setQuickLookCard] = useState<CardRecord | null>(null);
+  return (
+    <>
+      <TradeBalancerView onNavigate={onNavigate} onQuickLook={setQuickLookCard} />
+      {quickLookCard && (
+        <CardQuickLookModal card={quickLookCard} onClose={() => setQuickLookCard(null)} onNavigate={onNavigate} />
+      )}
+    </>
+  );
+}
+
 export default function App() {
   const [route, setRoute] = useState(() => parseAppRoute(window.location.pathname));
   const [locationSearch, setLocationSearch] = useState(() => window.location.search);
@@ -2729,7 +2741,7 @@ export default function App() {
         ) : route.kind === "tools-sealed-pools" ? (
           <SealedSimulator onError={setError} />
         ) : route.kind === "tools-trade-balancer" ? (
-          <TradeBalancerView onNavigate={navigate} />
+          <TradeBalancerQuickLookWrapper onNavigate={navigate} />
         ) : route.kind.startsWith("deck-explorer") ? (
           <DeckExplorerView route={route} onError={setError} onNavigate={navigate} />
         ) : (

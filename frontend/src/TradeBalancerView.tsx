@@ -174,6 +174,7 @@ function TradeCardBar({
   onDragStart,
   onDragEnd,
   onNavigate,
+  onQuickLook,
 }: {
   item: TradeItem;
   side: TradeSide;
@@ -189,6 +190,7 @@ function TradeCardBar({
   onDragStart: () => void;
   onDragEnd: () => void;
   onNavigate: (path: string) => void;
+  onQuickLook: (card: CardRecord) => void;
 }) {
   const { card } = item;
   const hasBothFinishes = card.finishes.length > 1;
@@ -282,7 +284,7 @@ function TradeCardBar({
                 alt={card.media.accessibility_text ?? card.riot_name}
                 loading="lazy"
                 style={{ cursor: "pointer" }}
-                onClick={() => onNavigate(buildCardDetailPath(card.id))}
+                onClick={() => onQuickLook(card)}
               />
             </div>
           )}
@@ -366,7 +368,7 @@ function TradeCardBar({
 
 // ── Main view ──────────────────────────────────────────────────────────────
 
-export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: string) => void }) {
+export default function TradeBalancerView({ onNavigate, onQuickLook }: { onNavigate: (path: string) => void; onQuickLook: (card: CardRecord) => void }) {
   const { index: priceIndex } = usePublishedPriceIndex();
 
   const [mine, setMine] = useState<TradeItem[]>([]);
@@ -687,6 +689,7 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
                 onDragStart={() => handleDragStart(item.key, "mine")}
                 onDragEnd={handleDragEnd}
                 onNavigate={onNavigate}
+                onQuickLook={onQuickLook}
               />
             ))
           )}
@@ -733,6 +736,7 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
                 onDragStart={() => handleDragStart(item.key, "yours")}
                 onDragEnd={handleDragEnd}
                 onNavigate={onNavigate}
+                onQuickLook={onQuickLook}
               />
             ))
           )}
