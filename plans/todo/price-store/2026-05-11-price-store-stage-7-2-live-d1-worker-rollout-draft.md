@@ -23,6 +23,14 @@ path live while preserving the old price method for safety.
   - a relational D1 schema with repo-managed migrations
   - local Wrangler/D1 validation of capture/process/publish behavior
   - local dual-price comparison proving acceptable parity
+  - the concrete Stage 7.1 table set:
+    - `price_capture_justtcg_runs`
+    - `price_capture_justtcg_pages`
+    - `price_process_runs`
+    - `price_data`
+    - `price_publish_runs`
+    - `price_publish_artifacts`
+    - `price_pipeline_state`
 - D1 is the source of truth for hosted price data.
 - The public site should not read D1 directly for every page load.
 - A public-serving artifact layer should sit downstream of D1 truth.
@@ -31,6 +39,12 @@ path live while preserving the old price method for safety.
 - A daily maintenance worker that deletes expired raw capture rows is the
   preferred retention cleanup model.
 - The old price method must remain available during this rollout.
+- Stage 7.1 deliberately did **not** move card metadata into D1.
+  Publish currently enriches `price_data` rows from `card_store` using
+  `tcgplayer_id`.
+- Stage 7.1 publishes the D1-backed local comparison artifacts to
+  `frontend/public/data/prices-d1/` while leaving the legacy
+  `frontend/public/data/prices/` path untouched.
 
 ## Expected Outputs
 
@@ -60,6 +74,8 @@ path live while preserving the old price method for safety.
 - whether publish also owns KV updates or whether distribution is separated
 - whether process is deployed as a fully separate Worker or remains an internal
   logical boundary behind capture/publish orchestration
+- whether Stage 7.2 should keep publish-time card metadata enrichment in
+  `card_store` or move that metadata into D1 as part of rollout preparation
 - what exact production verification gate allows Stage 7.3 to begin
 - whether the live site should expose both price paths simultaneously or keep
   the comparison limited to non-public/internal surfaces

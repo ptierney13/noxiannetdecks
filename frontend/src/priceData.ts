@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 
+const LEGACY_PRICE_PATH_PREFIX = "/data/prices";
+const D1_PRICE_PATH_PREFIX = "/data/prices-d1";
+
 export type PublishedPriceHistoryPoint = {
   amount: number;
   observedAt: string;
@@ -33,9 +36,22 @@ export type PublishedPriceRow = {
 
 export type PublishedPriceManifest = {
   version: 1;
+  game?: {
+    slug: string;
+    key: string;
+    label?: string;
+  };
   snapshotPath: string;
   publishedAt: string;
   sourceCapturedAt: string;
+  rowCount?: number;
+  variantCount?: number;
+  freshness?: {
+    rowCount: number;
+    pricedRowCount: number;
+    freshestPriceAt?: string;
+    stalestPriceAt?: string;
+  };
   priceSource: {
     id: string;
     label: string;
@@ -44,8 +60,19 @@ export type PublishedPriceManifest = {
 
 export type PublishedPriceSnapshot = {
   version: 1;
+  game?: {
+    slug: string;
+    key: string;
+    label?: string;
+  };
   publishedAt: string;
   sourceCapturedAt: string;
+  freshness?: {
+    rowCount: number;
+    pricedRowCount: number;
+    freshestPriceAt?: string;
+    stalestPriceAt?: string;
+  };
   priceSource: {
     id: string;
     label: string;
@@ -73,19 +100,38 @@ const CONDITION_ORDER = new Map<string, number>([
   ["sealed", 5]
 ]);
 
-let cachedPriceIndexPromise: Promise<PublishedPriceIndex> | null = null;
+const cachedPriceIndexPromises = new Map<string, Promise<PublishedPriceIndex>>();
 
 export function usePublishedPriceIndex(): {
   index: PublishedPriceIndex | null;
   status: "loading" | "ready" | "error";
 } {
+  return usePublishedPriceIndexForPath(resolveActivePricePathPrefix());
+}
+
+export function useOptionalPublishedPriceIndex(
+  pathPrefix: string,
+  enabled: boolean
+): {
+  index: PublishedPriceIndex | null;
+  status: "idle" | "loading" | "ready" | "error";
+} {
   const [index, setIndex] = useState<PublishedPriceIndex | null>(null);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">(enabled ? "loading" : "idle");
 
   useEffect(() => {
     let ignore = false;
 
-    loadPublishedPriceIndex()
+    if (!enabled) {
+      setIndex(null);
+      setStatus("idle");
+      return () => {
+        ignore = true;
+      };
+    }
+
+    setStatus("loading");
+    loadPublishedPriceIndexForPath(pathPrefix)
       .then((loaded) => {
         if (ignore) {
           return;
@@ -106,20 +152,65 @@ export function usePublishedPriceIndex(): {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [enabled, pathPrefix]);
+
+  return { index, status };
+}
+
+function usePublishedPriceIndexForPath(pathPrefix: string): {
+  index: PublishedPriceIndex | null;
+  status: "loading" | "ready" | "error";
+} {
+  const [index, setIndex] = useState<PublishedPriceIndex | null>(null);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+
+  useEffect(() => {
+    let ignore = false;
+
+    loadPublishedPriceIndexForPath(pathPrefix)
+      .then((loaded) => {
+        if (ignore) {
+          return;
+        }
+
+        setIndex(loaded);
+        setStatus("ready");
+      })
+      .catch(() => {
+        if (ignore) {
+          return;
+        }
+
+        setIndex(null);
+        setStatus("error");
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [pathPrefix]);
 
   return { index, status };
 }
 
 export async function loadPublishedPriceIndex(): Promise<PublishedPriceIndex> {
-  if (!cachedPriceIndexPromise) {
-    cachedPriceIndexPromise = buildPublishedPriceIndex().catch((error) => {
-      cachedPriceIndexPromise = null;
-      throw error;
-    });
+  return loadPublishedPriceIndexForPath(resolveActivePricePathPrefix());
+}
+
+export async function loadPublishedPriceIndexForPath(pathPrefix: string): Promise<PublishedPriceIndex> {
+  const normalizedPathPrefix = normalizePathPrefix(pathPrefix);
+
+  if (!cachedPriceIndexPromises.has(normalizedPathPrefix)) {
+    cachedPriceIndexPromises.set(
+      normalizedPathPrefix,
+      buildPublishedPriceIndex(normalizedPathPrefix).catch((error) => {
+        cachedPriceIndexPromises.delete(normalizedPathPrefix);
+        throw error;
+      })
+    );
   }
 
-  return cachedPriceIndexPromise;
+  return cachedPriceIndexPromises.get(normalizedPathPrefix) as Promise<PublishedPriceIndex>;
 }
 
 export function getPublishedRowsForCard(
@@ -219,9 +310,9 @@ function normalizeCondition(value: string | null | undefined): string {
   return (value ?? "").trim().toLowerCase();
 }
 
-async function buildPublishedPriceIndex(): Promise<PublishedPriceIndex> {
-  const manifest = await fetchJson<PublishedPriceManifest>("/data/prices/manifest.json");
-  const snapshot = await fetchJson<PublishedPriceSnapshot>(`/data/prices/${manifest.snapshotPath}`);
+async function buildPublishedPriceIndex(pathPrefix = "/data/prices"): Promise<PublishedPriceIndex> {
+  const manifest = await fetchJson<PublishedPriceManifest>(`${pathPrefix}/manifest.json`);
+  const snapshot = await fetchJson<PublishedPriceSnapshot>(`${pathPrefix}/${manifest.snapshotPath}`);
   const rowsByTcgplayerId = new Map<string, PublishedPriceRow[]>();
 
   for (const row of snapshot.rows) {
@@ -244,6 +335,56 @@ async function buildPublishedPriceIndex(): Promise<PublishedPriceIndex> {
     snapshot,
     rowsByTcgplayerId
   };
+}
+
+function normalizePathPrefix(pathPrefix: string): string {
+  return pathPrefix.endsWith("/") ? pathPrefix.slice(0, -1) : pathPrefix;
+}
+
+export function resolveActivePricePathPrefix(): string {
+  const fromQuery = resolvePricePathPrefixFromLocation();
+  if (fromQuery) {
+    return fromQuery;
+  }
+
+  const configured = import.meta.env.VITE_PRICE_DATA_PATH_PREFIX?.trim();
+  if (configured) {
+    return configured;
+  }
+
+  return LEGACY_PRICE_PATH_PREFIX;
+}
+
+export function resolveComparisonPricePathPrefix(): string | null {
+  const active = resolveActivePricePathPrefix();
+  if (active === D1_PRICE_PATH_PREFIX) {
+    return LEGACY_PRICE_PATH_PREFIX;
+  }
+
+  if (active === LEGACY_PRICE_PATH_PREFIX) {
+    return D1_PRICE_PATH_PREFIX;
+  }
+
+  return null;
+}
+
+function resolvePricePathPrefixFromLocation(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const requestedSource = params.get("priceSource")?.trim().toLowerCase();
+
+  if (requestedSource === "d1") {
+    return D1_PRICE_PATH_PREFIX;
+  }
+
+  if (requestedSource === "legacy") {
+    return LEGACY_PRICE_PATH_PREFIX;
+  }
+
+  return null;
 }
 
 async function fetchJson<T>(path: string): Promise<T> {

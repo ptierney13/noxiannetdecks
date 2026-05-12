@@ -85,6 +85,45 @@ Stage 5 now adds:
   - emits one row per source variant
   - leaves default display-price selection to later frontend logic
 
+Stage 7.1 now adds:
+
+- repo-managed D1 migrations under `price_store/migrations/d1/`
+- a relational hosted/local schema with the current tables:
+  - `price_capture_justtcg_runs`
+  - `price_capture_justtcg_pages`
+  - `price_process_runs`
+  - `price_data`
+  - `price_publish_runs`
+  - `price_publish_artifacts`
+  - `price_pipeline_state`
+- explicit capture, process, publish, and retention-cleanup responsibilities
+  under `src/hosted/`
+- local D1-backed scripts:
+  - `npm run hosted:local:migrate -w @noxiannet/price-store`
+  - `npm run hosted:local:capture -w @noxiannet/price-store`
+  - `npm run hosted:local:process -w @noxiannet/price-store`
+  - `npm run hosted:local:publish -w @noxiannet/price-store`
+  - `npm run hosted:local:cleanup -w @noxiannet/price-store`
+- worker-equivalent local entrypoints under `workers/`
+- a parallel D1-backed published artifact target at:
+  - `.price_data/exports/prices-d1/`
+  - `frontend/public/data/prices-d1/`
+- a local dual-price comparison surface in the frontend that compares:
+  - legacy `/data/prices/*`
+  - D1-backed `/data/prices-d1/*`
+
+## Stage 7.1 Notes
+
+- `price_data` tracks both the upstream capture provider and the logical price
+  source:
+  - `upstream_provider_id = justtcg`
+  - `price_source_id = tcgplayer`
+- Card metadata is not duplicated into a dedicated D1 table in Stage 7.1.
+  D1 publish currently enriches rows from `card_store` by `tcgplayer_id` while
+  keeping the old published path intact.
+- The new hosted/local path writes a parallel artifact set instead of replacing
+  `frontend/public/data/prices/` so parity can be checked side by side.
+
 ## Plans
 
 - [Stage 1 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-1-foundation-and-raw-capture.md)
@@ -92,3 +131,4 @@ Stage 5 now adds:
 - [Stage 3 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-3-justtcg-approval-auth-and-first-live-capture.md)
 - [Stage 4 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-4-justtcg-contracts-and-repositories.md)
 - [Stage 5 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-5-justtcg-publishable-snapshot-pipeline.md)
+- [Stage 7.1 executed plan](../plans/executed/price-store/2026-05-11-price-store-stage-7-1-d1-relational-local-validation-and-dual-price-display.md)

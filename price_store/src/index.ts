@@ -110,3 +110,4 @@ export {
   resolveJustTcgLocalEnvPath,
   verifyJustTcgRequestLimit
 } from "./sources/justtcg/index.js";
+export * from "./hosted/index.js";

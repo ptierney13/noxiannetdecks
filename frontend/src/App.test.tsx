@@ -522,6 +522,51 @@ const priceSnapshot = {
   ]
 };
 
+const d1PriceManifest = {
+  ...priceManifest,
+  publishedAt: "2026-05-11T02:15:00.000Z",
+  sourceCapturedAt: "2026-05-11T01:45:00.000Z",
+  freshness: {
+    rowCount: 5,
+    pricedRowCount: 5,
+    freshestPriceAt: "2026-05-11T01:40:00.000Z",
+    stalestPriceAt: "2026-05-05T00:00:00.000Z"
+  }
+};
+
+const d1PriceSnapshot = {
+  ...priceSnapshot,
+  publishedAt: "2026-05-11T02:15:00.000Z",
+  sourceCapturedAt: "2026-05-11T01:45:00.000Z",
+  freshness: {
+    rowCount: 5,
+    pricedRowCount: 5,
+    freshestPriceAt: "2026-05-11T01:40:00.000Z",
+    stalestPriceAt: "2026-05-05T00:00:00.000Z"
+  },
+  rows: priceSnapshot.rows.map((row) =>
+    row.rowId === "void-gate-foil-nm"
+      ? {
+          ...row,
+          currentPrice: {
+            ...row.currentPrice,
+            amount: 12.54,
+            lastUpdatedAt: "2026-05-11T01:40:00.000Z"
+          }
+        }
+      : row.rowId === "void-gate-normal-nm"
+        ? {
+            ...row,
+            currentPrice: {
+              ...row.currentPrice,
+              amount: 8.75,
+              lastUpdatedAt: "2026-05-11T01:35:00.000Z"
+            }
+          }
+        : row
+  )
+};
+
 function normalized(value: string | null | undefined): string {
   return (value ?? "").toLowerCase();
 }
@@ -570,6 +615,14 @@ function mockFetch(poolFactory = generatedPool) {
 
     if (url === "/data/prices/riftbound/latest.json") {
       return Response.json(priceSnapshot);
+    }
+
+    if (url === "/data/prices-d1/manifest.json") {
+      return Response.json(d1PriceManifest);
+    }
+
+    if (url === "/data/prices-d1/riftbound/latest.json") {
+      return Response.json(d1PriceSnapshot);
     }
 
     if (url === "/api/query/features") {
@@ -811,6 +864,21 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Near Mint $12.34" }));
     await user.click(screen.getByRole("button", { name: "Lightly Played $10.50" }));
     expect(screen.queryByTestId("price-history-chart")).not.toBeInTheDocument();
+  });
+
+  it("shows the local dual-price comparison panel when D1-backed artifacts are available", async () => {
+    window.history.pushState({}, "", "/cards/card-1");
+    render(<App />);
+
+    expect(await screen.findByRole("heading", { name: "Void Gate" })).toBeInTheDocument();
+
+    const panel = await screen.findByTestId("local-price-comparison");
+    expect(within(panel).getAllByText("Legacy").length).toBeGreaterThan(0);
+    expect(within(panel).getAllByText("D1").length).toBeGreaterThan(0);
+    expect(within(panel).getByText("Foil Near Mint")).toBeInTheDocument();
+    expect(within(panel).getByText("$12.34")).toBeInTheDocument();
+    expect(within(panel).getByText("$12.54")).toBeInTheDocument();
+    expect(within(panel).getByText("+$0.20")).toBeInTheDocument();
   });
 
   it("renders inline cost, might, and text symbols on the card detail page", async () => {

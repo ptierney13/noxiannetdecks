@@ -20,6 +20,7 @@ export type WritePublishedPriceArtifactsInput = {
   manifest: PublishedPriceManifest;
   snapshot: PublishedPriceSnapshot;
   repositoryRoot?: string;
+  pathPrefix?: string;
 };
 
 export type WritePublishedPriceArtifactsResult = {
@@ -37,16 +38,17 @@ export async function writePublishedPriceArtifacts(
 ): Promise<WritePublishedPriceArtifactsResult> {
   const packageRoot = resolvePriceStorePackageRoot();
   const repositoryRoot = input.repositoryRoot ? resolve(input.repositoryRoot) : resolve(packageRoot, "..");
-  const exportManifestPath = join(layout.exportsDir, "prices", "manifest.json");
-  const exportSnapshotPath = join(layout.exportsDir, "prices", input.gameKey, "latest.json");
-  const exportMetadataPath = join(layout.exportsDir, "prices", input.gameKey, "latest.publish.meta.json");
-  const frontendManifestPath = join(repositoryRoot, "frontend", "public", "data", "prices", "manifest.json");
+  const pathPrefix = sanitizePathPrefix(input.pathPrefix ?? "prices");
+  const exportManifestPath = join(layout.exportsDir, pathPrefix, "manifest.json");
+  const exportSnapshotPath = join(layout.exportsDir, pathPrefix, input.gameKey, "latest.json");
+  const exportMetadataPath = join(layout.exportsDir, pathPrefix, input.gameKey, "latest.publish.meta.json");
+  const frontendManifestPath = join(repositoryRoot, "frontend", "public", "data", pathPrefix, "manifest.json");
   const frontendSnapshotPath = join(
     repositoryRoot,
     "frontend",
     "public",
     "data",
-    "prices",
+    pathPrefix,
     input.gameKey,
     "latest.json"
   );
@@ -84,4 +86,15 @@ export async function writePublishedPriceArtifacts(
     frontendSnapshotPath,
     metadata
   };
+}
+
+function sanitizePathPrefix(value: string): string {
+  const normalized = value.trim().replace(/[^a-zA-Z0-9/_-]+/g, "-").replace(/\/+/g, "/");
+  const sanitized = normalized.replace(/^\/+|\/+$/g, "");
+
+  if (!sanitized) {
+    throw new Error("Published path prefix must contain at least one supported character.");
+  }
+
+  return sanitized;
 }

@@ -3823,6 +3823,94 @@ code {
   font-size: 0.88rem;
 }
 
+.price-compare-panel {
+  gap: 14px;
+}
+
+.price-compare-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.price-compare-copy {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.price-compare-status {
+  color: #f59e0b;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.price-compare-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.price-compare-summary > div {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-mid);
+  background: var(--surface-2);
+}
+
+.price-compare-summary strong {
+  color: var(--text-strong);
+}
+
+.price-compare-summary span {
+  color: var(--text-muted);
+  font-size: 0.84rem;
+}
+
+.price-compare-empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.price-compare-table-wrap {
+  overflow-x: auto;
+}
+
+.price-compare-table {
+  width: 100%;
+  min-width: 420px;
+  border-collapse: collapse;
+}
+
+.price-compare-table th,
+.price-compare-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.price-compare-table th {
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.price-compare-table td {
+  color: var(--text);
+  font-size: 0.86rem;
+}
+
 .price-toggle-group {
   display: flex;
   flex-direction: column;
@@ -3969,6 +4057,14 @@ code {
 
   .price-chart {
     padding: 12px;
+  }
+
+  .price-compare-header {
+    flex-direction: column;
+  }
+
+  .price-compare-summary {
+    grid-template-columns: 1fr;
   }
 }
 

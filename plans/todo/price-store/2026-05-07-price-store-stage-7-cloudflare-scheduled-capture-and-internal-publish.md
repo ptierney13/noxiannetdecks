@@ -109,6 +109,9 @@ The dedicated sub-stage documents for fresh implementation windows are:
     than logical JSON keys
   - migrating the hosted worker logic off document-style persistence
   - preserving the same publish output contract after the storage conversion
+  - keeping the card metadata ownership question explicit; Stage 7.1 may enrich
+    publish output from `card_store` instead of introducing a dedicated D1 card
+    metadata table immediately
 
 ### Initial D1 Schema Direction
 

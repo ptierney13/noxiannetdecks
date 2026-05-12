@@ -8,7 +8,9 @@ coverage/
 .price_data/
 .wrangler/
 .dev-*.log
+.codex-logs/
 frontend/test-results/
 playwright-report/
 scripts/out/
 *.local
+frontend/public/data/prices-d1/

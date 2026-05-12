@@ -27,9 +27,20 @@
     "prepublish:justtcg:prices": "npm run build",
     "publish:justtcg:prices": "node dist/scripts/publish-justtcg-prices.js",
     "prepublish:justtcg:catalog": "npm run build",
-    "publish:justtcg:catalog": "node dist/scripts/publish-justtcg-catalog.js"
+    "publish:justtcg:catalog": "node dist/scripts/publish-justtcg-catalog.js",
+    "prehosted:local:migrate": "npm run build",
+    "hosted:local:migrate": "node dist/scripts/hosted-local-migrate.js",
+    "prehosted:local:capture": "npm run build",
+    "hosted:local:capture": "node dist/scripts/hosted-local-capture.js",
+    "prehosted:local:process": "npm run build",
+    "hosted:local:process": "node dist/scripts/hosted-local-process.js",
+    "prehosted:local:publish": "npm run build",
+    "hosted:local:publish": "node dist/scripts/hosted-local-publish.js",
+    "prehosted:local:cleanup": "npm run build",
+    "hosted:local:cleanup": "node dist/scripts/hosted-local-cleanup.js"
   },
   "dependencies": {
+    "@noxiannet/card-store": "0.1.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
