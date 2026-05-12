@@ -17,12 +17,19 @@ This sub-stage should create or bind the production D1 database, deploy the
 worker topology, wire scheduling and service bindings, and enable the new hosted
 path live while preserving the old price method for safety.
 
+Stage 7.2 should be treated as the first productionization stage, not as an
+extension of local validation. Stage 7.1 is considered successful local
+implementation work and is complete once its local D1 semantics, full-ingestion
+validation, and dual-price comparison surface are accepted.
+
 ## Pertinent Details So Far
 
 - Stage 7.1 should already provide:
   - a relational D1 schema with repo-managed migrations
   - local Wrangler/D1 validation of capture/process/publish behavior
   - local dual-price comparison proving acceptable parity
+  - successful local full-ingestion validation against D1-backed published
+    artifacts
   - the concrete Stage 7.1 table set:
     - `price_capture_justtcg_runs`
     - `price_capture_justtcg_pages`
@@ -49,6 +56,24 @@ path live while preserving the old price method for safety.
   `frontend/public/data/prices/` path untouched.
 - The first live hosted baseline should be established from a full run before
   relying on incremental scheduled updates.
+- The intended default ingestion-worker behavior should be full capture unless
+  explicitly overridden by environment or request controls.
+- Stage 7.1 left incremental scaffolding in place, but the current intended
+  live default is full clean ingestion on each scheduled run unless explicitly
+  overridden.
+- Stage 7.1 confirmed that incremental processing must merge touched-card
+  updates into the prior full truth, preserving untouched cards while allowing
+  removed variants on touched cards to disappear.
+- Stage 7.1 also confirmed the current Cloudflare rollout blockers:
+  - publish still writes local filesystem artifacts instead of targeting a
+    Cloudflare-supported distribution destination
+  - publish still enriches from local `card_store` metadata rather than a
+    production-safe hosted source
+  - capture/process/publish worker orchestration is only partially wired for
+    production; the scheduled capture worker does not yet drive the full hosted
+    pipeline
+  - Wrangler configs remain local-validation stubs rather than finalized
+    production worker configs and bindings
 
 ## Expected Outputs
 
@@ -64,6 +89,10 @@ path live while preserving the old price method for safety.
 - bind production D1
 - bind any KV/public-serving target if included in the final 7.2 shape
 - wire Service Bindings and Cron Triggers
+- replace local filesystem publish writes with a Cloudflare-compatible publish
+  target and read path
+- resolve the production source of card metadata needed during publish, unless
+  the published payload contract is intentionally reduced
 - validate that the hosted path can run without removing the old path
 - update the operator/setup document with exact production page-by-page steps
 
@@ -80,6 +109,11 @@ path live while preserving the old price method for safety.
   logical boundary behind capture/publish orchestration
 - whether Stage 7.2 should keep publish-time card metadata enrichment in
   `card_store` or move that metadata into D1 as part of rollout preparation
+- what Cloudflare-supported artifact destination replaces the current local
+  `frontend/public/data/prices-d1/` write path
+- whether the live rollout should keep the current full-by-default ingestion
+  behavior for schedule-driven runs or introduce environment-controlled mode
+  switching immediately
 - what exact production verification gate allows Stage 7.3 to begin
 - whether the live site should expose both price paths simultaneously or keep
   the comparison limited to non-public/internal surfaces
@@ -88,6 +122,10 @@ path live while preserving the old price method for safety.
 
 - validate production D1 migration success
 - validate one end-to-end hosted run in production
+- validate that the deployed publish path no longer depends on local filesystem
+  writes
+- validate that the deployed publish path has access to the card metadata it
+  needs, or that the payload contract has been adjusted accordingly
 - validate maintenance cleanup scheduling
 - validate that the old path still functions while the new path is live
 - validate any public-serving artifact layer reads correctly from the new

@@ -130,6 +130,8 @@ Wrangler-local config stubs for Stage 7.2 rollout prep:
 The capture worker also accepts override controls through either request query
 parameters or worker environment variables:
 
+- default worker behavior is `full` capture when no override is provided
+
 - `mode=full|incremental`
 - `updatedAfter=<ISO timestamp>`
 - `maxPages=<number>`

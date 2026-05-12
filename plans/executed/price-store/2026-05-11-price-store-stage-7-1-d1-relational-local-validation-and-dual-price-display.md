@@ -2,9 +2,9 @@
 
 ## Status
 
-This is the implementation kickoff document for Stage 7.1. It is intended to
-be sufficient context for starting a fresh implementation window with a prompt
-such as `7.1 implementation`.
+Stage 7.1 is complete as a successful local implementation milestone. This
+document now records the scope and expectations that were enacted so the next
+stage can begin from a clean context.
 
 Stage 7.1 inherits its scope from the approved Stage 7 plan in
 [2026-05-07-price-store-stage-7-cloudflare-scheduled-capture-and-internal-publish.md](C:/Users/ptier/repos/Deck%20Archive%20Project/plans/todo/price-store/2026-05-07-price-store-stage-7-cloudflare-scheduled-capture-and-internal-publish.md),
@@ -29,6 +29,16 @@ repo in a state where:
 - the local app can show old and new prices side by side
 - the next window can start Stage 7.2 deployment work without needing this
   thread
+
+That local-only goal was met. Stage 7.1 concluded with:
+
+- relational D1-backed storage and repo-managed migrations in place
+- local Wrangler/D1-style validation for capture/process/publish and retention
+  behavior
+- full-ingestion local validation working with D1-backed published artifacts
+- a local dual-price comparison surface that keeps the old price path intact
+- incremental-processing scaffolding retained, with card-scoped delta merge
+  semantics fixed for future rollout work
 
 ## Current Architectural Decisions
 

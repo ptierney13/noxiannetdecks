@@ -28,7 +28,8 @@ function readBoolean(value: string | null | undefined): boolean | undefined {
 
 async function executeCapture(request: Request, env: PriceStoreWorkerEnv): Promise<Response> {
   const url = new URL(request.url);
-  const captureMode = url.searchParams.get("mode") ?? env.NOXIANNET_PRICE_CAPTURE_MODE;
+  const requestedCaptureMode = url.searchParams.get("mode") ?? env.NOXIANNET_PRICE_CAPTURE_MODE;
+  const captureMode = requestedCaptureMode === "incremental" ? "incremental" : "full";
   const updatedAfter = url.searchParams.get("updatedAfter") ?? env.NOXIANNET_PRICE_CAPTURE_UPDATED_AFTER;
   const game = url.searchParams.get("game") ?? env.NOXIANNET_PRICE_CAPTURE_GAME;
   const maxPages = readNumber(url.searchParams.get("maxPages") ?? env.NOXIANNET_PRICE_CAPTURE_MAX_PAGES);
@@ -45,7 +46,7 @@ async function executeCapture(request: Request, env: PriceStoreWorkerEnv): Promi
     database: env.DB,
     config: createWorkerJustTcgConfig(env),
     game,
-    mode: captureMode === "full" ? "full" : "incremental",
+    mode: captureMode,
     updatedAfter,
     maxPages,
     maxRequests,
