@@ -529,6 +529,14 @@ export default function TradeBalancerView() {
   const yoursTotal = sideTotal(yours);
   const delta = mineTotal - yoursTotal;
 
+  const tradeRatio = (mineTotal + yoursTotal) > 0
+    ? Math.min(0.99, Math.max(0.01, mineTotal / (mineTotal + yoursTotal)))
+    : 0.5;
+  const splitPct = (tradeRatio * 100).toFixed(2);
+  const deltaBarStyle = {
+    background: `linear-gradient(90deg, rgba(42,143,82,0.25) 0%, rgba(42,143,82,0.25) ${splitPct}%, rgba(181,32,56,0.25) ${splitPct}%, rgba(181,32,56,0.25) 100%)`
+  };
+
   // ── Drag handlers ──
   function handleDragStart(key: string, side: TradeSide) {
     setActiveDrag({ key, fromSide: side });
@@ -725,7 +733,7 @@ export default function TradeBalancerView() {
       </div>
 
       {/* ── Delta bar (desktop) ── */}
-      <div className="trade-delta-bar trade-desktop-only">
+      <div className="trade-delta-bar trade-desktop-only" style={deltaBarStyle}>
         <div className="trade-delta-side">
           <div className="trade-delta-label">Mine</div>
           <div className="trade-delta-total">{formatUsdPrice(mineTotal) ?? "$0.00"}</div>
