@@ -1,5 +1,4 @@
 import { useState } from "react";
-import type { ReactNode } from "react";
 
 type ZoneId =
   | "name" | "cost" | "energy" | "power" | "might"
@@ -34,57 +33,11 @@ const ZONES: Record<ZoneId, ZoneInfo> = {
   artist:           { label: "Artist",      query: 'artist:"league splash team"',  shorthand: 'a:"league splash"',        description: "Searches by illustrator name." },
 };
 
-// ── Symbol rendering ──────────────────────────────────────────────────────────
+// ── Card data constants (sourced from cards.json) ────────────────────────────
+// Blitzcrank – Impassive: cost="{5}{C}", energy=5, power=1, might=5, OGN #067/298
 
-const RUNE_SRCS: Record<string, string> = {
-  C: "/assets/riftbound/symbols/runes/rune-calm-inline.png",
-  F: "/assets/riftbound/symbols/runes/rune-fury-inline.png",
-  M: "/assets/riftbound/symbols/runes/rune-mind-inline.png",
-  B: "/assets/riftbound/symbols/runes/rune-body-inline.png",
-  H: "/assets/riftbound/symbols/runes/rune-chaos-inline.png",
-  O: "/assets/riftbound/symbols/runes/rune-order-inline.png",
-  P: "/assets/riftbound/symbols/power/wild-power-inline.png",
-};
-
-function energyBadgeSrc(n: number): string | null {
-  if (n < 0 || n > 12 || n === 11) return null;
-  return `/assets/riftbound/symbols/energy/energy-cost-${String(n).padStart(2, "0")}-badge.png`;
-}
-
-/** Renders a cost string like "{5}{C}" as badge + rune images. */
-function CostSymbols({ cost }: { cost: string }): ReactNode {
-  const tokens = [...cost.matchAll(/\{([^}]+)\}/g)].map(m => m[1]);
-  return (
-    <span className="csg-cost-symbols">
-      {tokens.map((token, i) => {
-        if (/^\d+$/.test(token)) {
-          const src = energyBadgeSrc(parseInt(token));
-          return src
-            ? <img key={i} src={src} alt={token} className="csg-sym csg-sym--badge" />
-            : <span key={i} className="csg-stat-num">{token}</span>;
-        }
-        const src = RUNE_SRCS[token];
-        return src
-          ? <img key={i} src={src} alt={`{${token}}`} className="csg-sym csg-sym--rune" />
-          : <span key={i}>{`{${token}}`}</span>;
-      })}
-    </span>
-  );
-}
-
-/** Renders a numeric energy value as its badge image. */
-function EnergyBadge({ value }: { value: number }): ReactNode {
-  const src = energyBadgeSrc(value);
-  return src
-    ? <img src={src} alt={String(value)} className="csg-sym csg-sym--badge" />
-    : <span className="csg-stat-num">{value}</span>;
-}
-
-// ── Card data constants ───────────────────────────────────────────────────────
-
-// Blitzcrank – Impassive (OGN #067/298, Foil Rare, Calm domain)
-const CARD_IMAGE = "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/654dcc4aef0a0b5a0c6e928d7aae397a52c3ab17-744x1039.png?accountingTag=RB";
-const CARD_COST    = "{5}{C}";
+const CARD_IMAGE   = "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/654dcc4aef0a0b5a0c6e928d7aae397a52c3ab17-744x1039.png?accountingTag=RB";
+const CARD_COST    = "{5}{C}";  // canonical cost field from cards.json
 const CARD_ENERGY  = 5;
 const CARD_POWER   = 1;
 const CARD_MIGHT   = 5;
@@ -128,11 +81,11 @@ export function CardSearchGuide() {
           <div className="csg-stat-row">
             <button className={zc("cost", "csg-cost")} {...zh("cost")} aria-pressed={active === "cost"}>
               <span className="csg-stat-key">Cost</span>
-              <CostSymbols cost={CARD_COST} />
+              <span className="csg-stat-val">{CARD_COST}</span>
             </button>
             <button className={zc("energy", "csg-energy")} {...zh("energy")} aria-pressed={active === "energy"}>
               <span className="csg-stat-key">Energy</span>
-              <EnergyBadge value={CARD_ENERGY} />
+              <span className="csg-stat-num">{CARD_ENERGY}</span>
             </button>
             <button className={zc("power", "csg-power")} {...zh("power")} aria-pressed={active === "power"}>
               <span className="csg-stat-key">Power</span>

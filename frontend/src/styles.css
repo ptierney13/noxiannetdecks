@@ -1543,33 +1543,22 @@ code {
   border-radius: 8px;
 }
 
-/* Symbol images (energy badges + rune glyphs) */
-.csg-cost-symbols {
-  display: flex;
-  gap: 2px;
-  align-items: center;
-  margin-top: 2px;
-}
-
-.csg-sym--badge {
-  width: 26px;
-  height: 26px;
-  object-fit: contain;
-}
-
-.csg-sym--rune {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-  opacity: 0.9;
-}
-
 .csg-stat-num {
   font-size: 1.25rem;
   font-weight: 800;
   color: var(--text-strong);
   line-height: 1;
   margin-top: 2px;
+}
+
+/* Cost text — slightly smaller to fit "{5}{C}" comfortably */
+.csg-stat-val {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-strong);
+  font-family: monospace;
+  margin-top: 2px;
+  white-space: nowrap;
 }
 
 .csg-stat-key {
