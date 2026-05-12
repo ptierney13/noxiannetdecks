@@ -117,6 +117,25 @@ Wrangler-local config stubs for Stage 7.2 rollout prep:
 - [wrangler.price-store-publish.jsonc](/C:/Users/ptier/repos/Deck%20Archive%20Project/wrangler.price-store-publish.jsonc)
 - [wrangler.price-store-maintenance.jsonc](/C:/Users/ptier/repos/Deck%20Archive%20Project/wrangler.price-store-maintenance.jsonc)
 
+The capture worker also accepts override controls through either request query
+parameters or worker environment variables:
+
+- `mode=full|incremental`
+- `updatedAfter=<ISO timestamp>`
+- `maxPages=<number>`
+- `maxRequests=<number>`
+- `requestDelayMs=<number>`
+- `verifyLimit=true|false`
+
+Worker environment names mirror the local script knobs:
+
+- `NOXIANNET_PRICE_CAPTURE_MODE`
+- `NOXIANNET_PRICE_CAPTURE_UPDATED_AFTER`
+- `NOXIANNET_PRICE_CAPTURE_MAX_PAGES`
+- `NOXIANNET_PRICE_CAPTURE_MAX_REQUESTS`
+- `NOXIANNET_PRICE_CAPTURE_REQUEST_DELAY_MS`
+- `NOXIANNET_PRICE_CAPTURE_VERIFY_LIMIT`
+
 ## Dual-Price Comparison
 
 The frontend card detail view now loads the legacy and D1-backed artifact sets

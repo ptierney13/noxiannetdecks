@@ -8,6 +8,13 @@ export type ServiceBindingLike = {
 export type PriceStoreWorkerEnv = {
   DB: D1DatabaseLike;
   JUSTTCG_API_KEY: string;
+  NOXIANNET_PRICE_CAPTURE_GAME?: string;
+  NOXIANNET_PRICE_CAPTURE_MODE?: string;
+  NOXIANNET_PRICE_CAPTURE_UPDATED_AFTER?: string;
+  NOXIANNET_PRICE_CAPTURE_MAX_PAGES?: string;
+  NOXIANNET_PRICE_CAPTURE_MAX_REQUESTS?: string;
+  NOXIANNET_PRICE_CAPTURE_REQUEST_DELAY_MS?: string;
+  NOXIANNET_PRICE_CAPTURE_VERIFY_LIMIT?: string;
   PRICE_STORE_PUBLISH?: ServiceBindingLike;
 };
 
