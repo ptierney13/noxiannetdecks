@@ -81,7 +81,7 @@ export function CardSearchGuide() {
           <div className="csg-stat-row">
             <button className={zc("cost", "csg-cost")} {...zh("cost")} aria-pressed={active === "cost"}>
               <span className="csg-stat-key">Cost</span>
-              <span className="csg-stat-val">{CARD_COST}</span>
+              <span className="csg-stat-num">{CARD_COST}</span>
             </button>
             <button className={zc("energy", "csg-energy")} {...zh("energy")} aria-pressed={active === "energy"}>
               <span className="csg-stat-key">Energy</span>

@@ -1551,15 +1551,6 @@ code {
   margin-top: 2px;
 }
 
-/* Cost text — slightly smaller to fit "{5}{C}" comfortably */
-.csg-stat-val {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text-strong);
-  font-family: monospace;
-  margin-top: 2px;
-  white-space: nowrap;
-}
 
 .csg-stat-key {
   font-size: 0.58rem;
