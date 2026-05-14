@@ -1196,22 +1196,23 @@ function SearchView({
 
         {hasSearched && (
           <p className="results-summary">
-            {resultCount.toLocaleString()} matching card{resultCount !== 1 ? "s" : ""}{displayedNormalizedQuery ? ` with "${displayedNormalizedQuery}"` : ""}
+            {resultCount.toLocaleString()} matching card{resultCount !== 1 ? "s" : ""}
+            {displayedNormalizedQuery ? ` with "${displayedNormalizedQuery}"${displayedNormalizedQuery.includes(":") ? "" : " anywhere"}` : ""}
           </p>
         )}
-      </div>
 
-      <Diagnostics diagnostics={diagnostics} />
-      {hasSearched ? (
-        <SearchResultsGrid
-          cards={cards}
-          sort={sort}
-          showPrice={showPrice}
-          variantMode={variantMode}
-          showVariants={showVariants}
-          onCardClick={setQuickLookCard}
-        />
-      ) : null}
+        <Diagnostics diagnostics={diagnostics} />
+        {hasSearched ? (
+          <SearchResultsGrid
+            cards={cards}
+            sort={sort}
+            showPrice={showPrice}
+            variantMode={variantMode}
+            showVariants={showVariants}
+            onCardClick={setQuickLookCard}
+          />
+        ) : null}
+      </div>
       {quickLookCard ? (
         <CardQuickLookModal card={quickLookCard} onClose={() => setQuickLookCard(null)} onNavigate={onNavigate} />
       ) : null}
