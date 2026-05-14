@@ -77,6 +77,7 @@ Draft summary plans for future stages should also state clearly that:
 - they must be finalized and approved before implementation begins
 - completing the current stage requires refreshing future-stage draft summaries
   with any newly pertinent information
+
 ## GitHub Workflow
 
 The `gh` CLI is **not installed** on this machine. All GitHub operations use plain `git`.
