@@ -4880,6 +4880,9 @@ code {
 }
 
 .search-controls-panel {
+  position: sticky;
+  top: 62px;
+  z-index: 40;
   border: 1px solid var(--border-mid);
   border-radius: 8px;
   background: var(--surface-2);
