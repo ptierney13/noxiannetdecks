@@ -84,3 +84,29 @@ git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" push origin main
 ```
 
 Use `--ff-only` to keep history linear. Cloudflare Pages deploys automatically when `main` is pushed - there is no separate deploy step.
+
+## Release Commands
+
+Use the checked-in release helper to keep conversational release behavior
+consistent:
+
+```bash
+npm run release:ship
+npm run release:publish
+```
+
+- `ship it` or similar means:
+  - push the current branch to `origin`
+  - treat the resulting Cloudflare Pages branch preview as the default
+    verification target
+  - include the preview URL as the last item in the final response
+- `publish it` or similar means:
+  - merge the current branch into the dedicated `main` worktree with
+    `--ff-only`
+  - push `origin main`
+  - treat that push as the live publish step
+- When significant feature work is completed and the result is reasonably
+  verifiable on a branch deploy, the default close-out path is to ship the
+  branch preview even if the user does not explicitly ask for the preview URL.
+- Never publish directly to `main` without an explicit publish instruction.
+- If the fast-forward merge fails, stop and ask the user before proceeding.

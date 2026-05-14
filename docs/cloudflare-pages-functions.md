@@ -133,6 +133,10 @@ through the Pages Functions entrypoint.
   This repo assumes the Pages project name is `noxiannetdecks`, and follows
   Cloudflare's documented branch-alias rule where aliases are lowercased and
   non-alphanumeric branch characters are replaced with `-`.
+- For routine release flow, use:
+  - `npm run release:ship` to push the current branch and report the preview URL
+  - `npm run release:publish` to fast-forward merge into the dedicated `main`
+    worktree and push `origin main`
 - Production serves the same app shape at `noxiannetdecks.com`:
   - static frontend assets from Pages
   - same-origin API routes from Pages Functions

@@ -117,6 +117,27 @@ Cloudflare Pages auto-deploys **every branch** pushed to origin, not just `main`
 
 There is no manual deploy step for either branches or main.
 
+### Release command vocabulary
+
+This repo treats conversational release requests as explicit git actions:
+
+- `ship it` means push the current branch to `origin` and return the Cloudflare
+  preview URL as the last response item
+- `publish it` means fast-forward merge the current branch into the dedicated
+  `main` worktree and push `origin main`
+- after significant feature work that can be meaningfully checked on a branch
+  deploy, preview shipping is the default close-out path
+
+Use the checked-in helper instead of reconstructing the flow ad hoc:
+
+```bash
+npm run release:ship
+npm run release:publish
+```
+
+If the `--ff-only` merge to `main` fails, stop and ask the user before doing
+anything else.
+
 ## Plan-first development
 
 Significant work (new features, architecture changes, data model changes, migrations, integrations, broad refactors) requires an approved plan before implementation. Plans live in `plans/todo/` (proposed/approved) and `plans/executed/` (completed). See `AGENTS.md` for full requirements.

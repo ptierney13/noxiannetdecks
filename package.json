@@ -17,7 +17,9 @@
     "price:d1:refresh-local": "npm run hosted:local:migrate -w @noxiannet/price-store && npm run hosted:local:refresh -w @noxiannet/price-store",
     "build": "npm run build -w @noxiannet/card-store && npm run build -w @noxiannet/deck-store && npm run build -w @noxiannet/price-store && npm run build -w @noxiannet/frontend",
     "test": "npm run test -w @noxiannet/card-store && npm run test -w @noxiannet/deck-store && npm run test -w @noxiannet/price-store && npm run test -w @noxiannet/frontend",
-    "preview:url": "node scripts/print-cloudflare-preview-url.mjs"
+    "preview:url": "node scripts/print-cloudflare-preview-url.mjs",
+    "release:ship": "node scripts/release-command.mjs ship",
+    "release:publish": "node scripts/release-command.mjs publish"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
