@@ -609,14 +609,6 @@ function mockFetch(poolFactory = generatedPool) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
 
-    if (url === "/data/prices/manifest.json") {
-      return Response.json(priceManifest);
-    }
-
-    if (url === "/data/prices/riftbound/latest.json") {
-      return Response.json(priceSnapshot);
-    }
-
     if (url === "/data/prices-d1/manifest.json") {
       return Response.json(d1PriceManifest);
     }
@@ -800,8 +792,8 @@ describe("App", () => {
 
     const dialog = await screen.findByRole("dialog", { name: "Void Gate" });
     expect(dialog).toBeInTheDocument();
-    expect(within(dialog).getByText("$12.34")).toBeInTheDocument();
-    expect(within(dialog).queryByText("Near Mint $12.34")).not.toBeInTheDocument();
+    expect(within(dialog).getByText("$12.54")).toBeInTheDocument();
+    expect(within(dialog).queryByText("Near Mint $12.54")).not.toBeInTheDocument();
   });
 
   it("renders inline symbols in quick-look card text and combines multi-domain chips", async () => {
@@ -844,41 +836,29 @@ describe("App", () => {
     render(<App />);
 
     expect(await screen.findByRole("heading", { name: "Void Gate" })).toBeInTheDocument();
-    expect(screen.getAllByText("Near Mint $12.34").length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: "Near Mint $8.90" })).toBeInTheDocument();
+    expect(screen.getAllByText("Near Mint $12.54").length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: "Near Mint $8.75" })).toBeInTheDocument();
     expect(screen.queryByText(/^Market Price$/)).not.toBeInTheDocument();
 
     expect(screen.getByRole("heading", { name: "Pricing" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Near Mint $12.34" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("link", { name: "Buy Foil on TCGPlayer ↗" }).getAttribute("href")).toContain("https://partner.tcgplayer.com/B5PQx1?u=");
+    expect(screen.getByRole("link", { name: "Buy Foil on TCGPlayer ↗" }).getAttribute("href")).toContain("Printing%3DFoil");
+    expect(screen.getByRole("link", { name: "Buy Nonfoil on TCGPlayer ↗" }).getAttribute("href")).toContain("Printing%3DNormal");
+    expect(screen.getByRole("button", { name: "Near Mint $12.54" })).toHaveAttribute("aria-pressed", "false");
     expect(screen.getByRole("button", { name: "Lightly Played $10.50" })).toHaveAttribute("aria-pressed", "false");
     expect(screen.getByRole("button", { name: "Damaged $3.25" })).toHaveAttribute("aria-pressed", "false");
     expect(screen.queryByTestId("price-history-chart")).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Near Mint $12.34" }));
+    await user.click(screen.getByRole("button", { name: "Near Mint $12.54" }));
     expect(await screen.findByTestId("price-history-chart")).toBeInTheDocument();
     expect(screen.getByText("Foil • Near Mint")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Lightly Played $10.50" }));
     expect(screen.getByText("Foil • Lightly Played")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Near Mint $12.34" }));
+    await user.click(screen.getByRole("button", { name: "Near Mint $12.54" }));
     await user.click(screen.getByRole("button", { name: "Lightly Played $10.50" }));
     expect(screen.queryByTestId("price-history-chart")).not.toBeInTheDocument();
-  });
-
-  it("shows the local dual-price comparison panel when D1-backed artifacts are available", async () => {
-    window.history.pushState({}, "", "/cards/card-1");
-    render(<App />);
-
-    expect(await screen.findByRole("heading", { name: "Void Gate" })).toBeInTheDocument();
-
-    const panel = await screen.findByTestId("local-price-comparison");
-    expect(within(panel).getAllByText("Legacy").length).toBeGreaterThan(0);
-    expect(within(panel).getAllByText("D1").length).toBeGreaterThan(0);
-    expect(within(panel).getByText("Foil Near Mint")).toBeInTheDocument();
-    expect(within(panel).getByText("$12.34")).toBeInTheDocument();
-    expect(within(panel).getByText("$12.54")).toBeInTheDocument();
-    expect(within(panel).getByText("+$0.20")).toBeInTheDocument();
   });
 
   it("renders inline cost, might, and text symbols on the card detail page", async () => {
@@ -906,7 +886,7 @@ describe("App", () => {
 
     expect(await screen.findByRole("heading", { name: "Void Gate" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Near Mint $12.34" }));
+    await user.click(screen.getByRole("button", { name: "Near Mint $12.54" }));
     expect(await screen.findByTestId("price-history-chart")).toBeInTheDocument();
 
     const nearMintLegend = screen.getByText(/Foil .* Near Mint/).parentElement;

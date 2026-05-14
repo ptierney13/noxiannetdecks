@@ -1,74 +1,138 @@
-# DRAFT: Price Store Stage 7.3 Old Price Method Removal
+# Price Store Stage 7.3 Legacy Price Path Removal
 
-## Draft Status
+## Status
 
-This is a draft summary plan for Stage 7.3. It must be finalized and manually
-approved before implementation begins.
+This plan must be manually approved before implementation begins.
 
-When Stage 7.3 is completed, update later `price-store` planning docs with any
-remaining cleanup, operational, or architectural notes.
+When Stage 7.3 is completed, update Stage 9 and any later `price-store`
+planning docs with the final retained public path, deleted legacy surfaces, and
+any newly relevant cleanup notes.
 
 ## Summary
 
-Stage 7.3 removes the legacy price-generation and read path only after the new
-queue-based D1-backed hosted pipeline has been validated and rolled out live
-successfully.
+Stage 7.3 removes the legacy static publish/read path now that the hosted
+queue-based D1 plus KV pipeline is the accepted live source of truth.
 
-This is the simplification and cleanup sub-stage. It should retire the old
-method, remove dead code and docs, and leave one clear source of truth for
-price generation and serving.
+This stage should leave the repo with one maintained pricing path:
 
-## Pertinent Details So Far
+- hosted discovery, ingestion, cook, publish, and maintenance workers remain
+  the only supported price-generation runtime
+- the Pages-served KV-backed `prices-d1` contract remains the only supported
+  public price-read contract for now
+- legacy `/data/prices/*`, legacy publish scripts, dual-source toggle logic,
+  and comparison-only UI/testing/docs are removed
 
-- Stage 7.2 should already provide:
-  - live Cloudflare deployment of the new hosted path
-  - production verification while the old path still exists
-  - KV-backed hosted `prices-d1` artifacts served through the Pages read path
-  - discovery, ingestion, cook, publish, and maintenance workers operating
-    against shared D1 tables and queues
-- Earlier Stage 7.1 and pre-rearchitecture Stage 7.2 assumptions are not
-  binding restrictions on Stage 7.3 cleanup decisions.
-- The old path should not be removed until the new path is accepted.
-- Stage 7.2 should also leave publish using a worker-safe bundled card metadata
-  lookup rather than filesystem reads from `card_store`, so Stage 7.3 should
-  preserve that hosted dependency while removing only the legacy price path.
+Stage 7.3 is cleanup and simplification only. It should not redesign the
+hosted runtime, rework the published snapshot schema, or introduce worker
+deploy automation.
 
-## Expected Outputs
+## Confirmed Starting Point
 
-- removal of the old price method from runtime and generation paths
-- cleanup of stale code, configs, and docs
-- one clear maintained price path going forward
-- updated operator guidance reflecting the post-migration steady state
+- The live hosted architecture is the queue-based Cloudflare pipeline documented
+  in [docs/price-store-stage-7-2-cloudflare-rollout.md](C:/Users/ptier/repos/Deck%20Archive%20Project/docs/price-store-stage-7-2-cloudflare-rollout.md).
+- The app already defaults to the hosted-backed `/data/prices-d1/*` path in
+  [frontend/src/priceData.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/frontend/src/priceData.ts).
+- Legacy support still exists in the repo through:
+  - the `/data/prices/*` static artifact path
+  - `priceSource=legacy` switching logic
+  - local dual-price comparison UI and related tests/docs
+  - earlier static publish commands and price-store docs that still describe the
+    old path as an active comparison target
+- Worker deploy automation is intentionally deferred to its own future process
+  and is not part of this cleanup stage.
 
-## Likely Scope
+## Key Changes
 
-- remove legacy read/write/generation code for the old method
-- remove transitional comparison-only UI once it is no longer needed
-- update docs to describe only the retained architecture
-- simplify tests that only existed to compare legacy and new paths
+### 1. Collapse the frontend onto one supported price source
+
+Remove legacy read-path switching from the frontend so card pricing features
+read from one source only.
+
+Implementation direction:
+
+- remove the legacy path constant and `priceSource=legacy` query override from
+  [frontend/src/priceData.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/frontend/src/priceData.ts)
+- remove any comparison-only card-detail UI that exists only to contrast legacy
+  versus hosted output
+- keep the current hosted-backed `prices-d1` path as the live frontend contract
+  rather than renaming it in this stage
+
+### 2. Remove the legacy static publish/generation path
+
+Retire the older repo-tracked static publish flow that wrote
+`frontend/public/data/prices/*`.
+
+Implementation direction:
+
+- remove the old static publish commands and any code paths that only exist to
+  materialize or read the legacy `/data/prices/*` artifacts
+- delete committed legacy artifact samples if they are no longer needed for
+  tests or documentation
+- preserve the hosted local-refresh workflow and hosted publish logic
+
+### 3. Simplify tests, docs, and package guidance
+
+Update the repository so it documents only the retained hosted path.
+
+Implementation direction:
+
+- replace dual-path test fixtures with single-path hosted fixtures where
+  possible
+- update [price_store/README.md](C:/Users/ptier/repos/Deck%20Archive%20Project/price_store/README.md),
+  [docs/price-store-stage-7-1-local-d1.md](C:/Users/ptier/repos/Deck%20Archive%20Project/docs/price-store-stage-7-1-local-d1.md),
+  and other price-store docs so they describe the hosted path as the only
+  supported runtime
+- keep historical executed plans intact; only update current guidance docs
+
+### 4. Keep the current hosted public path stable
+
+Stage 7.3 should not rename `prices-d1` back to `prices`.
+
+Reasoning:
+
+- the live Pages function currently serves only the `prices-d1` namespace path
+- keeping the path stable reduces rollout risk and keeps cleanup focused on
+  deleting old code rather than introducing a new production path rename
+- a future rename can be treated as a separate cleanup if it becomes worth the
+  churn
 
 ## Explicit Non-Goals
 
-- no large redesign beyond removing legacy behavior
-- no unrelated frontend cleanup
-- no new source integrations
+- no worker deploy automation
+- no Cloudflare monitoring redesign
+- no queue or D1 schema redesign
+- no rename of the live `prices-d1` public path
+- no new marketplace source integrations
 
-## Questions To Finalize In The Real Stage Plan
+## Suggested File/Area Targets
 
-- what exact parity/soak criteria must be met before removal
-- whether any internal-only comparison tooling should remain after cleanup
-- whether any temporary transitional D1/KV compatibility shims still need
-  removal
-- whether the hosted `prices-d1` path should be renamed back to the primary
-  public `prices` path as part of cleanup or remain explicitly distinct
+- [frontend/src/priceData.ts](C:/Users/ptier/repos/Deck%20Archive%20Project/frontend/src/priceData.ts)
+- [frontend/src/App.tsx](C:/Users/ptier/repos/Deck%20Archive%20Project/frontend/src/App.tsx)
+- [frontend/src/App.test.tsx](C:/Users/ptier/repos/Deck%20Archive%20Project/frontend/src/App.test.tsx)
+- [functions/data/[[path]].ts](C:/Users/ptier/repos/Deck%20Archive%20Project/functions/data/[[path]].ts)
+- [price_store/README.md](C:/Users/ptier/repos/Deck%20Archive%20Project/price_store/README.md)
+- [docs/price-store-stage-7-1-local-d1.md](C:/Users/ptier/repos/Deck%20Archive%20Project/docs/price-store-stage-7-1-local-d1.md)
+- [frontend/public/data/prices](C:/Users/ptier/repos/Deck%20Archive%20Project/frontend/public/data/prices)
+- any remaining legacy publish scripts or package commands under
+  [price_store](C:/Users/ptier/repos/Deck%20Archive%20Project/price_store)
 
 ## Test Plan
 
-- verify the live app still renders correct prices after legacy removal
-- verify the hosted pipeline remains healthy after dead-code cleanup
-- verify docs and operator instructions no longer reference obsolete paths
+- `npm.cmd run build -w @noxiannet/price-store`
+- `npm.cmd run test -w @noxiannet/price-store`
+- `npx.cmd tsc -p tsconfig.cloudflare.json`
+- `npm.cmd test`
+- verify card detail and trade-balancer pricing still render correctly using the
+  hosted path only
+- verify the Pages data function still serves `prices-d1` artifacts and no
+  frontend behavior depends on `/data/prices/*`
+- verify docs and package guidance no longer present the legacy path as an
+  active supported option
 
 ## Assumptions
 
-- The new hosted path is already the accepted replacement by the time Stage 7.3
-  begins.
+- The hosted `prices-d1` path is already the accepted live replacement.
+- Cloudflare monitoring is already in place outside this repo and is not a
+  prerequisite for this cleanup stage.
+- Worker deploy automation intentionally remains a future todo rather than a
+  dependency of legacy removal.

@@ -23,6 +23,15 @@ discovery, ingestion, cook, publish, and maintenance pipeline. Earlier Stage
 7.1 and pre-rearchitecture Stage 7.2 assumptions are useful historical context
 only and should not be treated as restrictions on the current plan set.
 
+Current practical sequencing:
+
+- Stage 7.3 is the cleanup stage that removes the legacy price path
+- Stage 9 is the monetization-link rollout stage built on the retained hosted
+  path
+- Stage 7.2.1 remains a separate future todo for worker deploy automation
+- Stage 8 monitoring has a Cloudflare-side baseline and can be revisited later
+  for repo runbooks or documentation hardening
+
 For this initiative, each stage starts from a draft summary plan in this folder.
 Before implementation begins for that stage, the draft must be finalized and
 approved. When a stage is completed, update the remaining future-stage draft

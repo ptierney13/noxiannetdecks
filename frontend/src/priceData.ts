@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const D1_PRICE_PATH_PREFIX = "/data/prices-d1";
-const LEGACY_PRICE_PATH_PREFIX = "/data/prices";
+const TCGPLAYER_AFFILIATE_BASE_URL = "https://partner.tcgplayer.com/B5PQx1";
 
 export type PublishedPriceHistoryPoint = {
   amount: number;
@@ -84,6 +84,15 @@ export type PublishedPriceIndex = {
   manifest: PublishedPriceManifest;
   snapshot: PublishedPriceSnapshot;
   rowsByTcgplayerId: Map<string, PublishedPriceRow[]>;
+};
+
+export type TcgplayerAffiliateLinkOptions = {
+  productId: string | null | undefined;
+  skuId?: string | null;
+  language?: string | null;
+  page?: number | null;
+  condition?: string | null;
+  printing?: string | null;
 };
 
 const PRINTING_ORDER = new Map<string, number>([
@@ -234,6 +243,15 @@ export function formatUsdPrice(amount: number | null | undefined): string | null
   }).format(amount);
 }
 
+export function buildTcgplayerAffiliateLink(options: TcgplayerAffiliateLinkOptions): string | null {
+  const landingUrl = buildTcgplayerProductUrl(options);
+  if (!landingUrl) {
+    return null;
+  }
+
+  return `${TCGPLAYER_AFFILIATE_BASE_URL}?u=${encodeURIComponent(landingUrl)}`;
+}
+
 export function sortPriceRows(rows: PublishedPriceRow[]): PublishedPriceRow[] {
   return [...rows].sort((left, right) => {
     const printingDelta = resolvePrintingOrder(left.printing) - resolvePrintingOrder(right.printing);
@@ -262,7 +280,36 @@ function normalizeCondition(value: string | null | undefined): string {
   return (value ?? "").trim().toLowerCase();
 }
 
-async function buildPublishedPriceIndex(pathPrefix = "/data/prices"): Promise<PublishedPriceIndex> {
+function buildTcgplayerProductUrl(options: TcgplayerAffiliateLinkOptions): string | null {
+  const productId = options.productId?.trim();
+  if (!productId) {
+    return null;
+  }
+
+  const params = new URLSearchParams();
+  if (options.skuId?.trim()) {
+    params.set("skuId", options.skuId.trim());
+  }
+  if (options.language?.trim()) {
+    params.set("Language", options.language.trim());
+  }
+  if (options.page != null) {
+    params.set("page", String(options.page));
+  }
+  if (options.condition?.trim()) {
+    params.set("Condition", options.condition.trim());
+  }
+  if (options.printing?.trim()) {
+    params.set("Printing", options.printing.trim());
+  }
+
+  const query = params.toString();
+  return query
+    ? `https://www.tcgplayer.com/product/${productId}?${query}`
+    : `https://www.tcgplayer.com/product/${productId}`;
+}
+
+async function buildPublishedPriceIndex(pathPrefix = D1_PRICE_PATH_PREFIX): Promise<PublishedPriceIndex> {
   const manifest = await fetchJson<PublishedPriceManifest>(`${pathPrefix}/manifest.json`);
   const snapshot = await fetchJson<PublishedPriceSnapshot>(`${pathPrefix}/${manifest.snapshotPath}`);
   const rowsByTcgplayerId = new Map<string, PublishedPriceRow[]>();
@@ -294,36 +341,12 @@ function normalizePathPrefix(pathPrefix: string): string {
 }
 
 export function resolveActivePricePathPrefix(): string {
-  const fromQuery = resolvePricePathPrefixFromLocation();
-  if (fromQuery) {
-    return fromQuery;
-  }
-
   const configured = import.meta.env.VITE_PRICE_DATA_PATH_PREFIX?.trim();
   if (configured) {
     return configured;
   }
 
   return D1_PRICE_PATH_PREFIX;
-}
-
-function resolvePricePathPrefixFromLocation(): string | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  const params = new URLSearchParams(window.location.search);
-  const requestedSource = params.get("priceSource")?.trim().toLowerCase();
-
-  if (requestedSource === "d1") {
-    return D1_PRICE_PATH_PREFIX;
-  }
-
-  if (requestedSource === "legacy") {
-    return LEGACY_PRICE_PATH_PREFIX;
-  }
-
-  return null;
 }
 
 async function fetchJson<T>(path: string): Promise<T> {

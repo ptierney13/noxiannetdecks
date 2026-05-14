@@ -36,8 +36,9 @@ commits.
 - Reserve Cloudflare hosting for later stages that add a scheduled capture
   worker plus internal publish worker against the same published artifact
   contract.
-- Defer affiliate-link setup until a final dedicated stage after the rest of
-  the price-store pipeline and operations work is already in place.
+- Defer affiliate-link setup until the hosted pricing path is accepted and the
+  cleanup stage is complete, while allowing worker deploy automation to remain
+  a separate later operational follow-up.
 - Require a detailed approved plan for each implementation stage before code
   for that stage is written.
 - Land the work as stage-by-stage commits on a dedicated `codex/price-store-*`
@@ -54,6 +55,7 @@ commits.
 7. Stage 7: Cloudflare-hosted scheduled capture and internal publish
    - Stage 7.1: D1 conversion, local worker validation, and local dual-price display
    - Stage 7.2: live worker/D1 rollout with the new hosted path enabled
+   - Stage 7.2.1: worker deploy automation as a separate future process
    - Stage 7.3: removal of the old price method after verification
 8. Stage 8: monitoring and runbooks
 9. Stage 9: affiliate-link setup and rollout
@@ -85,7 +87,8 @@ constraints, or changed assumptions.
   - published snapshots as the serving model
   - repo-tracked deployable artifacts as the first frontend-readable output
   - scheduled Cloudflare workers for hosted refresh generation
-  - affiliate setup as the literal last stage
+  - affiliate setup after hosted rollout and cleanup, while deploy automation
+    may remain a separate future follow-up
   - the requirement for a detailed approved plan per stage
   - stage-by-stage branch-based delivery
 

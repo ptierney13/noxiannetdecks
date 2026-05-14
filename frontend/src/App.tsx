@@ -3,6 +3,7 @@ import { generateSealedPool, getCard, loadPackGeneratorOptions, loadQueryFeature
 import { CardSearchGuide } from "./CardSearchGuide";
 import DeckExplorerView from "./DeckExplorerView";
 import {
+  buildTcgplayerAffiliateLink,
   formatPrintingLabel,
   formatUsdPrice,
   getPublishedRowsForCard,
@@ -2300,6 +2301,50 @@ function CardDetailView({
     () => groupRowsByPrinting(currentPriceRows),
     [currentPriceRows]
   );
+  const cardDetailBuyLinks = useMemo(() => {
+    const productId = card?.tcgplayer_id?.trim();
+    if (!productId) {
+      return [];
+    }
+
+    const availablePrintings = new Set(
+      currentPriceRows
+        .map((row) => normalizePrinting(row.printing))
+        .filter((value): value is string => value === "foil" || value === "normal")
+    );
+
+    if (availablePrintings.has("foil") && availablePrintings.has("normal")) {
+      return [
+        {
+          key: "foil",
+          label: "Buy Foil on TCGPlayer",
+          href: buildTcgplayerAffiliateLink({
+            productId,
+            printing: "Foil"
+          })
+        },
+        {
+          key: "normal",
+          label: "Buy Nonfoil on TCGPlayer",
+          href: buildTcgplayerAffiliateLink({
+            productId,
+            printing: "Normal"
+          })
+        }
+      ].filter((entry): entry is { key: string; label: string; href: string } => Boolean(entry.href));
+    }
+
+    const href = buildTcgplayerAffiliateLink({ productId });
+    return href
+      ? [
+          {
+            key: "default",
+            label: "Buy on TCGPlayer",
+            href
+          }
+        ]
+      : [];
+  }, [card?.tcgplayer_id, currentPriceRows]);
   const selectedPriceRows = useMemo(
     () => currentPriceRows.filter((row) => selectedPriceRowIds.includes(row.rowId)),
     [currentPriceRows, selectedPriceRowIds]
@@ -2481,16 +2526,17 @@ function CardDetailView({
             >
               View Card JSON ↗
             </a>
-            {card.tcgplayer_id && (
+            {cardDetailBuyLinks.map((link) => (
               <a
+                key={link.key}
                 className="card-detail-json-link"
-                href={`https://www.tcgplayer.com/product/${card.tcgplayer_id}`}
+                href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                TCGPlayer ↗
+                {link.label} ↗
               </a>
-            )}
+            ))}
           </div>
 
           <div className="card-detail-section card-price-panel">

@@ -15,6 +15,11 @@ Stage 8 makes the scheduled JustTCG-backed Cloudflare price pipeline
 supportable in production with monitoring, runbook guidance, and clear
 operator recovery paths.
 
+The current repo assumption is that a practical Cloudflare monitoring baseline
+already exists outside this repository. If Stage 8 is revisited, it should
+focus on codifying that baseline in repo docs and operator guidance rather than
+blocking cleanup or monetization work.
+
 ## Pertinent Details So Far
 
 - Stage 7 should already provide:
@@ -27,8 +32,10 @@ operator recovery paths.
   - a KV-backed public-serving `prices-d1` artifact layer
   - completion of a local dual-price validation pass before the live rollout
   - a defined deploy path, whether still manual or automated through Stage 7.2.1
-  - the Stage 7.1 relational table set rooted at `price_capture_*`,
-    `price_data`, `price_publish_*`, and `price_pipeline_state`
+  - the queue-based Stage 7.2 runtime rooted at `price_pipeline_runs`,
+    `price_ingestion_chunks`, `price_raw_pages`, `price_cooked_rows`,
+    `price_publish_runs`, `price_publish_artifacts`, and
+    `price_pipeline_state`
 - JustTCG plan limits and rate limits are an operational concern that should be
   visible to maintainers.
 - The intended cadence is every 2 days, not daily.
@@ -82,3 +89,5 @@ operator recovery paths.
 ## Assumptions
 
 - The scheduled capture/publish flow already exists by the time Stage 8 begins.
+- Cloudflare-side monitoring already covers the immediate operational need even
+  if repo-level runbooks and documentation are still worth improving later.

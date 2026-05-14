@@ -18,6 +18,10 @@ This is a follow-on operational hardening stage, not a replacement for the
 current manual setup. Its goal is to move the repo from a dashboard-plus-local-
 shell deployment process toward a checked-in, repeatable release flow.
 
+This stage is intentionally not part of the current cleanup or monetization
+work. Manual worker deployment remains the active and acceptable process until a
+future worker update makes automation worth doing.
+
 ## Pertinent Details So Far
 
 - Stage 7.2 currently assumes:
@@ -39,6 +43,8 @@ shell deployment process toward a checked-in, repeatable release flow.
   - Pages bindings for the hosted read path
 - The manual rollout remains the active path until this stage is finalized and
   accepted.
+- The current intent is to leave this as a future todo until the next worker
+  change justifies setting up auto-deploy.
 
 ## Expected Outputs
 
@@ -61,6 +67,8 @@ shell deployment process toward a checked-in, repeatable release flow.
 - no removal of the old price method
 - no major architecture redesign beyond what Stage 7.2 already established
 - no attempt to fully eliminate all one-time dashboard setup work
+- no requirement that cleanup, monitoring, or monetization wait on deploy
+  automation
 
 ## Questions To Finalize In The Real Stage Plan
 
