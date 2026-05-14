@@ -1,6 +1,7 @@
 export type AppRoute =
   | { kind: "home"; path: "/" | "/home" }
   | { kind: "cards"; path: "/cards" }
+  | { kind: "cards-learn-to-search"; path: "/cards/learn-to-search" }
   | { kind: "cards-query-builder"; path: "/cards/query-builder" }
   | { kind: "card-detail"; path: string; cardId: string }
   | { kind: "deck-explorer-home"; path: "/deck-explorer" }
@@ -43,6 +44,10 @@ export function parseAppRoute(pathname: string): AppRoute {
 
   if (normalizedPath === "/cards") {
     return { kind: "cards", path: "/cards" };
+  }
+
+  if (normalizedPath === "/cards/learn-to-search") {
+    return { kind: "cards-learn-to-search", path: "/cards/learn-to-search" };
   }
 
   if (normalizedPath === "/cards/query-builder") {
@@ -126,6 +131,7 @@ export function routeSection(route: AppRoute): NavSection {
     case "home":
       return "home";
     case "cards":
+    case "cards-learn-to-search":
     case "cards-query-builder":
     case "card-detail":
       return "cards";

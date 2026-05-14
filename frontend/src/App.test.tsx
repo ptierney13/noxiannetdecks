@@ -735,30 +735,27 @@ describe("App", () => {
     vi.unstubAllGlobals();
   });
 
-  it("renders the feature chart without initial search results", async () => {
+  it("renders the search results page without initial results", async () => {
     const fetchMock = mockFetch();
     window.history.pushState({}, "", "/cards");
     render(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Query Language" })).toBeInTheDocument();
-    expect(screen.getByText("Searchable Fields")).toBeInTheDocument();
-    expect(screen.queryByText("Type line")).not.toBeInTheDocument();
-    expect(screen.getByText("Query Syntax")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Card Search Results" })).toBeInTheDocument();
     expect(screen.queryByAltText("Void Gate card image.")).not.toBeInTheDocument();
     expect(screen.queryByTestId("card-grid")).not.toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalledWith(expect.stringMatching(/^\/api\/cards/));
   });
 
-  it("starts with query helper tables collapsed and expands them on demand", async () => {
+  it("shows tab buttons on learn-to-search page and switches content on click", async () => {
     const user = userEvent.setup();
-    window.history.pushState({}, "", "/cards");
+    window.history.pushState({}, "", "/cards/learn-to-search");
     render(<App />);
 
-    expect(await screen.findByRole("button", { name: "Show Searchable Fields" })).toBeInTheDocument();
-    expect(screen.queryByText("Type line")).not.toBeInTheDocument();
+    expect(await screen.findByRole("tab", { name: "Searchable Fields" })).toBeInTheDocument();
+    expect(screen.queryByText("I want cards with...")).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Show Searchable Fields" }));
-    expect(screen.getByText("Type line")).toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: "Searchable Fields" }));
+    expect(screen.getByText("I want cards with...")).toBeInTheDocument();
   });
 
   it("searches when the user clicks Search", async () => {
@@ -767,7 +764,7 @@ describe("App", () => {
 
     window.history.pushState({}, "", "/cards");
     render(<App />);
-    await screen.findByRole("heading", { name: "Query Language" });
+    await screen.findByRole("heading", { name: "Card Search Results" });
 
     await submitCardsSearch(user, "name:void");
 
@@ -783,12 +780,12 @@ describe("App", () => {
 
     window.history.pushState({}, "", "/cards");
     render(<App />);
-    await screen.findByRole("heading", { name: "Query Language" });
+    await screen.findByRole("heading", { name: "Card Search Results" });
 
     await submitCardsSearch(user, "name:void");
     await screen.findByAltText("Void Gate card image.");
 
-    await user.click(screen.getByText("Void Gate"));
+    await user.click(screen.getByAltText("Void Gate card image."));
 
     const dialog = await screen.findByRole("dialog", { name: "Void Gate" });
     expect(dialog).toBeInTheDocument();
@@ -804,12 +801,12 @@ describe("App", () => {
 
     window.history.pushState({}, "", "/cards");
     render(<App />);
-    await screen.findByRole("heading", { name: "Query Language" });
+    await screen.findByRole("heading", { name: "Card Search Results" });
 
     await submitCardsSearch(user, "name:twin");
     await screen.findByAltText("Twin Paths card image.");
 
-    await user.click(screen.getByText("Twin Paths"));
+    await user.click(screen.getByAltText("Twin Paths card image."));
 
     const dialog = await screen.findByRole("dialog", { name: "Twin Paths" });
     const domainChips = dialog.querySelectorAll(".card-attr-chip--domain");
@@ -822,7 +819,7 @@ describe("App", () => {
     await submitCardsSearch(user, "name:void");
     await screen.findByAltText("Void Gate card image.");
 
-    await user.click(screen.getByText("Void Gate"));
+    await user.click(screen.getByAltText("Void Gate card image."));
 
     const symbolDialog = await screen.findByRole("dialog", { name: "Void Gate" });
     expect(symbolDialog.querySelector('[data-symbol-token="E"]')).not.toBeNull();
@@ -908,7 +905,7 @@ describe("App", () => {
     const user = userEvent.setup();
     window.history.pushState({}, "", "/cards");
     render(<App />);
-    await screen.findByRole("heading", { name: "Query Language" });
+    await screen.findByRole("heading", { name: "Card Search Results" });
 
     await submitCardsSearch(user, "energy>>3");
 
@@ -931,7 +928,7 @@ describe("App", () => {
       expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid");
     });
 
-    expect(await screen.findByRole("heading", { name: "Riftbound Card Search" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Card Search Results" })).toBeInTheDocument();
     expect(screen.getByLabelText("Query")).toHaveValue("name:void");
     expect(await screen.findByAltText("Void Gate card image.")).toBeInTheDocument();
   });
@@ -961,7 +958,7 @@ describe("App", () => {
 
     expect(await screen.findByRole("heading", { name: "Deck Explorer" })).toBeInTheDocument();
     expect(window.location.pathname).toBe("/deck-explorer");
-    expect(screen.queryByRole("heading", { name: "Riftbound Card Search" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Card Search Results" })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("link", { name: "By Legend" }));
     expect(await screen.findByRole("heading", { name: "Legends" })).toBeInTheDocument();

@@ -200,6 +200,124 @@ function QueryLanguageTables({
   );
 }
 
+type LearnTab = "card-element" | "fields" | "syntax";
+
+function LearnToSearchView({
+  onError,
+}: {
+  onError: (message: string | null) => void;
+}) {
+  const [activeTab, setActiveTab] = useState<LearnTab>("card-element");
+  const [fieldGuides, setFieldGuides] = useState<QueryFieldGuide[]>([]);
+  const [syntaxGuides, setSyntaxGuides] = useState<QuerySyntaxGuide[]>([]);
+
+  useEffect(() => {
+    let ignore = false;
+    async function boot() {
+      try {
+        const result = await loadQueryFeatures();
+        if (!ignore) {
+          setFieldGuides(result.fields);
+          setSyntaxGuides(result.syntax);
+        }
+      } catch (caught) {
+        if (!ignore) onError(caught instanceof Error ? caught.message : "Unable to load query features.");
+      }
+    }
+    void boot();
+    return () => { ignore = true; };
+  }, [onError]);
+
+  return (
+    <div className="learn-to-search-view">
+      <p className="eyebrow">Cards / Learn to Search</p>
+      <h1>Learn to Search</h1>
+      <div className="lts-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "card-element"}
+          className={`lts-tab${activeTab === "card-element" ? " lts-tab--active" : ""}`}
+          onClick={() => setActiveTab("card-element")}
+        >
+          Search by Card Element
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "fields"}
+          className={`lts-tab${activeTab === "fields" ? " lts-tab--active" : ""}`}
+          onClick={() => setActiveTab("fields")}
+        >
+          Searchable Fields
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "syntax"}
+          className={`lts-tab${activeTab === "syntax" ? " lts-tab--active" : ""}`}
+          onClick={() => setActiveTab("syntax")}
+        >
+          Query Syntax
+        </button>
+      </div>
+      <div className="lts-panel">
+        {activeTab === "card-element" && <CardSearchGuide />}
+        {activeTab === "fields" && (
+          <table className="feature-table">
+            <thead>
+              <tr>
+                <th>I want cards with...</th>
+                <th>Use this query</th>
+                <th>Shorthand</th>
+                <th>Searches</th>
+                <th>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              {fieldGuides.map((field) => (
+                <tr key={field.property}>
+                  <td>{field.property}</td>
+                  <td><code>{field.query}</code></td>
+                  <td>{field.shorthand ? <code>{field.shorthand}</code> : "None"}</td>
+                  <td>{field.searches}</td>
+                  <td><code>{field.example}</code></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {activeTab === "syntax" && (
+          <table className="feature-table">
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>Syntax Examples</th>
+                <th>Behavior</th>
+              </tr>
+            </thead>
+            <tbody>
+              {syntaxGuides.map((operation) => (
+                <tr key={operation.operation}>
+                  <td>{operation.operation}</td>
+                  <td>
+                    <div className="example-list">
+                      {operation.examples.map((example) => (
+                        <code key={example}>{example}</code>
+                      ))}
+                    </div>
+                  </td>
+                  <td>{operation.behavior}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Diagnostics({ diagnostics }: { diagnostics: QueryDiagnostic[] }) {
   if (diagnostics.length === 0) return null;
 
@@ -619,6 +737,103 @@ function PriceHistoryChart({ rows, colorsByRowId }: { rows: PublishedPriceRow[];
   );
 }
 
+function groupCardsByRiftboundId(cards: CardRecord[]): CardRecord[][] {
+  const groups = new Map<string, CardRecord[]>();
+  for (const card of cards) {
+    const key = card.riftbound_id ?? card.clean_name ?? card.id;
+    const group = groups.get(key);
+    if (group) {
+      group.push(card);
+    } else {
+      groups.set(key, [card]);
+    }
+  }
+  return [...groups.values()];
+}
+
+function variantButtonLabel(card: CardRecord, finish: string): string {
+  const parts: string[] = [card.set.set_id];
+  if (card.variant.alternate_art) parts.push("AA");
+  if (card.variant.signed) parts.push("Sig");
+  else if (card.variant.overnumbered) parts.push("ON");
+  if (finish === "foil") parts.push("FOIL");
+  return parts.join(" ");
+}
+
+function SearchResultsGrid({
+  cards,
+  sort,
+  showPrice,
+  variantMode,
+  showVariants,
+  onCardClick,
+  onNavigate,
+}: {
+  cards: CardRecord[];
+  sort: SortKey;
+  showPrice: boolean;
+  variantMode: VariantMode;
+  showVariants: boolean;
+  onCardClick: (card: CardRecord) => void;
+  onNavigate: (path: string) => void;
+}) {
+  const { index: publishedPriceIndex } = usePublishedPriceIndex();
+  const sorted = useMemo(() => sortCardsByKey(cards, sort), [cards, sort]);
+  const cardGroups = useMemo(() => {
+    if (variantMode === "unique-cards") return groupCardsByRiftboundId(sorted);
+    return sorted.map((c) => [c]);
+  }, [sorted, variantMode]);
+
+  return (
+    <div className="card-grid" data-testid="card-grid" data-columns="4">
+      {cardGroups.map((group) => {
+        const representative = group[0];
+        return (
+          <article
+            className="card-tile card-tile--clickable"
+            key={representative.id}
+            data-layout={representative.media.layout}
+            onClick={() => onCardClick(representative)}
+          >
+            {representative.media.image_url ? (
+              <img
+                src={representative.media.image_url}
+                alt={representative.media.accessibility_text ?? representative.riot_name}
+                loading="lazy"
+              />
+            ) : (
+              <div className="missing-image">{representative.riot_name}</div>
+            )}
+            {showVariants && variantMode === "unique-cards" && (
+              <div className="variant-buttons" onClick={(e) => e.stopPropagation()}>
+                {group.flatMap((card) =>
+                  card.finishes.map((finish) => {
+                    const label = variantButtonLabel(card, finish);
+                    const priceRows = getPublishedRowsForCard(publishedPriceIndex, card.tcgplayer_id);
+                    const priceRow = showPrice ? resolveNearMintMarketPrice(priceRows, finish) : null;
+                    const priceStr = showPrice ? formatPriceOnly(priceRow) : null;
+                    return (
+                      <button
+                        key={`${card.id}-${finish}`}
+                        type="button"
+                        className="variant-btn"
+                        onClick={() => onNavigate(buildCardDetailPath(card.id))}
+                      >
+                        <span className="variant-btn-label">{label}</span>
+                        {priceStr && <span className="variant-btn-price">{priceStr}</span>}
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            )}
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+
 function CardGrid({ cards, onCardClick }: { cards: CardRecord[]; onCardClick?: (card: CardRecord) => void }) {
   const [sort, setSort] = useState<SortKey>("energy-asc");
   const sorted = useMemo(() => sortCardsByKey(cards, sort), [cards, sort]);
@@ -773,6 +988,8 @@ function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; o
   );
 }
 
+type VariantMode = "unique-cards" | "unique-printings";
+
 function SearchView({
   onError,
   locationSearch,
@@ -785,12 +1002,14 @@ function SearchView({
   const [query, setQuery] = useState("");
   const [cards, setCards] = useState<CardRecord[]>([]);
   const [diagnostics, setDiagnostics] = useState<QueryDiagnostic[]>([]);
-  const [fieldGuides, setFieldGuides] = useState<QueryFieldGuide[]>([]);
-  const [syntaxGuides, setSyntaxGuides] = useState<QuerySyntaxGuide[]>([]);
   const [normalizedQuery, setNormalizedQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [quickLookCard, setQuickLookCard] = useState<CardRecord | null>(null);
+  const [sort, setSort] = useState<SortKey>("energy-asc");
+  const [showPrice, setShowPrice] = useState(false);
+  const [variantMode, setVariantMode] = useState<VariantMode>("unique-cards");
+  const [showVariants, setShowVariants] = useState(false);
   const searchParamQuery = new URLSearchParams(locationSearch).get("q") ?? "";
 
   async function runSearch(nextQuery: string) {
@@ -812,30 +1031,6 @@ function SearchView({
   useEffect(() => {
     let ignore = false;
 
-    async function boot() {
-      try {
-        const featureResult = await loadQueryFeatures();
-        if (!ignore) {
-          setFieldGuides(featureResult.fields);
-          setSyntaxGuides(featureResult.syntax);
-        }
-      } catch (caught) {
-        if (!ignore) {
-          onError(caught instanceof Error ? caught.message : "Unable to load card search.");
-        }
-      }
-    }
-
-    void boot();
-
-    return () => {
-      ignore = true;
-    };
-  }, [onError]);
-
-  useEffect(() => {
-    let ignore = false;
-
     setQuery(searchParamQuery);
     onError(null);
 
@@ -844,9 +1039,7 @@ function SearchView({
       setDiagnostics([]);
       setNormalizedQuery("");
       setHasSearched(false);
-      return () => {
-        ignore = true;
-      };
+      return () => { ignore = true; };
     }
 
     setIsSearching(true);
@@ -855,29 +1048,20 @@ function SearchView({
     async function syncSearchFromUrl() {
       try {
         const result = await searchCards(searchParamQuery);
-        if (ignore) {
-          return;
-        }
-
+        if (ignore) return;
         setCards(result.items);
         setDiagnostics(result.diagnostics);
         setNormalizedQuery(result.normalizedQuery);
       } catch (caught) {
-        if (!ignore) {
-          onError(caught instanceof Error ? caught.message : "Search failed.");
-        }
+        if (!ignore) onError(caught instanceof Error ? caught.message : "Search failed.");
       } finally {
-        if (!ignore) {
-          setIsSearching(false);
-        }
+        if (!ignore) setIsSearching(false);
       }
     }
 
     void syncSearchFromUrl();
 
-    return () => {
-      ignore = true;
-    };
+    return () => { ignore = true; };
   }, [locationSearch, onError, searchParamQuery]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -885,22 +1069,21 @@ function SearchView({
     const trimmedQuery = query.trim();
     const nextPath = trimmedQuery.length > 0 ? `/cards?q=${encodeURIComponent(query)}` : "/cards";
     const currentPath = `${normalizePathname(window.location.pathname)}${window.location.search}`;
-
     if (nextPath === currentPath) {
       void runSearch(query);
       return;
     }
-
     onNavigate(nextPath);
   }
 
+  const cardGroups = useMemo(() => groupCardsByRiftboundId(cards), [cards]);
+  const resultCount = variantMode === "unique-cards" ? cardGroups.length : cards.length;
+
   return (
     <>
-      <section className="search-panel" aria-labelledby="search-heading">
-        <div className="search-copy">
-          <p className="eyebrow">Noxian Netdecks</p>
-          <h1 id="search-heading">Riftbound Card Search</h1>
-        </div>
+      <div className="search-results-view">
+        <p className="eyebrow">Cards / Search</p>
+        <h1>Card Search Results</h1>
         <form className="search-form" onSubmit={handleSubmit}>
           <label htmlFor="query-input">Query</label>
           <div className="search-row">
@@ -918,14 +1101,77 @@ function SearchView({
             </button>
           </div>
           <output className="normalized-query" aria-live="polite">
-            {normalizedQuery ? `Normalized: ${normalizedQuery}` : "Run a search to show matching cards."}
+            {normalizedQuery ? `Normalized: ${normalizedQuery}` : null}
           </output>
         </form>
-      </section>
+
+        <div className="search-controls-panel">
+          <div className="search-controls-row">
+            <div className="search-control-group">
+              <label htmlFor="sort-select" className="sort-label">Sort</label>
+              <select
+                id="sort-select"
+                value={sort}
+                onChange={(e) => setSort(e.target.value as SortKey)}
+                className="sort-select"
+              >
+                {SORT_OPTIONS.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={showPrice}
+                onChange={(e) => setShowPrice(e.target.checked)}
+              />
+              Show Price
+            </label>
+            <div className="search-control-group">
+              <label htmlFor="variant-mode-select">Variants</label>
+              <select
+                id="variant-mode-select"
+                value={variantMode}
+                onChange={(e) => setVariantMode(e.target.value as VariantMode)}
+                className="sort-select"
+              >
+                <option value="unique-cards">Unique Cards</option>
+                <option value="unique-printings">Unique Printings</option>
+              </select>
+            </div>
+            {variantMode === "unique-cards" && (
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={showVariants}
+                  onChange={(e) => setShowVariants(e.target.checked)}
+                />
+                Show Variants
+              </label>
+            )}
+          </div>
+        </div>
+
+        {hasSearched && (
+          <p className="results-summary">
+            {resultCount.toLocaleString()} matching card{resultCount !== 1 ? "s" : ""}{normalizedQuery ? ` with "${normalizedQuery}"` : ""}
+          </p>
+        )}
+      </div>
 
       <Diagnostics diagnostics={diagnostics} />
-      <QueryLanguageTables fields={fieldGuides} syntax={syntaxGuides} />
-      {hasSearched ? <CardGrid cards={cards} onCardClick={setQuickLookCard} /> : null}
+      {hasSearched ? (
+        <SearchResultsGrid
+          cards={cards}
+          sort={sort}
+          showPrice={showPrice}
+          variantMode={variantMode}
+          showVariants={showVariants}
+          onCardClick={setQuickLookCard}
+          onNavigate={onNavigate}
+        />
+      ) : null}
       {quickLookCard ? (
         <CardQuickLookModal card={quickLookCard} onClose={() => setQuickLookCard(null)} onNavigate={onNavigate} />
       ) : null}
@@ -2754,6 +3000,9 @@ export default function App() {
               <ProjectNavLink href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
                 Search
               </ProjectNavLink>
+              <ProjectNavLink href="/cards/learn-to-search" current={route.kind === "cards-learn-to-search"} onNavigate={navigate}>
+                Learn to Search
+              </ProjectNavLink>
               <ProjectNavLink href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
                 Query Builder
               </ProjectNavLink>
@@ -2812,6 +3061,8 @@ export default function App() {
         {error ? <div className="error-banner">{error}</div> : null}
         {route.kind === "cards" ? (
           <SearchView onError={setError} locationSearch={locationSearch} onNavigate={navigate} />
+        ) : route.kind === "cards-learn-to-search" ? (
+          <LearnToSearchView onError={setError} />
         ) : route.kind === "cards-query-builder" ? (
           <QueryBuilderView onNavigate={navigate} />
         ) : route.kind === "card-detail" ? (
