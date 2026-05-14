@@ -1,4 +1,4 @@
-import { type CSSProperties, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 type Props = {
   onNavigate: (nextPath: string) => void;
@@ -21,25 +21,6 @@ const FINISHES = [
 ] as const;
 const OPERATORS = [">=", ">", "=", "<", "<="] as const;
 const SUPERTYPES = ["Champion", "Signature"] as const;
-
-// Colors: Mind=blue, Fury=red, Calm=green, Body=orange, Chaos=purple, Order=yellow
-const DOMAIN_DATA: Record<string, { color: string; bg: string; bgHover: string }> = {
-  Fury:  { color: "#e53935", bg: "rgba(229,57,53,0.15)",   bgHover: "rgba(229,57,53,0.24)"  },
-  Calm:  { color: "#43a047", bg: "rgba(67,160,71,0.15)",   bgHover: "rgba(67,160,71,0.24)"  },
-  Mind:  { color: "#1e88e5", bg: "rgba(30,136,229,0.15)",  bgHover: "rgba(30,136,229,0.24)" },
-  Body:  { color: "#fb8c00", bg: "rgba(251,140,0,0.15)",   bgHover: "rgba(251,140,0,0.24)"  },
-  Chaos: { color: "#8e24aa", bg: "rgba(142,36,170,0.15)",  bgHover: "rgba(142,36,170,0.24)" },
-  Order: { color: "#e6c100", bg: "rgba(230,193,0,0.15)",   bgHover: "rgba(230,193,0,0.24)"  },
-};
-
-const RARITY_DATA: Record<string, { color: string; bg: string }> = {
-  Common:     { color: "#9e9e9e", bg: "rgba(158,158,158,0.15)" },
-  Uncommon:   { color: "#78909c", bg: "rgba(120,144,156,0.15)" },
-  Rare:       { color: "#42a5f5", bg: "rgba(66,165,245,0.15)"  },
-  Epic:       { color: "#ab47bc", bg: "rgba(171,71,188,0.15)"  },
-  Showcase:   { color: "#ffb300", bg: "rgba(255,179,0,0.15)"   },
-  Promo:      { color: "#ef5350", bg: "rgba(239,83,80,0.15)"   },
-};
 
 function SearchIcon() {
   return (
@@ -224,7 +205,7 @@ export default function QueryBuilderView({ onNavigate }: Props) {
         </h2>
 
         {/* Typeline search at top of section */}
-        <div className="qb-text-fields" style={{ marginBottom: "0.75rem" }}>
+        <div className="qb-text-fields qb-text-fields--spaced">
           <TextField
             label="Typeline"
             hint="t:Champion"
@@ -249,7 +230,7 @@ export default function QueryBuilderView({ onNavigate }: Props) {
           ))}
         </div>
 
-        <p className="qb-subsection-label" style={{ marginTop: "0.75rem" }}>Supertype</p>
+        <p className="qb-subsection-label qb-subsection-label--spaced">Supertype</p>
         <div className="qb-chips">
           {SUPERTYPES.map((st) => (
             <button
@@ -264,7 +245,7 @@ export default function QueryBuilderView({ onNavigate }: Props) {
           ))}
         </div>
 
-        <p className="qb-subsection-label" style={{ marginTop: "0.75rem" }}>Tag</p>
+        <p className="qb-subsection-label qb-subsection-label--spaced">Tag</p>
         <div className="qb-text-fields">
           <TextField
             label="Tag"
@@ -285,18 +266,13 @@ export default function QueryBuilderView({ onNavigate }: Props) {
         </h2>
         <div className="qb-chips">
           {DOMAIN_ORDER.map((domain) => {
-            const data = DOMAIN_DATA[domain];
             const on = selectedDomains.has(domain);
             return (
               <button
                 key={domain}
                 type="button"
                 className={`qb-chip qb-domain-chip${on ? " qb-chip--on" : ""}`}
-                style={{
-                  "--domain-color": data.color,
-                  "--domain-bg": data.bg,
-                  "--domain-bg-hover": data.bgHover,
-                } as CSSProperties}
+                data-domain={domain}
                 onClick={() => setSelectedDomains(toggle(selectedDomains, domain))}
                 aria-pressed={on}
               >
@@ -316,17 +292,13 @@ export default function QueryBuilderView({ onNavigate }: Props) {
         </h2>
         <div className="qb-chips">
           {RARITIES.map((rarity) => {
-            const data = RARITY_DATA[rarity];
             const on = selectedRarities.has(rarity);
             return (
               <button
                 key={rarity}
                 type="button"
                 className={`qb-chip qb-rarity-chip${on ? " qb-chip--on" : ""}`}
-                style={{
-                  "--rarity-color": data.color,
-                  "--rarity-bg": data.bg,
-                } as CSSProperties}
+                data-rarity={rarity}
                 onClick={() => setSelectedRarities(toggle(selectedRarities, rarity))}
                 aria-pressed={on}
               >

@@ -404,7 +404,14 @@ function domainChipClass(domains: string[]): string {
   return "card-attr-chip card-attr-chip--domain card-attr-chip--domain-multicolor";
 }
 
-const PRICE_SERIES_COLORS = ["#f59e0b", "#ef4444", "#38bdf8", "#a78bfa", "#34d399", "#f472b6"] as const;
+const PRICE_SERIES_COLORS = [
+  "var(--chart-series-1)",
+  "var(--chart-series-2)",
+  "var(--chart-series-3)",
+  "var(--chart-series-4)",
+  "var(--chart-series-5)",
+  "var(--chart-series-6)"
+] as const;
 type PricePrintingGroup = {
   key: string;
   label: string;
@@ -2226,7 +2233,7 @@ function HomePage({ onNavigate }: { onNavigate: (href: string) => void }) {
 
       <hr className="home-divider" />
 
-      <div className="home-section" style={{ paddingTop: "48px" }}>
+      <div className="home-section home-section--tight-top">
         <div className="home-promo-grid">
           <a
             href="/tools/tier-list"
@@ -2237,7 +2244,7 @@ function HomePage({ onNavigate }: { onNavigate: (href: string) => void }) {
             <h3>Tier List Generator</h3>
             <p>Rank any card set by dragging into tiers.</p>
           </a>
-          <div className="home-promo-card" style={{ cursor: "default", opacity: 0.6 }}>
+          <div className="home-promo-card home-promo-card--coming-soon">
             <div className="home-promo-label">Archive</div>
             <h3>Tournament Results</h3>
             <p>Events, legend win rates, top-placing decks.</p>

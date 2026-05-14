@@ -12,8 +12,8 @@
   --text: #b8bccf;
   --text-strong: #e8eaf2;
   --text-muted: #44485e;
-  color: var(--text-strong);
-  background: var(--bg);
+  color: var(--color-text-primary);
+  background: var(--color-app-bg);
   font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -27,8 +27,8 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--color-app-bg);
+  color: var(--color-text-secondary);
 }
 
 button,
@@ -169,6 +169,10 @@ select {
   padding: 68px 24px;
 }
 
+.home-section--tight-top {
+  padding-top: 48px;
+}
+
 .home-divider {
   border: none;
   border-top: 1px solid var(--border);
@@ -290,6 +294,11 @@ select {
 
 .home-promo-card:hover {
   border-color: var(--border-strong);
+}
+
+.home-promo-card--coming-soon {
+  cursor: default;
+  opacity: 0.6;
 }
 
 .home-promo-label {
@@ -570,8 +579,8 @@ select {
 .view-tabs button[aria-pressed="true"],
 .view-tabs a[aria-current="page"] {
   color: #fff;
-  border-color: var(--red);
-  background: var(--red);
+  border-color: var(--color-accent);
+  background: var(--color-accent);
 }
 
 .view-tab-link {
@@ -673,13 +682,13 @@ select {
   border-radius: 8px;
   padding: 0 18px;
   color: #fff;
-  background: var(--red);
+  background: var(--color-accent);
   cursor: pointer;
   transition: background 150ms;
 }
 
 .primary-action:hover {
-  background: var(--red-dim);
+  background: var(--color-accent-hover);
 }
 
 .primary-action.compact {
@@ -703,7 +712,7 @@ select {
 .text-button {
   border: 0;
   padding: 0;
-  color: var(--red);
+  color: var(--color-accent);
   background: transparent;
   cursor: pointer;
   font-weight: 800;
@@ -711,7 +720,7 @@ select {
 }
 
 .text-button:hover {
-  color: var(--amber);
+  color: var(--color-warning);
 }
 
 .text-button.strong {
@@ -720,16 +729,16 @@ select {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 1px solid rgba(181, 32, 56, 0.28);
+  border: 1px solid var(--color-negative-border);
   border-radius: 8px;
   padding: 0 12px;
-  background: rgba(181, 32, 56, 0.08);
-  color: var(--red);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
   transition: background 120ms, border-color 120ms;
 }
 
 .text-button.strong:hover {
-  background: rgba(181, 32, 56, 0.14);
+  background: var(--color-accent-soft-hover);
 }
 
 .text-button.strong:disabled {
@@ -759,7 +768,7 @@ select {
 }
 
 .icon-button:focus-visible {
-  outline: 3px solid var(--red-glow);
+  outline: 3px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -3096,13 +3105,21 @@ code {
 }
 
 .qb-chip--on {
-  background: rgba(181, 32, 56, 0.15);
-  border-color: var(--red);
-  color: var(--text-strong);
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
 }
 
 .qb-chip--on:hover {
-  background: rgba(181, 32, 56, 0.22);
+  background: var(--color-accent-soft-strong);
+}
+
+.qb-text-fields--spaced {
+  margin-bottom: 0.75rem;
+}
+
+.qb-subsection-label--spaced {
+  margin-top: 0.75rem;
 }
 
 /* ── Domain chips ── */
@@ -3146,9 +3163,9 @@ code {
   font-weight: 700;
   font-family: monospace;
   padding: 1px 5px;
-  background: var(--surface);
+  background: var(--color-surface-1);
   border-radius: 4px;
-  color: var(--text-muted);
+  color: var(--color-text-tertiary);
   letter-spacing: 0.04em;
 }
 
@@ -3729,7 +3746,7 @@ code {
   padding: 14px;
   border: 1px solid var(--border-mid);
   border-radius: 6px;
-  background: var(--surface-1);
+  background: var(--color-surface-1);
   color: var(--text);
   font-size: 0.8rem;
   line-height: 1.5;
@@ -4134,8 +4151,8 @@ code {
   text-transform: uppercase;
   letter-spacing: 0.10em;
 }
-.trade-side-label--mine  { color: #7de8a0; }
-.trade-side-label--yours { color: #e88; }
+.trade-side-label--mine  { color: var(--color-positive-strong); }
+.trade-side-label--yours { color: var(--color-negative); }
 
 .trade-side-total {
   font-size: 1.05rem;
@@ -4226,8 +4243,8 @@ code {
   font-weight: 500;
   white-space: nowrap;
 }
-.trade-tag--rarity  { color: #c9813a; border-color: rgba(201,129,58,.30); background: rgba(201,129,58,.08); }
-.trade-tag--domain  { color: #9ab4e8; border-color: rgba(154,180,232,.30); background: rgba(154,180,232,.08); }
+.trade-tag--rarity  { color: var(--color-warning); border-color: rgba(201,129,58,.30); background: rgba(201,129,58,.08); }
+.trade-tag--domain  { color: var(--color-info); border-color: var(--color-info-border); background: var(--color-info-soft); }
 .trade-tag--foil    { color: #d4a0f0; border-color: rgba(212,160,240,.30); background: rgba(212,160,240,.08); }
 .trade-tag--nonfoil { color: var(--text-muted); border-color: var(--border); }
 
@@ -4385,7 +4402,7 @@ code {
 .trade-expand-remove-inline {
   background: none;
   border: 1px solid rgba(181, 32, 56, 0.30);
-  color: #e88;
+  color: var(--color-negative);
   border-radius: 4px;
   width: 30px;
   height: 30px;
@@ -4639,8 +4656,8 @@ code {
   border-radius: 20px;
 }
 .trade-delta-value--even { color: var(--text-muted);  background: var(--surface-2); }
-.trade-delta-value--pos  { color: #7de8a0;            background: rgba(42,143,82,.15); }
-.trade-delta-value--neg  { color: #e88;               background: rgba(181,32,56,.15); }
+.trade-delta-value--pos  { color: var(--color-positive-strong); background: var(--color-positive-emphasis); }
+.trade-delta-value--neg  { color: var(--color-negative);        background: var(--color-negative-emphasis); }
 
 .trade-delta-note {
   font-size: 0.68rem;
@@ -4656,8 +4673,8 @@ code {
   border-radius: 6px;
 }
 .trade-mobile-delta--even { color: var(--text-muted);  background: var(--surface-2); }
-.trade-mobile-delta--pos  { color: #7de8a0;            background: rgba(42,143,82,.12); }
-.trade-mobile-delta--neg  { color: #e88;               background: rgba(181,32,56,.12); }
+.trade-mobile-delta--pos  { color: var(--color-positive-strong); background: rgba(42,143,82,.12); }
+.trade-mobile-delta--neg  { color: var(--color-negative);        background: rgba(181,32,56,.12); }
 
 /* ── Compact total strip (mobile search mode) ── */
 .trade-compact-strip {
@@ -4678,8 +4695,8 @@ code {
   text-transform: uppercase;
   letter-spacing: 0.07em;
 }
-.trade-compact-label--mine  { color: #7de8a0; }
-.trade-compact-label--yours { color: #e88; }
+.trade-compact-label--mine  { color: var(--color-positive-strong); }
+.trade-compact-label--yours { color: var(--color-negative); }
 .trade-compact-total {
   font-size: 0.88rem;
   font-weight: 700;
@@ -4692,8 +4709,8 @@ code {
   border-radius: 12px;
 }
 .trade-compact-delta--even { color: var(--text-muted); background: var(--surface); }
-.trade-compact-delta--pos  { color: #7de8a0; background: rgba(42,143,82,.15); }
-.trade-compact-delta--neg  { color: #e88;    background: rgba(181,32,56,.15); }
+.trade-compact-delta--pos  { color: var(--color-positive-strong); background: var(--color-positive-emphasis); }
+.trade-compact-delta--neg  { color: var(--color-negative);        background: var(--color-negative-emphasis); }
 
 /* ══════════════════════════════════════════════════════════════
    TRADE BALANCER — MOBILE
@@ -4793,4 +4810,7 @@ code {
     border-radius: 0;
     padding: 10px 16px;
   }
+}
+.trade-card-expand-image {
+  cursor: pointer;
 }

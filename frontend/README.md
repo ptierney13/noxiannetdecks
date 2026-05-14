@@ -20,6 +20,14 @@ The current site provides:
   `CardQuickLookModal` and `.card-quick-look-*`. Treat those as legacy internal
   identifiers for the same Quick View surface rather than a different UI.
 
+## UI Foundation
+
+- Shared semantic UI tokens and small cross-route primitives live in
+  `frontend/src/ui-foundation.css`.
+- Route and feature styling lives in `frontend/src/styles.css`.
+- Frontend contributor guidance for agents and humans lives in
+  `frontend/AGENTS.md`.
+
 ## Local Commands
 
 From the repository root:

@@ -60,6 +60,17 @@ Plan documents should include:
 - Test plan
 - Assumptions
 
+## Frontend UI Guidance
+
+When editing files under `frontend/`, read `frontend/AGENTS.md` first.
+
+Treat that file as the frontend-specific source of truth for:
+
+- semantic UI token usage
+- shared UI foundation expectations
+- when inline styles are acceptable
+- how to keep future UI overhaul work organized
+
 Draft summary plans for future stages should also state clearly that:
 
 - they are drafts

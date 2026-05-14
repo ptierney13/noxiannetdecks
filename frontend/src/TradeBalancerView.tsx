@@ -283,7 +283,7 @@ function TradeCardBar({
                 src={card.media.image_url}
                 alt={card.media.accessibility_text ?? card.riot_name}
                 loading="lazy"
-                style={{ cursor: "pointer" }}
+                className="trade-card-expand-image"
                 onClick={() => onQuickLook(card)}
               />
             </div>
@@ -541,7 +541,7 @@ export default function TradeBalancerView({ onNavigate, onQuickLook }: { onNavig
     : 0.5;
   const splitPct = (tradeRatio * 100).toFixed(2);
   const deltaBarStyle = {
-    background: `linear-gradient(90deg, rgba(42,143,82,0.25) 0%, rgba(42,143,82,0.25) ${splitPct}%, rgba(181,32,56,0.25) ${splitPct}%, rgba(181,32,56,0.25) 100%)`
+    background: `linear-gradient(90deg, var(--color-positive-emphasis) 0%, var(--color-positive-emphasis) ${splitPct}%, var(--color-negative-emphasis) ${splitPct}%, var(--color-negative-emphasis) 100%)`
   };
 
   // ── Drag handlers ──
