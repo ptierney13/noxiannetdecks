@@ -1,5 +1,6 @@
 import {
   applyHostedPriceStoreMigrations,
+  createFilesystemPublishedArtifactWriter,
   ensureHostedPriceStoreLayout,
   LocalD1Database,
   resolveHostedPriceStoreLayout,
@@ -13,9 +14,15 @@ async function main() {
 
   try {
     await applyHostedPriceStoreMigrations(database, layout.migrationsDir);
+    const runId = process.env.NOXIANNET_PRICE_RUN_ID;
+    if (!runId) {
+      throw new Error("NOXIANNET_PRICE_RUN_ID is required.");
+    }
+
     const result = await runHostedPricePublish({
       database,
-      processRunId: process.env.NOXIANNET_PRICE_PROCESS_RUN_ID
+      message: { runId },
+      publishedArtifactWriter: createFilesystemPublishedArtifactWriter()
     });
     console.log(JSON.stringify(result, null, 2));
   } finally {

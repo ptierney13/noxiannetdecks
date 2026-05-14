@@ -1,7 +1,7 @@
 import { mkdir, readdir, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import type { D1AllResult, D1DatabaseLike, D1PreparedStatementLike, D1RunResult, D1Value } from "./types.js";
+import type { D1AllResult, D1BatchResult, D1DatabaseLike, D1PreparedStatementLike, D1RunResult, D1Value } from "./types.js";
 
 type SqliteRunMeta = {
   changes?: number;
@@ -65,6 +65,22 @@ export class LocalD1Database implements D1DatabaseLike {
   constructor(databasePath: string) {
     this.database = new DatabaseSync(databasePath);
     this.database.exec("PRAGMA foreign_keys = ON;");
+  }
+
+  async batch(statements: D1PreparedStatementLike[]): Promise<D1BatchResult> {
+    const results: D1BatchResult = [];
+    this.database.exec("BEGIN TRANSACTION;");
+
+    try {
+      for (const statement of statements) {
+        results.push(await statement.run());
+      }
+      this.database.exec("COMMIT;");
+      return results;
+    } catch (error) {
+      this.database.exec("ROLLBACK;");
+      throw error;
+    }
   }
 
   prepare(query: string): D1PreparedStatementLike {

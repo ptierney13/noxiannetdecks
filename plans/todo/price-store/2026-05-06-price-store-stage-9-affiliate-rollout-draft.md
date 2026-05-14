@@ -33,6 +33,10 @@ monitoring are already working.
 - Stage 5 also leaves default display-price choice to frontend logic, so any
   affiliate link behavior should not assume one canonical row is already chosen
   for display.
+- Stage 7 should leave the live hosted path serving KV-backed `prices-d1`
+  artifacts through the same manifest/snapshot contract, so affiliate rollout
+  should prefer extending that published/runtime contract instead of adding a
+  separate side channel.
 
 ## Expected Outputs
 

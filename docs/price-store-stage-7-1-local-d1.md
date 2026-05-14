@@ -121,7 +121,7 @@ Stage 7.1 adds local worker-shaped files for the future Cloudflare split:
 - [workers/price-store-publish.ts](/C:/Users/ptier/repos/Deck%20Archive%20Project/workers/price-store-publish.ts)
 - [workers/price-store-maintenance.ts](/C:/Users/ptier/repos/Deck%20Archive%20Project/workers/price-store-maintenance.ts)
 
-Wrangler-local config stubs for Stage 7.2 rollout prep:
+Wrangler config files prepared for Stage 7.2 rollout:
 
 - [wrangler.price-store-capture.jsonc](/C:/Users/ptier/repos/Deck%20Archive%20Project/wrangler.price-store-capture.jsonc)
 - [wrangler.price-store-publish.jsonc](/C:/Users/ptier/repos/Deck%20Archive%20Project/wrangler.price-store-publish.jsonc)
@@ -147,6 +147,11 @@ Worker environment names mirror the local script knobs:
 - `NOXIANNET_PRICE_CAPTURE_MAX_REQUESTS`
 - `NOXIANNET_PRICE_CAPTURE_REQUEST_DELAY_MS`
 - `NOXIANNET_PRICE_CAPTURE_VERIFY_LIMIT`
+
+When no override is provided, hosted ingestion waits `8,500ms` between paged
+JustTCG requests. Discovery currently partitions work into `45`-page chunks,
+and ingestion processes one queued chunk at a time with queue consumer
+concurrency forced to `1`.
 
 ## Dual-Price Comparison
 

@@ -1,9 +1,9 @@
 import {
   applyHostedPriceStoreMigrations,
-  createHostedPriceStoreRepository,
   ensureHostedPriceStoreLayout,
   LocalD1Database,
-  resolveHostedPriceStoreLayout
+  resolveHostedPriceStoreLayout,
+  runHostedPriceMaintenance
 } from "../src/hosted/index.js";
 
 async function main() {
@@ -13,10 +13,10 @@ async function main() {
 
   try {
     await applyHostedPriceStoreMigrations(database, layout.migrationsDir);
-    const repository = createHostedPriceStoreRepository(database);
-    const expiresBefore = process.env.NOXIANNET_PRICE_CLEANUP_BEFORE ?? new Date().toISOString();
-    const deleted = await repository.deleteExpiredCapturePages(expiresBefore);
-    console.log(JSON.stringify({ expiresBefore, deleted }, null, 2));
+    const result = await runHostedPriceMaintenance({
+      database
+    });
+    console.log(JSON.stringify(result, null, 2));
   } finally {
     database.close();
   }

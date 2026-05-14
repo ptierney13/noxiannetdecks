@@ -23,15 +23,17 @@ export type {
   CaptureJustTcgCatalogResult,
   CaptureJustTcgSampleInput,
   CaptureJustTcgSampleResult,
-  VerifyJustTcgRequestLimitInput,
-  VerifyJustTcgRequestLimitResult
 } from "./capture.js";
 export {
   captureJustTcgCardsCatalog,
   captureJustTcgCardsSample,
   createJustTcgCaptureRunId,
-  verifyJustTcgRequestLimit
 } from "./capture.js";
+export type {
+  VerifyJustTcgRequestLimitInput,
+  VerifyJustTcgRequestLimitResult
+} from "./limit.js";
+export { verifyJustTcgRequestLimit } from "./limit.js";
 export type { PublishJustTcgPricesResult } from "./publish.js";
 export {
   createPublishedPriceManifest,

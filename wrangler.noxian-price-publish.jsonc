@@ -1,0 +1,32 @@
+{
+  "name": "noxian-price-publish",
+  "main": "workers/noxian-price-publish.ts",
+  "compatibility_date": "2026-05-13",
+  "observability": {
+    "enabled": true
+  },
+  "queues": {
+    "consumers": [
+      {
+        "queue": "noxian-price-publish-queue",
+        "max_batch_size": 1,
+        "max_retries": 3
+      }
+    ]
+  },
+  "kv_namespaces": [
+    {
+      "binding": "PRICE_STORE_PUBLISHED_DATA",
+      "id": "8fb344571f90445d992bb82385289fbe",
+      "preview_id": "REPLACE_WITH_PRICE_STORE_PUBLISHED_KV_PREVIEW_NAMESPACE_ID"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "noxian-db",
+      "database_id": "e4035dc9-7064-484a-a1b7-c80ebfcaa447",
+      "migrations_dir": "price_store/migrations/d1"
+    }
+  ]
+}

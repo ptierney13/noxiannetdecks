@@ -1,0 +1,19 @@
+{
+  "name": "noxian-maintenance",
+  "main": "workers/noxian-maintenance.ts",
+  "compatibility_date": "2026-05-13",
+  "observability": {
+    "enabled": true
+  },
+  "triggers": {
+    "crons": ["0 11 */2 * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "noxian-db",
+      "database_id": "e4035dc9-7064-484a-a1b7-c80ebfcaa447",
+      "migrations_dir": "price_store/migrations/d1"
+    }
+  ]
+}

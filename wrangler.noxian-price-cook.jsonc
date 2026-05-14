@@ -1,0 +1,31 @@
+{
+  "name": "noxian-price-cook",
+  "main": "workers/noxian-price-cook.ts",
+  "compatibility_date": "2026-05-13",
+  "observability": {
+    "enabled": true
+  },
+  "queues": {
+    "producers": [
+      {
+        "binding": "PRICE_STORE_PUBLISH_QUEUE",
+        "queue": "noxian-price-publish-queue"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "noxian-price-cook-queue",
+        "max_batch_size": 1,
+        "max_retries": 3
+      }
+    ]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "noxian-db",
+      "database_id": "e4035dc9-7064-484a-a1b7-c80ebfcaa447",
+      "migrations_dir": "price_store/migrations/d1"
+    }
+  ]
+}

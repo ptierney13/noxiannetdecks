@@ -1,149 +1,188 @@
-import { loadCards, type CardRecord } from "@noxiannet/card-store";
-import { writePublishedPriceArtifacts } from "../published/repository.js";
-import type {
-  PublishedPriceManifest,
-  PublishedPriceRow,
-  PublishedPriceSnapshot
-} from "../published/schema.js";
-import { resolvePriceDataLayout } from "../config.js";
+import { loadHostedPublishCardMetadataIndex, type HostedPublishedCardMetadata } from "./card-metadata.js";
+import { writePublishedPriceArtifactsToKv } from "../published/kv.js";
+import type { PublishedPriceManifest, PublishedPriceRow, PublishedPriceSnapshot } from "../published/schema.js";
 import { createHostedPriceStoreRepository } from "./repository.js";
-import type { D1DatabaseLike, HostedPriceDataRow } from "./types.js";
+import type { D1DatabaseLike, HostedCookedPriceRow, KVNamespaceLike } from "./types.js";
+
+export type HostedPublishedArtifactWriterInput = {
+  canonicalRelativeSnapshotPath: string;
+  gameKey: string;
+  manifest: PublishedPriceManifest;
+  publishedAt: string;
+  snapshot: PublishedPriceSnapshot;
+};
+
+export type HostedPublishedArtifactWriter = (input: HostedPublishedArtifactWriterInput) => Promise<void>;
 
 export type RunHostedPricePublishInput = {
   database: D1DatabaseLike;
-  processRunId?: string;
-  repositoryRoot?: string;
-  dataRootDir?: string;
+  message: { runId: string };
+  publishedArtifactWriter?: HostedPublishedArtifactWriter;
+  publishedDataKv?: KVNamespaceLike;
   startedAt?: string;
 };
 
 export type HostedPricePublishResult = {
-  publishRunId: string;
-  processRunId: string;
   captureRunId: string;
-  rowCount: number;
   manifest: PublishedPriceManifest;
+  processRunId: string;
+  publishRunId: string;
+  rowCount: number;
   snapshot: PublishedPriceSnapshot;
 };
 
 export async function runHostedPricePublish(input: RunHostedPricePublishInput): Promise<HostedPricePublishResult> {
   const repository = createHostedPriceStoreRepository(input.database);
-  const runningCaptureRuns = await repository.countRunningCaptureRuns();
-  const runningProcessRuns = await repository.countRunningProcessRuns();
-  if (runningCaptureRuns > 0 || runningProcessRuns > 0) {
-    throw new Error("Cannot publish while a capture or process run is still active.");
-  }
-
-  const processRun =
-    (input.processRunId ? await repository.getProcessRun(input.processRunId) : await repository.getLatestSuccessfulProcessRun()) ??
-    null;
-  if (!processRun) {
-    throw new Error("No successful process run is available to publish.");
-  }
-  if (processRun.status !== "succeeded") {
-    throw new Error(`Process run ${processRun.processRunId} is not complete.`);
-  }
-
-  const captureRun = await repository.getCaptureRun(processRun.captureRunId);
-  if (!captureRun || captureRun.status !== "succeeded") {
-    throw new Error(`Capture run ${processRun.captureRunId} is not publishable.`);
-  }
-
   const startedAt = input.startedAt ?? new Date().toISOString();
-  const publishRunId = createHostedPublishRunId(startedAt, processRun.processRunId);
+  const claimed = await repository.claimPublish(input.message.runId, startedAt);
+  if (!claimed) {
+    const run = await repository.getRun(input.message.runId);
+    if (!run || (run.status !== "succeeded" && run.status !== "publishing")) {
+      throw new Error(`Run ${input.message.runId} is not ready to publish.`);
+    }
+  }
 
+  const run = await repository.getRun(input.message.runId);
+  if (!run) {
+    throw new Error(`Run ${input.message.runId} was not found.`);
+  }
+
+  const publishRunId = createHostedPublishRunId(startedAt, input.message.runId);
   await repository.insertPublishRun({
     publishRunId,
-    processRunId: processRun.processRunId,
-    captureRunId: processRun.captureRunId,
+    runId: input.message.runId,
     status: "running",
     startedAt,
     completedAt: null,
-    artifactCount: 0,
+    manifestKey: null,
+    snapshotKey: null,
     rowCount: 0,
-    message: `Publishing D1-backed price artifacts from process run ${processRun.processRunId}.`
+    message: `Publishing hosted price artifacts for run ${input.message.runId}.`
   });
 
   try {
-    const priceRows = await repository.listPriceDataForProcessRun(processRun.processRunId);
-    const cards = await loadCards();
+    const priceRows = await repository.listCookedRows(input.message.runId);
+    const cardsByTcgplayerId = loadHostedPublishCardMetadataIndex();
     const publishedAt = new Date().toISOString();
-    const snapshot = createPublishedPriceSnapshotFromPriceData(priceRows, cards, captureRun.startedAt, publishedAt);
-    const manifest = createPublishedPriceManifestFromPriceData(processRun.processRunId, snapshot, publishedAt);
-    const layout = resolvePriceDataLayout(input.dataRootDir);
-
-    await writePublishedPriceArtifacts(layout, {
+    const snapshot = createPublishedPriceSnapshotFromPriceData(priceRows, cardsByTcgplayerId, run.startedAt, publishedAt);
+    const manifest = createPublishedPriceManifestFromPriceData(input.message.runId, snapshot, publishedAt);
+    let manifestKey: string | null = null;
+    let snapshotKey: string | null = null;
+    const artifactWriteInput: HostedPublishedArtifactWriterInput = {
       gameKey: snapshot.game.key,
       publishedAt,
-      canonicalRelativeSnapshotPath: `d1://price_process_runs/${processRun.processRunId}`,
+      canonicalRelativeSnapshotPath: `d1://price_pipeline_runs/${input.message.runId}`,
       manifest,
-      snapshot,
-      repositoryRoot: input.repositoryRoot,
-      pathPrefix: "prices-d1"
-    });
+      snapshot
+    };
+
+    if (input.publishedDataKv) {
+      const result = await writePublishedPriceArtifactsToKv(input.publishedDataKv, {
+        ...artifactWriteInput,
+        pathPrefix: "prices-d1"
+      });
+      manifestKey = result.manifestKey;
+      snapshotKey = result.snapshotKey;
+    } else if (input.publishedArtifactWriter) {
+      await input.publishedArtifactWriter(artifactWriteInput);
+      manifestKey = "prices-d1/manifest.json";
+      snapshotKey = `prices-d1/${snapshot.game.key}/latest.json`;
+    } else {
+      throw new Error("Publish requires either a KV namespace or a published artifact writer.");
+    }
 
     await repository.upsertPublishedArtifact({
       artifactId: `${publishRunId}::manifest`,
       publishRunId,
-      processRunId: processRun.processRunId,
-      captureRunId: processRun.captureRunId,
+      runId: input.message.runId,
       gameKey: snapshot.game.key,
       artifactType: "manifest",
-      payloadJson: JSON.stringify(manifest)
+      payloadJson: JSON.stringify({
+        artifactType: "manifest",
+        gameKey: snapshot.game.key,
+        key: manifestKey,
+        publishedAt,
+        rowCount: manifest.rowCount,
+        snapshotPath: manifest.snapshotPath,
+        version: manifest.version
+      })
     });
     await repository.upsertPublishedArtifact({
       artifactId: `${publishRunId}::snapshot`,
       publishRunId,
-      processRunId: processRun.processRunId,
-      captureRunId: processRun.captureRunId,
+      runId: input.message.runId,
       gameKey: snapshot.game.key,
       artifactType: "snapshot",
-      payloadJson: JSON.stringify(snapshot)
+      payloadJson: JSON.stringify({
+        artifactType: "snapshot",
+        freshestPriceAt: snapshot.freshness.freshestPriceAt,
+        gameKey: snapshot.game.key,
+        key: snapshotKey,
+        pricedRowCount: snapshot.freshness.pricedRowCount,
+        publishedAt,
+        rowCount: snapshot.rows.length,
+        sourceCapturedAt: snapshot.sourceCapturedAt,
+        stalestPriceAt: snapshot.freshness.stalestPriceAt,
+        version: snapshot.version
+      })
     });
+
+    const completedAt = new Date().toISOString();
     await repository.updatePublishRun({
       publishRunId,
-      processRunId: processRun.processRunId,
-      captureRunId: processRun.captureRunId,
+      runId: input.message.runId,
       status: "succeeded",
       startedAt,
-      completedAt: new Date().toISOString(),
-      artifactCount: 2,
+      completedAt,
+      manifestKey,
+      snapshotKey,
       rowCount: snapshot.rows.length,
-      message: `Published ${snapshot.rows.length} D1-backed price rows for ${snapshot.game.key}.`
+      message: `Published ${snapshot.rows.length} rows for ${snapshot.game.key}.`
     });
-    await repository.setPipelineState("latest_successful_publish_run_id", publishRunId);
+    await repository.completePublish(input.message.runId, {
+      completedAt,
+      livePublishedAt: publishedAt,
+      publishedRowCount: snapshot.rows.length
+    });
+    await repository.setPipelineState("current_live_run_id", input.message.runId);
+    await repository.setPipelineState("current_live_published_at", publishedAt);
+    await repository.setPipelineState("latest_successful_run_id", input.message.runId);
 
     return {
-      publishRunId,
-      processRunId: processRun.processRunId,
-      captureRunId: processRun.captureRunId,
-      rowCount: snapshot.rows.length,
+      captureRunId: input.message.runId,
       manifest,
+      processRunId: input.message.runId,
+      publishRunId,
+      rowCount: snapshot.rows.length,
       snapshot
     };
   } catch (error) {
     await repository.updatePublishRun({
       publishRunId,
-      processRunId: processRun.processRunId,
-      captureRunId: processRun.captureRunId,
+      runId: input.message.runId,
       status: "failed",
       startedAt,
       completedAt: new Date().toISOString(),
-      artifactCount: 0,
+      manifestKey: null,
+      snapshotKey: null,
       rowCount: 0,
       message: error instanceof Error ? error.message : "Unknown publish failure"
     });
+    await repository.markRunFailed(
+      input.message.runId,
+      error instanceof Error ? error.message : "Unknown publish failure",
+      new Date().toISOString()
+    );
     throw error;
   }
 }
 
 export function createPublishedPriceSnapshotFromPriceData(
-  rows: HostedPriceDataRow[],
-  cards: CardRecord[],
+  rows: HostedCookedPriceRow[],
+  cardsByTcgplayerId: Map<string, HostedPublishedCardMetadata[]>,
   sourceCapturedAt: string,
   publishedAt: string
 ): PublishedPriceSnapshot {
-  const cardsByTcgplayerId = indexCardsByTcgplayerId(cards);
   const publishedRows = rows.map((row) => createPublishedPriceRow(row, cardsByTcgplayerId));
   const gameSlug = rows[0]?.gameSlug ?? "riftbound-league-of-legends-trading-card-game";
 
@@ -152,7 +191,7 @@ export function createPublishedPriceSnapshotFromPriceData(
     game: {
       slug: gameSlug,
       key: resolvePublishedGameKey(gameSlug),
-      label: rows.length > 0 ? "Riftbound" : "Riftbound"
+      label: "Riftbound"
     },
     priceSource: {
       id: "tcgplayer",
@@ -166,7 +205,7 @@ export function createPublishedPriceSnapshotFromPriceData(
 }
 
 export function createPublishedPriceManifestFromPriceData(
-  processRunId: string,
+  runId: string,
   snapshot: PublishedPriceSnapshot,
   publishedAt: string
 ): PublishedPriceManifest {
@@ -185,33 +224,33 @@ export function createPublishedPriceManifestFromPriceData(
         id: "justtcg",
         label: "JustTCG"
       },
-      canonicalRelativeSnapshotPath: `d1://price_process_runs/${processRunId}`,
+      canonicalRelativeSnapshotPath: `d1://price_pipeline_runs/${runId}`,
       rawRelativePayloadPaths: [],
       rawRelativeMetadataPaths: []
     }
   };
 }
 
-export function createHostedPublishRunId(startedAt: string, processRunId: string): string {
-  return `hosted-publish-${compactTimestamp(startedAt)}-${processRunId}`;
+export function createHostedPublishRunId(startedAt: string, runId: string): string {
+  return `hosted-publish-${compactTimestamp(startedAt)}-${runId}`;
 }
 
 function createPublishedPriceRow(
-  row: HostedPriceDataRow,
-  cardsByTcgplayerId: Map<string, CardRecord[]>
+  row: HostedCookedPriceRow,
+  cardsByTcgplayerId: Map<string, HostedPublishedCardMetadata[]>
 ): PublishedPriceRow {
   const card = resolveCardMetadata(row, cardsByTcgplayerId);
 
   return {
     rowId: `${row.sourceCardId}::${row.sourceVariantId}`,
-    cardName: card?.riot_name ?? row.sourceCardId,
+    cardName: card?.riotName ?? row.sourceCardId,
     sourceCardId: row.sourceCardId,
     sourceVariantId: row.sourceVariantId,
     set: {
-      slug: card?.set.set_id.toLowerCase() ?? null,
+      slug: card?.set.slug ?? null,
       label: card?.set.label ?? null
     },
-    collectorNumber: card?.collector_number ?? null,
+    collectorNumber: card?.collectorNumber ?? null,
     rarity: card?.rarity ?? null,
     language: row.language,
     condition: row.condition,
@@ -229,7 +268,10 @@ function createPublishedPriceRow(
   };
 }
 
-function resolveCardMetadata(row: HostedPriceDataRow, cardsByTcgplayerId: Map<string, CardRecord[]>): CardRecord | null {
+function resolveCardMetadata(
+  row: HostedCookedPriceRow,
+  cardsByTcgplayerId: Map<string, HostedPublishedCardMetadata[]>
+): HostedPublishedCardMetadata | null {
   if (!row.tcgplayerId) {
     return null;
   }
@@ -247,22 +289,6 @@ function resolveCardMetadata(row: HostedPriceDataRow, cardsByTcgplayerId: Map<st
     candidates[0] ??
     null
   );
-}
-
-function indexCardsByTcgplayerId(cards: CardRecord[]): Map<string, CardRecord[]> {
-  const map = new Map<string, CardRecord[]>();
-
-  for (const card of cards) {
-    if (!card.tcgplayer_id) {
-      continue;
-    }
-
-    const existing = map.get(card.tcgplayer_id) ?? [];
-    existing.push(card);
-    map.set(card.tcgplayer_id, existing);
-  }
-
-  return map;
 }
 
 function normalizePricePrinting(value: string | null | undefined): "foil" | "normal" | "" {

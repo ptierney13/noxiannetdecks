@@ -24,7 +24,9 @@ operator recovery paths.
     outputs
   - a D1-backed source of truth for capture state, canonical data, and
     published artifacts
+  - a KV-backed public-serving `prices-d1` artifact layer
   - completion of a local dual-price validation pass before the live rollout
+  - a defined deploy path, whether still manual or automated through Stage 7.2.1
   - the Stage 7.1 relational table set rooted at `price_capture_*`,
     `price_data`, `price_publish_*`, and `price_pipeline_state`
 - JustTCG plan limits and rate limits are an operational concern that should be
@@ -45,9 +47,10 @@ operator recovery paths.
 - V0 remains single-source, so upstream availability is a concentrated risk.
 - D1 row counts, write patterns, and storage growth are now operational
   concerns worth observing alongside JustTCG request usage.
-- Publish currently enriches rows from `card_store` by `tcgplayer_id`, so
-  Stage 8 monitoring should consider whether missing card metadata mappings need
-  their own operator-visible signal.
+- Publish should use a worker-safe bundled card metadata lookup keyed by
+  `tcgplayer_id`, so Stage 8 monitoring should consider whether missing
+  metadata mappings or stale bundled metadata need their own operator-visible
+  signal.
 
 ## Expected Outputs
 

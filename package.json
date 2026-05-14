@@ -14,7 +14,7 @@
     "dev:price-d1": "concurrently -n api,web \"npm run dev -w @noxiannet/card-store\" \"npm run dev:price-d1 -w @noxiannet/frontend\"",
     "dev:api": "npm run dev -w @noxiannet/card-store",
     "dev:web": "npm run dev -w @noxiannet/frontend",
-    "price:d1:refresh-local": "npm run hosted:local:migrate -w @noxiannet/price-store && npm run hosted:local:capture -w @noxiannet/price-store && npm run hosted:local:process -w @noxiannet/price-store && npm run hosted:local:publish -w @noxiannet/price-store",
+    "price:d1:refresh-local": "npm run hosted:local:migrate -w @noxiannet/price-store && npm run hosted:local:refresh -w @noxiannet/price-store",
     "build": "npm run build -w @noxiannet/card-store && npm run build -w @noxiannet/deck-store && npm run build -w @noxiannet/price-store && npm run build -w @noxiannet/frontend",
     "test": "npm run test -w @noxiannet/card-store && npm run test -w @noxiannet/deck-store && npm run test -w @noxiannet/price-store && npm run test -w @noxiannet/frontend",
     "preview:url": "node scripts/print-cloudflare-preview-url.mjs"

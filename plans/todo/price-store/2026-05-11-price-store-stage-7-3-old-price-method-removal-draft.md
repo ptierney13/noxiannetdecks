@@ -10,8 +10,8 @@ remaining cleanup, operational, or architectural notes.
 
 ## Summary
 
-Stage 7.3 removes the legacy price-generation and read path only after the
-new D1-backed hosted pipeline has been validated locally and rolled out live
+Stage 7.3 removes the legacy price-generation and read path only after the new
+queue-based D1-backed hosted pipeline has been validated and rolled out live
 successfully.
 
 This is the simplification and cleanup sub-stage. It should retire the old
@@ -20,20 +20,18 @@ price generation and serving.
 
 ## Pertinent Details So Far
 
-- Stage 7.1 should already provide:
-  - relational D1-backed capture/process/publish logic
-  - local dual-price comparison proving acceptable parity
-  - a D1-backed comparison artifact path at `prices-d1`
 - Stage 7.2 should already provide:
   - live Cloudflare deployment of the new hosted path
   - production verification while the old path still exists
-- Incremental hosted captures should already merge card-scoped deltas into the
-  prior full truth instead of replacing the full dataset outright.
+  - KV-backed hosted `prices-d1` artifacts served through the Pages read path
+  - discovery, ingestion, cook, publish, and maintenance workers operating
+    against shared D1 tables and queues
+- Earlier Stage 7.1 and pre-rearchitecture Stage 7.2 assumptions are not
+  binding restrictions on Stage 7.3 cleanup decisions.
 - The old path should not be removed until the new path is accepted.
-- Stage 7.1 kept card metadata outside D1 and enriches publish output from
-  `card_store`, so Stage 7.3 should remove the old method carefully without
-  accidentally deleting metadata dependencies that the hosted publish path still
-  needs.
+- Stage 7.2 should also leave publish using a worker-safe bundled card metadata
+  lookup rather than filesystem reads from `card_store`, so Stage 7.3 should
+  preserve that hosted dependency while removing only the legacy price path.
 
 ## Expected Outputs
 
@@ -61,6 +59,8 @@ price generation and serving.
 - whether any internal-only comparison tooling should remain after cleanup
 - whether any temporary transitional D1/KV compatibility shims still need
   removal
+- whether the hosted `prices-d1` path should be renamed back to the primary
+  public `prices` path as part of cleanup or remain explicitly distinct
 
 ## Test Plan
 

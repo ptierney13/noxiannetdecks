@@ -1,17 +1,22 @@
-import { mkdtemp, readFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   applyHostedPriceStoreMigrations,
   createHostedPriceStoreRepository,
   LocalD1Database,
   resolveHostedPriceStoreLayout,
-  runHostedPriceCapture,
-  runHostedPriceProcess,
+  runHostedPriceCook,
+  runHostedPriceDiscovery,
+  runHostedPriceIngestion,
+  runHostedPriceMaintenance,
   runHostedPricePublish
 } from "../src/hosted/index.js";
-import type { HostedPriceDataRow } from "../src/hosted/types.js";
+import type {
+  HostedCookMessage,
+  HostedIngestionChunkMessage,
+  HostedPipelineRunRow,
+  HostedPublishMessage,
+  QueueSenderLike
+} from "../src/hosted/types.js";
 import type { JustTcgConfig } from "../src/sources/justtcg/index.js";
 
 const JUSTTCG_CONFIG: JustTcgConfig = {
@@ -24,431 +29,302 @@ const JUSTTCG_CONFIG: JustTcgConfig = {
 };
 
 let samplePayload = "";
-let deltaMergeFixture: DeltaMergeFixture;
-const createdDirs: string[] = [];
 
 beforeEach(async () => {
-  samplePayload = await readFile(join(process.cwd(), "fixtures", "justtcg", "riftbound-cards-sample-with-history.json"), "utf8");
-  deltaMergeFixture = JSON.parse(
-    await readFile(join(process.cwd(), "fixtures", "hosted", "2026-05-12-delta-merge-sample.json"), "utf8")
-  ) as DeltaMergeFixture;
+  samplePayload = await import("node:fs/promises").then(({ readFile }) =>
+    readFile(new URL("../fixtures/justtcg/riftbound-cards-sample-with-history.json", import.meta.url), "utf8")
+  );
 });
 
-afterEach(async () => {
+afterEach(() => {
   vi.restoreAllMocks();
-  for (const dir of createdDirs.splice(0)) {
-    await import("node:fs/promises").then(({ rm }) => rm(dir, { recursive: true, force: true }));
-  }
 });
 
-describe("hosted D1 price store", () => {
-  it("applies migrations and records capture pages through the D1 pipeline", async () => {
+describe("hosted D1 queue price store", () => {
+  it("discovers the total page count, stores a run, and enqueues bounded chunks", async () => {
     const database = new LocalD1Database(":memory:");
-
-    try {
-      await applyHostedPriceStoreMigrations(database, resolveHostedPriceStoreLayout().migrationsDir);
-      const fetchMock = vi.fn(async () => new Response(samplePayload, { status: 200 }));
-      vi.stubGlobal("fetch", fetchMock);
-
-      const result = await runHostedPriceCapture({
-        database,
-        config: JUSTTCG_CONFIG,
-        mode: "full",
-        verifyLimit: false,
-        maxPages: 1
-      });
-      const repository = createHostedPriceStoreRepository(database);
-      const captureRun = await repository.getCaptureRun(result.runId);
-      const pages = await repository.listCapturePages(result.runId);
-
-      expect(captureRun?.status).toBe("succeeded");
-      expect(captureRun?.captureMode).toBe("full");
-      expect(pages).toHaveLength(1);
-      expect(pages[0]?.rowCount).toBeGreaterThan(0);
-      expect(await repository.getPipelineState("latest_successful_capture_run_id")).toBe(result.runId);
-    } finally {
-      database.close();
-    }
-  });
-
-  it("processes captured pages, publishes parallel artifacts, and allows reruns", async () => {
-    const dataRoot = await mkdtemp(join(tmpdir(), "price-store-hosted-data-"));
-    const repositoryRoot = await mkdtemp(join(tmpdir(), "price-store-hosted-repo-"));
-    createdDirs.push(dataRoot, repositoryRoot);
-    const database = new LocalD1Database(":memory:");
+    const ingestionQueue = new LocalQueue<HostedIngestionChunkMessage>();
 
     try {
       await applyHostedPriceStoreMigrations(database, resolveHostedPriceStoreLayout().migrationsDir);
       vi.stubGlobal("fetch", vi.fn(async () => new Response(samplePayload, { status: 200 })));
 
-      const capture = await runHostedPriceCapture({
+      const result = await runHostedPriceDiscovery({
         database,
         config: JUSTTCG_CONFIG,
-        mode: "full",
-        verifyLimit: false,
-        maxPages: 1
-      });
-      const processOne = await runHostedPriceProcess({
-        database,
-        captureRunId: capture.runId
-      });
-      const publishOne = await runHostedPricePublish({
-        database,
-        processRunId: processOne.processRunId,
-        dataRootDir: dataRoot,
-        repositoryRoot
-      });
-      const publishTwo = await runHostedPricePublish({
-        database,
-        processRunId: processOne.processRunId,
-        dataRootDir: dataRoot,
-        repositoryRoot
+        ingestionQueue,
+        chunkRequestBudget: 45,
+        verifyLimit: false
       });
       const repository = createHostedPriceStoreRepository(database);
-      const publishedRun = await repository.getLatestSuccessfulPublishRun();
-      const snapshotPath = join(repositoryRoot, "frontend", "public", "data", "prices-d1", "riftbound", "latest.json");
-      const snapshot = JSON.parse(await readFile(snapshotPath, "utf8")) as {
-        rows: Array<{ rowId: string; externalIds: { tcgplayerId?: string } }>;
-      };
+      const run = await repository.getRun(result.runId);
+      const chunks = await repository.listChunks(result.runId);
 
-      expect(processOne.rowCount).toBeGreaterThan(0);
-      expect(publishOne.rowCount).toBe(processOne.rowCount);
-      expect(publishTwo.publishRunId).not.toBe(publishOne.publishRunId);
-      expect(publishedRun?.publishRunId).toBe(publishTwo.publishRunId);
-      expect(snapshot.rows.length).toBe(processOne.rowCount);
-      expect(snapshot.rows[0]?.externalIds.tcgplayerId).toBeTruthy();
+      expect(result.pageCount).toBe(55);
+      expect(result.chunkCount).toBe(2);
+      expect(run?.status).toBe("ingesting");
+      expect(run?.remainingChunkCount).toBe(2);
+      expect(chunks).toHaveLength(2);
+      expect(chunks[0]?.pageStartIndex).toBe(1);
+      expect(chunks[0]?.pageEndIndex).toBe(45);
+      expect(chunks[1]?.pageStartIndex).toBe(46);
+      expect(chunks[1]?.pageEndIndex).toBe(55);
+      expect(ingestionQueue.messages).toHaveLength(2);
     } finally {
       database.close();
     }
   });
 
-  it("refuses publish while process work is still active", async () => {
+  it("ingests raw pages and enqueues cook exactly once when the last chunk finishes", async () => {
     const database = new LocalD1Database(":memory:");
+    const ingestionQueue = new LocalQueue<HostedIngestionChunkMessage>();
+    const cookQueue = new LocalQueue<HostedCookMessage>();
 
     try {
       await applyHostedPriceStoreMigrations(database, resolveHostedPriceStoreLayout().migrationsDir);
-      const repository = createHostedPriceStoreRepository(database);
-
-      await repository.insertCaptureRun({
-        runId: "capture-1",
-        captureMode: "full",
-        gameSlug: "riftbound-league-of-legends-trading-card-game",
-        status: "succeeded",
-        startedAt: "2026-05-11T00:00:00.000Z",
-        completedAt: "2026-05-11T00:10:00.000Z",
-        updatedAfter: null,
-        requestCount: 1,
-        pageCount: 1,
-        cardCount: 1,
-        verifiedLimit: 20,
-        includePriceHistory: true,
-        includeStatistics: false,
-        message: "done"
-      });
-      await repository.insertProcessRun({
-        processRunId: "process-1",
-        captureRunId: "capture-1",
-        status: "running",
-        startedAt: "2026-05-11T00:11:00.000Z",
-        completedAt: null,
-        rowCount: 0,
-        message: "still running"
-      });
-
-      await expect(
-        runHostedPricePublish({
-          database
-        })
-      ).rejects.toThrow("Cannot publish while a capture or process run is still active.");
-    } finally {
-      database.close();
-    }
-  });
-
-  it("deletes expired raw capture pages by expires_at", async () => {
-    const database = new LocalD1Database(":memory:");
-
-    try {
-      await applyHostedPriceStoreMigrations(database, resolveHostedPriceStoreLayout().migrationsDir);
-      const repository = createHostedPriceStoreRepository(database);
-
-      await repository.insertCaptureRun({
-        runId: "capture-1",
-        captureMode: "full",
-        gameSlug: "riftbound-league-of-legends-trading-card-game",
-        status: "succeeded",
-        startedAt: "2026-05-01T00:00:00.000Z",
-        completedAt: "2026-05-01T00:10:00.000Z",
-        updatedAfter: null,
-        requestCount: 1,
-        pageCount: 0,
-        cardCount: 0,
-        verifiedLimit: 20,
-        includePriceHistory: true,
-        includeStatistics: false,
-        message: "done"
-      });
-      await repository.insertCapturePage({
-        pageId: "page-expired",
-        captureRunId: "capture-1",
-        pageIndex: 1,
-        pageOffset: 0,
-        capturedAt: "2026-05-01T00:05:00.000Z",
-        requestUrl: "https://example.test/page-expired",
-        rowCount: 1,
-        payloadJson: "{}",
-        expiresAt: "2026-05-02T00:00:00.000Z"
-      });
-      await repository.insertCapturePage({
-        pageId: "page-fresh",
-        captureRunId: "capture-1",
-        pageIndex: 2,
-        pageOffset: 20,
-        capturedAt: "2026-05-01T00:06:00.000Z",
-        requestUrl: "https://example.test/page-fresh",
-        rowCount: 1,
-        payloadJson: "{}",
-        expiresAt: "2026-05-20T00:00:00.000Z"
-      });
-
-      const deleted = await repository.deleteExpiredCapturePages("2026-05-11T00:00:00.000Z");
-      const pages = await repository.listCapturePages("capture-1");
-
-      expect(deleted).toBe(1);
-      expect(pages).toHaveLength(1);
-      expect(pages[0]?.pageId).toBe("page-fresh");
-    } finally {
-      database.close();
-    }
-  });
-
-  it("requires a previous successful process run before processing an incremental capture", async () => {
-    const database = new LocalD1Database(":memory:");
-
-    try {
-      await applyHostedPriceStoreMigrations(database, resolveHostedPriceStoreLayout().migrationsDir);
-      const repository = createHostedPriceStoreRepository(database);
-
-      await repository.insertCaptureRun({
-        runId: "capture-incremental-only",
-        captureMode: "incremental",
-        gameSlug: "riftbound-league-of-legends-trading-card-game",
-        status: "succeeded",
-        startedAt: "2026-05-12T22:37:49.539Z",
-        completedAt: "2026-05-12T22:45:20.000Z",
-        updatedAfter: "2026-05-12T00:00:00.000Z",
-        requestCount: 1,
-        pageCount: 1,
-        cardCount: deltaMergeFixture.incrementalPayload.data.length,
-        verifiedLimit: 20,
-        includePriceHistory: true,
-        includeStatistics: false,
-        message: "Incremental delta capture"
-      });
-      await repository.insertCapturePage({
-        pageId: "capture-incremental-only::page-001",
-        captureRunId: "capture-incremental-only",
-        pageIndex: 1,
-        pageOffset: 0,
-        capturedAt: "2026-05-12T22:37:49.539Z",
-        requestUrl: "https://api.justtcg.com/v1/cards?updated_after=1778544000",
-        rowCount: deltaMergeFixture.incrementalPayload.data.length,
-        payloadJson: JSON.stringify(deltaMergeFixture.incrementalPayload),
-        expiresAt: "2026-05-19T22:37:49.539Z"
-      });
-
-      await expect(
-        runHostedPriceProcess({
-          database,
-          captureRunId: "capture-incremental-only"
-        })
-      ).rejects.toThrow("cannot be processed before a previous successful process run establishes full truth");
-    } finally {
-      database.close();
-    }
-  });
-
-  it("merges incremental captures into prior truth, preserving untouched cards and removing missing touched variants", async () => {
-    const dataRoot = await mkdtemp(join(tmpdir(), "price-store-hosted-data-"));
-    const repositoryRoot = await mkdtemp(join(tmpdir(), "price-store-hosted-repo-"));
-    createdDirs.push(dataRoot, repositoryRoot);
-    const database = new LocalD1Database(":memory:");
-
-    try {
-      await applyHostedPriceStoreMigrations(database, resolveHostedPriceStoreLayout().migrationsDir);
-      const repository = createHostedPriceStoreRepository(database);
-
-      await repository.insertCaptureRun({
-        runId: "capture-full-baseline",
-        captureMode: "full",
-        gameSlug: "riftbound-league-of-legends-trading-card-game",
-        status: "succeeded",
-        startedAt: "2026-05-07T22:55:56.911Z",
-        completedAt: "2026-05-07T23:11:01.327Z",
-        updatedAfter: null,
-        requestCount: 55,
-        pageCount: 55,
-        cardCount: 1092,
-        verifiedLimit: 20,
-        includePriceHistory: true,
-        includeStatistics: false,
-        message: "Baseline full capture"
-      });
-      await repository.insertProcessRun({
-        processRunId: "process-full-baseline",
-        captureRunId: "capture-full-baseline",
-        status: "succeeded",
-        startedAt: "2026-05-07T23:11:05.000Z",
-        completedAt: "2026-05-07T23:11:10.000Z",
-        rowCount: deltaMergeFixture.previousRows.length,
-        message: "Baseline full process run"
-      });
-      await repository.replacePriceDataForProcessRun(
-        "process-full-baseline",
-        deltaMergeFixture.previousRows.map((row) => createHostedPriceDataRowFromFixture(row, "process-full-baseline", "capture-full-baseline"))
+      const discoveryPayload = createPagedSamplePayload({ hasMore: true, limit: 1, total: 2, variantSuffix: "d" });
+      const firstPagePayload = createPagedSamplePayload({ hasMore: true, limit: 1, total: 2, variantSuffix: "a" });
+      const secondPagePayload = createPagedSamplePayload({ hasMore: false, limit: 1, total: 2, variantSuffix: "b" });
+      vi.stubGlobal(
+        "fetch",
+        vi.fn()
+          .mockResolvedValueOnce(new Response(JSON.stringify(discoveryPayload), { status: 200 }))
+          .mockResolvedValueOnce(new Response(JSON.stringify(firstPagePayload), { status: 200 }))
+          .mockResolvedValueOnce(new Response(JSON.stringify(secondPagePayload), { status: 200 }))
       );
 
-      await repository.insertCaptureRun({
-        runId: "capture-incremental-2026-05-12",
-        captureMode: "incremental",
-        gameSlug: "riftbound-league-of-legends-trading-card-game",
-        status: "succeeded",
-        startedAt: "2026-05-12T22:37:49.539Z",
-        completedAt: "2026-05-12T22:45:20.000Z",
-        updatedAfter: "2026-05-12T00:00:00.000Z",
-        requestCount: 46,
-        pageCount: 1,
-        cardCount: deltaMergeFixture.incrementalPayload.data.length,
-        verifiedLimit: 20,
-        includePriceHistory: true,
-        includeStatistics: false,
-        message: "May 12 incremental delta capture"
-      });
-      await repository.insertCapturePage({
-        pageId: "capture-incremental-2026-05-12::page-001",
-        captureRunId: "capture-incremental-2026-05-12",
-        pageIndex: 1,
-        pageOffset: 0,
-        capturedAt: "2026-05-12T22:37:49.539Z",
-        requestUrl: "https://api.justtcg.com/v1/cards?updated_after=1778544000",
-        rowCount: deltaMergeFixture.incrementalPayload.data.length,
-        payloadJson: JSON.stringify(deltaMergeFixture.incrementalPayload),
-        expiresAt: "2026-05-19T22:37:49.539Z"
+      const discovery = await runHostedPriceDiscovery({
+        database,
+        config: { ...JUSTTCG_CONFIG, defaultLimit: 1 },
+        ingestionQueue,
+        chunkRequestBudget: 1,
+        verifyLimit: false
       });
 
-      const processResult = await runHostedPriceProcess({
+      const firstChunk = ingestionQueue.messages.shift();
+      const secondChunk = ingestionQueue.messages.shift();
+      if (!firstChunk || !secondChunk) {
+        throw new Error("Expected discovery to enqueue two ingestion chunks.");
+      }
+
+      const firstResult = await runHostedPriceIngestion(
+        {
+          cookQueue,
+          database,
+          message: firstChunk,
+          requestDelayMs: 0
+        },
+        { ...JUSTTCG_CONFIG, defaultLimit: 1 }
+      );
+      const secondResult = await runHostedPriceIngestion(
+        {
+          cookQueue,
+          database,
+          message: secondChunk,
+          requestDelayMs: 0
+        },
+        { ...JUSTTCG_CONFIG, defaultLimit: 1 }
+      );
+      const repository = createHostedPriceStoreRepository(database);
+      const run = await repository.getRun(discovery.runId);
+      const rawPages = await repository.listRawPages(discovery.runId);
+
+      expect(firstResult.shouldEnqueueCook).toBe(false);
+      expect(secondResult.shouldEnqueueCook).toBe(true);
+      expect(cookQueue.messages).toHaveLength(1);
+      expect(run?.status).toBe("ready_to_cook");
+      expect(run?.completedChunkCount).toBe(2);
+      expect(run?.remainingChunkCount).toBe(0);
+      expect(rawPages).toHaveLength(2);
+    } finally {
+      database.close();
+    }
+  });
+
+  it("cooks ingested pages, publishes KV artifacts, and records the live run", async () => {
+    const database = new LocalD1Database(":memory:");
+    const ingestionQueue = new LocalQueue<HostedIngestionChunkMessage>();
+    const cookQueue = new LocalQueue<HostedCookMessage>();
+    const publishQueue = new LocalQueue<HostedPublishMessage>();
+    const kv = new InMemoryKvNamespace();
+
+    try {
+      await applyHostedPriceStoreMigrations(database, resolveHostedPriceStoreLayout().migrationsDir);
+      vi.stubGlobal("fetch", vi.fn(async () => new Response(samplePayload, { status: 200 })));
+
+      const discovery = await runHostedPriceDiscovery({
         database,
-        captureRunId: "capture-incremental-2026-05-12"
+        config: JUSTTCG_CONFIG,
+        ingestionQueue,
+        chunkRequestBudget: 45,
+        verifyLimit: false
       });
-      const mergedRows = await repository.listPriceDataForProcessRun(processResult.processRunId);
+
+      while (ingestionQueue.messages.length > 0) {
+        const message = ingestionQueue.messages.shift();
+        if (!message) {
+          continue;
+        }
+
+        await runHostedPriceIngestion(
+          {
+            cookQueue,
+            database,
+            message,
+            requestDelayMs: 0
+          },
+          JUSTTCG_CONFIG
+        );
+      }
+
+      const cookMessage = cookQueue.messages.shift();
+      if (!cookMessage) {
+        throw new Error("Expected ingestion to enqueue one cook message.");
+      }
+
+      const cookResult = await runHostedPriceCook({
+        database,
+        message: cookMessage,
+        publishQueue
+      });
+      const publishMessage = publishQueue.messages.shift();
+      if (!publishMessage) {
+        throw new Error("Expected cook to enqueue one publish message.");
+      }
+
       const publishResult = await runHostedPricePublish({
         database,
-        processRunId: processResult.processRunId,
-        dataRootDir: dataRoot,
-        repositoryRoot
+        message: publishMessage,
+        publishedDataKv: kv
+      });
+      const repository = createHostedPriceStoreRepository(database);
+      const latestPublishRun = await repository.getLatestSuccessfulPublishRun();
+      const run = await repository.getRun(discovery.runId);
+
+      expect(cookResult.rowCount).toBeGreaterThan(0);
+      expect(publishResult.rowCount).toBe(cookResult.rowCount);
+      expect(await kv.get("prices-d1/manifest.json", "text")).toContain("\"snapshotPath\": \"riftbound/latest.json\"");
+      expect(await kv.get("prices-d1/riftbound/latest.json", "text")).toContain("\"rows\"");
+      expect(latestPublishRun?.runId).toBe(discovery.runId);
+      expect(await repository.getPipelineState("current_live_run_id")).toBe(discovery.runId);
+      expect(run?.status).toBe("succeeded");
+      expect(run?.publishedRowCount).toBe(publishResult.rowCount);
+    } finally {
+      database.close();
+    }
+  });
+
+  it("deletes runs older than one week behind the live snapshot", async () => {
+    const database = new LocalD1Database(":memory:");
+
+    try {
+      await applyHostedPriceStoreMigrations(database, resolveHostedPriceStoreLayout().migrationsDir);
+      const repository = createHostedPriceStoreRepository(database);
+
+      await repository.insertRun(createRunRow("old-run", "2026-05-01T00:00:00.000Z", "2026-05-01T12:00:00.000Z"));
+      await repository.insertRun(createRunRow("live-run", "2026-05-12T00:00:00.000Z", "2026-05-12T12:00:00.000Z"));
+      await repository.setPipelineState("current_live_run_id", "live-run");
+      await repository.setPipelineState("current_live_published_at", "2026-05-12T12:00:00.000Z");
+
+      const result = await runHostedPriceMaintenance({
+        database
       });
 
-      expect(processResult.rowCount).toBe(6);
-      expect(mergedRows).toHaveLength(6);
-      expect(
-        mergedRows.filter(
-          (row) =>
-            row.sourceCardId === "riftbound-league-of-legends-trading-card-game-origins-blazing-scorcher-common" &&
-            row.sourceVariantId ===
-              "riftbound-league-of-legends-trading-card-game-origins-blazing-scorcher-common_near-mint"
-        )
-      ).toHaveLength(1);
-      expect(
-        mergedRows.filter(
-          (row) =>
-            row.sourceCardId === "riftbound-league-of-legends-trading-card-game-unleashed-vex-apathetic-epic"
-        )
-      ).toHaveLength(1);
-      expect(
-        mergedRows.some(
-          (row) =>
-            row.sourceVariantId ===
-            "riftbound-league-of-legends-trading-card-game-unleashed-vex-apathetic-epic_lightly-played_foil"
-        )
-      ).toBe(false);
-      expect(
-        mergedRows.filter(
-          (row) =>
-            row.sourceCardId === "riftbound-league-of-legends-trading-card-game-origins-acceptable-losses-uncommon"
-        )
-      ).toHaveLength(4);
-      expect(
-        mergedRows
-          .filter(
-            (row) =>
-              row.sourceCardId === "riftbound-league-of-legends-trading-card-game-origins-blazing-scorcher-common"
-          )
-          .every((row) => row.processRunId === processResult.processRunId)
-      ).toBe(true);
-
-      expect(publishResult.rowCount).toBe(6);
-      expect(
-        publishResult.snapshot.rows.filter((row) => row.cardName === "Vex - Apathetic")
-      ).toHaveLength(1);
-      expect(
-        publishResult.snapshot.rows.filter((row) => row.cardName === "Acceptable Losses")
-      ).toHaveLength(4);
-      expect(
-        publishResult.snapshot.rows.some(
-          (row) =>
-            row.cardName === "Blazing Scorcher" &&
-            row.externalIds.tcgplayerSkuId === "8925402"
-        )
-      ).toBe(true);
+      expect(result.cutoffIso).toBe("2026-05-05T12:00:00.000Z");
+      expect(result.deletedRunCount).toBe(1);
+      expect(await repository.getRun("old-run")).toBeNull();
+      expect(await repository.getRun("live-run")).not.toBeNull();
     } finally {
       database.close();
     }
   });
 });
 
-type DeltaMergeFixture = {
-  previousRows: Array<FixturePriceDataRow>;
-  incrementalPayload: {
-    data: Array<Record<string, unknown>>;
-    meta: Record<string, unknown>;
-  };
-};
-
-type FixturePriceDataRow = {
-  sourceCardId: string;
-  sourceVariantId: string;
-  tcgplayerId: string | null;
-  tcgplayerSkuId: string | null;
-  language: string | null;
-  condition: string | null;
-  printing: string | null;
-  currentPriceAmount: number | null;
-  currentPriceLastUpdatedAt: string | null;
-  priceHistory: Array<{ amount: number; observedAt: string }>;
-};
-
-function createHostedPriceDataRowFromFixture(
-  row: FixturePriceDataRow,
-  processRunId: string,
-  captureRunId: string
-): HostedPriceDataRow {
+function createRunRow(runId: string, startedAt: string, publishedAt: string): HostedPipelineRunRow {
   return {
-    rowId: `${processRunId}::${row.sourceVariantId}`,
-    processRunId,
-    captureRunId,
-    upstreamProviderId: "justtcg",
-    priceSourceId: "tcgplayer",
+    runId,
     gameSlug: "riftbound-league-of-legends-trading-card-game",
-    sourceCardId: row.sourceCardId,
-    sourceVariantId: row.sourceVariantId,
-    tcgplayerId: row.tcgplayerId,
-    tcgplayerSkuId: row.tcgplayerSkuId,
-    language: row.language,
-    condition: row.condition,
-    printing: row.printing,
-    currency: "USD",
-    currentPriceAmount: row.currentPriceAmount,
-    currentPriceLastUpdatedAt: row.currentPriceLastUpdatedAt,
-    priceHistoryJson: JSON.stringify(row.priceHistory)
+    captureMode: "full",
+    status: "succeeded",
+    startedAt,
+    discoveryCompletedAt: startedAt,
+    ingestionCompletedAt: startedAt,
+    cookStartedAt: startedAt,
+    cookCompletedAt: startedAt,
+    publishStartedAt: startedAt,
+    completedAt: publishedAt,
+    updatedAfter: null,
+    verifiedLimit: 20,
+    requestBudgetPerChunk: 45,
+    pageCount: 1,
+    chunkCount: 1,
+    completedChunkCount: 1,
+    remainingChunkCount: 0,
+    rawPageCount: 1,
+    cookedRowCount: 1,
+    publishedRowCount: 1,
+    cookEnqueueRequestedAt: startedAt,
+    publishEnqueueRequestedAt: startedAt,
+    livePublishedAt: publishedAt,
+    latestError: null
   };
+}
+
+function createPagedSamplePayload(input: {
+  hasMore: boolean;
+  limit: number;
+  total: number;
+  variantSuffix: string;
+}): {
+  data: Array<Record<string, unknown>>;
+  meta: Record<string, unknown>;
+} {
+  const payload = JSON.parse(samplePayload) as {
+    data: Array<Record<string, unknown>>;
+    meta?: Record<string, unknown>;
+  };
+  const card = structuredClone(payload.data[0]);
+  if (card && typeof card === "object") {
+    card.id = `${String(card.id)}-${input.variantSuffix}`;
+    if (Array.isArray(card.variants) && card.variants[0] && typeof card.variants[0] === "object") {
+      card.variants[0].id = `${String(card.variants[0].id)}-${input.variantSuffix}`;
+      if (card.variants[0].tcgplayerSkuId) {
+        card.variants[0].tcgplayerSkuId = `${String(card.variants[0].tcgplayerSkuId)}${input.variantSuffix}`;
+      }
+    }
+  }
+
+  return {
+    data: [card],
+    meta: {
+      ...payload.meta,
+      hasMore: input.hasMore,
+      limit: input.limit,
+      total: input.total
+    }
+  };
+}
+
+class LocalQueue<T> implements QueueSenderLike<T> {
+  readonly messages: T[] = [];
+
+  async send(body: T): Promise<void> {
+    this.messages.push(body);
+  }
+}
+
+class InMemoryKvNamespace {
+  private readonly values = new Map<string, string>();
+
+  async get(key: string, type: "text"): Promise<string | null> {
+    if (type !== "text") {
+      throw new Error(`Unsupported type ${type}`);
+    }
+
+    return this.values.get(key) ?? null;
+  }
+
+  async put(key: string, value: string): Promise<void> {
+    this.values.set(key, value);
+  }
 }

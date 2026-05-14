@@ -87,7 +87,6 @@ export async function writePublishedPriceArtifacts(
     metadata
   };
 }
-
 function sanitizePathPrefix(value: string): string {
   const normalized = value.trim().replace(/[^a-zA-Z0-9/_-]+/g, "-").replace(/\/+/g, "/");
   const sanitized = normalized.replace(/^\/+|\/+$/g, "");
