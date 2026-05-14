@@ -794,9 +794,9 @@ describe("App", () => {
     expect(dialog).toBeInTheDocument();
     expect(within(dialog).getByText("$12.54")).toBeInTheDocument();
     expect(within(dialog).queryByText("Near Mint $12.54")).not.toBeInTheDocument();
-    expect(within(dialog).getByRole("link", { name: "Buy on TCG ↗" }).getAttribute("href")).toContain("https://partner.tcgplayer.com/B5PQx1?u=");
-    expect(within(dialog).getByRole("link", { name: "Buy on TCG ↗" }).getAttribute("href")).toContain("search%2Friftbound-league-of-legends-trading-card-game%2Fproduct");
-    expect(within(dialog).getByRole("link", { name: "Buy on TCG ↗" }).getAttribute("href")).toContain("productLineName%3Driftbound-league-of-legends-trading-card-game");
+    expect(within(dialog).getByRole("link", { name: "Buy on TCGPlayer ↗" }).getAttribute("href")).toContain("https://partner.tcgplayer.com/B5PQx1?u=");
+    expect(within(dialog).getByRole("link", { name: "Buy on TCGPlayer ↗" }).getAttribute("href")).toContain("search%2Friftbound-league-of-legends-trading-card-game%2Fproduct");
+    expect(within(dialog).getByRole("link", { name: "Buy on TCGPlayer ↗" }).getAttribute("href")).toContain("productLineName%3Driftbound-league-of-legends-trading-card-game");
   });
 
   it("renders inline symbols in Quick View text and combines multi-domain chips", async () => {

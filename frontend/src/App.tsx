@@ -753,7 +753,7 @@ function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; o
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Buy on TCG ↗
+                Buy on TCGPlayer ↗
               </a>
             ) : null}
             <button type="button" className="card-quick-look-detail-link" onClick={handleViewDetails}>
