@@ -599,6 +599,8 @@ function matchesQuery(card: CardRecord, query: string): boolean {
       case "s":
       case "set":
         return normalized(card.set.set_id).includes(value) || normalized(card.set.label).includes(value);
+      case "unique":
+        return true; // display option, not a filter
       default:
         return normalized(card.riot_name).includes(value);
     }
@@ -640,7 +642,7 @@ function mockFetch(poolFactory = generatedPool) {
       const parsedUrl = new URL(url, "https://example.test");
       const query = parsedUrl.searchParams.get("q") ?? "";
 
-      if (query === "energy>>3") {
+      if (query.includes("energy>>3")) {
         return Response.json({
           total: 0,
           normalizedQuery: "energy>>3",
@@ -769,10 +771,64 @@ describe("App", () => {
     await submitCardsSearch(user, "name:void");
 
     await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid");
+      expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid+unique%3Aid");
     });
     expect(await screen.findByAltText("Void Gate card image.")).toBeInTheDocument();
     expect(screen.getByTestId("card-grid")).toHaveAttribute("data-columns", "4");
+  });
+
+  it("show variants only displays the variants returned by the search, not all variants of a card", async () => {
+    const user = userEvent.setup();
+
+    const ognPrinting: CardRecord = {
+      ...createCard({
+        id: "void-gate-ogn",
+        riotName: "Void Gate",
+        cleanName: "void gate",
+        setId: "OGN",
+        setLabel: "Origins",
+        collectorNumber: "1",
+        finishes: ["nonfoil"]
+      }),
+      riftbound_id: "void-gate-shared"
+    };
+
+    const unlAAPrinting: CardRecord = {
+      ...createCard({
+        id: "void-gate-unl-aa",
+        riotName: "Void Gate",
+        cleanName: "void gate",
+        setId: "UNL",
+        setLabel: "Unleashed",
+        collectorNumber: "201",
+        finishes: ["nonfoil"]
+      }),
+      riftbound_id: "void-gate-shared",
+      variant: { alternate_art: true, overnumbered: false, signed: false }
+    };
+
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url === "/data/prices-d1/manifest.json") return Response.json(d1PriceManifest);
+      if (url === "/data/prices-d1/riftbound/latest.json") return Response.json(d1PriceSnapshot);
+      if (url === "/api/query/features") return Response.json({ fields, syntax });
+      if (url.startsWith("/api/cards")) {
+        return Response.json({ total: 1, normalizedQuery: "void gate", diagnostics: [], items: [ognPrinting] });
+      }
+      return new Response(null, { status: 404 });
+    }));
+
+    window.history.pushState({}, "", "/cards");
+    render(<App />);
+    await screen.findByRole("heading", { name: "Card Search Results" });
+
+    await submitCardsSearch(user, "void gate");
+    await screen.findByAltText("Void Gate card image.");
+
+    await user.click(screen.getByLabelText("Show Variants"));
+
+    expect(screen.getByRole("button", { name: "OGN" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "UNL AA" })).not.toBeInTheDocument();
   });
 
   it("shows the published near mint market price in the Quick View", async () => {
@@ -925,7 +981,7 @@ describe("App", () => {
     await waitFor(() => {
       expect(window.location.pathname).toBe("/cards");
       expect(window.location.search).toBe("?q=name%3Avoid");
-      expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid");
+      expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid+unique%3Aid");
     });
 
     expect(await screen.findByRole("heading", { name: "Card Search Results" })).toBeInTheDocument();

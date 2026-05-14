@@ -737,6 +737,18 @@ function PriceHistoryChart({ rows, colorsByRowId }: { rows: PublishedPriceRow[];
   );
 }
 
+function stripUniqueFromQuery(query: string): string {
+  return query.replace(/\bunique:\S+/gi, "").replace(/\s{2,}/g, " ").trim();
+}
+
+function queryRequestsAllPrintings(query: string): boolean {
+  return /\bunique:(id|prints|\*)/i.test(query);
+}
+
+function stripUniqueFromNormalized(normalized: string): string {
+  return normalized.replace(/\bunique:\S+/gi, "").replace(/\s{2,}/g, " ").trim();
+}
+
 function groupCardsByRiftboundId(cards: CardRecord[]): CardRecord[][] {
   const groups = new Map<string, CardRecord[]>();
   for (const card of cards) {
@@ -758,6 +770,42 @@ function variantButtonLabel(card: CardRecord, finish: string): string {
   else if (card.variant.overnumbered) parts.push("ON");
   if (finish === "foil") parts.push("FOIL");
   return parts.join(" ");
+}
+
+function VariantButtonRow({
+  cards,
+  showPrice,
+  publishedPriceIndex,
+  onNavigate,
+}: {
+  cards: CardRecord[];
+  showPrice: boolean;
+  publishedPriceIndex: ReturnType<typeof usePublishedPriceIndex>["index"];
+  onNavigate: (path: string) => void;
+}) {
+  return (
+    <div className="variant-buttons" onClick={(e) => e.stopPropagation()}>
+      {cards.flatMap((card) =>
+        card.finishes.map((finish) => {
+          const label = variantButtonLabel(card, finish);
+          const priceRows = getPublishedRowsForCard(publishedPriceIndex, card.tcgplayer_id);
+          const priceRow = showPrice ? resolveNearMintMarketPrice(priceRows, finish) : null;
+          const priceStr = showPrice ? formatPriceOnly(priceRow) : null;
+          return (
+            <button
+              key={`${card.id}-${finish}`}
+              type="button"
+              className="variant-btn"
+              onClick={() => onNavigate(buildCardDetailPath(card.id))}
+            >
+              <span className="variant-btn-label">{label}</span>
+              {priceStr && <span className="variant-btn-price">{priceStr}</span>}
+            </button>
+          );
+        })
+      )}
+    </div>
+  );
 }
 
 function SearchResultsGrid({
@@ -788,6 +836,10 @@ function SearchResultsGrid({
     <div className="card-grid" data-testid="card-grid" data-columns="4">
       {cardGroups.map((group) => {
         const representative = group[0];
+        // Which cards to show buttons for:
+        // - showVariants: all records in the group
+        // - showPrice only: just the representative's finishes
+        const buttonCards = showVariants ? group : showPrice ? [representative] : [];
         return (
           <article
             className="card-tile card-tile--clickable"
@@ -804,28 +856,13 @@ function SearchResultsGrid({
             ) : (
               <div className="missing-image">{representative.riot_name}</div>
             )}
-            {showVariants && variantMode === "unique-cards" && (
-              <div className="variant-buttons" onClick={(e) => e.stopPropagation()}>
-                {group.flatMap((card) =>
-                  card.finishes.map((finish) => {
-                    const label = variantButtonLabel(card, finish);
-                    const priceRows = getPublishedRowsForCard(publishedPriceIndex, card.tcgplayer_id);
-                    const priceRow = showPrice ? resolveNearMintMarketPrice(priceRows, finish) : null;
-                    const priceStr = showPrice ? formatPriceOnly(priceRow) : null;
-                    return (
-                      <button
-                        key={`${card.id}-${finish}`}
-                        type="button"
-                        className="variant-btn"
-                        onClick={() => onNavigate(buildCardDetailPath(card.id))}
-                      >
-                        <span className="variant-btn-label">{label}</span>
-                        {priceStr && <span className="variant-btn-price">{priceStr}</span>}
-                      </button>
-                    );
-                  })
-                )}
-              </div>
+            {buttonCards.length > 0 && (
+              <VariantButtonRow
+                cards={buttonCards}
+                showPrice={showPrice}
+                publishedPriceIndex={publishedPriceIndex}
+                onNavigate={onNavigate}
+              />
             )}
           </article>
         );
@@ -990,6 +1027,11 @@ function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; o
 
 type VariantMode = "unique-cards" | "unique-printings";
 
+function buildApiQuery(rawQuery: string): string {
+  const stripped = stripUniqueFromQuery(rawQuery);
+  return stripped.length > 0 ? `${stripped} unique:id` : "unique:id";
+}
+
 function SearchView({
   onError,
   locationSearch,
@@ -1012,12 +1054,12 @@ function SearchView({
   const [showVariants, setShowVariants] = useState(false);
   const searchParamQuery = new URLSearchParams(locationSearch).get("q") ?? "";
 
-  async function runSearch(nextQuery: string) {
+  async function runSearch(rawQuery: string) {
     setIsSearching(true);
     onError(null);
     setHasSearched(true);
     try {
-      const result = await searchCards(nextQuery);
+      const result = await searchCards(buildApiQuery(rawQuery));
       setCards(result.items);
       setDiagnostics(result.diagnostics);
       setNormalizedQuery(result.normalizedQuery);
@@ -1033,6 +1075,8 @@ function SearchView({
 
     setQuery(searchParamQuery);
     onError(null);
+    // Auto-detect mode from URL query
+    setVariantMode(queryRequestsAllPrintings(searchParamQuery) ? "unique-printings" : "unique-cards");
 
     if (searchParamQuery.trim().length === 0) {
       setCards([]);
@@ -1047,7 +1091,7 @@ function SearchView({
 
     async function syncSearchFromUrl() {
       try {
-        const result = await searchCards(searchParamQuery);
+        const result = await searchCards(buildApiQuery(searchParamQuery));
         if (ignore) return;
         setCards(result.items);
         setDiagnostics(result.diagnostics);
@@ -1078,6 +1122,7 @@ function SearchView({
 
   const cardGroups = useMemo(() => groupCardsByRiftboundId(cards), [cards]);
   const resultCount = variantMode === "unique-cards" ? cardGroups.length : cards.length;
+  const displayedNormalizedQuery = stripUniqueFromNormalized(normalizedQuery);
 
   return (
     <>
@@ -1100,9 +1145,6 @@ function SearchView({
               <span>{isSearching ? "Searching" : "Search"}</span>
             </button>
           </div>
-          <output className="normalized-query" aria-live="polite">
-            {normalizedQuery ? `Normalized: ${normalizedQuery}` : null}
-          </output>
         </form>
 
         <div className="search-controls-panel">
@@ -1153,9 +1195,14 @@ function SearchView({
           </div>
         </div>
 
+        {displayedNormalizedQuery && (
+          <output className="normalized-query" aria-live="polite">
+            Normalized: {displayedNormalizedQuery}
+          </output>
+        )}
         {hasSearched && (
           <p className="results-summary">
-            {resultCount.toLocaleString()} matching card{resultCount !== 1 ? "s" : ""}{normalizedQuery ? ` with "${normalizedQuery}"` : ""}
+            {resultCount.toLocaleString()} matching card{resultCount !== 1 ? "s" : ""}{displayedNormalizedQuery ? ` with "${displayedNormalizedQuery}"` : ""}
           </p>
         )}
       </div>

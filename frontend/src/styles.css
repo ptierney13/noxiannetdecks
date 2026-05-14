@@ -4967,7 +4967,7 @@ code {
 }
 
 .variant-btn-price {
-  color: var(--text-muted);
+  color: var(--amber);
   font-size: 0.74rem;
   font-weight: 400;
 }
