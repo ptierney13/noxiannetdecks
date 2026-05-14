@@ -768,7 +768,7 @@ function variantButtonLabel(card: CardRecord, finish: string): string {
   if (card.variant.alternate_art) parts.push("AA");
   if (card.variant.signed) parts.push("Sig");
   else if (card.variant.overnumbered) parts.push("ON");
-  if (finish === "foil") parts.push("FOIL");
+  if (finish === "foil" && card.finishes.includes("nonfoil")) parts.push("FOIL");
   return parts.join(" ");
 }
 
@@ -776,12 +776,12 @@ function VariantButtonRow({
   cards,
   showPrice,
   publishedPriceIndex,
-  onNavigate,
+  onCardClick,
 }: {
   cards: CardRecord[];
   showPrice: boolean;
   publishedPriceIndex: ReturnType<typeof usePublishedPriceIndex>["index"];
-  onNavigate: (path: string) => void;
+  onCardClick: (card: CardRecord) => void;
 }) {
   return (
     <div className="variant-buttons" onClick={(e) => e.stopPropagation()}>
@@ -796,7 +796,7 @@ function VariantButtonRow({
               key={`${card.id}-${finish}`}
               type="button"
               className="variant-btn"
-              onClick={() => onNavigate(buildCardDetailPath(card.id))}
+              onClick={() => onCardClick(card)}
             >
               <span className="variant-btn-label">{label}</span>
               {priceStr && <span className="variant-btn-price">{priceStr}</span>}
@@ -815,7 +815,6 @@ function SearchResultsGrid({
   variantMode,
   showVariants,
   onCardClick,
-  onNavigate,
 }: {
   cards: CardRecord[];
   sort: SortKey;
@@ -823,7 +822,6 @@ function SearchResultsGrid({
   variantMode: VariantMode;
   showVariants: boolean;
   onCardClick: (card: CardRecord) => void;
-  onNavigate: (path: string) => void;
 }) {
   const { index: publishedPriceIndex } = usePublishedPriceIndex();
   const sorted = useMemo(() => sortCardsByKey(cards, sort), [cards, sort]);
@@ -838,8 +836,9 @@ function SearchResultsGrid({
         const representative = group[0];
         // Which cards to show buttons for:
         // - showVariants: all records in the group
-        // - showPrice only: just the representative's finishes
-        const buttonCards = showVariants ? group : showPrice ? [representative] : [];
+        // - showPrice only: the representative with only its first finish
+        const priceRepresentative = { ...representative, finishes: [representative.finishes[0]] };
+        const buttonCards = showVariants ? group : showPrice ? [priceRepresentative] : [];
         return (
           <article
             className="card-tile card-tile--clickable"
@@ -861,7 +860,7 @@ function SearchResultsGrid({
                 cards={buttonCards}
                 showPrice={showPrice}
                 publishedPriceIndex={publishedPriceIndex}
-                onNavigate={onNavigate}
+                onCardClick={onCardClick}
               />
             )}
           </article>
@@ -1168,7 +1167,7 @@ function SearchView({
                 checked={showPrice}
                 onChange={(e) => setShowPrice(e.target.checked)}
               />
-              Show Price
+              Show Prices
             </label>
             <div className="search-control-group">
               <label htmlFor="variant-mode-select">Variants</label>
@@ -1195,11 +1194,6 @@ function SearchView({
           </div>
         </div>
 
-        {displayedNormalizedQuery && (
-          <output className="normalized-query" aria-live="polite">
-            Normalized: {displayedNormalizedQuery}
-          </output>
-        )}
         {hasSearched && (
           <p className="results-summary">
             {resultCount.toLocaleString()} matching card{resultCount !== 1 ? "s" : ""}{displayedNormalizedQuery ? ` with "${displayedNormalizedQuery}"` : ""}
@@ -1216,7 +1210,6 @@ function SearchView({
           variantMode={variantMode}
           showVariants={showVariants}
           onCardClick={setQuickLookCard}
-          onNavigate={onNavigate}
         />
       ) : null}
       {quickLookCard ? (

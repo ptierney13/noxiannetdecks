@@ -4927,7 +4927,7 @@ code {
 
 .results-summary {
   margin: 0 0 16px;
-  color: var(--text-muted);
+  color: var(--amber);
   font-size: 0.92rem;
 }
 
