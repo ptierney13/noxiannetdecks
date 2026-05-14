@@ -7,13 +7,9 @@ import {
   formatUsdPrice,
   getPublishedRowsForCard,
   normalizePrinting,
-  resolveActivePricePathPrefix,
-  resolveComparisonPricePathPrefix,
   resolveNearMintMarketPrice,
   sortPriceRows,
-  useOptionalPublishedPriceIndex,
   usePublishedPriceIndex,
-  type PublishedPriceIndex,
   type PublishedPriceRow
 } from "./priceData";
 import QueryBuilderView from "./QueryBuilderView";
@@ -455,163 +451,6 @@ function groupRowsByPrinting(rows: PublishedPriceRow[]): PricePrintingGroup[] {
       label: formatPrintingLabel(key),
       rows: groups.get(key) ?? []
     }));
-}
-
-type PriceComparisonRow = {
-  key: string;
-  label: string;
-  legacy: PublishedPriceRow | null;
-  d1: PublishedPriceRow | null;
-};
-
-function buildPriceComparisonRows(legacyRows: PublishedPriceRow[], d1Rows: PublishedPriceRow[]): PriceComparisonRow[] {
-  const rows = new Map<string, PriceComparisonRow>();
-
-  for (const row of legacyRows) {
-    const key = createPriceComparisonKey(row);
-    rows.set(key, {
-      key,
-      label: `${formatPrintingLabel(row.printing)} ${row.condition ?? "Unknown"}`,
-      legacy: row,
-      d1: rows.get(key)?.d1 ?? null
-    });
-  }
-
-  for (const row of d1Rows) {
-    const key = createPriceComparisonKey(row);
-    rows.set(key, {
-      key,
-      label: `${formatPrintingLabel(row.printing)} ${row.condition ?? "Unknown"}`,
-      legacy: rows.get(key)?.legacy ?? null,
-      d1: row
-    });
-  }
-
-  return [...rows.values()].sort((left, right) => left.key.localeCompare(right.key));
-}
-
-function createPriceComparisonKey(row: PublishedPriceRow): string {
-  return [
-    normalizePrinting(row.printing) || "other",
-    (row.condition ?? "").trim().toLowerCase(),
-    (row.language ?? "").trim().toLowerCase()
-  ].join("::");
-}
-
-function formatPriceDelta(legacy: PublishedPriceRow | null, d1: PublishedPriceRow | null): string {
-  const legacyAmount = legacy?.currentPrice.amount;
-  const d1Amount = d1?.currentPrice.amount;
-
-  if (legacyAmount == null || d1Amount == null) {
-    return "n/a";
-  }
-
-  const delta = d1Amount - legacyAmount;
-  if (delta === 0) {
-    return "$0.00";
-  }
-
-  const prefix = delta > 0 ? "+" : "";
-  return `${prefix}${formatUsdPrice(delta) ?? "$0.00"}`;
-}
-
-function formatComparisonTimestamp(value: string | undefined): string {
-  if (!value) {
-    return "n/a";
-  }
-
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZone: "UTC"
-  }).format(parsed);
-}
-
-function LocalPriceComparisonPanel({
-  tcgplayerId,
-  primaryIndex,
-  comparisonIndex,
-  comparisonStatus
-}: {
-  tcgplayerId: string | null | undefined;
-  primaryIndex: PublishedPriceIndex | null;
-  comparisonIndex: PublishedPriceIndex | null;
-  comparisonStatus: "idle" | "loading" | "ready" | "error";
-}) {
-  if (!resolveComparisonPricePathPrefix() || !tcgplayerId) {
-    return null;
-  }
-
-  const primaryRows = getPublishedRowsForCard(primaryIndex, tcgplayerId);
-  const comparisonRowsForCard = getPublishedRowsForCard(comparisonIndex, tcgplayerId);
-  const comparisonRows = buildPriceComparisonRows(primaryRows, comparisonRowsForCard);
-  const primaryLabel = resolveActivePricePathPrefix() === "/data/prices-d1" ? "D1" : "Legacy";
-  const comparisonLabel = primaryLabel === "D1" ? "Legacy" : "D1";
-
-  return (
-    <div className="card-detail-section price-compare-panel" data-testid="local-price-comparison">
-      <div className="price-compare-header">
-        <div>
-          <h2 className="card-detail-section-heading">Local Price Comparison</h2>
-          <p className="price-compare-copy">The active localhost price source stays visible while the alternate artifact set renders beside it for parity checks.</p>
-        </div>
-        <span className="price-compare-status">
-          {comparisonStatus === "ready" ? `${comparisonLabel} snapshot loaded` : comparisonStatus === "loading" ? `Loading ${comparisonLabel} snapshot` : comparisonStatus === "error" ? `${comparisonLabel} snapshot unavailable` : "Comparison idle"}
-        </span>
-      </div>
-
-      <div className="price-compare-summary">
-        <div>
-          <strong>{primaryLabel}</strong>
-          <span>{primaryRows.length} rows</span>
-          <span>published {formatComparisonTimestamp(primaryIndex?.manifest.publishedAt)}</span>
-          <span>freshest {formatComparisonTimestamp(primaryIndex?.snapshot.freshness?.freshestPriceAt)}</span>
-        </div>
-        <div>
-          <strong>{comparisonLabel}</strong>
-          <span>{comparisonRowsForCard.length} rows</span>
-          <span>published {formatComparisonTimestamp(comparisonIndex?.manifest.publishedAt)}</span>
-          <span>freshest {formatComparisonTimestamp(comparisonIndex?.snapshot.freshness?.freshestPriceAt)}</span>
-        </div>
-      </div>
-
-      {comparisonStatus === "error" ? (
-        <p className="price-compare-empty">No alternate local price artifact set was found for comparison yet.</p>
-      ) : comparisonRows.length === 0 ? (
-        <p className="price-compare-empty">No comparable rows are available for this card yet.</p>
-      ) : (
-        <div className="price-compare-table-wrap">
-          <table className="price-compare-table">
-            <thead>
-              <tr>
-                <th>Row</th>
-                <th>{primaryLabel}</th>
-                <th>{comparisonLabel}</th>
-                <th>Delta</th>
-              </tr>
-            </thead>
-            <tbody>
-              {comparisonRows.map((row) => (
-                <tr key={row.key}>
-                  <td>{row.label}</td>
-                  <td>{formatPriceOnly(row.legacy) ?? "n/a"}</td>
-                  <td>{formatPriceOnly(row.d1) ?? "n/a"}</td>
-                  <td>{formatPriceDelta(row.legacy, row.d1)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
 }
 
 type ChartTooltip = { cx: number; cy: number; amount: number; date: string };
@@ -2400,15 +2239,6 @@ function CardDetailView({
   const [selectedPriceRowIds, setSelectedPriceRowIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const { index: publishedPriceIndex } = usePublishedPriceIndex();
-  const comparisonPricePathPrefix = resolveComparisonPricePathPrefix();
-  const enableDualPriceComparison = Boolean(
-    comparisonPricePathPrefix &&
-    (import.meta.env.DEV || import.meta.env.VITE_ENABLE_DUAL_PRICE_COMPARE === "1")
-  );
-  const { index: d1PublishedPriceIndex, status: d1PriceStatus } = useOptionalPublishedPriceIndex(
-    comparisonPricePathPrefix ?? "/data/prices-d1",
-    enableDualPriceComparison
-  );
   const priceSeriesColorsRef = useRef<Record<string, string>>({});
   const nextPriceSeriesColorIndexRef = useRef(0);
 
@@ -2695,13 +2525,6 @@ function CardDetailView({
               </>
             )}
           </div>
-
-          <LocalPriceComparisonPanel
-            tcgplayerId={card.tcgplayer_id}
-            primaryIndex={publishedPriceIndex}
-            comparisonIndex={d1PublishedPriceIndex}
-            comparisonStatus={d1PriceStatus}
-          />
         </div>
       </div>
     </section>

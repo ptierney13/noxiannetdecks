@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-const LEGACY_PRICE_PATH_PREFIX = "/data/prices";
 const D1_PRICE_PATH_PREFIX = "/data/prices-d1";
+const LEGACY_PRICE_PATH_PREFIX = "/data/prices";
 
 export type PublishedPriceHistoryPoint = {
   amount: number;
@@ -107,54 +107,6 @@ export function usePublishedPriceIndex(): {
   status: "loading" | "ready" | "error";
 } {
   return usePublishedPriceIndexForPath(resolveActivePricePathPrefix());
-}
-
-export function useOptionalPublishedPriceIndex(
-  pathPrefix: string,
-  enabled: boolean
-): {
-  index: PublishedPriceIndex | null;
-  status: "idle" | "loading" | "ready" | "error";
-} {
-  const [index, setIndex] = useState<PublishedPriceIndex | null>(null);
-  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">(enabled ? "loading" : "idle");
-
-  useEffect(() => {
-    let ignore = false;
-
-    if (!enabled) {
-      setIndex(null);
-      setStatus("idle");
-      return () => {
-        ignore = true;
-      };
-    }
-
-    setStatus("loading");
-    loadPublishedPriceIndexForPath(pathPrefix)
-      .then((loaded) => {
-        if (ignore) {
-          return;
-        }
-
-        setIndex(loaded);
-        setStatus("ready");
-      })
-      .catch(() => {
-        if (ignore) {
-          return;
-        }
-
-        setIndex(null);
-        setStatus("error");
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, [enabled, pathPrefix]);
-
-  return { index, status };
 }
 
 function usePublishedPriceIndexForPath(pathPrefix: string): {
@@ -352,20 +304,7 @@ export function resolveActivePricePathPrefix(): string {
     return configured;
   }
 
-  return LEGACY_PRICE_PATH_PREFIX;
-}
-
-export function resolveComparisonPricePathPrefix(): string | null {
-  const active = resolveActivePricePathPrefix();
-  if (active === D1_PRICE_PATH_PREFIX) {
-    return LEGACY_PRICE_PATH_PREFIX;
-  }
-
-  if (active === LEGACY_PRICE_PATH_PREFIX) {
-    return D1_PRICE_PATH_PREFIX;
-  }
-
-  return null;
+  return D1_PRICE_PATH_PREFIX;
 }
 
 function resolvePricePathPrefixFromLocation(): string | null {
