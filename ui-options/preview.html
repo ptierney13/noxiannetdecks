@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Noxian Netdecks — UI Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+  <style>
+:root {
+  --ink-0:   oklch(0.13 0.008 30); --ink-1:  oklch(0.16 0.009 30); --ink-2: oklch(0.19 0.010 30);
+  --ink-3:   oklch(0.22 0.011 30); --ink-4:  oklch(0.27 0.013 30);
+  --line-1:  oklch(0.28 0.012 30); --line-2: oklch(0.36 0.013 30);
+  --bone-1:  oklch(0.55 0.010 60); --bone-2: oklch(0.72 0.010 60);
+  --bone-3:  oklch(0.88 0.010 70); --bone-4: oklch(0.96 0.008 80);
+  --blood-1: oklch(0.28 0.09 25);  --blood-2: oklch(0.40 0.14 25);
+  --blood-3: oklch(0.50 0.18 25);  --blood-4: oklch(0.60 0.20 25); --blood-5: oklch(0.74 0.16 30);
+  --d-fury: oklch(0.62 0.17 30); --d-calm: oklch(0.65 0.12 230); --d-mind: oklch(0.62 0.14 290);
+  --d-body: oklch(0.62 0.13 145); --d-chaos: oklch(0.62 0.16 340); --d-order: oklch(0.78 0.11 85);
+  --serif: "Cormorant Garamond", Georgia, serif;
+  --sans:  "Manrope", system-ui, sans-serif;
+  --mono:  "JetBrains Mono", ui-monospace, monospace;
+  --page-max: 1440px; --page-pad: clamp(16px, 3vw, 48px);
+  --radius: 4px; --radius-lg: 8px;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: var(--sans); font-size: 15px; line-height: 1.55; font-weight: 500; color: var(--bone-3); background: var(--ink-1); background-image: radial-gradient(1100px 700px at 75% -5%, oklch(0.22 0.04 25 / 0.3), transparent 60%), radial-gradient(800px 500px at -5% 105%, oklch(0.17 0.02 25 / 0.4), transparent 55%); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; } button { font: inherit; color: inherit; cursor: pointer; } p { margin: 0; }
+::selection { background: var(--blood-3); color: var(--bone-4); }
+.eyebrow { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--bone-2); font-weight: 500; }
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; color: var(--bone-4); margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(38px, 5.5vw, 80px); line-height: 1.03; letter-spacing: -0.02em; }
+h2 { font-size: clamp(24px, 2.2vw, 36px); line-height: 1.12; }
+h2 em, h1 em { font-style: italic; color: var(--blood-5); }
+.mono { font-family: var(--mono); } .faint { color: var(--bone-1); }
+
+/* Preview tab bar */
+.preview-tab-bar { background: var(--ink-0); border-bottom: 2px solid var(--blood-3); padding: 7px var(--page-pad); display: flex; align-items: center; gap: 4px; font-size: 11px; font-family: var(--mono); color: var(--bone-1); flex-wrap: wrap; }
+.preview-tab { padding: 4px 10px; border-radius: 3px; border: none; background: none; color: var(--bone-2); font-family: var(--mono); font-size: 11px; transition: all 120ms; white-space: nowrap; }
+.preview-tab:hover { background: var(--ink-3); color: var(--bone-4); }
+.preview-tab.active { background: var(--blood-1); color: var(--blood-5); }
+
+/* Nav */
+.top-nav { position: sticky; top: 0; z-index: 50; background: color-mix(in oklch, var(--ink-1) 85%, transparent); backdrop-filter: blur(10px) saturate(130%); -webkit-backdrop-filter: blur(10px) saturate(130%); border-bottom: 1px solid var(--line-1); }
+.top-nav__inner { max-width: var(--page-max); margin: 0 auto; padding: 0 var(--page-pad); height: 60px; display: flex; align-items: center; gap: 20px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--serif); font-weight: 600; font-size: 19px; color: var(--bone-4); letter-spacing: -0.01em; white-space: nowrap; background: none; border: none; padding: 0; }
+.brand__mark { width: 18px; height: 18px; background: var(--blood-3); border-radius: 2px; transform: rotate(45deg); flex-shrink: 0; box-shadow: 0 0 12px oklch(0.5 0.2 25 / 0.4); }
+.brand em { font-style: italic; color: var(--blood-5); margin-left: 1px; }
+.nav-search { flex: 1; max-width: 340px; display: flex; align-items: center; gap: 8px; background: var(--ink-3); border: 1px solid var(--line-1); border-radius: var(--radius); padding: 0 10px; height: 34px; transition: border-color 150ms, opacity 150ms; }
+.nav-search:focus-within { border-color: var(--blood-3); }
+.nav-search--disabled { opacity: 0.35; pointer-events: none; }
+.nav-search input { flex: 1; background: none; border: none; outline: none; color: var(--bone-3); font-family: var(--sans); font-size: 13.5px; font-weight: 500; min-width: 0; }
+.nav-search input::placeholder { color: var(--bone-1); }
+.nav-search button { background: var(--blood-3); color: var(--bone-4); border: none; border-radius: 3px; padding: 3px 12px; font-size: 12.5px; font-weight: 700; transition: background 120ms; }
+.nav-search button:hover { background: var(--blood-4); }
+.nav-links { display: flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 500; margin-left: auto; }
+.nav-link { padding: 7px 11px; border-radius: var(--radius); color: var(--bone-2); background: none; border: none; transition: color 120ms, background 120ms; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.nav-link:hover { color: var(--bone-4); background: var(--ink-3); }
+.nav-link.active { color: var(--bone-4); }
+.nav-dropdown { position: relative; }
+.nav-popover { position: absolute; top: calc(100% + 6px); left: 0; background: var(--ink-2); border: 1px solid var(--line-1); border-radius: var(--radius-lg); padding: 6px; min-width: 170px; z-index: 100; box-shadow: 0 8px 24px oklch(0 0 0 / 0.4); }
+.nav-popover-item { display: block; width: 100%; padding: 7px 12px; border-radius: var(--radius); background: none; border: none; text-align: left; color: var(--bone-2); font-size: 13.5px; font-weight: 500; transition: color 120ms, background 120ms; }
+.nav-popover-item:hover { color: var(--bone-4); background: var(--ink-3); }
+.chevron { width: 14px; height: 14px; transition: transform 180ms; }
+.chevron.open { transform: rotate(180deg); }
+
+/* Layout */
+.page-inner { max-width: var(--page-max); margin: 0 auto; padding: 0 var(--page-pad); }
+.section { padding: 48px 0; border-top: 1px solid var(--line-1); }
+.section-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; gap: 16px; }
+
+/* Hero */
+.hero { padding: clamp(60px, 9vw, 100px) var(--page-pad) clamp(50px, 7vw, 80px); max-width: var(--page-max); margin: 0 auto; }
+.hero__sub { color: var(--bone-2); font-size: 16px; line-height: 1.65; max-width: 52ch; margin-bottom: 36px; }
+.hero-search { display: flex; align-items: center; background: var(--ink-2); border: 1px solid var(--line-2); border-radius: var(--radius-lg); overflow: hidden; max-width: 540px; transition: border-color 180ms, box-shadow 180ms; }
+.hero-search:focus-within { border-color: var(--blood-3); box-shadow: 0 0 0 3px oklch(0.5 0.18 25 / 0.18); }
+.hero-search__icon { padding: 0 12px; color: var(--bone-1); display: flex; align-items: center; }
+.hero-search__input { flex: 1; background: none; border: none; outline: none; color: var(--bone-4); font-family: var(--mono); font-size: 13.5px; padding: 13px 0; min-width: 0; }
+.hero-search__input::placeholder { color: var(--bone-1); font-family: var(--mono); }
+.hero-search__btn { background: var(--blood-3); color: var(--bone-4); border: none; padding: 13px 22px; font-weight: 700; font-size: 13.5px; transition: background 120ms; white-space: nowrap; }
+.hero-search__btn:hover { background: var(--blood-4); }
+.hero-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+.hero-chip { font-family: var(--mono); font-size: 11.5px; font-weight: 500; color: var(--bone-2); background: var(--ink-3); border: 1px solid var(--line-1); border-radius: 999px; padding: 4px 11px; transition: color 120ms, border-color 120ms, background 120ms; }
+.hero-chip:hover { color: var(--blood-5); border-color: var(--blood-2); background: var(--ink-4); }
+.hero-chips__label { color: var(--bone-1); font-size: 12px; align-self: center; }
+
+/* Tool tiles */
+.tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.tool-tile { background: var(--ink-2); border: 1px solid var(--line-1); border-radius: var(--radius-lg); padding: 24px 20px; display: flex; flex-direction: column; gap: 10px; text-align: left; transition: border-color 150ms, background 150ms; }
+.tool-tile:hover { border-color: var(--blood-2); background: var(--ink-3); }
+.tool-tile__index { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--bone-1); }
+.tool-tile__title { font-family: var(--serif); font-size: 18px; font-weight: 600; color: var(--bone-4); line-height: 1.2; }
+.tool-tile__title em { font-style: italic; color: var(--blood-5); }
+.tool-tile__arrow { margin-top: auto; font-size: 12px; color: var(--bone-2); display: flex; align-items: center; gap: 5px; }
+
+/* Price row */
+.price-row-wrap { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+.price-row-wrap::-webkit-scrollbar { height: 4px; }
+.price-row-wrap::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 2px; }
+
+/* Cards */
+.card-tile { flex: 0 0 auto; width: 140px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--line-1); background: var(--ink-2); cursor: pointer; transition: border-color 150ms, transform 150ms; position: relative; }
+.card-tile:hover { border-color: var(--line-2); transform: translateY(-3px); }
+.card-tile__art { width: 140px; height: 196px; position: relative; overflow: hidden; }
+.card-tile__art-inner { position: absolute; inset: 0; }
+.card-tile__name-badge { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, oklch(0 0 0 / 0.75) 0%, transparent 100%); padding: 20px 8px 6px; font-family: var(--serif); font-size: 12px; font-weight: 600; color: var(--bone-4); line-height: 1.2; }
+.card-tile__price-badge { position: absolute; top: 7px; right: 7px; background: oklch(0 0 0 / 0.7); border: 1px solid var(--line-2); border-radius: 4px; padding: 2px 7px; font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--blood-5); }
+.card-tile__meta { padding: 6px 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--bone-1); border-top: 1px solid var(--line-1); }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.domain-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.domain-dot--fury{background:var(--d-fury);} .domain-dot--calm{background:var(--d-calm);} .domain-dot--mind{background:var(--d-mind);}
+.domain-dot--body{background:var(--d-body);} .domain-dot--chaos{background:var(--d-chaos);} .domain-dot--order{background:var(--d-order);}
+
+/* Search page */
+.search-topbar { display: flex; align-items: center; gap: 12px; padding: 20px 0 16px; border-bottom: 1px solid var(--line-1); margin-bottom: 20px; flex-wrap: wrap; }
+.search-bar { flex: 1; min-width: 240px; display: flex; align-items: center; background: var(--ink-2); border: 1px solid var(--line-2); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 180ms; }
+.search-bar:focus-within { border-color: var(--blood-3); }
+.search-bar__icon { padding: 0 12px; color: var(--bone-1); display: flex; align-items: center; }
+.search-bar__input { flex: 1; background: none; border: none; outline: none; color: var(--bone-4); font-family: var(--mono); font-size: 13px; padding: 11px 0; min-width: 0; }
+.search-bar__input::placeholder { color: var(--bone-1); font-family: var(--mono); }
+.search-bar__btn { background: var(--blood-3); color: var(--bone-4); border: none; padding: 11px 18px; font-weight: 700; font-size: 13px; transition: background 120ms; }
+.search-bar__btn:hover { background: var(--blood-4); }
+.show-prices-label { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--bone-2); cursor: pointer; white-space: nowrap; user-select: none; }
+.show-prices-label input[type="checkbox"] { accent-color: var(--blood-3); width: 14px; height: 14px; cursor: pointer; }
+.results-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.results-count { font-size: 13px; color: var(--bone-2); }
+.results-count strong { color: var(--bone-4); }
+.results-bar__spacer { flex: 1; }
+.sort-select { background: var(--ink-3); border: 1px solid var(--line-1); border-radius: var(--radius); padding: 5px 8px; color: var(--bone-3); font-size: 13px; font-family: var(--sans); outline: none; cursor: pointer; }
+.view-toggle { display: flex; gap: 2px; }
+.view-btn { width: 30px; height: 30px; background: none; border: 1px solid var(--line-1); border-radius: var(--radius); color: var(--bone-2); display: flex; align-items: center; justify-content: center; transition: all 120ms; }
+.view-btn:hover, .view-btn[aria-pressed="true"] { background: var(--ink-3); color: var(--bone-4); border-color: var(--line-2); }
+.card-rows { display: flex; flex-direction: column; gap: 1px; }
+.card-row { display: flex; align-items: center; gap: 12px; background: var(--ink-2); border: 1px solid var(--line-1); border-radius: var(--radius); padding: 8px 12px; cursor: pointer; transition: background 120ms, border-color 120ms; }
+.card-row:hover { background: var(--ink-3); border-color: var(--line-2); }
+.card-row__thumb { width: 38px; height: 53px; border-radius: 3px; flex-shrink: 0; overflow: hidden; }
+.card-row__name { font-size: 14px; font-weight: 600; color: var(--bone-4); min-width: 0; flex: 1; }
+.card-row__type { font-size: 12px; color: var(--bone-2); min-width: 80px; }
+.card-row__set { font-family: var(--mono); font-size: 11px; color: var(--bone-1); min-width: 56px; }
+.card-row__energy { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--bone-3); min-width: 24px; text-align: center; }
+.card-row__price { font-family: var(--mono); font-size: 13px; color: var(--blood-5); min-width: 56px; text-align: right; }
+
+/* Learn to search */
+.learn-section { padding: 28px 0; border-top: 1px solid var(--line-1); }
+.learn-section-head { display: flex; align-items: center; justify-content: space-between; cursor: pointer; gap: 12px; }
+.learn-section-title { font-family: var(--sans); font-size: 13.5px; font-weight: 700; color: var(--bone-3); }
+.learn-chevron { color: var(--bone-1); transition: transform 200ms; }
+.learn-chevron.open { transform: rotate(180deg); }
+.learn-body { margin-top: 18px; }
+.ref-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ref-table th { text-align: left; font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--bone-1); padding: 0 12px 8px 0; border-bottom: 1px solid var(--line-1); font-weight: 600; }
+.ref-table td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--line-1); color: var(--bone-2); vertical-align: top; line-height: 1.5; }
+.ref-table tr:last-child td { border-bottom: none; }
+.ref-table td:first-child { color: var(--bone-3); font-weight: 600; }
+.ref-table code { font-family: var(--mono); font-size: 12px; color: var(--blood-5); background: var(--ink-3); border: 1px solid var(--line-1); border-radius: 3px; padding: 1px 5px; }
+.learn-example-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+.learn-example-chip { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--bone-2); background: var(--ink-3); border: 1px solid var(--line-1); border-radius: 999px; padding: 4px 12px; transition: color 120ms, border-color 120ms, background 120ms; }
+.learn-example-chip:hover { color: var(--blood-5); border-color: var(--blood-2); background: var(--ink-4); }
+
+/* Query builder — sticky full-width built-query bar */
+.qb-bar { position: sticky; top: 60px; z-index: 40; background: color-mix(in oklch, var(--ink-2) 97%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line-1); }
+.qb-bar__inner { max-width: var(--page-max); margin: 0 auto; padding: 12px var(--page-pad); display: flex; align-items: center; gap: 16px; min-height: 54px; }
+.qb-bar__label { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--bone-1); white-space: nowrap; flex-shrink: 0; }
+.qb-bar__output { flex: 1; font-family: var(--mono); font-size: 13px; color: var(--blood-5); word-break: break-all; min-width: 0; }
+.qb-bar__empty { color: var(--bone-1); font-style: italic; }
+.qb-bar__btn { background: var(--blood-3); border: none; border-radius: var(--radius); padding: 8px 18px; color: var(--bone-4); font-weight: 700; font-size: 13px; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; gap: 7px; transition: background 120ms; }
+.qb-bar__btn:hover { background: var(--blood-4); }
+.qb-layout { display: grid; grid-template-columns: 420px 1fr; gap: 24px; align-items: start; padding: 28px 0 60px; }
+.qb-panel { background: var(--ink-2); border: 1px solid var(--line-1); border-radius: var(--radius-lg); position: sticky; top: 114px; max-height: calc(100vh - 136px); overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+.qb-panel::-webkit-scrollbar { width: 4px; }
+.qb-panel::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 2px; }
+.qb-section { padding: 14px 16px; border-bottom: 1px solid var(--line-1); }
+.qb-section:last-child { border-bottom: none; }
+.qb-section-title { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone-3); margin: 0 0 8px; }
+.qb-section-example { font-family: var(--mono); font-size: 10.5px; color: var(--blood-5); background: var(--blood-1); border: 1px solid var(--blood-2); border-radius: 3px; padding: 1px 6px; font-weight: 500; white-space: nowrap; }
+.qb-subsection-label { font-size: 10.5px; color: var(--bone-1); margin: 8px 0 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+.qb-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.qb-chip { font-size: 12.5px; font-weight: 500; background: var(--ink-3); border: 1px solid var(--line-1); border-radius: 999px; padding: 4px 10px; color: var(--bone-2); transition: all 120ms; display: flex; align-items: center; gap: 5px; }
+.qb-chip:hover { border-color: var(--line-2); color: var(--bone-3); }
+.qb-chip--on { background: var(--blood-1); border-color: var(--blood-3); color: var(--blood-5); }
+.qb-domain-pip { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.qb-rarity-pip { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.qb-set-code { font-family: var(--mono); font-size: 10px; color: var(--bone-1); }
+.qb-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.qb-stat-row { background: var(--ink-3); border: 1px solid var(--line-1); border-radius: var(--radius); padding: 8px 10px; min-width: 0; }
+.qb-stat-label { font-size: 11px; color: var(--bone-2); margin-bottom: 5px; }
+.qb-stat-controls { display: flex; gap: 5px; }
+.qb-op-select { background: var(--ink-2); border: 1px solid var(--line-1); border-radius: var(--radius); color: var(--bone-3); font-family: var(--mono); font-size: 12px; padding: 3px 4px; outline: none; width: 48px; flex-shrink: 0; }
+.qb-stat-input { flex: 1; min-width: 0; background: var(--ink-2); border: 1px solid var(--line-1); border-radius: var(--radius); color: var(--bone-4); font-family: var(--mono); font-size: 12px; padding: 3px 6px; outline: none; transition: border-color 120ms; }
+.qb-stat-input:focus { border-color: var(--blood-3); }
+.qb-text-fields { display: flex; flex-direction: column; gap: 7px; }
+.qb-text-row { display: flex; align-items: center; gap: 8px; }
+.qb-text-label { font-size: 12px; color: var(--bone-2); min-width: 72px; flex-shrink: 0; }
+.qb-text-input { flex: 1; min-width: 0; background: var(--ink-3); border: 1px solid var(--line-1); border-radius: var(--radius); color: var(--bone-4); font-family: var(--sans); font-size: 12.5px; padding: 5px 9px; outline: none; transition: border-color 120ms; }
+.qb-text-input:focus { border-color: var(--blood-3); }
+.qb-note { font-size: 11px; color: var(--bone-1); margin-top: 7px; line-height: 1.5; }
+.qb-results-header { font-size: 13px; color: var(--bone-2); margin-bottom: 12px; }
+.qb-results-header strong { color: var(--bone-4); }
+.qb-empty { padding: 60px 20px; text-align: center; background: var(--ink-2); border: 1px dashed var(--line-1); border-radius: var(--radius-lg); }
+.qb-empty__title { font-family: var(--serif); font-size: 22px; font-style: italic; color: var(--bone-2); margin-bottom: 8px; }
+.qb-empty__sub { font-family: var(--mono); font-size: 11px; color: var(--bone-1); }
+
+/* Trade Balancer */
+.trade-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 520px; }
+.trade-side { padding: 20px; border: 1px solid var(--line-1); border-radius: var(--radius-lg); background: var(--ink-2); display: flex; flex-direction: column; gap: 12px; }
+.trade-side--mine { border-right: none; border-radius: var(--radius-lg) 0 0 var(--radius-lg); }
+.trade-side--yours { border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+.trade-side-header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.trade-side-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--bone-1); }
+.trade-side-total { font-family: var(--serif); font-size: 28px; font-weight: 600; color: var(--bone-4); }
+.trade-add-search { display: flex; align-items: center; gap: 6px; background: var(--ink-3); border: 1px solid var(--line-1); border-radius: var(--radius); padding: 0 10px; height: 32px; transition: border-color 150ms; }
+.trade-add-search:focus-within { border-color: var(--blood-3); }
+.trade-add-search input { flex: 1; background: none; border: none; outline: none; color: var(--bone-3); font-family: var(--sans); font-size: 12.5px; min-width: 0; }
+.trade-add-search input::placeholder { color: var(--bone-1); }
+.trade-items { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.trade-item { background: var(--ink-3); border: 1px solid var(--line-1); border-radius: var(--radius); padding: 8px 10px; display: flex; align-items: center; gap: 10px; }
+.trade-item__thumb { width: 30px; height: 42px; border-radius: 2px; overflow: hidden; flex-shrink: 0; }
+.trade-item__info { flex: 1; min-width: 0; }
+.trade-item__name { font-size: 13px; font-weight: 600; color: var(--bone-4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trade-item__sub { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+.trade-item__condition { font-size: 11px; background: var(--ink-2); border: 1px solid var(--line-1); border-radius: 3px; color: var(--bone-2); padding: 1px 5px; outline: none; font-family: var(--sans); }
+.trade-item__finish { font-size: 11px; background: var(--ink-2); border: 1px solid var(--line-1); border-radius: 3px; color: var(--bone-2); padding: 1px 5px; outline: none; font-family: var(--sans); }
+.trade-item__price { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--blood-5); white-space: nowrap; }
+.trade-item__remove { background: none; border: none; padding: 2px 4px; color: var(--bone-1); font-size: 14px; line-height: 1; transition: color 120ms; }
+.trade-item__remove:hover { color: var(--bone-3); }
+.trade-empty { flex: 1; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--line-1); border-radius: var(--radius); color: var(--bone-1); font-size: 12.5px; font-family: var(--mono); text-align: center; padding: 20px; min-height: 120px; }
+.trade-verdict { border-top: 1px solid var(--line-1); padding-top: 20px; margin-top: 4px; }
+.trade-delta-bar-wrap { height: 10px; border-radius: 999px; overflow: hidden; margin-bottom: 10px; display: flex; }
+.trade-verdict-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.trade-verdict-text { font-family: var(--serif); font-size: 18px; font-style: italic; color: var(--bone-3); }
+.trade-verdict-delta { font-family: var(--mono); font-size: 14px; font-weight: 600; }
+
+/* Tier List */
+.tier-layout { display: flex; flex-direction: column; gap: 20px; padding-bottom: 60px; }
+.tier-rows { display: flex; flex-direction: column; gap: 6px; }
+.tier-row { display: flex; align-items: stretch; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--line-1); min-height: 80px; }
+.tier-row__label { width: 56px; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 28px; font-weight: 700; color: var(--bone-4); flex-shrink: 0; }
+.tier-row__cards { flex: 1; padding: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; background: var(--ink-2); border-left: 1px solid var(--line-1); min-height: 80px; }
+.tier-card-thumb { width: 50px; height: 70px; border-radius: 4px; overflow: hidden; border: 1px solid var(--line-1); cursor: pointer; transition: transform 120ms, border-color 120ms; position: relative; flex-shrink: 0; }
+.tier-card-thumb:hover { transform: scale(1.05); border-color: var(--line-2); }
+.tier-card-thumb__name { position: absolute; bottom: 0; left: 0; right: 0; background: oklch(0 0 0 / 0.7); font-size: 7px; font-weight: 600; color: var(--bone-4); padding: 2px 3px; font-family: var(--serif); line-height: 1.2; }
+.tier-drop-empty { flex: 1; border: 1px dashed var(--line-1); border-radius: var(--radius); margin: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--bone-1); font-family: var(--mono); }
+.tier-pool-panel { background: var(--ink-2); border: 1px solid var(--line-1); border-radius: var(--radius-lg); padding: 14px; }
+.tier-pool-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--bone-1); margin-bottom: 10px; }
+.tier-pool-search-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.tier-pool-search { display: flex; align-items: center; gap: 6px; background: var(--ink-3); border: 1px solid var(--line-1); border-radius: var(--radius); padding: 0 8px; height: 32px; flex: 1; transition: border-color 150ms; }
+.tier-pool-search:focus-within { border-color: var(--blood-3); }
+.tier-pool-search input { flex: 1; background: none; border: none; outline: none; color: var(--bone-3); font-size: 12.5px; font-family: var(--sans); min-width: 0; }
+.tier-pool-generate { background: var(--blood-3); color: var(--bone-4); border: none; border-radius: var(--radius); padding: 0 14px; height: 32px; font-weight: 700; font-size: 12.5px; white-space: nowrap; transition: background 120ms; flex-shrink: 0; }
+.tier-pool-generate:hover { background: var(--blood-4); }
+.tier-pool-empty { padding: 20px; text-align: center; color: var(--bone-1); font-family: var(--mono); font-size: 12px; border: 1px dashed var(--line-1); border-radius: var(--radius); }
+.tier-pool-cards { display: flex; flex-wrap: wrap; gap: 5px; }
+.tier-pool-card { width: 50px; height: 70px; border-radius: 4px; overflow: hidden; border: 1px solid var(--line-1); cursor: pointer; position: relative; flex-shrink: 0; transition: border-color 120ms, transform 120ms; }
+.tier-pool-card:hover { border-color: var(--blood-2); transform: scale(1.05); }
+.tier-pool-card.placed { opacity: 0.35; }
+.tier-pool-card__name { position: absolute; bottom: 0; left: 0; right: 0; background: oklch(0 0 0 / 0.7); font-size: 7px; font-weight: 600; color: var(--bone-4); padding: 2px 3px; font-family: var(--serif); line-height: 1.2; }
+
+/* Sealed Simulator */
+.sealed-layout { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; padding-bottom: 60px; }
+.sealed-config { background: var(--ink-2); border: 1px solid var(--line-1); border-radius: var(--radius-lg); padding: 18px; position: sticky; top: 68px; }
+.sealed-config-title { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone-3); margin-bottom: 14px; }
+.sealed-field { margin-bottom: 14px; }
+.sealed-field-label { font-size: 11px; color: var(--bone-2); margin-bottom: 5px; font-weight: 600; }
+.sealed-select, .sealed-input { width: 100%; background: var(--ink-3); border: 1px solid var(--line-1); border-radius: var(--radius); color: var(--bone-3); font-family: var(--sans); font-size: 13px; padding: 7px 10px; outline: none; transition: border-color 120ms; }
+.sealed-select:focus, .sealed-input:focus { border-color: var(--blood-3); }
+.sealed-generate-btn { width: 100%; background: var(--blood-3); border: none; border-radius: var(--radius); padding: 10px; color: var(--bone-4); font-weight: 700; font-size: 13px; transition: background 120ms; }
+.sealed-generate-btn:hover { background: var(--blood-4); }
+.sealed-view-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+.sealed-tab { font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: var(--radius); border: 1px solid var(--line-1); background: none; color: var(--bone-2); transition: all 120ms; }
+.sealed-tab:hover { border-color: var(--line-2); color: var(--bone-3); }
+.sealed-tab.active { background: var(--blood-1); border-color: var(--blood-3); color: var(--blood-5); }
+.sealed-pack { margin-bottom: 28px; }
+.sealed-pack-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line-1); }
+.sealed-pack-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--bone-1); }
+.sealed-domain-section { margin-bottom: 24px; }
+.sealed-domain-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.sealed-domain-pip { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.sealed-domain-name { font-size: 13px; font-weight: 700; color: var(--bone-3); }
+.sealed-domain-count { font-family: var(--mono); font-size: 11px; color: var(--bone-1); }
+.sealed-empty { padding: 80px 20px; text-align: center; background: var(--ink-2); border: 1px dashed var(--line-1); border-radius: var(--radius-lg); }
+.sealed-empty__title { font-family: var(--serif); font-size: 24px; font-style: italic; color: var(--bone-2); margin-bottom: 8px; }
+.sealed-empty__sub { font-family: var(--mono); font-size: 12px; color: var(--bone-1); }
+
+/* Shared */
+.btn-ghost { background: none; border: 1px solid var(--line-1); border-radius: var(--radius); padding: 6px 14px; font-size: 12.5px; color: var(--bone-2); transition: all 120ms; }
+.btn-ghost:hover { border-color: var(--line-2); color: var(--bone-4); }
+.footer { text-align: center; padding: 40px 20px; font-family: var(--mono); font-size: 11px; color: var(--bone-1); border-top: 1px solid var(--line-1); margin-top: 60px; }
+@media (max-width: 1000px) { .qb-layout { grid-template-columns: 1fr; } .qb-panel { position: static; max-height: none; } .sealed-layout { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .tools-grid { grid-template-columns: repeat(2, 1fr); } .trade-layout { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .tools-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useRef, useEffect, useMemo } = React;
+
+/* ─── Shared Data ─── */
+const DOMAIN_BG = { Fury:"linear-gradient(135deg,oklch(0.28 0.10 30),oklch(0.18 0.06 30))", Calm:"linear-gradient(135deg,oklch(0.24 0.09 230),oklch(0.16 0.04 230))", Mind:"linear-gradient(135deg,oklch(0.26 0.09 290),oklch(0.17 0.05 290))", Body:"linear-gradient(135deg,oklch(0.24 0.08 145),oklch(0.16 0.04 145))", Chaos:"linear-gradient(135deg,oklch(0.26 0.10 340),oklch(0.17 0.05 340))", Order:"linear-gradient(135deg,oklch(0.28 0.07 85),oklch(0.19 0.04 85))" };
+const DOMAIN_COLOR = { Fury:"#e53935",Calm:"#43a047",Mind:"#1e88e5",Body:"#fb8c00",Chaos:"#8e24aa",Order:"#e6c100" };
+const DOMAIN_BG_CHIP = { Fury:"rgba(229,57,53,0.15)",Calm:"rgba(67,160,71,0.15)",Mind:"rgba(30,136,229,0.15)",Body:"rgba(251,140,0,0.15)",Chaos:"rgba(142,36,170,0.15)",Order:"rgba(230,193,0,0.15)" };
+const DOMAIN_CODE = { Fury:"F",Calm:"C",Mind:"M",Body:"B",Chaos:"X",Order:"O" };
+const RARITY_COLOR = { Common:"#9e9e9e",Uncommon:"#78909c",Rare:"#42a5f5",Epic:"#ab47bc",Showcase:"#ffb300",Promo:"#ef5350" };
+const RARITY_BG = { Common:"rgba(158,158,158,0.15)",Uncommon:"rgba(120,144,156,0.15)",Rare:"rgba(66,165,245,0.15)",Epic:"rgba(171,71,188,0.15)",Showcase:"rgba(255,179,0,0.15)",Promo:"rgba(239,83,80,0.15)" };
+
+const CARDS = [
+  {id:"darius",    name:"Darius",        type:"Legend",    supertype:"Champion",domains:["Fury"],        set:"OGN",num:"001",energy:5,rarity:"Rare",    finish:"nonfoil",price:52.40},
+  {id:"aurelion",  name:"Aurelion Sol",  type:"Legend",    supertype:"Champion",domains:["Chaos","Mind"],set:"UNL",num:"003",energy:7,rarity:"Epic",    finish:"nonfoil",price:45.00},
+  {id:"jinx",      name:"Jinx",          type:"Legend",    supertype:"Champion",domains:["Chaos"],       set:"OGN",num:"012",energy:4,rarity:"Rare",    finish:"nonfoil",price:38.75},
+  {id:"thresh",    name:"Thresh",        type:"Legend",    supertype:"Champion",domains:["Order","Body"],set:"OGN",num:"023",energy:4,rarity:"Epic",    finish:"nonfoil",price:31.00},
+  {id:"azir",      name:"Azir",          type:"Legend",    supertype:"Champion",domains:["Order","Mind"],set:"SFD",num:"007",energy:6,rarity:"Rare",    finish:"nonfoil",price:29.50},
+  {id:"vi",        name:"Vi",            type:"Unit",      supertype:"Champion",domains:["Fury"],        set:"OGN",num:"034",energy:3,rarity:"Uncommon",finish:"nonfoil",price:24.80},
+  {id:"ekko",      name:"Ekko",          type:"Unit",      supertype:"Champion",domains:["Chaos","Mind"],set:"SFD",num:"015",energy:3,rarity:"Rare",    finish:"nonfoil",price:19.90},
+  {id:"braum",     name:"Braum",         type:"Unit",      supertype:null,      domains:["Body"],        set:"OGN",num:"056",energy:2,rarity:"Common",  finish:"nonfoil",price:14.25},
+  {id:"teemo",     name:"Teemo",         type:"Unit",      supertype:"Champion",domains:["Calm"],        set:"OGN",num:"067",energy:1,rarity:"Common",  finish:"nonfoil",price:12.50},
+  {id:"sivir",     name:"Sivir",         type:"Unit",      supertype:"Champion",domains:["Order"],       set:"SFD",num:"019",energy:3,rarity:"Uncommon",finish:"nonfoil",price:11.80},
+  {id:"riven",     name:"Riven",         type:"Unit",      supertype:"Champion",domains:["Fury","Body"], set:"UNL",num:"011",energy:4,rarity:"Rare",    finish:"foil",   price:10.20},
+  {id:"nasus",     name:"Nasus",         type:"Unit",      supertype:null,      domains:["Order","Body"],set:"OGN",num:"089",energy:5,rarity:"Common",  finish:"nonfoil",price:9.50},
+  {id:"twisted",   name:"Twisted Fate",  type:"Legend",    supertype:"Champion",domains:["Chaos"],       set:"SFD",num:"001",energy:3,rarity:"Rare",    finish:"foil",   price:8.75},
+  {id:"leona",     name:"Leona",         type:"Unit",      supertype:"Champion",domains:["Order"],       set:"OGN",num:"045",energy:4,rarity:"Uncommon",finish:"nonfoil",price:7.90},
+  {id:"fiora",     name:"Fiora",         type:"Unit",      supertype:"Champion",domains:["Body","Mind"], set:"UNL",num:"022",energy:3,rarity:"Rare",    finish:"foil",   price:6.20},
+  {id:"zilean",    name:"Zilean",        type:"Legend",    supertype:"Champion",domains:["Mind"],        set:"UNL",num:"008",energy:6,rarity:"Epic",    finish:"nonfoil",price:5.80},
+  {id:"lux",       name:"Lux",           type:"Spell",     supertype:null,      domains:["Order","Mind"],set:"OGN",num:"112",energy:3,rarity:"Common",  finish:"nonfoil",price:2.50},
+  {id:"frost",     name:"Frostbite",     type:"Spell",     supertype:null,      domains:["Calm"],        set:"SFD",num:"088",energy:1,rarity:"Common",  finish:"nonfoil",price:1.20},
+  {id:"runeblade", name:"Runeblade",     type:"Gear",      supertype:null,      domains:["Fury"],        set:"OGN",num:"150",energy:2,rarity:"Uncommon",finish:"nonfoil",price:3.80},
+  {id:"chronorift",name:"Chrono Rift",   type:"Battlefield",supertype:null,     domains:["Mind"],        set:"UNL",num:"200",energy:null,rarity:"Rare", finish:"nonfoil",price:4.10},
+];
+const HIGHEST_PRICED = [...CARDS].sort((a,b)=>b.price-a.price).slice(0,9);
+function fmtUsd(n){return n==null?"—":"$"+n.toFixed(2);}
+function orGroup(items){return items.length===1?items[0]:`(${items.join(" or ")})`;}
+function quoteVal(v){return /[\s"():*]/.test(v)?`"${v}"`:v;}
+function DomainDots({domains}){return <span style={{display:"inline-flex",gap:3}}>{(domains||[]).map(d=><span key={d} className={`domain-dot domain-dot--${d.toLowerCase()}`} title={d}/>)}</span>;}
+function CardArt({card,w=140,h=196}){const bg=DOMAIN_BG[card.domains[0]]||DOMAIN_BG.Fury;const initials=card.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();return <div style={{width:w,height:h,background:bg,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:"var(--serif)",fontSize:h<80?13:28,fontWeight:700,color:"oklch(1 0 0 / 0.22)",userSelect:"none"}}>{initials}</span></div>;}
+const IconSearch=()=><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>;
+const IconArrow=()=><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>;
+
+/* ─── Nav ─── */
+function TopNav({view,setView,setSearchQuery}){
+  const [sv,setSv]=useState("");
+  const [cOpen,setCOpen]=useState(false);
+  const [tOpen,setTOpen]=useState(false);
+  const cRef=useRef(null);const tRef=useRef(null);
+  useEffect(()=>{
+    function h(e){if(cRef.current&&!cRef.current.contains(e.target))setCOpen(false);if(tRef.current&&!tRef.current.contains(e.target))setTOpen(false);}
+    document.addEventListener("pointerdown",h);return()=>document.removeEventListener("pointerdown",h);
+  },[]);
+  function onSearch(e){e.preventDefault();if(sv.trim()){setSearchQuery(sv);setView("search");}}
+  const cardsActive=["learn","search","qbuilder"].includes(view);
+  const toolsActive=["trade","tier","sealed"].includes(view);
+  const searchDisabled=["home","learn","search","qbuilder"].includes(view);
+  return <header className="top-nav"><div className="top-nav__inner">
+    <button className="brand" onClick={()=>setView("home")}><span className="brand__mark" aria-hidden="true"/><span>Noxian <em>Netdecks</em></span></button>
+    <form className={`nav-search${searchDisabled?" nav-search--disabled":""}`} onSubmit={onSearch} tabIndex={searchDisabled?-1:0}>
+      <IconSearch/><input placeholder="Search cards…" value={sv} onChange={e=>setSv(e.target.value)} autoCapitalize="none" disabled={searchDisabled}/>
+      <button type="submit" disabled={searchDisabled}>Search</button>
+    </form>
+    <nav className="nav-links">
+      <div className="nav-dropdown" ref={cRef}>
+        <button className={`nav-link${cardsActive?" active":""}`} onClick={()=>{setCOpen(o=>!o);setTOpen(false);}}>
+          Cards<svg className={`chevron${cOpen?" open":""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        {cOpen&&<div className="nav-popover">
+          <button className="nav-popover-item" onClick={()=>{setView("search");setCOpen(false);}}>Search</button>
+          <button className="nav-popover-item" onClick={()=>{setView("learn");setCOpen(false);}}>Learn to Search</button>
+          <button className="nav-popover-item" onClick={()=>{setView("qbuilder");setCOpen(false);}}>Query Builder</button>
+        </div>}
+      </div>
+      <div className="nav-dropdown" ref={tRef}>
+        <button className={`nav-link${toolsActive?" active":""}`} onClick={()=>{setTOpen(o=>!o);setCOpen(false);}}>
+          Tools<svg className={`chevron${tOpen?" open":""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        {tOpen&&<div className="nav-popover">
+          <button className="nav-popover-item" onClick={()=>{setView("trade");setTOpen(false);}}>Trade Balancer</button>
+          <button className="nav-popover-item" onClick={()=>{setView("tier");setTOpen(false);}}>Tier List</button>
+          <button className="nav-popover-item" onClick={()=>{setView("sealed");setTOpen(false);}}>Sealed Simulator</button>
+        </div>}
+      </div>
+    </nav>
+  </div></header>;
+}
+
+/* ─── Home ─── */
+const HOME_CHIPS=["t:legend d:fury","t:legend d:body","t:legend d:pr","d:fury energy<=3","d:chaos"];
+function HomePage({setView,setSearchQuery}){
+  const [q,setQ]=useState("");
+  function onSearch(e){e.preventDefault();if(q.trim()){setSearchQuery(q);setView("search");}}
+  return <div>
+    <section style={{borderBottom:"1px solid var(--line-1)"}}>
+      <div className="hero">
+        <div style={{marginBottom:16}}><span className="eyebrow">A Riftbound archive</span></div>
+        <h1 style={{marginBottom:28}}>The <em>Noxian</em><br/>Netdeck Index.</h1>
+        <p className="hero__sub">Every card, printing, and price in Riftbound — searchable by any property.</p>
+        <form className="hero-search" onSubmit={onSearch}>
+          <span className="hero-search__icon"><IconSearch/></span>
+          <input className="hero-search__input" placeholder="t:champion d:fury energy>=4" value={q} onChange={e=>setQ(e.target.value)} autoFocus/>
+          <button type="submit" className="hero-search__btn">Search</button>
+        </form>
+        <div className="hero-chips">
+          <span className="hero-chips__label">Try:</span>
+          {HOME_CHIPS.map(c=><button key={c} className="hero-chip" onClick={()=>{setSearchQuery(c);setView("search");}}>{c}</button>)}
+        </div>
+      </div>
+    </section>
+    <div className="page-inner">
+      <section className="section">
+        <div className="section-head"><div><div style={{marginBottom:8}}><span className="eyebrow">Tools</span></div><h2>Brew, <em>balance</em>, explore.</h2></div></div>
+        <div className="tools-grid">
+          {[
+            {idx:"01",title:<>Card <em>Search</em></>,desc:"Query by name, domain, energy, keywords, and more.",go:"learn"},
+            {idx:"02",title:<>Trade <em>Balancer</em></>,desc:"Drop cards into either side. See the balance live.",go:"trade"},
+            {idx:"03",title:<>Sealed <em>Simulator</em></>,desc:"Generate pools from any format. Build and save decks.",go:"sealed"},
+          ].map(t=><button key={t.idx} className="tool-tile" onClick={()=>setView(t.go)}>
+            <span className="tool-tile__index">{t.idx}</span>
+            <div className="tool-tile__title">{t.title}</div>
+            <p style={{fontSize:13,color:"var(--bone-2)",lineHeight:1.55,margin:0}}>{t.desc}</p>
+            <span className="tool-tile__arrow">Open <IconArrow/></span>
+          </button>)}
+        </div>
+      </section>
+      <section className="section">
+        <div className="section-head">
+          <div><div style={{marginBottom:8}}><span className="eyebrow">Prices</span></div><h2>Most <em>Expensive</em> Cards.</h2></div>
+          <button className="btn-ghost" onClick={()=>setView("learn")}>Browse all →</button>
+        </div>
+        <div className="price-row-wrap">
+          {HIGHEST_PRICED.map(card=><div key={card.id} className="card-tile">
+            <div className="card-tile__art"><div className="card-tile__art-inner"><CardArt card={card}/></div><div className="card-tile__name-badge">{card.name}</div><div className="card-tile__price-badge">{fmtUsd(card.price)}</div></div>
+            <div className="card-tile__meta"><DomainDots domains={card.domains}/><span style={{fontFamily:"var(--mono)",fontSize:10}}>{card.set}·{card.num}</span></div>
+          </div>)}
+        </div>
+      </section>
+    </div>
+    <footer className="footer">Noxian Netdecks · fan-made Riftbound archive</footer>
+  </div>;
+}
+
+/* ─── Learn to Search ─── */
+const FIELDS_DATA=[
+  {prop:"Name",        query:"name:jinx",            short:"n:jinx",            desc:"Name contains this text."},
+  {prop:"Card type",   query:"cardtype:unit",         short:"ct:unit",           desc:"Unit, Spell, Gear, Rune, Battlefield."},
+  {prop:"Supertype",   query:"supertype:champion",    short:"u:champion",        desc:"Champion, Signature, etc."},
+  {prop:"Type line",   query:"t:champion",            short:null,                desc:"Matches any word on the full type line."},
+  {prop:"Tag",         query:"tag:dragon",            short:null,                desc:"Subtypes: champion names, tribes, origins."},
+  {prop:"Domain",      query:"domain:Fury",           short:"d:Fury",            desc:"Cards of this domain. Multiple: d:Fury or d:Calm."},
+  {prop:"Energy",      query:"energy>=3",             short:"e>=3",              desc:"Supports >=, >, =, <, <=. Use none for no cost."},
+  {prop:"Might",       query:"might>=2",              short:"m>=2",              desc:"Numeric comparison on the Might stat."},
+  {prop:"Power",       query:"power>=1",              short:"p>=1",              desc:"Numeric comparison on the Power stat."},
+  {prop:"Cost",        query:"cost>=3",               short:"c>=3",              desc:"Numeric comparison on the play cost."},
+  {prop:"Rarity",      query:"rarity:rare",           short:null,                desc:"Common, Uncommon, Rare, Epic, Showcase, Promo."},
+  {prop:"Set",         query:"set:OGN",               short:"s:OGN",             desc:"Set code (OGN, SFD, UNL) or set name."},
+  {prop:"Rules text",  query:'text:"draw a card"',    short:'o:"draw a card"',   desc:"Searches within the card's rules text."},
+  {prop:"Keyword",     query:"keyword:tank",          short:"k:tank",            desc:"Cards that have this rules keyword."},
+  {prop:"Artist",      query:'artist:"league splash"',short:'a:"league splash"', desc:"Illustrator name."},
+  {prop:"Finish",      query:"is:foil",               short:null,                desc:"is:foil, is:signed, is:altart, is:overnumbered."},
+];
+const SYNTAX_DATA=[
+  {op:"AND",       examples:["d:Fury e>=3","t:champion d:chaos"],    desc:"Space between terms — all must match."},
+  {op:"OR",        examples:["d:Fury or d:Calm"],                    desc:'"or" between terms — either can match.'},
+  {op:"NOT",       examples:["-is:foil","-d:Calm"],                  desc:"Dash prefix excludes matching cards."},
+  {op:"Grouping",  examples:["(d:Fury or d:Calm) e>=4"],             desc:"Parentheses for OR groups combined with AND."},
+  {op:"Wildcard",  examples:["n:jin*","tag:zau*"],                   desc:"Asterisk matches any suffix."},
+  {op:"Comparison",examples:["e>=3","e<=6","p=1"],                   desc:">=, >, =, <, <= on numeric fields."},
+  {op:"Exact",     examples:['n="Jinx the Loose Cannon"'],           desc:"Quotes for exact or phrase matching."},
+  {op:"Unique",    examples:["t:legend unique:prints"],              desc:"unique:prints shows all printings of the same card."},
+];
+const LEARN_EXAMPLES=["t:legend d:fury","t:legend d:body","t:legend d:pr","d:fury energy<=3","d:chaos e>=5","ct:unit u:champion","is:foil rarity:epic","set:UNL","n:darius"];
+
+function Collapsible({title,children}){
+  const [open,setOpen]=useState(false);
+  return <div className="learn-section">
+    <div className="learn-section-head" onClick={()=>setOpen(o=>!o)} role="button" aria-expanded={open}>
+      <span className="learn-section-title">{title}</span>
+      <svg className={`learn-chevron${open?" open":""}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    {open&&<div className="learn-body">{children}</div>}
+  </div>;
+}
+
+function LearnToSearchPage({setView,setSearchQuery}){
+  const [q,setQ]=useState("");
+  function onSearch(e){e.preventDefault();if(q.trim()){setSearchQuery(q);setView("search");}}
+  return <div className="page-inner" style={{paddingBottom:60}}>
+    <div style={{paddingTop:24,marginBottom:4}}><span className="eyebrow">Cards · Search</span></div>
+    <h2 style={{marginBottom:20,fontSize:28}}>Find any <em>card.</em></h2>
+    <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:20,flexWrap:"wrap"}}>
+      <form className="search-bar" onSubmit={onSearch} style={{flex:1,minWidth:240}}>
+        <span className="search-bar__icon"><IconSearch/></span>
+        <input className="search-bar__input" placeholder="t:champion d:fury energy>=4   ·   name:darius   ·   set:OGN is:foil" value={q} onChange={e=>setQ(e.target.value)} autoFocus/>
+        {q&&<button type="button" onClick={()=>setQ("")} style={{background:"none",border:"none",padding:"0 8px",color:"var(--bone-1)"}}>✕</button>}
+        <button type="submit" className="search-bar__btn">Search</button>
+      </form>
+      <button className="btn-ghost" onClick={()=>setView("qbuilder")}>Query Builder →</button>
+    </div>
+    <div style={{marginBottom:4}}><span className="eyebrow" style={{display:"block",marginBottom:10}}>Example Queries</span>
+      <div className="learn-example-chips">
+        {LEARN_EXAMPLES.map(q=><button key={q} className="learn-example-chip" onClick={()=>{setSearchQuery(q);setView("search");}}>{q}</button>)}
+      </div>
+    </div>
+    <Collapsible title="Searchable Fields">
+      <table className="ref-table"><thead><tr><th>Field</th><th>Query syntax</th><th>Shorthand</th><th>Description</th></tr></thead>
+        <tbody>{FIELDS_DATA.map(f=><tr key={f.prop}><td>{f.prop}</td><td><code>{f.query}</code></td><td>{f.short?<code>{f.short}</code>:<span style={{color:"var(--bone-1)"}}>—</span>}</td><td>{f.desc}</td></tr>)}</tbody>
+      </table>
+    </Collapsible>
+    <Collapsible title="Query Syntax">
+      <table className="ref-table"><thead><tr><th>Operation</th><th>Examples</th><th>Behavior</th></tr></thead>
+        <tbody>{SYNTAX_DATA.map(s=><tr key={s.op}><td>{s.op}</td><td><div style={{display:"flex",flexDirection:"column",gap:3}}>{s.examples.map(ex=><code key={ex}>{ex}</code>)}</div></td><td>{s.desc}</td></tr>)}</tbody>
+      </table>
+    </Collapsible>
+    <footer className="footer">Noxian Netdecks · fan-made Riftbound archive</footer>
+  </div>;
+}
+
+/* ─── Search Results ─── */
+function SearchPage({initialQuery,setView}){
+  const [q,setQ]=useState(initialQuery||"");const [sub,setSub]=useState(initialQuery||"");
+  const [sort,setSort]=useState("price-desc");const [vm,setVm]=useState("grid");const [sp,setSp]=useState(false);
+  useEffect(()=>{setQ(initialQuery||"");setSub(initialQuery||"");},[initialQuery]);
+  const results=useMemo(()=>{
+    let list=CARDS.filter(c=>{
+      if(!sub)return true;
+      for(const t of sub.toLowerCase().trim().split(/\s+/)){
+        const col=t.indexOf(":");
+        if(col>-1){const k=t.slice(0,col),v=t.slice(col+1);
+          if(k==="ct"&&c.type.toLowerCase()!==v)return false;
+          if(k==="t"&&!(c.type.toLowerCase()+" "+(c.supertype||"").toLowerCase()).includes(v))return false;
+          if((k==="d"||k==="domain")&&!c.domains.some(d=>d.toLowerCase().startsWith(v)))return false;
+          if((k==="s"||k==="set")&&c.set.toLowerCase()!==v)return false;
+          if((k==="n"||k==="name")&&!c.name.toLowerCase().includes(v))return false;
+          if(k==="is"&&v==="foil"&&c.finish!=="foil")return false;
+        } else if(!c.name.toLowerCase().includes(t))return false;
+      }return true;
+    });
+    return [...list].sort((a,b)=>{if(sort==="price-desc")return(b.price||0)-(a.price||0);if(sort==="price-asc")return(a.price||0)-(b.price||0);if(sort==="energy-asc")return(a.energy??999)-(b.energy??999);if(sort==="name-asc")return a.name.localeCompare(b.name);return 0;});
+  },[sub,sort]);
+  return <div className="page-inner" style={{paddingBottom:60}}>
+    <div className="search-topbar">
+      <form className="search-bar" onSubmit={e=>{e.preventDefault();setSub(q);}} style={{flex:1}}>
+        <span className="search-bar__icon"><IconSearch/></span>
+        <input className="search-bar__input" placeholder="t:champion d:fury energy>=4" value={q} onChange={e=>setQ(e.target.value)} autoFocus/>
+        {q&&<button type="button" onClick={()=>{setQ("");setSub("");}} style={{background:"none",border:"none",padding:"0 8px",color:"var(--bone-1)"}}>✕</button>}
+        <button type="submit" className="search-bar__btn">Search</button>
+      </form>
+      <button className="btn-ghost" onClick={()=>setView("learn")} style={{whiteSpace:"nowrap"}}>Learn to search</button>
+    </div>
+    <div className="results-bar">
+      <span className="results-count"><strong>{results.length}</strong> cards</span>
+      {sub&&<span className="mono faint" style={{fontSize:12}}>→ {sub}</span>}
+      <div className="results-bar__spacer"/>
+      <label className="show-prices-label"><input type="checkbox" checked={sp} onChange={e=>setSp(e.target.checked)}/>Show prices</label>
+      <select className="sort-select" value={sort} onChange={e=>setSort(e.target.value)}>
+        <option value="price-desc">Price ↓</option><option value="price-asc">Price ↑</option>
+        <option value="energy-asc">Energy ↑</option><option value="name-asc">Name A→Z</option>
+      </select>
+      <div className="view-toggle">
+        <button className="view-btn" aria-pressed={vm==="grid"} onClick={()=>setVm("grid")} title="Grid"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+        <button className="view-btn" aria-pressed={vm==="list"} onClick={()=>setVm("list")} title="List"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><circle cx="3.5" cy="6" r="1.2" fill="currentColor"/><circle cx="3.5" cy="12" r="1.2" fill="currentColor"/><circle cx="3.5" cy="18" r="1.2" fill="currentColor"/></svg></button>
+      </div>
+    </div>
+    {vm==="grid"?<div className="card-grid">{results.map(card=><div key={card.id} className="card-tile" style={{width:"auto",flex:"none"}}>
+      <div className="card-tile__art" style={{width:"auto",height:196}}>
+        <div className="card-tile__art-inner"><CardArt card={card} w={200} h={196}/></div>
+        <div className="card-tile__name-badge">{card.name}</div>
+        {sp&&card.price&&<div className="card-tile__price-badge">{fmtUsd(card.price)}</div>}
+      </div>
+    </div>)}</div>:<div className="card-rows">{results.map(card=><div key={card.id} className="card-row">
+      <div className="card-row__thumb"><CardArt card={card} w={38} h={53}/></div>
+      <span className="card-row__name">{card.name}</span>
+      <span className="card-row__type">{card.supertype?`${card.supertype} ${card.type}`:card.type}</span>
+      <DomainDots domains={card.domains}/>
+      <span className="card-row__set">{card.set} {card.num}</span>
+      <span className="card-row__energy">{card.energy??"—"}</span>
+      {sp&&<span className="card-row__price">{fmtUsd(card.price)}</span>}
+    </div>)}</div>}
+    <footer className="footer">Noxian Netdecks · fan-made Riftbound archive</footer>
+  </div>;
+}
+
+/* ─── Query Builder ─── */
+const CARD_TYPES=["Unit","Spell","Gear","Rune","Battlefield","Legend"];
+const SUPERTYPES=["Champion","Signature"];
+const DOMAIN_ORDER=["Fury","Calm","Mind","Body","Chaos","Order"];
+const RARITIES=["Common","Uncommon","Rare","Epic","Showcase","Promo"];
+const QB_SETS=[{id:"OGN",label:"Origins"},{id:"SFD",label:"Spiritforged"},{id:"UNL",label:"Unleashed"}];
+const FINISHES=[{value:"foil",label:"Foil"},{value:"normal",label:"Normal"},{value:"signed",label:"Signed"},{value:"altart",label:"Alt Art"},{value:"overnumbered",label:"Overnumbered"}];
+const OPS=[">=",">","=","<","<="];
+function tog(s,v){const n=new Set(s);n.has(v)?n.delete(v):n.add(v);return n;}
+function QBSection({title,children}){return <div className="qb-section"><div className="qb-section-title">{title}</div>{children}</div>;}
+function SR({label,op,onOp,val,onVal}){return <div className="qb-stat-row"><div className="qb-stat-label">{label}</div><div className="qb-stat-controls"><select className="qb-op-select" value={op} onChange={e=>onOp(e.target.value)}>{OPS.map(o=><option key={o} value={o}>{o}</option>)}</select><input className="qb-stat-input" value={val} onChange={e=>onVal(e.target.value)} placeholder="—"/></div></div>;}
+function TF({label,hint,placeholder,value,onChange}){return <div className="qb-text-row"><span className="qb-text-label">{label}</span><input className="qb-text-input" value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} autoComplete="off" spellCheck={false}/><span className="qb-section-example">{hint}</span></div>;}
+
+function QueryBuilderPage({setView}){
+  const [sT,setST]=useState(new Set());const [sST,setSST]=useState(new Set());
+  const [sD,setSD]=useState(new Set());const [sR,setSR]=useState(new Set());
+  const [sSets,setSSets]=useState(new Set());const [sF,setSF]=useState(new Set());
+  const [tl,setTl]=useState("");const [tag,setTag]=useState("");
+  const [nm,setNm]=useState("");const [rt,setRt]=useState("");const [kw,setKw]=useState("");const [ar,setAr]=useState("");
+  const [eOp,setEOp]=useState(">=");const [eV,setEV]=useState("");
+  const [mOp,setMOp]=useState(">=");const [mV,setMV]=useState("");
+  const [pOp,setPOp]=useState(">=");const [pV,setPV]=useState("");
+  const [cOp,setCOp]=useState(">=");const [cV,setCV]=useState("");
+
+  const bq=useMemo(()=>{
+    const p=[];
+    if(sT.size)p.push(orGroup([...sT].map(t=>`ct:${t}`)));if(sST.size)p.push(orGroup([...sST].map(u=>`u:${u}`)));
+    if(tl.trim())p.push(`t:${quoteVal(tl.trim())}`);if(tag.trim())p.push(`tag:${quoteVal(tag.trim())}`);
+    if(sD.size===1)p.push(`d:${[...sD][0]}`);
+    else if(sD.size>1){const code=DOMAIN_ORDER.filter(d=>sD.has(d)).map(d=>DOMAIN_CODE[d]).join("");p.push(`d:${code}`);}
+    if(sR.size)p.push(orGroup([...sR].map(r=>`rarity:${r}`)));
+    if(sSets.size)p.push(orGroup([...sSets].map(s=>`s:${s}`)));
+    if(nm.trim())p.push(`n:${quoteVal(nm.trim())}`);if(rt.trim())p.push(`r:${quoteVal(rt.trim())}`);
+    if(kw.trim())p.push(`kw:${quoteVal(kw.trim())}`);if(ar.trim())p.push(`a:${quoteVal(ar.trim())}`);
+    if(eV.trim())p.push(`e${eOp}${eV.trim()}`);if(mV.trim())p.push(`m${mOp}${mV.trim()}`);
+    if(pV.trim())p.push(`p${pOp}${pV.trim()}`);if(cV.trim())p.push(`c${cOp}${cV.trim()}`);
+    for(const f of sF)p.push(`is:${f}`);
+    return p.join(" ");
+  },[sT,sST,sD,sR,sSets,sF,tl,tag,nm,rt,kw,ar,eOp,eV,mOp,mV,pOp,pV,cOp,cV]);
+
+  const lr=useMemo(()=>{
+    if(!bq.trim())return[];
+    return CARDS.filter(c=>{
+      if(sT.size&&!sT.has(c.type))return false;if(sST.size&&!sST.has(c.supertype||""))return false;
+      if(sD.size&&!c.domains.some(d=>sD.has(d)))return false;if(sR.size&&!sR.has(c.rarity))return false;
+      if(sSets.size&&!sSets.has(c.set))return false;if(sF.size&&!sF.has(c.finish))return false;
+      if(nm.trim()&&!c.name.toLowerCase().includes(nm.trim().toLowerCase()))return false;
+      if(eV.trim()){const n=Number(eV),e=c.energy??-1;if(eOp===">="&&!(e>=n))return false;if(eOp==="<="&&!(e<=n))return false;if(eOp===">"&&!(e>n))return false;if(eOp==="<"&&!(e<n))return false;if(eOp==="="&&!(e===n))return false;}
+      return true;
+    });
+  },[sT,sST,sD,sR,sSets,sF,nm,eOp,eV,bq]);
+
+  return <div>
+    <div className="qb-bar">
+      <div className="qb-bar__inner">
+        <span className="qb-bar__label">Built Query</span>
+        <output className="qb-bar__output">{bq||<span className="qb-bar__empty">Make a selection below to build your query</span>}</output>
+        <button className="qb-bar__btn" onClick={()=>setView("search")}><IconSearch/>{bq?"Search with this query":"Search all cards"}</button>
+      </div>
+    </div>
+    <div className="page-inner">
+      <div style={{paddingTop:24,marginBottom:4}}><span className="eyebrow">Cards · Query Builder</span></div>
+      <p style={{fontSize:13,color:"var(--bone-2)",marginBottom:20}}>Build your query with our interactive UI.</p>
+      <div className="qb-layout">
+        <div className="qb-panel">
+          <QBSection title="Card Type &amp; Tags">
+            <div className="qb-text-fields" style={{marginBottom:10}}><TF label="Typeline" hint="t:Champion" placeholder="e.g. Champion Unit" value={tl} onChange={setTl}/></div>
+            <p className="qb-subsection-label">Card Type</p><div className="qb-chips">{CARD_TYPES.map(t=><button key={t} className={`qb-chip${sT.has(t)?" qb-chip--on":""}`} onClick={()=>setST(tog(sT,t))} aria-pressed={sT.has(t)}>{t}</button>)}</div>
+            <p className="qb-subsection-label" style={{marginTop:8}}>Supertype</p><div className="qb-chips">{SUPERTYPES.map(st=><button key={st} className={`qb-chip${sST.has(st)?" qb-chip--on":""}`} onClick={()=>setSST(tog(sST,st))} aria-pressed={sST.has(st)}>{st}</button>)}</div>
+            <p className="qb-subsection-label" style={{marginTop:8}}>Tag</p><div className="qb-text-fields"><TF label="Tag" hint="tag:Dragon" placeholder="e.g. Dragon, Zaun, Mech" value={tag} onChange={setTag}/></div>
+            <p className="qb-note">Tags include champion names, tribes, origins. Supertypes are Champion, Signature.</p>
+          </QBSection>
+          <QBSection title="Domain">
+            <div className="qb-chips">{DOMAIN_ORDER.map(d=>{const on=sD.has(d);return <button key={d} className={`qb-chip${on?" qb-chip--on":""}`} style={on?{background:DOMAIN_BG_CHIP[d],borderColor:DOMAIN_COLOR[d],color:DOMAIN_COLOR[d]}:{}} onClick={()=>setSD(tog(sD,d))} aria-pressed={on}><span className="qb-domain-pip" style={{background:DOMAIN_COLOR[d]}} aria-hidden="true"/>{d}</button>;})}</div>
+          </QBSection>
+          <QBSection title="Rarity">
+            <div className="qb-chips">{RARITIES.map(r=>{const on=sR.has(r);return <button key={r} className={`qb-chip${on?" qb-chip--on":""}`} style={on?{background:RARITY_BG[r],borderColor:RARITY_COLOR[r],color:RARITY_COLOR[r]}:{}} onClick={()=>setSR(tog(sR,r))} aria-pressed={on}><span className="qb-rarity-pip" style={{background:RARITY_COLOR[r]}} aria-hidden="true"/>{r}</button>;})}</div>
+          </QBSection>
+          <QBSection title="Set">
+            <div className="qb-chips">{QB_SETS.map(({id,label})=><button key={id} className={`qb-chip${sSets.has(id)?" qb-chip--on":""}`} onClick={()=>setSSets(tog(sSets,id))} aria-pressed={sSets.has(id)}><span className="qb-set-code">{id}</span>{label}</button>)}</div>
+          </QBSection>
+          <QBSection title="Stats">
+            <div className="qb-stats-grid"><SR label="Energy" op={eOp} onOp={setEOp} val={eV} onVal={setEV}/><SR label="Might" op={mOp} onOp={setMOp} val={mV} onVal={setMV}/><SR label="Power" op={pOp} onOp={setPOp} val={pV} onVal={setPV}/><SR label="Cost" op={cOp} onOp={setCOp} val={cV} onVal={setCV}/></div>
+          </QBSection>
+          <QBSection title="Text Filters">
+            <div className="qb-text-fields"><TF label="Name" hint="n:jinx" placeholder="e.g. Jinx" value={nm} onChange={setNm}/><TF label="Rules Text" hint='r:"draw a card"' placeholder="e.g. draw a card" value={rt} onChange={setRt}/><TF label="Keyword" hint="kw:Action" placeholder="e.g. Action, Resolve" value={kw} onChange={setKw}/><TF label="Artist" hint='a:"League Splash"' placeholder="e.g. League Splash Team" value={ar} onChange={setAr}/></div>
+            <p className="qb-note">Use quotes around multi-word values. Keywords are mechanics like Tank or Resolve.</p>
+          </QBSection>
+          <QBSection title="Finish">
+            <div className="qb-chips">{FINISHES.map(({value,label})=><button key={value} className={`qb-chip${sF.has(value)?" qb-chip--on":""}`} onClick={()=>setSF(tog(sF,value))} aria-pressed={sF.has(value)}>{label}</button>)}</div>
+          </QBSection>
+        </div>
+        <div>{!bq.trim()?<div className="qb-empty"><div className="qb-empty__title">Select filters to preview results.</div><div className="qb-empty__sub">Results update live as you build your query.</div></div>:<><div className="qb-results-header"><strong>{lr.length}</strong> matching cards</div><div className="card-grid">{lr.map(card=><div key={card.id} className="card-tile" style={{width:"auto",flex:"none"}}><div className="card-tile__art" style={{width:"auto",height:196}}><div className="card-tile__art-inner"><CardArt card={card} w={200} h={196}/></div><div className="card-tile__name-badge">{card.name}</div></div><div className="card-tile__meta"><DomainDots domains={card.domains}/><span style={{fontFamily:"var(--mono)",fontSize:10}}>{card.set}·{card.num}</span></div></div>)}</div></>}</div>
+      </div>
+    </div>
+  </div>;
+}
+
+/* ─── Trade Balancer ─── */
+const CONDITIONS=["Near Mint","Lightly Played","Mod. Played","Heavily Played","Damaged"];
+const COND_MULT={"Near Mint":1,"Lightly Played":0.85,"Mod. Played":0.70,"Heavily Played":0.55,"Damaged":0.40};
+const SEED_MINE=[{id:"darius",cond:"Near Mint",finish:"nonfoil"},{id:"thresh",cond:"Lightly Played",finish:"nonfoil"}];
+const SEED_YOURS=[{id:"jinx",cond:"Near Mint",finish:"nonfoil"},{id:"vi",cond:"Near Mint",finish:"nonfoil"},{id:"teemo",cond:"Near Mint",finish:"nonfoil"}];
+function makeItems(seeds){return seeds.map(s=>{const card=CARDS.find(c=>c.id===s.id);return {...s,card,key:s.id+"-"+Math.random()}});}
+
+function TradeBalancerPage(){
+  const [mine,setMine]=useState(makeItems(SEED_MINE));
+  const [yours,setYours]=useState(makeItems(SEED_YOURS));
+  const [mSearch,setMSearch]=useState("");const [ySearch,setYSearch]=useState("");
+
+  function cardPrice(card,cond,finish){const base=finish==="foil"?(card.price*2.5):card.price;return Math.round(base*(COND_MULT[cond]||1)*100)/100;}
+  function sideTotal(items){return items.reduce((sum,it)=>sum+cardPrice(it.card,it.cond,it.finish),0);}
+  const mTotal=sideTotal(mine);const yTotal=sideTotal(yours);
+  const delta=mTotal-yTotal;const absDelta=Math.abs(delta);
+  const totalBoth=mTotal+yTotal;
+  const greenPct=totalBoth>0?(mTotal/totalBoth)*100:50;
+
+  function addCard(side,setSide,search,setSearch){
+    const card=CARDS.find(c=>c.name.toLowerCase().includes(search.toLowerCase())&&!side.some(it=>it.card.id===c.id));
+    if(!card)return;setSide(p=>[...p,{card,cond:"Near Mint",finish:card.finish,key:card.id+"-"+Date.now()}]);setSearch("");
+  }
+  function removeItem(side,setSide,key){setSide(p=>p.filter(it=>it.key!==key));}
+  function updateItem(side,setSide,key,patch){setSide(p=>p.map(it=>it.key===key?{...it,...patch}:it));}
+
+  function TradeSide({items,setItems,total,label,search,setSearch,cls}){
+    return <div className={`trade-side ${cls}`}>
+      <div className="trade-side-header">
+        <span className="trade-side-label">{label}</span>
+        <span className="trade-side-total">{fmtUsd(total)}</span>
+      </div>
+      <div className="trade-add-search" onKeyDown={e=>e.key==="Enter"&&addCard(items,setItems,search,setSearch)}>
+        <IconSearch/><input placeholder="Add a card…" value={search} onChange={e=>setSearch(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCard(items,setItems,search,setSearch)}/>
+        <button type="button" onClick={()=>addCard(items,setItems,search,setSearch)} style={{background:"var(--blood-3)",color:"var(--bone-4)",border:"none",borderRadius:3,padding:"2px 8px",fontSize:11.5,fontWeight:700}}>Add</button>
+      </div>
+      {items.length===0?<div className="trade-empty">Search for a card above<br/>to add it to this side.</div>:
+        <div className="trade-items">{items.map(it=><div key={it.key} className="trade-item">
+          <div className="trade-item__thumb"><CardArt card={it.card} w={30} h={42}/></div>
+          <div className="trade-item__info">
+            <div className="trade-item__name">{it.card.name}</div>
+            <div className="trade-item__sub">
+              <select className="trade-item__condition" value={it.cond} onChange={e=>updateItem(items,setItems,it.key,{cond:e.target.value})}>{CONDITIONS.map(c=><option key={c} value={c}>{c}</option>)}</select>
+              <select className="trade-item__finish" value={it.finish} onChange={e=>updateItem(items,setItems,it.key,{finish:e.target.value})}><option value="nonfoil">Normal</option><option value="foil">Foil</option></select>
+            </div>
+          </div>
+          <span className="trade-item__price">{fmtUsd(cardPrice(it.card,it.cond,it.finish))}</span>
+          <button className="trade-item__remove" onClick={()=>removeItem(items,setItems,it.key)}>✕</button>
+        </div>)}</div>}
+    </div>;
+  }
+
+  const verdictText=absDelta<0.5?"Even trade":delta>0?`You give $${absDelta.toFixed(2)} more`:`You receive $${absDelta.toFixed(2)} more`;
+  const verdictColor=absDelta<0.5?"var(--bone-2)":delta>0?"var(--d-chaos)":"var(--d-body)";
+
+  return <div className="page-inner" style={{paddingBottom:60}}>
+    <div style={{paddingTop:24,marginBottom:4}}><span className="eyebrow">Tools · Trade Balancer</span></div>
+    <h2 style={{marginBottom:20,fontSize:28}}>Settle a <em>fair</em> trade.</h2>
+    <div className="trade-layout">
+      <TradeSide items={mine} setItems={setMine} total={mTotal} label="My Side" search={mSearch} setSearch={setMSearch} cls="trade-side--mine"/>
+      <TradeSide items={yours} setItems={setYours} total={yTotal} label="Their Side" search={ySearch} setSearch={setYSearch} cls="trade-side--yours"/>
+    </div>
+    <div className="trade-verdict">
+      <div className="trade-delta-bar-wrap">
+        <div style={{width:`${greenPct}%`,background:"oklch(0.58 0.16 145)",transition:"width 300ms ease"}}/>
+        <div style={{width:`${100-greenPct}%`,background:"oklch(0.50 0.18 25)",transition:"width 300ms ease"}}/>
+      </div>
+      <div className="trade-verdict-row">
+        <span className="trade-verdict-text">{verdictText}</span>
+        <span className="trade-verdict-delta" style={{color:verdictColor}}>{delta===0?"—":delta>0?`+${fmtUsd(absDelta)}`:`−${fmtUsd(absDelta)}`}</span>
+      </div>
+    </div>
+    <footer className="footer">Noxian Netdecks · fan-made Riftbound archive</footer>
+  </div>;
+}
+
+/* ─── Tier List ─── */
+const TIER_DEFS=[
+  {id:"S",label:"S",color:"#c94b4b",bg:"rgba(201,75,75,0.12)"},
+  {id:"A",label:"A",color:"#de7c30",bg:"rgba(222,124,48,0.12)"},
+  {id:"B",label:"B",color:"#d2ad2b",bg:"rgba(210,173,43,0.12)"},
+  {id:"C",label:"C",color:"#7da63d",bg:"rgba(125,166,61,0.12)"},
+  {id:"D",label:"D",color:"#4e7cb7",bg:"rgba(78,124,183,0.12)"},
+];
+
+function TierListPage(){
+  const [placements,setPlacements]=useState({S:[],A:[],B:[],C:[],D:[]});
+  const [poolSearch,setPoolSearch]=useState("");
+  const [pool,setPool]=useState([]);
+
+  const placedIds=useMemo(()=>new Set(Object.values(placements).flat()),[placements]);
+
+  function generatePool(){
+    const q=poolSearch.trim().toLowerCase();
+    setPool(q?CARDS.filter(c=>c.name.toLowerCase().includes(q)):CARDS);
+  }
+
+  function placeCard(cardId,tierId){
+    setPlacements(p=>{const next={...p};for(const k of Object.keys(next))next[k]=next[k].filter(id=>id!==cardId);if(tierId)next[tierId]=[...next[tierId],cardId];return next;});
+  }
+  function removeCard(cardId){
+    setPlacements(p=>{const next={...p};for(const k of Object.keys(next))next[k]=next[k].filter(id=>id!==cardId);return next;});
+  }
+
+  return <div className="page-inner" style={{paddingBottom:60}}>
+    <div style={{paddingTop:24,marginBottom:4}}><span className="eyebrow">Tools · Tier List</span></div>
+    <h2 style={{marginBottom:20,fontSize:28}}>Rank any set of <em>cards.</em></h2>
+    <div className="tier-layout">
+      <div className="tier-rows">
+        {TIER_DEFS.map(tier=>{
+          const tierCards=placements[tier.id].map(id=>CARDS.find(c=>c.id===id)).filter(Boolean);
+          return <div key={tier.id} className="tier-row" style={{borderColor:tier.color+"40"}}>
+            <div className="tier-row__label" style={{background:tier.bg,color:tier.color}}>{tier.label}</div>
+            <div className="tier-row__cards"
+              onDragOver={e=>e.preventDefault()}
+              onDrop={e=>{const id=e.dataTransfer.getData("cardId");if(id)placeCard(id,tier.id);}}>
+              {tierCards.length===0?<div className="tier-drop-empty">Drop cards here</div>:
+                tierCards.map(card=><div key={card.id} className="tier-card-thumb" draggable onDragStart={e=>{e.dataTransfer.setData("cardId",card.id);}} onClick={()=>removeCard(card.id)} title={`${card.name} — click to remove`}>
+                  <CardArt card={card} w={50} h={70}/>
+                  <div className="tier-card-thumb__name">{card.name}</div>
+                </div>)}
+            </div>
+          </div>;
+        })}
+      </div>
+      <div className="tier-pool-panel">
+        <div className="tier-pool-title">Card Pool</div>
+        <div className="tier-pool-search-row">
+          <div className="tier-pool-search"><IconSearch/><input placeholder="Search cards…" value={poolSearch} onChange={e=>setPoolSearch(e.target.value)} onKeyDown={e=>e.key==="Enter"&&generatePool()}/></div>
+          <button className="tier-pool-generate" onClick={generatePool}>Generate card pool</button>
+        </div>
+        {pool.length===0
+          ?<div className="tier-pool-empty">Search for cards above, then click Generate card pool.</div>
+          :<div className="tier-pool-cards">
+            {pool.map(card=><div key={card.id} className={`tier-pool-card${placedIds.has(card.id)?" placed":""}`} draggable onDragStart={e=>{e.dataTransfer.setData("cardId",card.id);}} onClick={()=>{if(!placedIds.has(card.id))placeCard(card.id,"S");else removeCard(card.id);}} title={card.name}>
+              <CardArt card={card} w={50} h={70}/>
+              <div className="tier-pool-card__name">{card.name}</div>
+            </div>)}
+          </div>}
+      </div>
+    </div>
+    <p style={{fontSize:11.5,color:"var(--bone-1)",fontFamily:"var(--mono)"}}>Search for a set of cards to rank. then your stuff</p>
+    <footer className="footer">Noxian Netdecks · fan-made Riftbound archive</footer>
+  </div>;
+}
+
+/* ─── Sealed Simulator ─── */
+const SEALED_FORMATS=[{id:"std-OGN",label:"Standard — Origins"},{id:"std-SFD",label:"Standard — Spiritforged"},{id:"std-UNL",label:"Standard — Unleashed"},{id:"prift-SFD",label:"Pre-Rift — Spiritforged"},{id:"prift-UNL",label:"Pre-Rift — Unleashed"},{id:"custom",label:"Custom"}];
+
+function generatePool(formatId,packCount){
+  const pool=[];const candidates=CARDS.filter(()=>true);
+  for(let p=0;p<packCount;p++){
+    const pack=[];const shuffled=[...candidates].sort(()=>Math.random()-0.5);
+    for(let i=0;i<Math.min(10,shuffled.length);i++)pack.push({...shuffled[i],packNum:p+1});
+    pool.push(...pack);
+  }
+  return pool;
+}
+
+function SealedSimulatorPage(){
+  const [format,setFormat]=useState("std-OGN");
+  const [packCount,setPackCount]=useState(6);
+  const [pool,setPool]=useState(null);
+  const [poolView,setPoolView]=useState("packs");
+
+  function generate(){setPool(generatePool(format,packCount));}
+
+  const packs=useMemo(()=>{
+    if(!pool)return[];
+    const byPack={};for(const c of pool){if(!byPack[c.packNum])byPack[c.packNum]=[];byPack[c.packNum].push(c);}
+    return Object.entries(byPack).map(([n,cards])=>({pack:Number(n),cards}));
+  },[pool]);
+
+  const byDomain=useMemo(()=>{
+    if(!pool)return[];
+    const groups={};for(const c of pool){const d=c.domains[0]||"Other";if(!groups[d])groups[d]=[];groups[d].push(c);}
+    return Object.entries(groups).sort((a,b)=>b[1].length-a[1].length);
+  },[pool]);
+
+  return <div className="page-inner" style={{paddingBottom:60}}>
+    <div style={{paddingTop:24,marginBottom:4}}><span className="eyebrow">Tools · Sealed Simulator</span></div>
+    <h2 style={{marginBottom:20,fontSize:28}}>Generate a <em>pool.</em></h2>
+    <div className="sealed-layout">
+      <div className="sealed-config">
+        <div className="sealed-config-title">Format</div>
+        <div className="sealed-field">
+          <div className="sealed-field-label">Format</div>
+          <select className="sealed-select" value={format} onChange={e=>setFormat(e.target.value)}>
+            {SEALED_FORMATS.map(f=><option key={f.id} value={f.id}>{f.label}</option>)}
+          </select>
+        </div>
+        <div className="sealed-field">
+          <div className="sealed-field-label">Number of Packs</div>
+          <input type="number" className="sealed-input" min="1" max="24" value={packCount} onChange={e=>setPackCount(Math.max(1,Math.min(24,Number(e.target.value)||1)))}/>
+        </div>
+        <button className="sealed-generate-btn" onClick={generate}>Generate Pool</button>
+        {pool&&<p style={{marginTop:10,fontSize:11.5,color:"var(--bone-1)",textAlign:"center",fontFamily:"var(--mono)"}}>{pool.length} cards across {packCount} packs</p>}
+      </div>
+      <div>
+        {!pool?<div className="sealed-empty"><div className="sealed-empty__title">No pool yet.</div><div className="sealed-empty__sub">Configure and generate a pool to see cards here.</div></div>:<>
+          <div className="sealed-view-tabs">
+            {[{id:"packs",label:"By Pack"},{id:"domain",label:"By Domain"},{id:"grid",label:"All Cards"}].map(t=><button key={t.id} className={`sealed-tab${poolView===t.id?" active":""}`} onClick={()=>setPoolView(t.id)}>{t.label}</button>)}
+          </div>
+          {poolView==="packs"&&packs.map(({pack,cards})=><div key={pack} className="sealed-pack">
+            <div className="sealed-pack-header"><span className="sealed-pack-label">Pack {pack}</span><span style={{fontFamily:"var(--mono)",fontSize:11,color:"var(--bone-1)"}}>{cards.length} cards</span></div>
+            <div className="card-grid">{cards.map((card,i)=><div key={card.id+i} className="card-tile" style={{width:"auto",flex:"none"}}><div className="card-tile__art" style={{width:"auto",height:150}}><div className="card-tile__art-inner"><CardArt card={card} w={200} h={150}/></div><div className="card-tile__name-badge" style={{fontSize:10}}>{card.name}</div></div><div className="card-tile__meta"><DomainDots domains={card.domains}/><span style={{fontFamily:"var(--mono)",fontSize:9}}>{card.type}</span></div></div>)}</div>
+          </div>)}
+          {poolView==="domain"&&byDomain.map(([domain,cards])=><div key={domain} className="sealed-domain-section">
+            <div className="sealed-domain-header"><span className="sealed-domain-pip" style={{background:DOMAIN_COLOR[domain]||"var(--bone-1)"}}/><span className="sealed-domain-name">{domain}</span><span className="sealed-domain-count">{cards.length} cards</span></div>
+            <div className="card-grid">{cards.map((card,i)=><div key={card.id+i} className="card-tile" style={{width:"auto",flex:"none"}}><div className="card-tile__art" style={{width:"auto",height:150}}><div className="card-tile__art-inner"><CardArt card={card} w={200} h={150}/></div><div className="card-tile__name-badge" style={{fontSize:10}}>{card.name}</div></div><div className="card-tile__meta"><DomainDots domains={card.domains}/><span style={{fontFamily:"var(--mono)",fontSize:9}}>{card.type}</span></div></div>)}</div>
+          </div>)}
+          {poolView==="grid"&&<div className="card-grid">{pool.map((card,i)=><div key={card.id+i} className="card-tile" style={{width:"auto",flex:"none"}}><div className="card-tile__art" style={{width:"auto",height:196}}><div className="card-tile__art-inner"><CardArt card={card} w={200} h={196}/></div><div className="card-tile__name-badge">{card.name}</div></div><div className="card-tile__meta"><DomainDots domains={card.domains}/><span style={{fontFamily:"var(--mono)",fontSize:10}}>{card.set}</span></div></div>)}</div>}
+        </>}
+      </div>
+    </div>
+  </div>;
+}
+
+/* ─── App ─── */
+function App(){
+  const [view,setView]=useState("home");
+  const [sq,setSq]=useState("");
+  const TABS=[{id:"home",l:"Home"},{id:"learn",l:"Cards"},{id:"search",l:"Search Results"},{id:"qbuilder",l:"Query Builder"},{id:"trade",l:"Trade Balancer"},{id:"tier",l:"Tier List"},{id:"sealed",l:"Sealed"}];
+  return <div>
+    <div className="preview-tab-bar">
+      <span style={{marginRight:6}}>Preview →</span>
+      {TABS.map(t=><button key={t.id} className={`preview-tab${view===t.id?" active":""}`} onClick={()=>setView(t.id)}>{t.l}</button>)}
+    </div>
+    <TopNav view={view} setView={setView} setSearchQuery={setSq}/>
+    {view==="home"   &&<HomePage setView={setView} setSearchQuery={setSq}/>}
+    {view==="learn"  &&<LearnToSearchPage setView={setView} setSearchQuery={setSq}/>}
+    {view==="search" &&<SearchPage initialQuery={sq} setView={setView}/>}
+    {view==="qbuilder"&&<QueryBuilderPage setView={setView}/>}
+    {view==="trade"  &&<TradeBalancerPage/>}
+    {view==="tier"   &&<TierListPage/>}
+    {view==="sealed" &&<SealedSimulatorPage/>}
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
