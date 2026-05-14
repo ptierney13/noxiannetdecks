@@ -10,16 +10,20 @@ import {
 } from "../pack_generator/index.js";
 import {
   fieldDefinitions,
+  parsedQueryReferencesField,
   parseQuery,
   queryFieldGuides,
   querySyntaxGuides,
   searchCards,
+  searchCardsFromParsed,
   sortCards
 } from "../query/index.js";
+import type { SearchPriceIndex } from "../prices/published.js";
 
 export type CardApiServiceOptions = {
   cards: CardRecord[];
   loadMetagamePilotBundle?: () => Promise<unknown>;
+  loadSearchPriceIndex?: () => Promise<SearchPriceIndex | null>;
 };
 
 export class CardApiError extends Error {
@@ -100,9 +104,23 @@ function parsePackGeneratorRequest(body: unknown): GenerateSealedPoolRequest {
 
 export function createCardApiService({
   cards,
-  loadMetagamePilotBundle
+  loadMetagamePilotBundle,
+  loadSearchPriceIndex
 }: CardApiServiceOptions) {
   const sortedCards = sortCards(cards);
+  let cachedPriceIndexPromise: Promise<SearchPriceIndex | null> | null = null;
+
+  function getSearchPriceIndex() {
+    if (!loadSearchPriceIndex) {
+      return Promise.resolve<SearchPriceIndex | null>(null);
+    }
+
+    if (!cachedPriceIndexPromise) {
+      cachedPriceIndexPromise = loadSearchPriceIndex();
+    }
+
+    return cachedPriceIndexPromise;
+  }
 
   return {
     health() {
@@ -112,8 +130,22 @@ export function createCardApiService({
       };
     },
 
-    search(query = "") {
-      return searchCards(sortedCards, query);
+    async search(query = "") {
+      const parsed = parseQuery(query);
+      if (parsed.diagnostics.length > 0) {
+        return searchCardsFromParsed(sortedCards, parsed);
+      }
+
+      if (!parsedQueryReferencesField(parsed, "price")) {
+        return searchCardsFromParsed(sortedCards, parsed);
+      }
+
+      const priceIndex = await getSearchPriceIndex();
+      if (!priceIndex) {
+        throw new CardApiError(503, "Published price data is unavailable.");
+      }
+
+      return searchCardsFromParsed(sortedCards, parsed, { priceIndex });
     },
 
     cardById(id: string) {

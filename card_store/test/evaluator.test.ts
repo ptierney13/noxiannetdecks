@@ -202,6 +202,46 @@ function domainNamesFor(query: string): string[] {
   return searchCards(domainOperatorFixtureCards, query).items.map((card) => card.riot_name);
 }
 
+const priceFixtureCards = [
+  makeCard({
+    id: "p1",
+    riftbound_id: "p1",
+    tcgplayer_id: "1001",
+    riot_name: "Cheap Gate",
+    clean_name: "Cheap Gate",
+    collector_number: "p1"
+  }),
+  makeCard({
+    id: "p2",
+    riftbound_id: "p2",
+    tcgplayer_id: "1002",
+    riot_name: "Premium Gate",
+    clean_name: "Premium Gate",
+    collector_number: "p2"
+  }),
+  makeCard({
+    id: "p3",
+    riftbound_id: "p3",
+    tcgplayer_id: null,
+    riot_name: "Unpriced Gate",
+    clean_name: "Unpriced Gate",
+    collector_number: "p3"
+  })
+];
+
+const priceSearchContext = {
+  priceIndex: {
+    nearMintByTcgplayerId: new Map([
+      ["1001", 1.25],
+      ["1002", 12.5]
+    ])
+  }
+};
+
+function priceNamesFor(query: string): string[] {
+  return searchCards(priceFixtureCards, query, priceSearchContext).items.map((card) => card.riot_name);
+}
+
 describe("searchCards", () => {
   it("returns every card for an empty query", () => {
     expect(namesFor("")).toEqual([
@@ -407,5 +447,17 @@ describe("domain set query semantics", () => {
   it("falls back to plain string matching for unrecognized domain text", () => {
     expect(domainNamesFor("d:cha")).toEqual(["Chaos Solo", "Chaos Mind Hybrid", "Chaos Body Hybrid", "Chaos Fury Hybrid"]);
     expect(searchCards(domainOperatorFixtureCards, "d>mystery").diagnostics.length).toBeGreaterThan(0);
+  });
+});
+
+describe("price query semantics", () => {
+  it("supports numeric comparisons against published near-mint prices", () => {
+    expect(priceNamesFor("price>=10")).toEqual(["Premium Gate"]);
+    expect(priceNamesFor("price<2")).toEqual(["Cheap Gate"]);
+  });
+
+  it("treats cards without a published near-mint price as missing", () => {
+    expect(priceNamesFor("price:none")).toEqual(["Unpriced Gate"]);
+    expect(priceNamesFor("price>=1")).not.toContain("Unpriced Gate");
   });
 });

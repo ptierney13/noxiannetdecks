@@ -179,6 +179,10 @@ These invariants should be enforced by tests and preserved by importers:
 - `is:Signed`, `is:Signature`, and `is:sig` search `variant.signed`.
 - `riftbound_id:` searches legal/decklist identity, not the old source string ID.
 - `tcgplayer_id:` searches external TCGplayer product IDs.
+- `price` searches the published `Near Mint` market price joined by
+  `tcgplayer_id`. When multiple `Near Mint` rows exist, search prefers
+  non-foil over foil. Cards without a published `Near Mint` price match
+  `price:none`.
 - Search results default to `unique:legal`, returning one representative record per
   `riftbound_id`. `unique:id` returns every matched source record, matching the
   previous behavior. `unique:art` returns one record per legal-card artwork/image

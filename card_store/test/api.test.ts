@@ -61,6 +61,7 @@ describe("card store API", () => {
     expect(features.statusCode).toBe(200);
     expect(features.json().fields.length).toBeGreaterThan(10);
     expect(features.json().syntax.length).toBeGreaterThan(5);
+    expect(features.json().fields.some((field: { property: string }) => field.property === "Price")).toBe(true);
 
     const found = await app.inject({ method: "GET", url: "/api/cards/fixture-001" });
     expect(found.statusCode).toBe(200);
@@ -68,6 +69,25 @@ describe("card store API", () => {
 
     const missing = await app.inject({ method: "GET", url: "/api/cards/nope" });
     expect(missing.statusCode).toBe(404);
+
+    await app.close();
+  });
+
+  it("uses the published price index for price queries", async () => {
+    const app = await createApp({
+      cards: fixtureCards.map((card, index) => (index === 0 ? { ...card, tcgplayer_id: "1001" } : card)),
+      loadSearchPriceIndex: async () => ({
+        nearMintByTcgplayerId: new Map([["1001", 12.5]])
+      })
+    });
+
+    const pricedSearch = await app.inject({ method: "GET", url: "/api/cards?q=price%3E%3D10" });
+    expect(pricedSearch.statusCode).toBe(200);
+    expect(pricedSearch.json().items.map((card: { riot_name: string }) => card.riot_name)).toEqual(["Void Gate"]);
+
+    const missingSearch = await app.inject({ method: "GET", url: "/api/cards?q=price%3Anone" });
+    expect(missingSearch.statusCode).toBe(200);
+    expect(missingSearch.json().items.some((card: { riot_name: string }) => card.riot_name === "Void Gate")).toBe(false);
 
     await app.close();
   });

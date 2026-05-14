@@ -4,11 +4,13 @@ import { fileURLToPath } from "node:url";
 import cors from "@fastify/cors";
 import Fastify from "fastify";
 import type { CardRecord } from "../data/schema.js";
+import { createSearchPriceIndex, type PublishedPriceManifest, type PublishedPriceSnapshot, type SearchPriceIndex } from "../prices/published.js";
 import { CardApiError, createCardApiService } from "./service.js";
 
 type CreateAppOptions = {
   cards: CardRecord[];
   loadMetagamePilotBundle?: () => Promise<unknown>;
+  loadSearchPriceIndex?: () => Promise<SearchPriceIndex | null>;
 };
 
 function resolveDefaultMetagamePilotBundlePath(environment: NodeJS.ProcessEnv = process.env) {
@@ -26,7 +28,30 @@ async function loadMetagamePilotBundleFromDisk() {
   return JSON.parse(raw) as unknown;
 }
 
-export async function createApp({ cards, loadMetagamePilotBundle = loadMetagamePilotBundleFromDisk }: CreateAppOptions) {
+function resolveDefaultPriceDataDir(environment: NodeJS.ProcessEnv = process.env) {
+  const configuredRoot = environment.NOXIANNET_PRICE_DATA_DIR?.trim();
+  if (configuredRoot) {
+    return configuredRoot;
+  }
+
+  const currentDir = dirname(fileURLToPath(import.meta.url));
+  return resolve(currentDir, "..", "..", "..", "frontend", "public", "data", "prices-d1");
+}
+
+async function loadSearchPriceIndexFromDisk(): Promise<SearchPriceIndex | null> {
+  const rootDir = resolveDefaultPriceDataDir();
+  const manifestRaw = await readFile(resolve(rootDir, "manifest.json"), "utf8");
+  const manifest = JSON.parse(manifestRaw) as PublishedPriceManifest;
+  const snapshotRaw = await readFile(resolve(rootDir, manifest.snapshotPath), "utf8");
+  const snapshot = JSON.parse(snapshotRaw) as PublishedPriceSnapshot;
+  return createSearchPriceIndex(snapshot);
+}
+
+export async function createApp({
+  cards,
+  loadMetagamePilotBundle = loadMetagamePilotBundleFromDisk,
+  loadSearchPriceIndex = loadSearchPriceIndexFromDisk
+}: CreateAppOptions) {
   const app = Fastify({
     logger: false,
     ajv: {
@@ -37,7 +62,8 @@ export async function createApp({ cards, loadMetagamePilotBundle = loadMetagameP
   });
   const api = createCardApiService({
     cards,
-    loadMetagamePilotBundle
+    loadMetagamePilotBundle,
+    loadSearchPriceIndex
   });
 
   await app.register(cors, {
@@ -46,8 +72,16 @@ export async function createApp({ cards, loadMetagamePilotBundle = loadMetagameP
 
   app.get("/api/health", async () => api.health());
 
-  app.get<{ Querystring: { q?: string } }>("/api/cards", async (request) => {
-    return api.search(request.query.q ?? "");
+  app.get<{ Querystring: { q?: string } }>("/api/cards", async (request, reply) => {
+    try {
+      return await api.search(request.query.q ?? "");
+    } catch (caught) {
+      if (caught instanceof CardApiError) {
+        return reply.status(caught.status).send({ message: caught.message });
+      }
+
+      throw caught;
+    }
   });
 
   app.get<{ Params: { id: string }; Querystring: { pretty?: string } }>("/api/cards/:id", async (request, reply) => {

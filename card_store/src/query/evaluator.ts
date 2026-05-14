@@ -1,4 +1,5 @@
 import type { CardRecord } from "../data/schema.js";
+import type { SearchPriceIndex } from "../prices/published.js";
 import { normalizeVariantQuery } from "../data/variant.js";
 import type { ParsedQuery, QueryNode, QueryOperator } from "./ast.js";
 import { compareDomainSet, parseDomainQueryValue, DOMAIN_PRIMARY } from "./domain.js";
@@ -13,6 +14,10 @@ export type SearchResult = {
   uniqueMode: SearchUniqueMode;
   diagnostics: ParsedQuery["diagnostics"];
   items: CardRecord[];
+};
+
+export type SearchEvaluationContext = {
+  priceIndex?: SearchPriceIndex | null;
 };
 
 function escapeRegExp(value: string): string {
@@ -109,7 +114,7 @@ function stringValuesForField(card: CardRecord, canonicalField: string): string[
   }
 }
 
-function numberValueForField(card: CardRecord, canonicalField: string): number | null {
+function numberValueForField(card: CardRecord, canonicalField: string, context: SearchEvaluationContext): number | null {
   switch (canonicalField) {
     case "cost":
       return card.attributes.energy;
@@ -119,6 +124,8 @@ function numberValueForField(card: CardRecord, canonicalField: string): number |
       return card.attributes.might;
     case "power":
       return card.attributes.power;
+    case "price":
+      return card.tcgplayer_id ? context.priceIndex?.nearMintByTcgplayerId.get(card.tcgplayer_id) ?? null : null;
     default:
       return null;
   }
@@ -336,15 +343,21 @@ function rollupCards(cards: CardRecord[], uniqueMode: SearchUniqueMode): CardRec
   return sortCards([...representatives.values()]);
 }
 
-function isMissingValue(card: CardRecord, canonicalField: string): boolean {
-  const numberValue = numberValueForField(card, canonicalField);
+function isMissingValue(card: CardRecord, canonicalField: string, context: SearchEvaluationContext): boolean {
+  const numberValue = numberValueForField(card, canonicalField, context);
   if (numberValue !== null) return false;
 
   const stringValues = stringValuesForField(card, canonicalField);
   return stringValues.length === 0 || stringValues.every((value) => normalizeText(value).length === 0);
 }
 
-function matchesPredicate(card: CardRecord, fieldName: string, operator: QueryOperator, value: string): boolean {
+function matchesPredicate(
+  card: CardRecord,
+  fieldName: string,
+  operator: QueryOperator,
+  value: string,
+  context: SearchEvaluationContext
+): boolean {
   const field = resolveField(fieldName);
   if (!field) return false;
 
@@ -368,7 +381,7 @@ function matchesPredicate(card: CardRecord, fieldName: string, operator: QueryOp
   }
 
   if (normalizeText(value) === "none") {
-    return isMissingValue(card, field.canonical);
+    return isMissingValue(card, field.canonical, context);
   }
 
   if (field.kind === "number") {
@@ -392,7 +405,7 @@ function matchesPredicate(card: CardRecord, fieldName: string, operator: QueryOp
       return compareNumber(candidate, operator, expected);
     }
 
-    const candidate = numberValueForField(card, field.canonical);
+    const candidate = numberValueForField(card, field.canonical, context);
     if (candidate === null) return false;
     const expected = Number(value);
     if (Number.isNaN(expected)) return false;
@@ -433,20 +446,20 @@ function matchesTerm(card: CardRecord, value: string): boolean {
   return candidates.some((candidate) => matchesText(candidate, value, "contains"));
 }
 
-export function evaluateQueryNode(card: CardRecord, node: QueryNode): boolean {
+export function evaluateQueryNode(card: CardRecord, node: QueryNode, context: SearchEvaluationContext = {}): boolean {
   switch (node.type) {
     case "all":
       return true;
     case "term":
       return matchesTerm(card, node.value);
     case "predicate":
-      return matchesPredicate(card, node.field, node.operator, node.value);
+      return matchesPredicate(card, node.field, node.operator, node.value, context);
     case "not":
-      return !evaluateQueryNode(card, node.child);
+      return !evaluateQueryNode(card, node.child, context);
     case "and":
-      return node.children.every((child) => evaluateQueryNode(card, child));
+      return node.children.every((child) => evaluateQueryNode(card, child, context));
     case "or":
-      return node.children.some((child) => evaluateQueryNode(card, child));
+      return node.children.some((child) => evaluateQueryNode(card, child, context));
   }
 }
 
@@ -458,12 +471,15 @@ export function sortCards(cards: CardRecord[]): CardRecord[] {
   });
 }
 
-export function searchCards(cards: CardRecord[], query: string): SearchResult {
-  const parsed = parseQuery(query);
+export function searchCardsFromParsed(
+  cards: CardRecord[],
+  parsed: ParsedQuery,
+  context: SearchEvaluationContext = {}
+): SearchResult {
   const matched =
     parsed.diagnostics.length > 0
       ? []
-      : sortCards(cards.filter((card) => evaluateQueryNode(card, parsed.ast)));
+      : sortCards(cards.filter((card) => evaluateQueryNode(card, parsed.ast, context)));
   const items = parsed.diagnostics.length > 0 ? [] : rollupCards(matched, parsed.uniqueMode);
 
   return {
@@ -473,4 +489,8 @@ export function searchCards(cards: CardRecord[], query: string): SearchResult {
     diagnostics: parsed.diagnostics,
     items
   };
+}
+
+export function searchCards(cards: CardRecord[], query: string, context: SearchEvaluationContext = {}): SearchResult {
+  return searchCardsFromParsed(cards, parseQuery(query), context);
 }

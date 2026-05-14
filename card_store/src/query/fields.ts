@@ -32,7 +32,8 @@ export const fieldDefinitions: FieldDefinition[] = [
   { canonical: "cost", aliases: ["c"], kind: "number", description: "Cost value." },
   { canonical: "energy", aliases: ["e"], kind: "number", description: "Energy value." },
   { canonical: "might", aliases: ["m"], kind: "number", description: "Might value." },
-  { canonical: "power", aliases: ["p"], kind: "number", description: "Power value." }
+  { canonical: "power", aliases: ["p"], kind: "number", description: "Power value." },
+  { canonical: "price", aliases: [], kind: "number", description: "Published near-mint market price." }
 ];
 
 const fieldLookup = new Map<string, FieldDefinition>();

@@ -126,6 +126,13 @@ export const queryFieldGuides: QueryFieldGuide[] = [
     example: "p=1 or p=ff or p<=f"
   },
   {
+    property: "Price",
+    query: "price<number comparison>",
+    shorthand: null,
+    searches: "published Near Mint market price joined by tcgplayer_id; cards without a published Near Mint price match price:none",
+    example: "price>=10"
+  },
+  {
     property: "Collector number",
     query: "number=<collector number>",
     shorthand: "cn=<collector number>",
