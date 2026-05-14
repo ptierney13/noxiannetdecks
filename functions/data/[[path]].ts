@@ -21,6 +21,7 @@ function normalizePathParam(path: string | string[] | undefined): string[] {
   return Array.isArray(path) ? path : [path];
 }
 
+
 function resolveContentType(key: string): string {
   if (key.endsWith(".json")) {
     return "application/json; charset=utf-8";
