@@ -87,6 +87,21 @@ The `gh` CLI is **not installed** on this machine. All GitHub operations use pla
 C:\Users\ptier\repos\Deck Archive Project-main-merge
 ```
 
+Before starting implementation work on an approved plan or other new code
+changes, always begin from a fresh branch created off `main` after that
+worktree has been pulled and synced with `origin`.
+
+Expected start-of-work flow:
+
+```bash
+git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" fetch --prune origin
+git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" pull --ff-only origin main
+git -C "C:\Users\ptier\repos\Deck Archive Project" checkout -b codex/<task-name> "origin/main"
+```
+
+Do not continue new implementation work on an older existing branch unless the
+user explicitly asks to resume that branch.
+
 To merge a finished branch to main and deploy:
 
 ```bash
