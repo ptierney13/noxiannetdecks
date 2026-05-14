@@ -3,6 +3,7 @@ import { generateSealedPool, getCard, loadPackGeneratorOptions, loadQueryFeature
 import { CardSearchGuide } from "./CardSearchGuide";
 import DeckExplorerView from "./DeckExplorerView";
 import {
+  buildTcgplayerAffiliateSearchLink,
   buildTcgplayerAffiliateLink,
   formatPrintingLabel,
   formatUsdPrice,
@@ -664,6 +665,8 @@ function CardGrid({ cards, onCardClick }: { cards: CardRecord[]; onCardClick?: (
   );
 }
 
+// "Quick View" is the product/UI term for this surface.
+// Legacy internal names still use "quick-look" in classes and tests.
 function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; onClose: () => void; onNavigate: (path: string) => void }) {
   const { index: publishedPriceIndex } = usePublishedPriceIndex();
   useEffect(() => {
@@ -692,6 +695,15 @@ function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; o
     [priceRows]
   );
   const headlinePrice = formatPriceOnly(nearMintPrice);
+  const quickViewBuyHref = useMemo(
+    () =>
+      buildTcgplayerAffiliateSearchLink({
+        query: card.riot_name,
+        gameSlug: "riftbound-league-of-legends-trading-card-game",
+        productLineName: "riftbound-league-of-legends-trading-card-game"
+      }),
+    [card.riot_name]
+  );
 
   return (
     <div className="card-quick-look-backdrop" onClick={handleBackdropClick} role="presentation">
@@ -733,9 +745,21 @@ function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; o
             {card.rarity && <span>{card.rarity}</span>}
             {headlinePrice ? <span className="card-quick-look-price">{headlinePrice}</span> : null}
           </div>
-          <button type="button" className="card-quick-look-detail-link" onClick={handleViewDetails}>
-            View full details →
-          </button>
+          <div className="card-quick-view-actions">
+            {quickViewBuyHref ? (
+              <a
+                className="card-quick-look-detail-link"
+                href={quickViewBuyHref}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Buy on TCG ↗
+              </a>
+            ) : null}
+            <button type="button" className="card-quick-look-detail-link" onClick={handleViewDetails}>
+              View full details →
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -2317,7 +2341,7 @@ function CardDetailView({
       return [
         {
           key: "foil",
-          finishLabel: "Foil",
+          finishLabel: "FOIL",
           href: buildTcgplayerAffiliateLink({
             productId,
             printing: "Foil"
@@ -2325,7 +2349,7 @@ function CardDetailView({
         },
         {
           key: "normal",
-          finishLabel: "Nonfoil",
+          finishLabel: "NONFOIL",
           href: buildTcgplayerAffiliateLink({
             productId,
             printing: "Normal"
@@ -2535,9 +2559,7 @@ function CardDetailView({
                 rel="noopener noreferrer"
               >
                 {link.finishLabel ? (
-                  <>
-                    Buy <span className="card-detail-buy-link-accent">{link.finishLabel}</span> on TCGPlayer ↗
-                  </>
+                  <>Buy {link.finishLabel} on TCGPlayer ↗</>
                 ) : (
                   <>Buy on TCGPlayer ↗</>
                 )}

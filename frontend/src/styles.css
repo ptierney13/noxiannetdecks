@@ -3499,6 +3499,9 @@ code {
 }
 
 .card-quick-look-detail-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   align-self: flex-start;
   margin-top: auto;
   border: none;
@@ -3510,10 +3513,18 @@ code {
   font-weight: 700;
   cursor: pointer;
   transition: background 0.12s ease;
+  text-decoration: none;
 }
 
 .card-quick-look-detail-link:hover {
   background: var(--red-dim);
+}
+
+.card-quick-view-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: auto;
 }
 
 /* ── CARD DETAIL PAGE ── */
@@ -3711,10 +3722,6 @@ code {
 .card-detail-json-link:hover {
   border-color: var(--border-strong);
   color: var(--text-strong);
-}
-
-.card-detail-buy-link-accent {
-  color: var(--red);
 }
 
 .card-detail-json-block {

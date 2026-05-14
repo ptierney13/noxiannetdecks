@@ -10,6 +10,16 @@ The current site provides:
 - A detailed query-language feature chart
 - A scrollable card-image grid with four columns on desktop
 
+## UI Terms
+
+- `Quick View` is the canonical product term for the compact dialog that opens
+  when a search-result card is clicked.
+- Quick View shows a lightweight card summary and actions such as `Buy on TCG`
+  and `View full details`.
+- Some older internal code and CSS still use `quick-look` in names like
+  `CardQuickLookModal` and `.card-quick-look-*`. Treat those as legacy internal
+  identifiers for the same Quick View surface rather than a different UI.
+
 ## Local Commands
 
 From the repository root:

@@ -95,6 +95,12 @@ export type TcgplayerAffiliateLinkOptions = {
   printing?: string | null;
 };
 
+export type TcgplayerAffiliateSearchLinkOptions = {
+  query: string | null | undefined;
+  gameSlug?: string | null;
+  productLineName?: string | null;
+};
+
 const PRINTING_ORDER = new Map<string, number>([
   ["foil", 0],
   ["normal", 1]
@@ -252,6 +258,15 @@ export function buildTcgplayerAffiliateLink(options: TcgplayerAffiliateLinkOptio
   return `${TCGPLAYER_AFFILIATE_BASE_URL}?u=${encodeURIComponent(landingUrl)}`;
 }
 
+export function buildTcgplayerAffiliateSearchLink(options: TcgplayerAffiliateSearchLinkOptions): string | null {
+  const landingUrl = buildTcgplayerSearchUrl(options);
+  if (!landingUrl) {
+    return null;
+  }
+
+  return `${TCGPLAYER_AFFILIATE_BASE_URL}?u=${encodeURIComponent(landingUrl)}`;
+}
+
 export function sortPriceRows(rows: PublishedPriceRow[]): PublishedPriceRow[] {
   return [...rows].sort((left, right) => {
     const printingDelta = resolvePrintingOrder(left.printing) - resolvePrintingOrder(right.printing);
@@ -307,6 +322,22 @@ function buildTcgplayerProductUrl(options: TcgplayerAffiliateLinkOptions): strin
   return query
     ? `https://www.tcgplayer.com/product/${productId}?${query}`
     : `https://www.tcgplayer.com/product/${productId}`;
+}
+
+function buildTcgplayerSearchUrl(options: TcgplayerAffiliateSearchLinkOptions): string | null {
+  const queryValue = options.query?.trim();
+  if (!queryValue) {
+    return null;
+  }
+
+  const gameSlug = options.gameSlug?.trim() || "riftbound-league-of-legends-trading-card-game";
+  const productLineName = options.productLineName?.trim() || gameSlug;
+  const params = new URLSearchParams();
+  params.set("q", queryValue);
+  params.set("productLineName", productLineName);
+  params.set("view", "grid");
+
+  return `https://www.tcgplayer.com/search/${encodeURIComponent(gameSlug)}/product?${params.toString()}`;
 }
 
 async function buildPublishedPriceIndex(pathPrefix = D1_PRICE_PATH_PREFIX): Promise<PublishedPriceIndex> {
