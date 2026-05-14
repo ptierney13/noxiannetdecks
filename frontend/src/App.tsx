@@ -2317,7 +2317,7 @@ function CardDetailView({
       return [
         {
           key: "foil",
-          label: "Buy Foil on TCGPlayer",
+          finishLabel: "Foil",
           href: buildTcgplayerAffiliateLink({
             productId,
             printing: "Foil"
@@ -2325,13 +2325,13 @@ function CardDetailView({
         },
         {
           key: "normal",
-          label: "Buy Nonfoil on TCGPlayer",
+          finishLabel: "Nonfoil",
           href: buildTcgplayerAffiliateLink({
             productId,
             printing: "Normal"
           })
         }
-      ].filter((entry): entry is { key: string; label: string; href: string } => Boolean(entry.href));
+      ].filter((entry): entry is { key: string; finishLabel: string; href: string } => Boolean(entry.href));
     }
 
     const href = buildTcgplayerAffiliateLink({ productId });
@@ -2339,7 +2339,7 @@ function CardDetailView({
       ? [
           {
             key: "default",
-            label: "Buy on TCGPlayer",
+            finishLabel: null,
             href
           }
         ]
@@ -2534,7 +2534,13 @@ function CardDetailView({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {link.label} ↗
+                {link.finishLabel ? (
+                  <>
+                    Buy <span className="card-detail-buy-link-accent">{link.finishLabel}</span> on TCGPlayer ↗
+                  </>
+                ) : (
+                  <>Buy on TCGPlayer ↗</>
+                )}
               </a>
             ))}
           </div>

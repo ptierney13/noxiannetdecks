@@ -3713,6 +3713,10 @@ code {
   color: var(--text-strong);
 }
 
+.card-detail-buy-link-accent {
+  color: var(--red);
+}
+
 .card-detail-json-block {
   margin-top: 10px;
   padding: 14px;
