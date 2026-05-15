@@ -5229,7 +5229,6 @@ body {
 
 .site-nav--stage-compact,
 .site-nav--stage-search {
-  display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.75rem;
@@ -5605,7 +5604,7 @@ body {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 640px) {
   .site-header {
     padding-top: 1rem;
   }
