@@ -4959,9 +4959,14 @@ code {
   line-height: 1.3;
 }
 
-.variant-btn:hover {
+.variant-btn:hover,
+.variant-btn--active {
   background: var(--surface-3, var(--surface));
   border-color: var(--red);
+}
+
+.variant-btn--active {
+  color: var(--red);
 }
 
 .variant-btn-label {
