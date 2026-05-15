@@ -766,7 +766,7 @@ function groupCardsByRiftboundId(cards: CardRecord[]): CardRecord[][] {
 function variantButtonLabel(card: CardRecord, finish: string): string {
   const parts: string[] = [card.set.set_id];
   if (card.variant.alternate_art) parts.push("AA");
-  if (card.variant.signed) parts.push("Sig");
+  if (card.variant.signed) parts.push("SIG");
   else if (card.variant.overnumbered) parts.push("ON");
   if (finish === "foil" && card.finishes.includes("nonfoil")) parts.push("FOIL");
   return parts.join(" ");
