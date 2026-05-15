@@ -315,7 +315,7 @@ function LearnToSearchView({
 
         {activeTab === "text-guide" && (() => {
           const SECTION_CHILDREN: Record<string, string[]> = {
-            "Cost":      ["Energy", "Power", "Might"],
+            "Cost":      ["Energy", "Power"],
             "Type line": ["Card type", "Supertype", "Tag"],
           };
           const childSet = new Set(Object.values(SECTION_CHILDREN).flat());
