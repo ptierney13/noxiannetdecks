@@ -190,7 +190,7 @@ export function StorybookViewportFrame({
   children: ReactNode;
 }) {
   const widthStyle = mode === "mobile"
-    ? { width: `${mobileWidth}px`, maxWidth: `${mobileWidth}px` }
+    ? { width: "100%", maxWidth: `${mobileWidth}px` }
     : desktopWidth
       ? { width: `${desktopWidth}px`, maxWidth: `${desktopWidth}px` }
       : undefined;

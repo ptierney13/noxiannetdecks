@@ -4334,6 +4334,8 @@ body {
 .site-nav,
 .storybook-header-preview {
   display: grid;
+  width: 100%;
+  min-width: 0;
   grid-template-columns: auto minmax(280px, 1fr) auto;
   position: relative;
   container-type: inline-size;
@@ -4346,6 +4348,7 @@ body {
 
 .site-nav-mobile-shell {
   display: grid;
+  width: 100%;
   gap: 0.85rem;
   container-type: inline-size;
   container-name: mobile-header-shell;
@@ -4353,6 +4356,7 @@ body {
 
 .storybook-mobile-shell {
   display: grid;
+  width: 100%;
   gap: 0.85rem;
   container-type: inline-size;
   container-name: mobile-header-shell;
@@ -4363,6 +4367,7 @@ body {
 .site-nav-mobile-inline,
 .storybook-mobile-inline {
   display: grid;
+  width: 100%;
   grid-template-columns: auto minmax(0, 1fr) auto;
 }
 
@@ -5150,7 +5155,7 @@ body {
 }
 
 .storybook-viewport-inner--mobile {
-  width: 393px;
+  width: 100%;
   max-width: 393px;
   min-height: 852px;
   margin: 0 auto;

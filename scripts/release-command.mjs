@@ -19,14 +19,16 @@ function currentBranch() {
   return runGit(["branch", "--show-current"]);
 }
 
+const MAX_PREVIEW_ALIAS_LENGTH = 28;
+
 function sanitizeBranchAlias(branch) {
   return branch
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "")
-    .slice(0, 28)
-    .replace(/-$/, "");
+    .slice(0, MAX_PREVIEW_ALIAS_LENGTH)
+    .replace(/-+$/g, "");
 }
 
 function previewInfo(branch, config) {
