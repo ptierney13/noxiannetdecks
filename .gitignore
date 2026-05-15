@@ -9,6 +9,11 @@ coverage/
 .wrangler/
 .dev-*.log
 .codex-logs/
+_tmp_*
+**/_tmp_*
+**/.storybook/*.log
+**/debug-storybook.log
+**/storybook-static/
 frontend/test-results/
 playwright-report/
 scripts/out/

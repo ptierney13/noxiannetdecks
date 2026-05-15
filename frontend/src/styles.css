@@ -1579,29 +1579,6 @@ code {
   padding: 4px 14px 12px;
 }
 
-/* ── Query chip ── */
-
-.query-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 8px;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border-default);
-  border-radius: 6px;
-  font-family: ui-monospace, monospace;
-  font-size: 0.8rem;
-  color: var(--color-accent-warm);
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-}
-
-.query-chip:hover,
-.query-chip:focus-visible {
-  background: var(--color-accent-warm-soft);
-  border-color: rgba(215, 170, 73, 0.4);
-  color: var(--color-accent-warm);
-}
-
 /* ── LTS detail overlay ── */
 
 .lts-detail-overlay {
@@ -5021,11 +4998,6 @@ body {
   background: rgba(255, 255, 255, 0.03);
   color: var(--color-text-primary);
   cursor: pointer;
-}
-
-.menu-icon {
-  width: 1.3rem;
-  height: 1.3rem;
 }
 
 .mobile-nav-backdrop {

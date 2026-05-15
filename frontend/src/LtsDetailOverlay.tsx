@@ -1,4 +1,4 @@
-import { QueryChip } from "./QueryChip";
+import { QueryChip } from "./ui";
 
 export type LtsDetailItem = {
   label: string;

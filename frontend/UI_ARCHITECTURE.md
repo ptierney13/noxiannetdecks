@@ -1,34 +1,110 @@
-# Frontend UI Architecture Preferences
+# Frontend UI Architecture
 
-This document captures the preferred design and implementation model for future
-UI work in `frontend/`. It is motivated by the homepage and navigation redesign
-work already completed in this repository.
+This document is the durable source of truth for frontend architecture,
+responsive design, and UI patterns. It is the detailed companion to
+`frontend/AGENTS.md`.
 
-Use this file as the durable source of truth for responsive UI architecture,
-especially when reworking shared shells, homepage sections, navigation, and
-Storybook-driven component review.
+## Migration Era Contract
+
+The frontend is mid-migration toward a layered architecture with Tailwind
+styling, TanStack Router, and TanStack Query. The full initiative plan lives in
+`plans/todo/frontend-ui-architecture-alignment/`.
+
+During the migration, two sets of patterns coexist:
+
+| Category | Pattern | Status |
+| -------- | ------- | ------ |
+| Styling | Tailwind utility classes on components | **Target — use for all new/migrated work** |
+| Styling | `styles.css` selectors | Legacy — do not add; remove after migrating the matching component |
+| Styling | `ui-foundation.css` | Stays as CSS custom property token declarations only |
+| Routing | TanStack Router (`@tanstack/react-router`) | **Target — Stage 3+** |
+| Routing | `parseAppRoute()` + `window.history` | Legacy — replaced in Stage 3 |
+| Data | TanStack Query (`@tanstack/react-query`) | **Target — Stage 4+** |
+| Data | `useEffect` waterfalls + `useState` | Legacy — replaced in Stage 4 |
+| Structure | `app/`, `routes/`, `features/`, `ui/`, `data/`, `lib/` layers | **Target** |
+| Structure | `App.tsx` monolith | Transitional — being reduced to providers + `<RouterProvider>` |
+
+CSS migration protocol: write Tailwind on the component, confirm it renders
+correctly, then delete the corresponding `styles.css` selector. Never leave
+both active at the same time. Never add new `styles.css` rules.
 
 ## Core Philosophy
 
 - Design mobile-first.
-- Scale up from the smallest useful layout instead of shrinking a desktop
-  layout down.
+- Scale up from the smallest useful layout instead of shrinking a desktop layout down.
 - Build shared systems before page-specific polish.
-- Prefer reusable semantic tokens and shared surface primitives over one-off
-  page styles.
+- Style with Tailwind utility classes; semantic CSS tokens (`ui-foundation.css`)
+  supplement where values are shared across components.
 - Treat Storybook as a first-class review environment, not an afterthought.
+
+## Target Layer Structure
+
+```
+frontend/src/
+  app/        — providers, app shell, top-level route mounting
+  routes/     — TanStack Router route definitions, loaders, validateSearch schemas
+  features/   — domain UI shared by more than one route
+  ui/         — product-agnostic primitives (Tailwind, no API calls, no domain logic)
+  data/       — TanStack Query keys, queryOptions definitions, API client
+  lib/        — shared non-domain React utilities (useDebounce, formatters, etc.)
+```
+
+Import direction (one-way):
+
+```
+app → routes / features / ui / data / lib
+routes → features / ui / data / lib
+features → ui / data / lib
+ui → lib
+data → lib
+lib → (nothing in this repo)
+```
+
+Each layer exposes a barrel `index.ts`. Consumers import from the barrel, not
+from internal files.
+
+**Where does X go?**
+
+- New button or input primitive → `ui/`
+- New card-domain component used by multiple routes → `features/`
+- New card-domain component used only by one route → keep in the route file
+- New API call or query definition → `data/`
+- New non-domain hook or utility → `lib/`
+- New page route → `routes/`
+
+## Shared Design System
+
+Semantic tokens are defined as CSS custom properties in `ui-foundation.css`.
+They represent shared visual decisions and should be referenced in Tailwind
+classes via `var(--token-name)` where needed.
+
+Examples of token-backed decisions:
+
+- accent gradients
+- button treatments
+- border strengths
+- hover emphasis
+- surface hierarchy
+- text color roles
+
+Promote a value to a CSS custom property in `ui-foundation.css` if it
+represents a shared design decision used in more than one component.
+
+Do not introduce new raw colors or shadows directly in feature files if the
+value is reusable. Do not add utility selectors to `ui-foundation.css`.
+`styles.css` must not receive any new rules.
 
 ## Responsive Model
 
 ### Mobile First
 
-- Base styles should target narrow screens by default.
-- Larger-screen behavior should be layered on progressively.
-- The standard expansion breakpoints are:
-  - `640px`
-  - `768px`
-  - `1024px`
-  - `1280px`
+Base styles target narrow screens. Larger-screen behavior is layered on
+progressively using the standard expansion breakpoints:
+
+- `640px`
+- `768px`
+- `1024px`
+- `1280px`
 
 ### Container Queries First
 
@@ -40,132 +116,99 @@ Use `@container` for component-level adaptation:
 - shared promotional surfaces
 - modular layout groups
 
-Components should respond to the width of the surface they live in, not assume
-the full browser viewport is the only layout signal.
-
-This is required so components behave correctly in:
-
-- Storybook canvases
-- embedded layouts
-- future split-pane or dashboard contexts
-- page shells with constrained widths
+Components should respond to the width of their containing surface, not assume
+the full browser viewport is the layout signal. This ensures correct behavior in
+Storybook canvases, embedded layouts, and future split-pane or dashboard contexts.
 
 ### Viewport Queries Only For Shell-Level Changes
 
-Reserve viewport media queries for true app-shell behavior such as:
+Reserve viewport media queries for true app-shell behavior:
 
 - switching between separate desktop and mobile navigation implementations
 - showing or hiding desktop-only chrome
-- changing global page framing that depends on the actual device/browser window
+- changing global page framing that depends on the actual browser window
 
-Do not use viewport media queries for component internals when container width
-is the real signal.
+Do not use viewport queries for component internals when container width is the
+real signal.
 
 ## Navigation Architecture
 
-Navigation should be written mobile-first and expanded upward.
+Navigation is authored mobile-first and expanded upward.
 
 ### Separate Mobile And Desktop Nav
 
-Do not treat desktop nav as the base component and shrink it into mobile.
-Implement:
+Implement separate mobile and desktop navigation experiences that share tokens,
+iconography, labels, and navigation data, but are purpose-built for their
+interaction model.
 
-- a dedicated mobile navigation experience
-- a dedicated desktop navigation experience
-
-The mobile version should be:
-
+Mobile nav:
 - hamburger or drawer based
-- tap friendly
-- organized around clear grouped actions
-- capable of handling nested actions with explicit expandable controls
+- tap friendly with at least `44px` touch targets
+- organized around grouped actions
+- explicit expandable controls for nested actions
 
-The desktop version should be:
-
+Desktop nav:
 - full-width
 - directly scannable
 - optimized for pointer and keyboard use
-
-They may share tokens, iconography, labels, and navigation data, but they
-should not be the same UI mechanically scaled down.
 
 ### Mobile Interaction Requirements
 
 - minimum `44px` touch target height
 - no hover-only critical behavior
 - tap equivalents for anything desktop exposes on hover
-- enough spacing for imprecise/fat-finger input
+- enough spacing for imprecise input
 
 ## Homepage And Hero Rules
 
-For homepage work, the primary CTA is the hero search area and the content
-stack immediately above it.
+Primary CTA is the hero search area and the content stack immediately above it.
 
-On mobile, above the fold should prioritize only:
-
+On mobile, above the fold must prioritize only:
 - the hero headline/brand stack
 - the primary search CTA
 
-Everything else should come after that block.
-
 Additional guidance:
-
-- hero layouts should start centered on small screens unless there is a strong
-  reason not to
+- hero layouts start centered on small screens
 - scaling between breakpoints should be continuous and mathematically close on
   either side of a transition
-- when transitions cannot be fully continuous, add small eased transitions to
-  reduce perceived snapping
 - lower content such as feature cards may remain left-aligned even when hero
   copy is centered
 
-## Shared Design System Expectations
-
-Shared visual decisions belong in the foundation first.
-
-Use:
-
-- `frontend/src/ui-foundation.css` for semantic tokens and shared primitives
-- `frontend/src/styles.css` for route and feature composition built on those
-  tokens
-
-Promote decisions into tokens when they represent shared meaning, such as:
-
-- accent gradients
-- button treatments
-- border strengths
-- hover emphasis
-- surface hierarchy
-- text color roles
-
-Avoid introducing reusable colors or shadows directly inside feature-local CSS
-when they really belong to the system.
-
 ## Storybook Expectations
 
-Storybook is the primary UI review harness for iterative design work.
+Storybook is the primary UI review harness.
+
+| Surface | Coverage required |
+| ------- | ----------------- |
+| Exported `ui/` component | Yes |
+| Exported `features/` component | Yes |
+| Route-shell and feature states the user should inspect | Yes |
+| Tiny private leaf helper with no meaningful inspectable state | No |
+
+Stories must cover: default, loading, empty, and error states where applicable.
+Use `@storybook/test` play functions for meaningful interaction states.
+
+**Completion notes must list the Storybook story paths to open for inspection.**
 
 ### Story Structure
 
-- group stories by system area, not by arbitrary catch-all demo pages
-- shared patterns should live in shared folders, not be buried inside a page
-  story
-- prefer focused stories for individual reusable primitives instead of one
-  oversized sandbox story
+- Group stories by system area, not by arbitrary catch-all demo pages.
+- Shared patterns live in shared folders, not buried inside a page story.
+- Prefer focused stories for individual reusable primitives.
+- Build route-level stories from shared components so Storybook supports both
+  isolated and assembled review.
 
 ### Responsive Behavior In Storybook
 
-- components must render correctly when the Storybook canvas is resized
-- component responsiveness should not depend on global window size unless the
-  behavior is truly shell-level
-- if a story represents a device frame, keep that frame explicit and stable
-- if Storybook hot reload appears stale after major CSS changes, restart the
-  Storybook server fresh before judging the result
+- Components must render correctly when the Storybook canvas is resized.
+- Component responsiveness must not depend on global window size unless the
+  behavior is truly shell-level.
+- After major CSS architecture changes, restart the Storybook server fresh
+  instead of assuming hot reload applied correctly.
 
 ### Storybook-Only Mocking
 
 When a story includes navigation or controls that would leave Storybook:
-
 - mock the interaction in Storybook
 - keep the user inside the story
 - preserve visual and behavioral review value without requiring real routing
@@ -177,13 +220,11 @@ When a story includes navigation or controls that would leave Storybook:
   enough room.
 - Do not remove important explanatory content at intermediate widths unless
   that simplification is deliberate and still reads well.
-- If a card becomes stacked vertically and has room again, restore its richer
-  content rather than leaving it in a collapsed desktop-derived state.
 - Decorative UI that is not essential should be hidden or reduced on mobile.
 
 ## Implementation Workflow
 
-When doing future UI overhaul work:
+When doing UI overhaul work:
 
 1. Update the design tokens and shared primitives first.
 2. Build or revise the shared shell and foundational responsive patterns.
@@ -192,11 +233,11 @@ When doing future UI overhaul work:
 5. Roll the system out across the rest of the site incrementally.
 
 Avoid mixing broad visual architecture work with unrelated product logic unless
-the user explicitly wants both in the same pass.
+explicitly requested.
 
 ## Verification Checklist
 
-For meaningful UI changes, verify:
+For meaningful UI changes, run:
 
 - `npm run test -w @noxiannet/frontend`
 - `npm run build -w @noxiannet/frontend`
@@ -210,3 +251,153 @@ Manual review should confirm:
 - primary CTAs remain visible without scrolling where required
 - desktop and mobile navigation both feel purpose-built
 - tap targets remain large enough on mobile
+
+---
+
+## Architecture Inventory (as of 2026-05-15)
+
+This section documents the current state of the frontend for use by Stage 2+
+agents. Update it as migrations complete.
+
+### Current File Map
+
+| File | Lines | Status | Stage 2+ destination |
+| ---- | ----- | ------ | -------------------- |
+| `App.tsx` | 3,116 | Monolith — routing, nav state, all views | Reduce to providers + `<AppShell>` + `<RouteRenderer>` in Stage 2; `<RouterProvider>` in Stage 3 |
+| `routes.ts` | 180 | Hand-rolled router + URL builders | Replaced by TanStack Router route files in Stage 3; delete after |
+| `api.ts` | — | Raw fetch API client | Move to `data/api.ts` in Stage 4 |
+| `useDebounce.ts` | — | Debounce hook | Move to `lib/useDebounce.ts` in Stage 2 |
+| `headerLayout.ts` | — | Responsive header state logic | Move to `app/` or `ui/` in Stage 2 |
+| `priceData.ts` | — | Price formatting utilities | Move to `lib/priceData.ts` in Stage 2 |
+| `types.ts` | — | Type re-exports from card-store | Stays or distributes per consuming layer |
+| `QueryChip.tsx` | — | Query syntax chip/button — shared | Move to `ui/QueryChip.tsx` in Stage 2 |
+| `LtsDetailOverlay.tsx` | — | Learn-to-search detail overlay | Move to `ui/` or `features/` in Stage 2 |
+| `siteSystem.tsx` | — | Homepage components | Route module in Stage 3; shared parts to `features/` |
+| `CardSearchGuide.tsx` | — | Visual card search guide | Move to `features/` (used only by search route) |
+| `CardSearchGuideImageOverlay.tsx` | — | Search guide image overlay | Move to `features/` with CardSearchGuide |
+| `DeckExplorerView.tsx` | — | Deck explorer page | Move to `routes/` in Stage 3 |
+| `QueryBuilderView.tsx` | — | Query builder page | Move to `routes/` in Stage 3 |
+| `TierListView.tsx` | — | Tier list tool | Move to `routes/` in Stage 3 |
+| `TradeBalancerView.tsx` | — | Trade balancer tool | Move to `routes/` in Stage 3 |
+| `deck-explorer/manualData.ts` | — | Static deck data | Move to `data/` in Stage 4 |
+| `styles.css` | 5,931 | Legacy CSS — shrinking to zero | Delete selectors as components migrate to Tailwind |
+| `ui-foundation.css` | 184 | CSS custom property tokens | Keep as token file; no utility selectors |
+
+### Monolith Hotspots
+
+**`App.tsx` (3,116 lines)** owns too much:
+
+- Route parsing and navigation dispatch (`parseAppRoute`, `navigate`, popstate listener)
+- 25+ `useState` hooks covering nav menus, header shell mode, search state, sealed pool tool state, quick-look state
+- Desktop header (full/compact/search stages), mobile header, all nav menus
+- Inline SVG icon components
+- Direct rendering of all 17 route kinds
+
+Stage 2's primary job is to reduce this to: providers + `<AppShell>` + `<RouteRenderer route={currentRoute} />`.
+
+**`styles.css` (5,931 lines)** covers every route and shared pattern. During
+migration, it shrinks as each component adopts Tailwind. Never add rules to it.
+
+**`App.test.tsx`** is a monolith test. It uses `window.history.pushState` for
+route navigation testing and will need to be split into co-located test files
+once components are extracted. Stage 5 disbands it.
+
+### CSS Selector → Component Map (Stage 2 migration guide)
+
+These are the primary CSS sections in `styles.css` and the components that own them.
+When a component is migrated to Tailwind, delete its corresponding section.
+
+| styles.css section | Owning component | Stage |
+| ------------------ | ---------------- | ----- |
+| `.site-header`, `.site-nav`, header stages | AppShell header (to be extracted) | 2 |
+| `.view-tabs`, `.view-tabs button` | Tab controls (to be extracted to `ui/`) | 2 |
+| `.search-panel`, card search inputs | SearchView inner components | 2–5 |
+| `.learn-to-search-view`, LTS tabs/fields | LearnToSearchView, CardSearchGuide | 2–5 |
+| `.card-grid`, card layout | CardGrid (currently inline in App.tsx) | 2–5 |
+| `.card-quick-look`, modal overlay | CardQuickLookModal (inline in App.tsx) | 2–5 |
+| `.price-chart`, tooltip | Price chart component (inline in App.tsx) | 4–5 |
+| `.card-detail`, printings, attributes | CardDetailView (inline in App.tsx) | 2–5 |
+| Deck explorer selectors | DeckExplorerView | 3–5 |
+| Sealed pool selectors | SealedPoolView (inline in App.tsx) | 2–5 |
+| Tier list selectors | TierListView | 3–5 |
+| Trade balancer selectors | TradeBalancerView | 3–5 |
+| Domain color variants | Shared Tailwind tokens / `ui-foundation.css` | 2–5 |
+| Rarity color variants | Shared Tailwind tokens / `ui-foundation.css` | 2–5 |
+
+### Storybook Coverage Gaps
+
+Current stories (6 files under `src/storybook/`):
+
+| Story file | What it covers |
+| ---------- | -------------- |
+| `design-system.stories.test.tsx` | Design system token tests |
+| `header.stories.tsx` | Header component stories |
+| `home-shared-feature-cards.stories.tsx` | Feature card component |
+| `home-shared-promo-cards.stories.tsx` | Promo card component |
+| `home-shared-route-surface.stories.tsx` | Route surface |
+| `home.stories.tsx` | Home page |
+
+Missing coverage (required before stage completion):
+
+- `QueryChip` — default, disabled, interactive states
+- `LtsDetailOverlay` — open/closed, content variants
+- `CardSearchGuide` — default, expanded states
+- AppShell and header — desktop/mobile, shell modes
+- Navigation menus — open/closed states
+- Shared empty, loading, error states
+- Route-level assemblies for each of the 17 route kinds (at minimum the
+  primary routes: cards, deck-explorer-home, tools-tier-list, etc.)
+- All data states (loading, empty, error, success) once TanStack Query is wired
+
+### Stage-by-Stage Exit Criteria
+
+**Stage 2 exit (shell + shared UI extraction):**
+
+- `App.tsx` owns only: provider wrappers, `<AppShell>`, and `<RouteRenderer route={currentRoute} />`
+- Shell, header, and navigation are extracted into `app/` and `ui/`
+- `QueryChip`, `LtsDetailOverlay`, `useDebounce`, `headerLayout`, `priceData` are extracted to their target layers
+- Every extracted shared component has Storybook stories covering default, loading, empty, and error states
+- No new rules added to `styles.css`; header and shell selectors are migrated to Tailwind and deleted from `styles.css`
+- Tests for extracted components are co-located
+
+**Stage 3 exit (TanStack Router):**
+
+- Zero `window.history.pushState` / `replaceState` calls in non-test code
+- Zero direct `window.location.search` / `URLSearchParams` reads in route, feature, or app code
+- All 17 route kinds are TanStack Router route objects under `routes/`
+- `routes.ts` and `parseAppRoute()` are deleted
+- All search param schemas use `validateSearch`
+- Route loader stubs are in place
+
+**Stage 4 exit (TanStack Query):**
+
+- Zero bare `useEffect` data-fetching patterns in route, feature, or app code
+- Route loaders call `queryClient.ensureQueryData()` for each route's primary data
+- All components that previously fetched via `useEffect` now use `useQuery()`
+- Query key factories and `queryOptions` live under `data/` and are barrel-exported
+- Loading, empty, and error states use shared `ui/` components consistently
+
+**Stage 5 exit (rollout + cleanup — initiative done):**
+
+- `App.tsx` owns only provider wrappers and `<RouterProvider>`
+- All route entrypoints are TanStack Router route objects under `routes/`
+- `styles.css` is empty or deleted
+- `App.test.tsx` is disbanded; tests are co-located
+- Shared UI discoverable under `ui/` with barrel exports and Storybook coverage
+- Shared domain UI discoverable under `features/` with Storybook coverage
+- Shared data helpers discoverable under `data/` with barrel exports
+- Docs reflect the final boundaries
+
+### Known Router/Fetching Seams (for Stage 3 and Stage 4)
+
+**window.history seams (Stage 3 targets):**
+
+- `App.tsx:2786` — `window.history.pushState({}, "", fullPath)` inside `navigate()`
+- `App.tsx:2710` — `window.addEventListener("popstate", handlePopState)`
+
+**useEffect data-fetching seams (Stage 4 targets):**
+
+- `App.tsx` — `searchCards()` query (search view), `loadQueryFeatures()` (learn-to-search)
+- `DeckExplorerView.tsx` — data loading
+- `TierListView.tsx` — data loading
+- `TradeBalancerView.tsx` — data loading

@@ -7,9 +7,9 @@ import {
   usePublishedPriceIndex,
   type PublishedPriceIndex,
   type PublishedPriceRow,
-} from "./priceData";
+} from "./lib";
 import { buildCardDetailPath } from "./routes";
-import { useDebounce } from "./useDebounce";
+import { useDebounce } from "./lib";
 import type { CardRecord } from "./types";
 
 // ── Types ──────────────────────────────────────────────────────────────────

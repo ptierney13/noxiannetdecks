@@ -68,19 +68,32 @@ For significant UI or responsive design work under `frontend/`, also read:
 
 - `frontend/UI_ARCHITECTURE.md`
 
-Treat that file as the frontend-specific source of truth for:
+Treat `frontend/AGENTS.md` as the task router and migration-era rule set for:
 
-- semantic UI token usage
-- shared UI foundation expectations
-- when inline styles are acceptable
-- how to keep future UI overhaul work organized
+- where new UI, feature, route, data, and utility code belongs
+- Tailwind migration protocol and CSS legacy-pattern rules
+- Storybook coverage requirements
+- target architecture layers (`ui/`, `features/`, `routes/`, `data/`, `lib/`)
 
-Treat `frontend/UI_ARCHITECTURE.md` as the more detailed companion for:
+Treat `frontend/UI_ARCHITECTURE.md` as the detailed companion for:
 
 - mobile-first responsive design expectations
 - container-query vs viewport-query usage
 - navigation architecture preferences
 - Storybook-driven UI review structure
+- migration era contract and target layer descriptions
+
+**Frontend task routing:**
+
+| If you are doing...                         | Read this first                                          |
+| ------------------------------------------- | -------------------------------------------------------- |
+| Any new component or shared UI work         | `frontend/AGENTS.md`, then check `src/ui/`               |
+| Feature-level domain UI                     | `frontend/AGENTS.md` `features/` section                 |
+| Routing or navigation work                  | `frontend/AGENTS.md`, TanStack Router docs               |
+| Data fetching or query definitions          | `frontend/AGENTS.md`, `src/data/` barrel                 |
+| CSS migration of a legacy component         | `frontend/AGENTS.md` Migration Era Contract section      |
+| Storybook story work                        | `frontend/AGENTS.md` Storybook Requirement section       |
+| Stage-level architecture decisions          | `plans/todo/frontend-ui-architecture-alignment/`         |
 
 Draft summary plans for future stages should also state clearly that:
 

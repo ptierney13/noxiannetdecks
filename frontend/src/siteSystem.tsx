@@ -1,5 +1,5 @@
 import { type FormEvent, type ReactNode, useLayoutEffect, useRef, useState } from "react";
-import { resolveDesktopHeaderStage, type DesktopHeaderStage } from "./headerLayout";
+import { resolveDesktopHeaderStage, type DesktopHeaderStage } from "./lib";
 
 export const heroBackgroundAsset = "/design-assets/hero-background.png";
 
