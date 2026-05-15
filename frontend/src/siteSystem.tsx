@@ -431,8 +431,6 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
   }
 
   const useCompactInlineHeader = desktopHeaderStage === "compact" || desktopHeaderStage === "search";
-  const showDesktopSearchButton = desktopHeaderStage !== "compact";
-
   return (
     <div className="storybook-header-demo">
       <div
@@ -448,7 +446,7 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
             <SearchGlyph />
           </span>
           <input className="site-nav-search-input" readOnly placeholder={desktopHeaderStage === "full" ? "Search for Riftbound Cards" : "Search"} />
-          <button type="button" className="site-nav-search-btn" aria-hidden={showDesktopSearchButton ? undefined : true}>Search</button>
+          <button type="button" className="site-nav-search-btn">Search</button>
         </div>
         <div className="site-nav-shell-actions">
           <div className="storybook-header-links site-nav-links">

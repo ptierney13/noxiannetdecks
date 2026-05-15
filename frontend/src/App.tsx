@@ -2090,11 +2090,13 @@ function ProjectNavLink({
   href,
   current,
   onNavigate,
+  className,
   children
 }: {
   href: string;
   current: boolean;
   onNavigate: (href: string) => void;
+  className?: string;
   children: ReactNode;
 }) {
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {
@@ -2114,7 +2116,7 @@ function ProjectNavLink({
   }
 
   return (
-    <a href={href} aria-current={current ? "page" : undefined} onClick={handleClick}>
+    <a href={href} className={className} aria-current={current ? "page" : undefined} onClick={handleClick}>
       {children}
     </a>
   );
@@ -2599,7 +2601,6 @@ export default function App() {
   const activeSection = routeSection(route);
   const isHome = route.kind === "home";
   const useCompactInlineHeader = desktopHeaderStage === "compact" || desktopHeaderStage === "search";
-  const showDesktopSearchButton = desktopHeaderStage !== "compact";
 
   function handleHeaderSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -2642,7 +2643,7 @@ export default function App() {
             spellCheck={false}
             aria-label="Search cards"
           />
-          <button type="submit" className="site-nav-search-btn" aria-hidden={showDesktopSearchButton ? undefined : true}>Search</button>
+          <button type="submit" className="site-nav-search-btn">Search</button>
         </form>
         <div className="site-nav-shell-actions">
           <div className="site-nav-links">
@@ -2663,10 +2664,10 @@ export default function App() {
               </button>
               {showCardsMenu ? (
                 <div className="site-nav-tools-popover" role="menu" aria-label="Cards">
-                  <ProjectNavLink href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
+                  <ProjectNavLink className="site-nav-menu-item" href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
                     Search
                   </ProjectNavLink>
-                  <ProjectNavLink href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
+                  <ProjectNavLink className="site-nav-menu-item" href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
                     Query Builder
                   </ProjectNavLink>
                 </div>
@@ -2696,13 +2697,13 @@ export default function App() {
               </button>
               {showToolsMenu ? (
                 <div className="site-nav-tools-popover" role="menu" aria-label="Tools">
-                  <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
+                  <ProjectNavLink className="site-nav-menu-item" href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
                     Tier List Generator
                   </ProjectNavLink>
-                  <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
+                  <ProjectNavLink className="site-nav-menu-item" href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
                     Sealed Simulator
                   </ProjectNavLink>
-                  <ProjectNavLink href="/tools/trade-balancer" current={activeSection === "tools-trade-balancer"} onNavigate={navigate}>
+                  <ProjectNavLink className="site-nav-menu-item" href="/tools/trade-balancer" current={activeSection === "tools-trade-balancer"} onNavigate={navigate}>
                     Trade Balancer
                   </ProjectNavLink>
                 </div>
