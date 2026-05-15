@@ -64,12 +64,23 @@ Plan documents should include:
 
 When editing files under `frontend/`, read `frontend/AGENTS.md` first.
 
+For significant UI or responsive design work under `frontend/`, also read:
+
+- `frontend/UI_ARCHITECTURE.md`
+
 Treat that file as the frontend-specific source of truth for:
 
 - semantic UI token usage
 - shared UI foundation expectations
 - when inline styles are acceptable
 - how to keep future UI overhaul work organized
+
+Treat `frontend/UI_ARCHITECTURE.md` as the more detailed companion for:
+
+- mobile-first responsive design expectations
+- container-query vs viewport-query usage
+- navigation architecture preferences
+- Storybook-driven UI review structure
 
 Draft summary plans for future stages should also state clearly that:
 

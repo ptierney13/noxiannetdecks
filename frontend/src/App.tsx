@@ -15,6 +15,8 @@ import {
   type PublishedPriceRow
 } from "./priceData";
 import QueryBuilderView from "./QueryBuilderView";
+import { resolveDesktopHeaderStage, type DesktopHeaderStage } from "./headerLayout";
+import { HomePage as SiteHomePage } from "./siteSystem";
 import TradeBalancerView from "./TradeBalancerView";
 import { buildCardDetailPath, buildCardsSearchPath, normalizePathname, parseAppRoute, routeSection } from "./routes";
 import TierListView from "./TierListView";
@@ -76,6 +78,18 @@ function CardsIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
       <path d="M6 3h10a2 2 0 0 1 2 2v13H8a2 2 0 0 1-2-2V3Zm2 2v11h8V5H8Zm-2 15h12v2H6a4 4 0 0 1-4-4V7h2v11a2 2 0 0 0 2 2Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function MenuIcon({ open }: { open: boolean }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false" className="menu-icon">
+      {open ? (
+        <path d="M6 6 18 18M18 6 6 18" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+      ) : (
+        <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+      )}
     </svg>
   );
 }
@@ -197,124 +211,6 @@ function QueryLanguageTables({
         </table>
       </CollapsibleFeatureTable>
     </section>
-  );
-}
-
-type LearnTab = "card-element" | "fields" | "syntax";
-
-function LearnToSearchView({
-  onError,
-}: {
-  onError: (message: string | null) => void;
-}) {
-  const [activeTab, setActiveTab] = useState<LearnTab>("card-element");
-  const [fieldGuides, setFieldGuides] = useState<QueryFieldGuide[]>([]);
-  const [syntaxGuides, setSyntaxGuides] = useState<QuerySyntaxGuide[]>([]);
-
-  useEffect(() => {
-    let ignore = false;
-    async function boot() {
-      try {
-        const result = await loadQueryFeatures();
-        if (!ignore) {
-          setFieldGuides(result.fields);
-          setSyntaxGuides(result.syntax);
-        }
-      } catch (caught) {
-        if (!ignore) onError(caught instanceof Error ? caught.message : "Unable to load query features.");
-      }
-    }
-    void boot();
-    return () => { ignore = true; };
-  }, [onError]);
-
-  return (
-    <div className="learn-to-search-view">
-      <p className="eyebrow">Cards / Learn to Search</p>
-      <h1>Learn to Search</h1>
-      <div className="lts-tabs" role="tablist">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === "card-element"}
-          className={`lts-tab${activeTab === "card-element" ? " lts-tab--active" : ""}`}
-          onClick={() => setActiveTab("card-element")}
-        >
-          Search by Card Element
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === "fields"}
-          className={`lts-tab${activeTab === "fields" ? " lts-tab--active" : ""}`}
-          onClick={() => setActiveTab("fields")}
-        >
-          Searchable Fields
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === "syntax"}
-          className={`lts-tab${activeTab === "syntax" ? " lts-tab--active" : ""}`}
-          onClick={() => setActiveTab("syntax")}
-        >
-          Query Syntax
-        </button>
-      </div>
-      <div className="lts-panel">
-        {activeTab === "card-element" && <CardSearchGuide />}
-        {activeTab === "fields" && (
-          <table className="feature-table">
-            <thead>
-              <tr>
-                <th>I want cards with...</th>
-                <th>Use this query</th>
-                <th>Shorthand</th>
-                <th>Searches</th>
-                <th>Example</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fieldGuides.map((field) => (
-                <tr key={field.property}>
-                  <td>{field.property}</td>
-                  <td><code>{field.query}</code></td>
-                  <td>{field.shorthand ? <code>{field.shorthand}</code> : "None"}</td>
-                  <td>{field.searches}</td>
-                  <td><code>{field.example}</code></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        {activeTab === "syntax" && (
-          <table className="feature-table">
-            <thead>
-              <tr>
-                <th>Operation</th>
-                <th>Syntax Examples</th>
-                <th>Behavior</th>
-              </tr>
-            </thead>
-            <tbody>
-              {syntaxGuides.map((operation) => (
-                <tr key={operation.operation}>
-                  <td>{operation.operation}</td>
-                  <td>
-                    <div className="example-list">
-                      {operation.examples.map((example) => (
-                        <code key={example}>{example}</code>
-                      ))}
-                    </div>
-                  </td>
-                  <td>{operation.behavior}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </div>
   );
 }
 
@@ -737,142 +633,6 @@ function PriceHistoryChart({ rows, colorsByRowId }: { rows: PublishedPriceRow[];
   );
 }
 
-function stripUniqueFromQuery(query: string): string {
-  return query.replace(/\bunique:\S+/gi, "").replace(/\s{2,}/g, " ").trim();
-}
-
-function queryRequestsAllPrintings(query: string): boolean {
-  return /\bunique:(id|prints|\*)/i.test(query);
-}
-
-function stripUniqueFromNormalized(normalized: string): string {
-  return normalized.replace(/\bunique:\S+/gi, "").replace(/\s{2,}/g, " ").trim();
-}
-
-function groupCardsByRiftboundId(cards: CardRecord[]): CardRecord[][] {
-  const groups = new Map<string, CardRecord[]>();
-  for (const card of cards) {
-    const key = card.riftbound_id ?? card.clean_name ?? card.id;
-    const group = groups.get(key);
-    if (group) {
-      group.push(card);
-    } else {
-      groups.set(key, [card]);
-    }
-  }
-  return [...groups.values()];
-}
-
-function variantButtonLabel(card: CardRecord, finish: string): string {
-  const parts: string[] = [card.set.set_id];
-  if (card.variant.alternate_art) parts.push("AA");
-  if (card.variant.signed) parts.push("SIG");
-  else if (card.variant.overnumbered) parts.push("ON");
-  if (finish === "foil" && card.finishes.includes("nonfoil")) parts.push("FOIL");
-  return parts.join(" ");
-}
-
-function VariantButtonRow({
-  cards,
-  showPrice,
-  publishedPriceIndex,
-  onVariantClick,
-  activeKey,
-}: {
-  cards: CardRecord[];
-  showPrice: boolean;
-  publishedPriceIndex: ReturnType<typeof usePublishedPriceIndex>["index"];
-  onVariantClick: (card: CardRecord, finish: "foil" | "nonfoil") => void;
-  activeKey?: string;
-}) {
-  return (
-    <div className="variant-buttons" onClick={(e) => e.stopPropagation()}>
-      {cards.flatMap((card) =>
-        card.finishes.map((finish) => {
-          const key = `${card.id}-${finish}`;
-          const label = variantButtonLabel(card, finish);
-          const priceRows = getPublishedRowsForCard(publishedPriceIndex, card.tcgplayer_id);
-          const priceRow = showPrice ? resolveNearMintMarketPrice(priceRows, finish) : null;
-          const priceStr = showPrice ? formatPriceOnly(priceRow) : null;
-          return (
-            <button
-              key={key}
-              type="button"
-              className={`variant-btn${activeKey === key ? " variant-btn--active" : ""}`}
-              onClick={() => onVariantClick(card, finish)}
-            >
-              <span className="variant-btn-label">{label}</span>
-              {priceStr && <span className="variant-btn-price">{priceStr}</span>}
-            </button>
-          );
-        })
-      )}
-    </div>
-  );
-}
-
-function SearchResultsGrid({
-  cards,
-  sort,
-  showPrice,
-  variantMode,
-  showVariants,
-  onCardClick,
-}: {
-  cards: CardRecord[];
-  sort: SortKey;
-  showPrice: boolean;
-  variantMode: VariantMode;
-  showVariants: boolean;
-  onCardClick: (card: CardRecord, group: CardRecord[], finish?: "foil" | "nonfoil") => void;
-}) {
-  const { index: publishedPriceIndex } = usePublishedPriceIndex();
-  const sorted = useMemo(() => sortCardsByKey(cards, sort), [cards, sort]);
-  const cardGroups = useMemo(() => {
-    if (variantMode === "unique-cards") return groupCardsByRiftboundId(sorted);
-    return sorted.map((c) => [c]);
-  }, [sorted, variantMode]);
-
-  return (
-    <div className="card-grid" data-testid="card-grid" data-columns="4">
-      {cardGroups.map((group) => {
-        const representative = group[0];
-        // Which cards to show buttons for:
-        // - showVariants: all records in the group
-        // - showPrice only: the representative with only its first finish
-        const priceRepresentative = { ...representative, finishes: [representative.finishes[0]] };
-        const buttonCards = showVariants ? group : showPrice ? [priceRepresentative] : [];
-        return (
-          <article
-            className="card-tile card-tile--clickable"
-            key={representative.id}
-            data-layout={representative.media.layout}
-            onClick={() => onCardClick(representative, group)}
-          >
-            {representative.media.image_url ? (
-              <img
-                src={representative.media.image_url}
-                alt={representative.media.accessibility_text ?? representative.riot_name}
-                loading="lazy"
-              />
-            ) : (
-              <div className="missing-image">{representative.riot_name}</div>
-            )}
-            {buttonCards.length > 0 && (
-              <VariantButtonRow
-                cards={buttonCards}
-                showPrice={showPrice}
-                publishedPriceIndex={publishedPriceIndex}
-                onVariantClick={(card, finish) => onCardClick(card, group, finish)}
-              />
-            )}
-          </article>
-        );
-      })}
-    </div>
-  );
-}
-
 function CardGrid({ cards, onCardClick }: { cards: CardRecord[]; onCardClick?: (card: CardRecord) => void }) {
   const [sort, setSort] = useState<SortKey>("energy-asc");
   const sorted = useMemo(() => sortCardsByKey(cards, sort), [cards, sort]);
@@ -928,28 +688,8 @@ function CardGrid({ cards, onCardClick }: { cards: CardRecord[]; onCardClick?: (
 
 // "Quick View" is the product/UI term for this surface.
 // Legacy internal names still use "quick-look" in classes and tests.
-function CardQuickLookModal({
-  group,
-  initialCard,
-  initialFinish,
-  onClose,
-  onNavigate,
-}: {
-  group: CardRecord[];
-  initialCard: CardRecord;
-  initialFinish: "foil" | "nonfoil";
-  onClose: () => void;
-  onNavigate: (path: string) => void;
-}) {
+function CardQuickLookModal({ card, onClose, onNavigate }: { card: CardRecord; onClose: () => void; onNavigate: (path: string) => void }) {
   const { index: publishedPriceIndex } = usePublishedPriceIndex();
-  const [activeCard, setActiveCard] = useState(initialCard);
-  const [activeFinish, setActiveFinish] = useState(initialFinish);
-
-  useEffect(() => {
-    setActiveCard(initialCard);
-    setActiveFinish(initialFinish);
-  }, [initialCard, initialFinish]);
-
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
@@ -964,61 +704,68 @@ function CardQuickLookModal({
 
   function handleViewDetails() {
     onClose();
-    onNavigate(buildCardDetailPath(activeCard.id));
+    onNavigate(buildCardDetailPath(card.id));
   }
 
+  const priceRows = useMemo(
+    () => getPublishedRowsForCard(publishedPriceIndex, card.tcgplayer_id),
+    [publishedPriceIndex, card.tcgplayer_id]
+  );
+  const nearMintPrice = useMemo(
+    () => resolveNearMintMarketPrice(priceRows),
+    [priceRows]
+  );
+  const headlinePrice = formatPriceOnly(nearMintPrice);
   const quickViewBuyHref = useMemo(
     () =>
       buildTcgplayerAffiliateSearchLink({
-        query: activeCard.riot_name,
+        query: card.riot_name,
         gameSlug: "riftbound-league-of-legends-trading-card-game",
         productLineName: "riftbound-league-of-legends-trading-card-game"
       }),
-    [activeCard.riot_name]
+    [card.riot_name]
   );
 
   return (
     <div className="card-quick-look-backdrop" onClick={handleBackdropClick} role="presentation">
-      <div className="card-quick-look-dialog" role="dialog" aria-label={activeCard.riot_name} aria-modal="true">
+      <div className="card-quick-look-dialog" role="dialog" aria-label={card.riot_name} aria-modal="true">
         <div className="card-quick-look-image-col">
-          {activeCard.media.image_url ? (
-            <img src={activeCard.media.image_url} alt={activeCard.media.accessibility_text ?? activeCard.riot_name} />
+          {card.media.image_url ? (
+            <img src={card.media.image_url} alt={card.media.accessibility_text ?? card.riot_name} />
           ) : (
-            <div className="missing-image">{activeCard.riot_name}</div>
+            <div className="missing-image">{card.riot_name}</div>
           )}
         </div>
         <div className="card-quick-look-info-col">
           <div className="card-quick-look-header">
-            <h2 className="card-quick-look-name">{activeCard.riot_name}</h2>
+            <h2 className="card-quick-look-name">{card.riot_name}</h2>
             <button type="button" className="card-quick-look-close" onClick={onClose} aria-label="Close">✕</button>
           </div>
-          <p className="card-quick-look-typeline">{formatTypeline(activeCard)}</p>
+          <p className="card-quick-look-typeline">{formatTypeline(card)}</p>
           <div className="card-quick-look-attrs">
-            {formatCostText(activeCard) != null && (
+            {formatCostText(card) != null && (
               <span className="card-attr-chip card-attr-chip--symbolic">
-                {renderTokenizedText(formatCostText(activeCard) ?? "", { size: "chip" })}
+                {renderTokenizedText(formatCostText(card) ?? "", { size: "chip" })}
               </span>
             )}
-            {activeCard.attributes.might != null && (
+            {card.attributes.might != null && (
               <span className="card-attr-chip card-attr-chip--symbolic">
                 <span className="card-inline-metric">
-                  <span>{activeCard.attributes.might}</span>
+                  <span>{card.attributes.might}</span>
                   {renderTokenizedText("{T}", { size: "chip" })}
                 </span>
               </span>
             )}
-            {activeCard.attributes.domain.length > 0 && (
-              <span className={domainChipClass(activeCard.attributes.domain)}>{activeCard.attributes.domain.join(", ")}</span>
+            {card.attributes.domain.length > 0 && (
+              <span className={domainChipClass(card.attributes.domain)}>{card.attributes.domain.join(", ")}</span>
             )}
           </div>
-          {activeCard.text.rich && <p className="card-quick-look-text">{renderTokenizedText(normalizeCardText(activeCard.text.rich))}</p>}
-          <VariantButtonRow
-            cards={group}
-            showPrice={true}
-            publishedPriceIndex={publishedPriceIndex}
-            onVariantClick={(card, finish) => { setActiveCard(card); setActiveFinish(finish); }}
-            activeKey={`${activeCard.id}-${activeFinish}`}
-          />
+          {card.text.rich && <p className="card-quick-look-text">{renderTokenizedText(normalizeCardText(card.text.rich))}</p>}
+          <div className="card-quick-look-meta">
+            <span>{card.set.label} · {card.set.set_id} {card.collector_number ?? "?"}</span>
+            {card.rarity && <span>{card.rarity}</span>}
+            {headlinePrice ? <span className="card-quick-look-price">{headlinePrice}</span> : null}
+          </div>
           <div className="card-quick-view-actions">
             {quickViewBuyHref ? (
               <a
@@ -1040,13 +787,6 @@ function CardQuickLookModal({
   );
 }
 
-type VariantMode = "unique-cards" | "unique-printings";
-
-function buildApiQuery(rawQuery: string): string {
-  const stripped = stripUniqueFromQuery(rawQuery);
-  return stripped.length > 0 ? `${stripped} unique:id` : "unique:id";
-}
-
 function SearchView({
   onError,
   locationSearch,
@@ -1059,22 +799,20 @@ function SearchView({
   const [query, setQuery] = useState("");
   const [cards, setCards] = useState<CardRecord[]>([]);
   const [diagnostics, setDiagnostics] = useState<QueryDiagnostic[]>([]);
+  const [fieldGuides, setFieldGuides] = useState<QueryFieldGuide[]>([]);
+  const [syntaxGuides, setSyntaxGuides] = useState<QuerySyntaxGuide[]>([]);
   const [normalizedQuery, setNormalizedQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-  const [quickLook, setQuickLook] = useState<{ group: CardRecord[]; card: CardRecord; finish: "foil" | "nonfoil" } | null>(null);
-  const [sort, setSort] = useState<SortKey>("energy-asc");
-  const [showPrice, setShowPrice] = useState(false);
-  const [variantMode, setVariantMode] = useState<VariantMode>("unique-cards");
-  const [showVariants, setShowVariants] = useState(false);
+  const [quickLookCard, setQuickLookCard] = useState<CardRecord | null>(null);
   const searchParamQuery = new URLSearchParams(locationSearch).get("q") ?? "";
 
-  async function runSearch(rawQuery: string) {
+  async function runSearch(nextQuery: string) {
     setIsSearching(true);
     onError(null);
     setHasSearched(true);
     try {
-      const result = await searchCards(buildApiQuery(rawQuery));
+      const result = await searchCards(nextQuery);
       setCards(result.items);
       setDiagnostics(result.diagnostics);
       setNormalizedQuery(result.normalizedQuery);
@@ -1088,17 +826,41 @@ function SearchView({
   useEffect(() => {
     let ignore = false;
 
+    async function boot() {
+      try {
+        const featureResult = await loadQueryFeatures();
+        if (!ignore) {
+          setFieldGuides(featureResult.fields);
+          setSyntaxGuides(featureResult.syntax);
+        }
+      } catch (caught) {
+        if (!ignore) {
+          onError(caught instanceof Error ? caught.message : "Unable to load card search.");
+        }
+      }
+    }
+
+    void boot();
+
+    return () => {
+      ignore = true;
+    };
+  }, [onError]);
+
+  useEffect(() => {
+    let ignore = false;
+
     setQuery(searchParamQuery);
     onError(null);
-    // Auto-detect mode from URL query
-    setVariantMode(queryRequestsAllPrintings(searchParamQuery) ? "unique-printings" : "unique-cards");
 
     if (searchParamQuery.trim().length === 0) {
       setCards([]);
       setDiagnostics([]);
       setNormalizedQuery("");
       setHasSearched(false);
-      return () => { ignore = true; };
+      return () => {
+        ignore = true;
+      };
     }
 
     setIsSearching(true);
@@ -1106,21 +868,30 @@ function SearchView({
 
     async function syncSearchFromUrl() {
       try {
-        const result = await searchCards(buildApiQuery(searchParamQuery));
-        if (ignore) return;
+        const result = await searchCards(searchParamQuery);
+        if (ignore) {
+          return;
+        }
+
         setCards(result.items);
         setDiagnostics(result.diagnostics);
         setNormalizedQuery(result.normalizedQuery);
       } catch (caught) {
-        if (!ignore) onError(caught instanceof Error ? caught.message : "Search failed.");
+        if (!ignore) {
+          onError(caught instanceof Error ? caught.message : "Search failed.");
+        }
       } finally {
-        if (!ignore) setIsSearching(false);
+        if (!ignore) {
+          setIsSearching(false);
+        }
       }
     }
 
     void syncSearchFromUrl();
 
-    return () => { ignore = true; };
+    return () => {
+      ignore = true;
+    };
   }, [locationSearch, onError, searchParamQuery]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -1128,22 +899,22 @@ function SearchView({
     const trimmedQuery = query.trim();
     const nextPath = trimmedQuery.length > 0 ? `/cards?q=${encodeURIComponent(query)}` : "/cards";
     const currentPath = `${normalizePathname(window.location.pathname)}${window.location.search}`;
+
     if (nextPath === currentPath) {
       void runSearch(query);
       return;
     }
+
     onNavigate(nextPath);
   }
 
-  const cardGroups = useMemo(() => groupCardsByRiftboundId(cards), [cards]);
-  const resultCount = variantMode === "unique-cards" ? cardGroups.length : cards.length;
-  const displayedNormalizedQuery = stripUniqueFromNormalized(normalizedQuery);
-
   return (
     <>
-      <div className="search-results-view">
-        <p className="eyebrow">Cards / Search</p>
-        <h1>Card Search Results</h1>
+      <section className="search-panel" aria-labelledby="search-heading">
+        <div className="search-copy">
+          <p className="eyebrow">Noxian Netdecks</p>
+          <h1 id="search-heading">Riftbound Card Search</h1>
+        </div>
         <form className="search-form" onSubmit={handleSubmit}>
           <label htmlFor="query-input">Query</label>
           <div className="search-row">
@@ -1160,85 +931,17 @@ function SearchView({
               <span>{isSearching ? "Searching" : "Search"}</span>
             </button>
           </div>
+          <output className="normalized-query" aria-live="polite">
+            {normalizedQuery ? `Normalized: ${normalizedQuery}` : "Run a search to show matching cards."}
+          </output>
         </form>
+      </section>
 
-        <div className="search-controls-panel">
-          <div className="search-controls-row">
-            <div className="search-control-group">
-              <label htmlFor="sort-select" className="sort-label">Sort</label>
-              <select
-                id="sort-select"
-                value={sort}
-                onChange={(e) => setSort(e.target.value as SortKey)}
-                className="sort-select"
-              >
-                {SORT_OPTIONS.map(({ value, label }) => (
-                  <option key={value} value={value}>{label}</option>
-                ))}
-              </select>
-            </div>
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={showPrice}
-                onChange={(e) => setShowPrice(e.target.checked)}
-              />
-              Show Prices
-            </label>
-            <div className="search-control-group">
-              <label htmlFor="variant-mode-select">Variants</label>
-              <select
-                id="variant-mode-select"
-                value={variantMode}
-                onChange={(e) => setVariantMode(e.target.value as VariantMode)}
-                className="sort-select"
-              >
-                <option value="unique-cards">Unique Cards</option>
-                <option value="unique-printings">Unique Printings</option>
-              </select>
-            </div>
-            {variantMode === "unique-cards" && (
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={showVariants}
-                  onChange={(e) => setShowVariants(e.target.checked)}
-                />
-                Show Variants
-              </label>
-            )}
-          </div>
-        </div>
-
-        {hasSearched && (
-          <p className="results-summary">
-            {resultCount.toLocaleString()} matching card{resultCount !== 1 ? "s" : ""}
-            {displayedNormalizedQuery ? ` with "${displayedNormalizedQuery}"${displayedNormalizedQuery.includes(":") ? "" : " anywhere"}` : ""}
-          </p>
-        )}
-
-        <Diagnostics diagnostics={diagnostics} />
-        {hasSearched ? (
-          <SearchResultsGrid
-            cards={cards}
-            sort={sort}
-            showPrice={showPrice}
-            variantMode={variantMode}
-            showVariants={showVariants}
-            onCardClick={(card, group, finish) =>
-              setQuickLook({ group, card, finish: finish ?? card.finishes[0] })
-            }
-          />
-        ) : null}
-      </div>
-      {quickLook ? (
-        <CardQuickLookModal
-          group={quickLook.group}
-          initialCard={quickLook.card}
-          initialFinish={quickLook.finish}
-          onClose={() => setQuickLook(null)}
-          onNavigate={onNavigate}
-        />
+      <Diagnostics diagnostics={diagnostics} />
+      <QueryLanguageTables fields={fieldGuides} syntax={syntaxGuides} />
+      {hasSearched ? <CardGrid cards={cards} onCardClick={setQuickLookCard} /> : null}
+      {quickLookCard ? (
+        <CardQuickLookModal card={quickLookCard} onClose={() => setQuickLookCard(null)} onNavigate={onNavigate} />
       ) : null}
     </>
   );
@@ -2417,157 +2120,6 @@ function ProjectNavLink({
   );
 }
 
-function HomePage({ onNavigate }: { onNavigate: (href: string) => void }) {
-  const [query, setQuery] = useState("");
-
-  function handleSearch(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const q = query.trim();
-    onNavigate(q ? `/cards?q=${encodeURIComponent(q)}` : "/cards");
-  }
-
-  return (
-    <div className="home-page">
-      <section className="hero">
-        <div className="hero-bg-wrap">
-          <svg className="hero-bg" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g transform="rotate(45, 200, 200)">
-              <polygon points="200,18 193,55 207,55" fill="#c9813a"/>
-              <rect x="195" y="55" width="10" height="220" fill="#c9813a"/>
-              <rect x="155" y="268" width="90" height="12" rx="6" fill="#c9813a"/>
-              <rect x="193" y="280" width="14" height="48" rx="7" fill="#c9813a"/>
-            </g>
-            <g transform="rotate(-45, 200, 200)">
-              <polygon points="200,18 193,55 207,55" fill="#b52038"/>
-              <rect x="195" y="55" width="10" height="220" fill="#b52038"/>
-              <rect x="155" y="268" width="90" height="12" rx="6" fill="#b52038"/>
-              <rect x="193" y="280" width="14" height="48" rx="7" fill="#b52038"/>
-            </g>
-            <circle cx="200" cy="200" r="22" stroke="#c9813a" strokeWidth="5" fill="none"/>
-            <circle cx="200" cy="200" r="10" fill="#c9813a"/>
-          </svg>
-        </div>
-        <div className="hero-content">
-          <h1 className="hero-heading">
-            <span className="plain">The complete</span><br/>
-            <span className="gradient">Riftbound archive.</span>
-          </h1>
-          <p className="hero-sub">Search cards, study tournament decks, simulate sealed pools.</p>
-          <form className="hero-search-box" onSubmit={handleSearch}>
-            <div className="hero-search-icon">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <circle cx="11" cy="11" r="7"/>
-                <path d="m21 21-4.35-4.35"/>
-              </svg>
-            </div>
-            <input
-              className="hero-search-input"
-              placeholder="Search for cards…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              autoCapitalize="none"
-            />
-            <button type="submit" className="hero-search-btn">Search</button>
-          </form>
-        </div>
-      </section>
-
-      <hr className="home-divider" />
-
-      <div className="home-section">
-        <div className="home-feature-grid">
-          <a
-            href="/cards"
-            className="home-feature-card"
-            onClick={(e) => { e.preventDefault(); onNavigate("/cards"); }}
-          >
-            <div className="home-feature-icon-row">
-              <div className="home-feature-icon-tile">
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <ellipse cx="11" cy="11" rx="7.5" ry="7.5" stroke="white" strokeWidth="2"/>
-                  <path d="M7.5 8.5 Q9 7 11.5 7.5" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" fill="none"/>
-                  <line x1="16.5" y1="16.5" x2="24" y2="24" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-                  <line x1="18.8" y1="18.2" x2="20.4" y2="19.8" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2"/>
-                  <line x1="20.5" y1="19.9" x2="22.1" y2="21.5" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2"/>
-                </svg>
-              </div>
-              <span className="home-feature-arrow">→</span>
-            </div>
-            <div className="home-feature-title">Card Search</div>
-            <div className="home-feature-desc">Full database. Filter by cost, domain, type, and more.</div>
-          </a>
-
-          <a
-            href="/deck-explorer"
-            className="home-feature-card"
-            onClick={(e) => { e.preventDefault(); onNavigate("/deck-explorer"); }}
-          >
-            <div className="home-feature-icon-row">
-              <div className="home-feature-icon-tile">
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="7" width="14" height="18" rx="2" transform="rotate(-14 10 16)" stroke="rgba(255,255,255,0.45)" strokeWidth="1.8" fill="rgba(255,255,255,0.06)"/>
-                  <rect x="5" y="6" width="14" height="18" rx="2" transform="rotate(-5 12 15)" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8" fill="rgba(255,255,255,0.08)"/>
-                  <rect x="9" y="5" width="14" height="18" rx="2" stroke="white" strokeWidth="2" fill="rgba(255,255,255,0.10)"/>
-                  <line x1="12" y1="9" x2="20" y2="9" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2"/>
-                  <line x1="12" y1="12" x2="20" y2="12" stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
-                </svg>
-              </div>
-              <span className="home-feature-arrow">→</span>
-            </div>
-            <div className="home-feature-title">Deck Explorer</div>
-            <div className="home-feature-desc">Tournament decks by event, legend, and player.</div>
-          </a>
-
-          <a
-            href="/tools/sealed-pools"
-            className="home-feature-card"
-            onClick={(e) => { e.preventDefault(); onNavigate("/tools/sealed-pools"); }}
-          >
-            <div className="home-feature-icon-row">
-              <div className="home-feature-icon-tile">
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="10" width="9" height="13" rx="1.5" transform="rotate(-28 6.5 16.5)" stroke="rgba(255,255,255,0.4)" strokeWidth="1.6" fill="rgba(255,255,255,0.05)"/>
-                  <rect x="5" y="9" width="9" height="13" rx="1.5" transform="rotate(-12 9.5 15.5)" stroke="rgba(255,255,255,0.65)" strokeWidth="1.8" fill="rgba(255,255,255,0.07)"/>
-                  <rect x="9" y="8" width="9" height="13" rx="1.5" stroke="white" strokeWidth="2" fill="rgba(255,255,255,0.10)"/>
-                  <rect x="7" y="18" width="14" height="8" rx="2" stroke="rgba(255,255,255,0.85)" strokeWidth="2" fill="rgba(255,255,255,0.12)"/>
-                  <line x1="9" y1="20.5" x2="19" y2="20.5" stroke="rgba(255,255,255,0.4)" strokeWidth="1"/>
-                  <path d="M7 18 Q10 16.5 14 18 Q18 16.5 21 18" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" fill="none"/>
-                </svg>
-              </div>
-              <span className="home-feature-arrow">→</span>
-            </div>
-            <div className="home-feature-title">Sealed Simulator</div>
-            <div className="home-feature-desc">Generate pools from any format. Build and save decks.</div>
-          </a>
-        </div>
-      </div>
-
-      <hr className="home-divider" />
-
-      <div className="home-section home-section--tight-top">
-        <div className="home-promo-grid">
-          <a
-            href="/tools/tier-list"
-            className="home-promo-card"
-            onClick={(e) => { e.preventDefault(); onNavigate("/tools/tier-list"); }}
-          >
-            <div className="home-promo-label">Tool</div>
-            <h3>Tier List Generator</h3>
-            <p>Rank any card set by dragging into tiers.</p>
-          </a>
-          <div className="home-promo-card home-promo-card--coming-soon">
-            <div className="home-promo-label">Archive</div>
-            <h3>Tournament Results</h3>
-            <p>Events, legend win rates, top-placing decks.</p>
-          </div>
-        </div>
-      </div>
-
-      <footer className="home-footer">Noxian Netdecks · Riftbound</footer>
-    </div>
-  );
-}
-
 function CardDetailView({
   cardId,
   onError,
@@ -2929,13 +2481,7 @@ function TradeBalancerQuickLookWrapper({ onNavigate }: { onNavigate: (path: stri
     <>
       <TradeBalancerView onNavigate={onNavigate} onQuickLook={setQuickLookCard} />
       {quickLookCard && (
-        <CardQuickLookModal
-          group={[quickLookCard]}
-          initialCard={quickLookCard}
-          initialFinish={quickLookCard.finishes[0]}
-          onClose={() => setQuickLookCard(null)}
-          onNavigate={onNavigate}
-        />
+        <CardQuickLookModal card={quickLookCard} onClose={() => setQuickLookCard(null)} onNavigate={onNavigate} />
       )}
     </>
   );
@@ -2950,6 +2496,12 @@ export default function App() {
   const toolsMenuRef = useRef<HTMLDivElement | null>(null);
   const [showCardsMenu, setShowCardsMenu] = useState(false);
   const cardsMenuRef = useRef<HTMLDivElement | null>(null);
+  const desktopNavRef = useRef<HTMLElement | null>(null);
+  const [desktopHeaderStage, setDesktopHeaderStage] = useState<DesktopHeaderStage>("full");
+  const [showCompactMenu, setShowCompactMenu] = useState(false);
+  const compactMenuRef = useRef<HTMLDivElement | null>(null);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function handlePopState() {
@@ -2958,12 +2510,28 @@ export default function App() {
       setError(null);
       setShowToolsMenu(false);
       setShowCardsMenu(false);
+      setShowCompactMenu(false);
+      setShowMobileMenu(false);
     }
 
     window.addEventListener("popstate", handlePopState);
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
+  }, []);
+
+  useEffect(() => {
+    if (!desktopNavRef.current || typeof ResizeObserver === "undefined") {
+      return;
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      const nextWidth = entries[0]?.contentRect.width ?? 0;
+      setDesktopHeaderStage(resolveDesktopHeaderStage(nextWidth));
+    });
+
+    observer.observe(desktopNavRef.current);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -2974,12 +2542,20 @@ export default function App() {
       if (cardsMenuRef.current && !cardsMenuRef.current.contains(event.target as Node)) {
         setShowCardsMenu(false);
       }
+      if (compactMenuRef.current && !compactMenuRef.current.contains(event.target as Node)) {
+        setShowCompactMenu(false);
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setShowMobileMenu(false);
+      }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setShowToolsMenu(false);
         setShowCardsMenu(false);
+        setShowCompactMenu(false);
+        setShowMobileMenu(false);
       }
     }
 
@@ -3016,10 +2592,14 @@ export default function App() {
     setError(null);
     setShowToolsMenu(false);
     setShowCardsMenu(false);
+    setShowCompactMenu(false);
+    setShowMobileMenu(false);
   }
 
   const activeSection = routeSection(route);
   const isHome = route.kind === "home";
+  const useCompactInlineHeader = desktopHeaderStage === "compact" || desktopHeaderStage === "search";
+  const showDesktopSearchButton = desktopHeaderStage !== "compact";
 
   function handleHeaderSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -3027,100 +2607,243 @@ export default function App() {
   }
 
   const navContent = (
-    <nav className="nav" aria-label="Primary navigation">
-      <button
-        type="button"
-        className="nav-brand"
-        onClick={() => navigate("/")}
-        aria-label="Noxian Netdecks home"
+    <header className="site-header">
+      <nav
+        ref={desktopNavRef}
+        className={`site-nav site-nav--desktop site-nav--stage-${desktopHeaderStage}`}
+        aria-label="Primary navigation"
       >
-        <div className="nav-logo">N</div>
-        <span className="nav-wordmark">Noxian Netdecks</span>
-      </button>
-      <form className="nav-search-form" onSubmit={handleHeaderSearchSubmit} role="search" aria-label="Site card search">
-        <div className="nav-search-icon" aria-hidden="true">
-          <SearchIcon />
-        </div>
-        <input
-          className="nav-search-input"
-          type="search"
-          placeholder="Search cards..."
-          value={headerSearchQuery}
-          onChange={(event) => setHeaderSearchQuery(event.target.value)}
-          autoCapitalize="none"
-          autoCorrect="off"
-          spellCheck={false}
-          aria-label="Search cards"
-        />
-        <button type="submit" className="nav-search-btn">Search</button>
-      </form>
-      <div className="nav-links">
-        <div className="nav-tools-menu" ref={cardsMenuRef}>
-          <button
-            type="button"
-            className={`nav-link${activeSection === "cards" ? " active" : ""}`}
-            aria-expanded={showCardsMenu}
-            aria-haspopup="menu"
-            onClick={() => setShowCardsMenu((current) => !current)}
-          >
-            Cards
-            <ChevronIcon expanded={showCardsMenu} />
-          </button>
-          {showCardsMenu ? (
-            <div className="nav-tools-popover" role="menu" aria-label="Cards">
-              <ProjectNavLink href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
-                Search
-              </ProjectNavLink>
-              <ProjectNavLink href="/cards/learn-to-search" current={route.kind === "cards-learn-to-search"} onNavigate={navigate}>
-                Learn to Search
-              </ProjectNavLink>
-              <ProjectNavLink href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
-                Query Builder
-              </ProjectNavLink>
-            </div>
-          ) : null}
-        </div>
-        <ProjectNavLink
-          href="/deck-explorer"
-          current={activeSection === "deck-explorer"}
-          onNavigate={navigate}
+        <button
+          type="button"
+          className="site-nav-brand"
+          onClick={() => navigate("/")}
+          aria-label="Noxian Netdecks home"
         >
-          <span className={`nav-link${activeSection === "deck-explorer" ? " active" : ""}`}>Deck Explorer</span>
-        </ProjectNavLink>
-        <div className="nav-tools-menu" ref={toolsMenuRef}>
+          <div className="site-nav-logo">N</div>
+          <span className="site-nav-wordmark">Noxian Netdecks</span>
+        </button>
+        <form
+          className={`site-nav-search-form${useCompactInlineHeader ? " site-nav-search-form--mobile-inline mobile-nav-search" : ""}`}
+          onSubmit={handleHeaderSearchSubmit}
+          role="search"
+          aria-label="Site card search"
+        >
+          <div className="site-nav-search-brand-mark" aria-hidden="true">N</div>
+          <div className="site-nav-search-icon" aria-hidden="true">
+            <SearchIcon />
+          </div>
+          <input
+            className="site-nav-search-input"
+            type="search"
+            placeholder={desktopHeaderStage === "full" ? "Search for Riftbound Cards" : "Search"}
+            value={headerSearchQuery}
+            onChange={(event) => setHeaderSearchQuery(event.target.value)}
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            aria-label="Search cards"
+          />
+          <button type="submit" className="site-nav-search-btn" aria-hidden={showDesktopSearchButton ? undefined : true}>Search</button>
+        </form>
+        <div className="site-nav-shell-actions">
+          <div className="site-nav-links">
+            <div className="site-nav-tools-menu" ref={cardsMenuRef}>
+              <button
+                type="button"
+                className={`site-nav-link${activeSection === "cards" ? " active" : ""}`}
+                aria-expanded={showCardsMenu}
+                aria-haspopup="menu"
+                onClick={() => {
+                  setShowCardsMenu((current) => !current);
+                  setShowToolsMenu(false);
+                  setShowCompactMenu(false);
+                }}
+              >
+                Cards
+                <ChevronIcon expanded={showCardsMenu} />
+              </button>
+              {showCardsMenu ? (
+                <div className="site-nav-tools-popover" role="menu" aria-label="Cards">
+                  <ProjectNavLink href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
+                    Search
+                  </ProjectNavLink>
+                  <ProjectNavLink href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
+                    Query Builder
+                  </ProjectNavLink>
+                </div>
+              ) : null}
+            </div>
+            <ProjectNavLink
+              href="/deck-explorer"
+              current={activeSection === "deck-explorer"}
+              onNavigate={navigate}
+            >
+              <span className={`site-nav-link${activeSection === "deck-explorer" ? " active" : ""}`}>Deck Explorer</span>
+            </ProjectNavLink>
+            <div className="site-nav-tools-menu" ref={toolsMenuRef}>
+              <button
+                type="button"
+                className={`site-nav-link${activeSection === "tools-tier-list" || activeSection === "tools-sealed-pools" || activeSection === "tools-trade-balancer" ? " active" : ""}`}
+                aria-expanded={showToolsMenu}
+                aria-haspopup="menu"
+                onClick={() => {
+                  setShowToolsMenu((current) => !current);
+                  setShowCardsMenu(false);
+                  setShowCompactMenu(false);
+                }}
+              >
+                Tools
+                <ChevronIcon expanded={showToolsMenu} />
+              </button>
+              {showToolsMenu ? (
+                <div className="site-nav-tools-popover" role="menu" aria-label="Tools">
+                  <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
+                    Tier List Generator
+                  </ProjectNavLink>
+                  <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
+                    Sealed Simulator
+                  </ProjectNavLink>
+                  <ProjectNavLink href="/tools/trade-balancer" current={activeSection === "tools-trade-balancer"} onNavigate={navigate}>
+                    Trade Balancer
+                  </ProjectNavLink>
+                </div>
+              ) : null}
+            </div>
+          </div>
+          <div className="site-nav-compact-menu-wrap" ref={compactMenuRef}>
+            <button
+              type="button"
+              className="site-nav-compact-toggle"
+              aria-expanded={showCompactMenu}
+              aria-haspopup="menu"
+              aria-label={showCompactMenu ? "Close compact navigation menu" : "Open compact navigation menu"}
+              onClick={() => {
+                setShowCompactMenu((current) => !current);
+                setShowCardsMenu(false);
+                setShowToolsMenu(false);
+              }}
+            >
+              <MenuIcon open={showCompactMenu} />
+            </button>
+            {showCompactMenu ? (
+              <div className="site-nav-compact-popover" role="menu" aria-label="Compact navigation">
+                <section className="nav-drawer-section" aria-labelledby="compact-nav-cards-heading">
+                  <p id="compact-nav-cards-heading" className="nav-drawer-heading">Cards</p>
+                  <ProjectNavLink href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Card Search</span>
+                  </ProjectNavLink>
+                  <ProjectNavLink href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Query Builder</span>
+                  </ProjectNavLink>
+                </section>
+                <section className="nav-drawer-section" aria-labelledby="compact-nav-explore-heading">
+                  <p id="compact-nav-explore-heading" className="nav-drawer-heading">Explore</p>
+                  <ProjectNavLink href="/deck-explorer" current={activeSection === "deck-explorer"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Deck Explorer</span>
+                  </ProjectNavLink>
+                </section>
+                <section className="nav-drawer-section" aria-labelledby="compact-nav-tools-heading">
+                  <p id="compact-nav-tools-heading" className="nav-drawer-heading">Tools</p>
+                  <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Sealed Simulator</span>
+                  </ProjectNavLink>
+                  <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Tier List Generator</span>
+                  </ProjectNavLink>
+                  <ProjectNavLink href="/tools/trade-balancer" current={activeSection === "tools-trade-balancer"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Trade Balancer</span>
+                  </ProjectNavLink>
+                </section>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </nav>
+      <div className="site-nav-mobile-shell">
+        <div className="site-nav-mobile-inline">
+          <form className="site-nav-search-form site-nav-search-form--mobile-inline mobile-nav-search" onSubmit={handleHeaderSearchSubmit} role="search" aria-label="Mobile site card search">
+            <div className="site-nav-search-brand-mark" aria-hidden="true">N</div>
+            <div className="site-nav-search-icon" aria-hidden="true">
+              <SearchIcon />
+            </div>
+            <input
+              className="site-nav-search-input"
+              type="search"
+              placeholder="Search"
+              value={headerSearchQuery}
+              onChange={(event) => setHeaderSearchQuery(event.target.value)}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              aria-label="Search cards"
+            />
+            <button type="submit" className="site-nav-search-btn">Search</button>
+          </form>
           <button
             type="button"
-            className={`nav-link${activeSection === "tools-tier-list" || activeSection === "tools-sealed-pools" || activeSection === "tools-trade-balancer" ? " active" : ""}`}
-            aria-expanded={showToolsMenu}
-            aria-haspopup="menu"
-            onClick={() => setShowToolsMenu((current) => !current)}
+            className="site-nav-mobile-toggle"
+            aria-expanded={showMobileMenu}
+            aria-controls="mobile-primary-navigation"
+            aria-label={showMobileMenu ? "Close navigation menu" : "Open navigation menu"}
+            onClick={() => setShowMobileMenu((current) => !current)}
           >
-            Tools
-            <ChevronIcon expanded={showToolsMenu} />
+            <MenuIcon open={showMobileMenu} />
           </button>
-          {showToolsMenu ? (
-            <div className="nav-tools-popover" role="menu" aria-label="Tools">
-              <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
-                Tier List Generator
-              </ProjectNavLink>
-              <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
-                Sealed Simulator
-              </ProjectNavLink>
-              <ProjectNavLink href="/tools/trade-balancer" current={activeSection === "tools-trade-balancer"} onNavigate={navigate}>
-                Trade Balancer
-              </ProjectNavLink>
-            </div>
-          ) : null}
         </div>
+        {showMobileMenu ? (
+          <>
+            <button
+              type="button"
+              className="mobile-nav-backdrop mobile-nav-backdrop--visible"
+              aria-label="Close navigation menu"
+              onClick={() => setShowMobileMenu(false)}
+            />
+            <div
+              id="mobile-primary-navigation"
+              ref={mobileMenuRef}
+              className="mobile-nav-panel mobile-nav-panel--open"
+            >
+              <div className="nav-drawer-links">
+                <section className="nav-drawer-section" aria-labelledby="mobile-nav-cards-heading">
+                  <p id="mobile-nav-cards-heading" className="nav-drawer-heading">Cards</p>
+                  <ProjectNavLink href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Card Search</span>
+                  </ProjectNavLink>
+                  <ProjectNavLink href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Query Builder</span>
+                  </ProjectNavLink>
+                </section>
+                <section className="nav-drawer-section" aria-labelledby="mobile-nav-explore-heading">
+                  <p id="mobile-nav-explore-heading" className="nav-drawer-heading">Explore</p>
+                  <ProjectNavLink href="/deck-explorer" current={activeSection === "deck-explorer"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Deck Explorer</span>
+                  </ProjectNavLink>
+                </section>
+                <section className="nav-drawer-section" aria-labelledby="mobile-nav-tools-heading">
+                  <p id="mobile-nav-tools-heading" className="nav-drawer-heading">Tools</p>
+                  <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Sealed Simulator</span>
+                  </ProjectNavLink>
+                  <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Tier List Generator</span>
+                  </ProjectNavLink>
+                  <ProjectNavLink href="/tools/trade-balancer" current={activeSection === "tools-trade-balancer"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Trade Balancer</span>
+                  </ProjectNavLink>
+                </section>
+              </div>
+            </div>
+          </>
+        ) : null}
       </div>
-    </nav>
+    </header>
   );
 
   if (isHome) {
     return (
       <>
         {navContent}
-        <HomePage onNavigate={navigate} />
+        <SiteHomePage onNavigate={navigate} />
       </>
     );
   }
@@ -3129,40 +2852,40 @@ export default function App() {
     <>
       {navContent}
       <main className="app-shell">
-        {error ? <div className="error-banner">{error}</div> : null}
-        {route.kind === "cards" ? (
-          <SearchView onError={setError} locationSearch={locationSearch} onNavigate={navigate} />
-        ) : route.kind === "cards-learn-to-search" ? (
-          <LearnToSearchView onError={setError} />
-        ) : route.kind === "cards-query-builder" ? (
-          <QueryBuilderView onNavigate={navigate} />
-        ) : route.kind === "card-detail" ? (
-          <CardDetailView cardId={route.cardId} onError={setError} onNavigate={navigate} />
-        ) : route.kind === "tools-tier-list" ? (
-          <TierListView onError={setError} />
-        ) : route.kind === "tools-sealed-pools" ? (
-          <SealedSimulator onError={setError} />
-        ) : route.kind === "tools-trade-balancer" ? (
-          <TradeBalancerQuickLookWrapper onNavigate={navigate} />
-        ) : route.kind.startsWith("deck-explorer") ? (
-          <DeckExplorerView route={route} onError={setError} onNavigate={navigate} />
-        ) : (
-          <section className="route-panel route-panel--not-found">
-            <div className="section-heading">
-              <p className="eyebrow">Not Found</p>
-              <h1>That page does not exist</h1>
-              <p>The current URL is not mapped to Cards, Deck Explorer, or one of the Tools routes.</p>
-            </div>
-            <nav className="view-tabs" aria-label="Recovery navigation">
-              <ProjectNavLink href="/cards" current={false} onNavigate={navigate}>
-                Back to Cards
-              </ProjectNavLink>
-              <ProjectNavLink href="/deck-explorer" current={false} onNavigate={navigate}>
-                Open Deck Explorer
-              </ProjectNavLink>
-            </nav>
-          </section>
-        )}
+        <div className="site-page-shell">
+          {error ? <div className="error-banner">{error}</div> : null}
+          {route.kind === "cards" ? (
+            <SearchView onError={setError} locationSearch={locationSearch} onNavigate={navigate} />
+          ) : route.kind === "cards-query-builder" ? (
+            <QueryBuilderView onNavigate={navigate} />
+          ) : route.kind === "card-detail" ? (
+            <CardDetailView cardId={route.cardId} onError={setError} onNavigate={navigate} />
+          ) : route.kind === "tools-tier-list" ? (
+            <TierListView onError={setError} />
+          ) : route.kind === "tools-sealed-pools" ? (
+            <SealedSimulator onError={setError} />
+          ) : route.kind === "tools-trade-balancer" ? (
+            <TradeBalancerQuickLookWrapper onNavigate={navigate} />
+          ) : route.kind.startsWith("deck-explorer") ? (
+            <DeckExplorerView route={route} onError={setError} onNavigate={navigate} />
+          ) : (
+            <section className="route-panel route-panel--not-found">
+              <div className="section-heading">
+                <p className="eyebrow">Not Found</p>
+                <h1>That page does not exist</h1>
+                <p>The current URL is not mapped to Cards, Deck Explorer, or one of the Tools routes.</p>
+              </div>
+              <nav className="view-tabs" aria-label="Recovery navigation">
+                <ProjectNavLink href="/cards" current={false} onNavigate={navigate}>
+                  Back to Cards
+                </ProjectNavLink>
+                <ProjectNavLink href="/deck-explorer" current={false} onNavigate={navigate}>
+                  Open Deck Explorer
+                </ProjectNavLink>
+              </nav>
+            </section>
+          )}
+        </div>
       </main>
     </>
   );

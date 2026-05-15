@@ -7,6 +7,13 @@ This file adds frontend-specific guidance on top of the repository root
 
 These notes apply when editing files under `frontend/`.
 
+Before significant UI work, read:
+
+- `frontend/UI_ARCHITECTURE.md`
+
+Treat that file as the detailed design and responsive-architecture companion to
+this one.
+
 ## UI Foundation
 
 Shared UI foundation lives in:
@@ -47,6 +54,40 @@ foundation first.
 - Do not use inline styles for static spacing, colors, opacity, cursors, or
   hover-state presentation.
 
+## Responsive Architecture
+
+- Build frontend UI mobile-first by default. Base styles should target narrow
+  screens first, then add larger-screen behavior progressively.
+- Shared responsive breakpoints for expansion work are:
+  - `640px`
+  - `768px`
+  - `1024px`
+  - `1280px`
+- Use `@container` queries for component-level layout changes whenever the
+  component should adapt to the width of its containing surface, Storybook
+  canvas, or embedded context.
+- Reserve viewport media queries for true page- or shell-level changes, such
+  as switching between mobile and desktop navigation implementations or showing
+  desktop-only chrome/decorative shell layers.
+- Do not make homepage cards, heroes, or other shared surfaces depend on the
+  browser viewport width when container width is the actual layout signal.
+- Storybook stories must render correctly when their canvas width changes. Do
+  not rely on global viewport state for component responsiveness.
+- After meaningful CSS architecture changes, prefer restarting Storybook fresh
+  instead of assuming hot reload updated the active browser tab correctly.
+- Navigation should be authored mobile-first and scale upward. Do not build the
+  desktop nav first and merely shrink it down.
+- Prefer separate mobile and desktop navigation implementations that share
+  tokens/data but are purpose-built for their interaction model.
+
+## Mobile Interaction Rules
+
+- Touch targets should be at least `44px` tall on mobile.
+- Do not rely on hover-only interactions. Anything behaviorally important on
+  hover must have a tap/click equivalent.
+- On mobile homepage work, protect above-the-fold real estate so the primary
+  CTA remains visible without scrolling.
+
 ## When Adding UI
 
 Before adding a new UI pattern:
@@ -65,6 +106,13 @@ For future redesign work:
 - update one flagship route or flow next
 - reuse the resulting patterns across the remaining views
 - avoid mixing a broad visual overhaul with unrelated product behavior changes
+
+## Discoverability Requirement
+
+If you update future UI guidance, keep both of these files aligned:
+
+- `frontend/AGENTS.md`
+- `frontend/UI_ARCHITECTURE.md`
 
 ## Verification
 

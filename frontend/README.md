@@ -35,6 +35,18 @@ From the repository root:
 - `npm run dev:web`
 - `npm run test -w @noxiannet/frontend`
 - `npm run build -w @noxiannet/frontend`
+- `npm run storybook -w @noxiannet/frontend`
+- `npm run test:storybook -w @noxiannet/frontend`
+- `npm run build-storybook -w @noxiannet/frontend`
+
+## Storybook
+
+- Storybook is the primary isolated review surface for the shared shell,
+  homepage composition, and reusable route-level presentation patterns.
+- Stories for the top-level design system live beside the implementation under
+  `frontend/src/*.stories.tsx`.
+- Use Storybook before route-by-route tweaking when making future visual passes
+  so top-level design decisions stay centralized.
 
 Browser API calls default to same-origin `/api/*` routes so the production
 shape matches Cloudflare Pages + Functions. Local browser development points to
