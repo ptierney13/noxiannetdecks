@@ -1473,6 +1473,21 @@ code {
   border-color: var(--color-border-accent);
 }
 
+.lts-field-children {
+  list-style: none;
+  padding: 0;
+  margin: 3px 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-left: 2px solid var(--color-border-accent);
+  padding-left: 10px;
+}
+
+.lts-field-row--child {
+  background: var(--color-surface-inset);
+}
+
 .lts-field-row-main {
   display: flex;
   align-items: center;

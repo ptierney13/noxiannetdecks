@@ -313,28 +313,59 @@ function LearnToSearchView({
           />
         )}
 
-        {activeTab === "text-guide" && (
-          <ul className="lts-field-list" aria-label="Searchable fields">
-            {fieldGuides.map((field) => (
-              <li key={field.property}>
-                <div className="lts-field-row">
-                  <button
-                    type="button"
-                    className="lts-field-row-main"
-                    onClick={() => setDetailItem(fieldToDetail(field))}
-                    aria-label={`${field.property} — details`}
-                  >
-                    <span className="lts-field-row-name">{field.property}</span>
-                    <svg className="lts-field-row-arrow" aria-hidden="true" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M6 3l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                  <QueryChip text={field.query} onAppend={onAppendToSearch} />
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        {activeTab === "text-guide" && (() => {
+          const SECTION_CHILDREN: Record<string, string[]> = {
+            "Cost":      ["Energy", "Power", "Might"],
+            "Type line": ["Card type", "Supertype", "Tag"],
+          };
+          const childSet = new Set(Object.values(SECTION_CHILDREN).flat());
+          const fieldByName = new Map(fieldGuides.map((f) => [f.property, f]));
+
+          function FieldRow({ field, child = false }: { field: QueryFieldGuide; child?: boolean }) {
+            return (
+              <div className={`lts-field-row${child ? " lts-field-row--child" : ""}`}>
+                <button
+                  type="button"
+                  className="lts-field-row-main"
+                  onClick={() => setDetailItem(fieldToDetail(field))}
+                  aria-label={`${field.property} — details`}
+                >
+                  <span className="lts-field-row-name">{field.property}</span>
+                  <svg className="lts-field-row-arrow" aria-hidden="true" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M6 3l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                <QueryChip text={field.query} onAppend={onAppendToSearch} />
+              </div>
+            );
+          }
+
+          return (
+            <ul className="lts-field-list" aria-label="Searchable fields">
+              {fieldGuides.flatMap((field) => {
+                if (childSet.has(field.property)) return [];
+                const children = SECTION_CHILDREN[field.property];
+                return [
+                  <li key={field.property}>
+                    <FieldRow field={field} />
+                    {children && (
+                      <ul className="lts-field-children">
+                        {children.flatMap((childName) => {
+                          const child = fieldByName.get(childName);
+                          return child ? [
+                            <li key={childName}>
+                              <FieldRow field={child} child />
+                            </li>
+                          ] : [];
+                        })}
+                      </ul>
+                    )}
+                  </li>
+                ];
+              })}
+            </ul>
+          );
+        })()}
 
         {activeTab === "syntax-guide" && (
           <ul className="lts-syntax-list" aria-label="Query syntax">
