@@ -362,8 +362,11 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
     return (
       <div className="storybook-header-demo storybook-mobile-shell">
         <div className="storybook-mobile-inline site-nav-mobile-inline">
+          <div className="site-nav-brand">
+            <div className="site-nav-logo">N</div>
+            <span className="site-nav-wordmark">Noxian Netdecks</span>
+          </div>
           <div className="site-nav-search-form site-nav-search-form--static site-nav-search-form--mobile-inline mobile-nav-search">
-            <div className="site-nav-search-brand-mark" aria-hidden="true">N</div>
             <span className="site-nav-search-icon" aria-hidden="true">
               <SearchGlyph />
             </span>
@@ -441,7 +444,6 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
           <span className="site-nav-wordmark">Noxian Netdecks</span>
         </div>
         <div className={`site-nav-search-form site-nav-search-form--static${useCompactInlineHeader ? " site-nav-search-form--mobile-inline mobile-nav-search" : ""}`}>
-          <div className="site-nav-search-brand-mark" aria-hidden="true">N</div>
           <span className="site-nav-search-icon" aria-hidden="true">
             <SearchGlyph />
           </span>

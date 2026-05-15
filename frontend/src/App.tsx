@@ -2628,7 +2628,6 @@ export default function App() {
           role="search"
           aria-label="Site card search"
         >
-          <div className="site-nav-search-brand-mark" aria-hidden="true">N</div>
           <div className="site-nav-search-icon" aria-hidden="true">
             <SearchIcon />
           </div>
@@ -2761,8 +2760,16 @@ export default function App() {
       </nav>
       <div className="site-nav-mobile-shell">
         <div className="site-nav-mobile-inline">
+          <button
+            type="button"
+            className="site-nav-brand"
+            onClick={() => navigate("/")}
+            aria-label="Noxian Netdecks home"
+          >
+            <div className="site-nav-logo">N</div>
+            <span className="site-nav-wordmark">Noxian Netdecks</span>
+          </button>
           <form className="site-nav-search-form site-nav-search-form--mobile-inline mobile-nav-search" onSubmit={handleHeaderSearchSubmit} role="search" aria-label="Mobile site card search">
-            <div className="site-nav-search-brand-mark" aria-hidden="true">N</div>
             <div className="site-nav-search-icon" aria-hidden="true">
               <SearchIcon />
             </div>
