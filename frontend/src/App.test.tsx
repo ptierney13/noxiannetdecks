@@ -769,7 +769,7 @@ describe("App", () => {
   beforeEach(() => {
     window.history.pushState({}, "", "/");
     vi.stubGlobal("ResizeObserver", TestResizeObserver);
-    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function () {
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
       return {
         width: this.tagName === "HEADER" ? DESKTOP_TEST_WIDTH : 0,
         height: 0,
@@ -808,11 +808,51 @@ describe("App", () => {
     window.history.pushState({}, "", "/cards/learn-to-search");
     render(<App />);
 
-    expect(await screen.findByRole("tab", { name: "Searchable Fields" })).toBeInTheDocument();
-    expect(screen.queryByText("I want cards with...")).not.toBeInTheDocument();
+    expect(await screen.findByRole("tab", { name: "Visual Guide" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Text Guide" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Syntax Guide" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("tab", { name: "Searchable Fields" }));
-    expect(screen.getByText("I want cards with...")).toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: "Text Guide" }));
+    expect(await screen.findByText("Name")).toBeInTheDocument();
+  });
+
+  it("opens the detail overlay when a Text Guide field row is clicked", async () => {
+    const user = userEvent.setup();
+    window.history.pushState({}, "", "/cards/learn-to-search");
+    render(<App />);
+
+    await user.click(await screen.findByRole("tab", { name: "Text Guide" }));
+    const nameRow = await screen.findByRole("button", { name: "Name — details" });
+    await user.click(nameRow);
+
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
+  });
+
+  it("closes the detail overlay when the close button is clicked", async () => {
+    const user = userEvent.setup();
+    window.history.pushState({}, "", "/cards/learn-to-search");
+    render(<App />);
+
+    await user.click(await screen.findByRole("tab", { name: "Text Guide" }));
+    await user.click(await screen.findByRole("button", { name: "Name — details" }));
+    await screen.findByRole("dialog");
+
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("appends a query chip text to the search bar without triggering a search", async () => {
+    const user = userEvent.setup();
+    window.history.pushState({}, "", "/cards/learn-to-search");
+    render(<App />);
+
+    await user.click(await screen.findByRole("tab", { name: "Syntax Guide" }));
+    const chip = await screen.findByRole("button", { name: "e>=3" });
+    await user.click(chip);
+
+    const searchInput = document.querySelector<HTMLInputElement>(".site-nav-search-input");
+    expect(searchInput?.value).toBe("e>=3");
   });
 
   it("searches when the user clicks Search", async () => {

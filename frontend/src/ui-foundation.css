@@ -51,6 +51,7 @@
   --space-shell-x: clamp(1rem, 2vw, 1.75rem);
   --space-shell-y: clamp(1rem, 2vw, 1.5rem);
   --content-max-width: 1240px;
+  --site-header-height: 60px;
   --chart-series-1: #f59e0b;
   --chart-series-2: #ef4444;
   --chart-series-3: #38bdf8;

@@ -1,6 +1,8 @@
 import { type CSSProperties, type FormEvent, type MouseEvent, type PointerEvent, type ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { generateSealedPool, getCard, loadPackGeneratorOptions, loadQueryFeatures, searchCards } from "./api";
 import { CardSearchGuide } from "./CardSearchGuide";
+import { LtsDetailOverlay, type LtsDetailItem } from "./LtsDetailOverlay";
+import { QueryChip } from "./QueryChip";
 import DeckExplorerView from "./DeckExplorerView";
 import {
   buildTcgplayerAffiliateSearchLink,
@@ -214,16 +216,19 @@ function QueryLanguageTables({
   );
 }
 
-type LearnTab = "card-element" | "fields" | "syntax";
+type LearnTab = "visual-guide" | "text-guide" | "syntax-guide";
 
 function LearnToSearchView({
   onError,
+  onAppendToSearch,
 }: {
   onError: (message: string | null) => void;
+  onAppendToSearch: (fragment: string) => void;
 }) {
-  const [activeTab, setActiveTab] = useState<LearnTab>("card-element");
+  const [activeTab, setActiveTab] = useState<LearnTab>("visual-guide");
   const [fieldGuides, setFieldGuides] = useState<QueryFieldGuide[]>([]);
   const [syntaxGuides, setSyntaxGuides] = useState<QuerySyntaxGuide[]>([]);
+  const [detailItem, setDetailItem] = useState<LtsDetailItem | null>(null);
 
   useEffect(() => {
     let ignore = false;
@@ -248,92 +253,122 @@ function LearnToSearchView({
     };
   }, [onError]);
 
+  function fieldToDetail(field: QueryFieldGuide): LtsDetailItem {
+    return {
+      label: field.property,
+      category: field.property.toUpperCase(),
+      description: field.searches,
+      query: field.query,
+      shorthand: field.shorthand ?? undefined,
+      examples: [field.example],
+    };
+  }
+
+  function syntaxToDetail(op: QuerySyntaxGuide): LtsDetailItem {
+    return {
+      label: op.operation,
+      category: "SYNTAX",
+      description: op.behavior,
+      examples: op.examples,
+    };
+  }
+
   return (
     <div className="learn-to-search-view">
-      <p className="eyebrow">Cards / Learn to Search</p>
-      <h1>Learn to Search</h1>
       <div className="lts-tabs" role="tablist">
         <button
           type="button"
           role="tab"
-          aria-selected={activeTab === "card-element"}
-          className={`lts-tab${activeTab === "card-element" ? " lts-tab--active" : ""}`}
-          onClick={() => setActiveTab("card-element")}
+          aria-selected={activeTab === "visual-guide"}
+          className={`lts-tab${activeTab === "visual-guide" ? " lts-tab--active" : ""}`}
+          onClick={() => setActiveTab("visual-guide")}
         >
-          Search by Card Element
+          Visual Guide
         </button>
         <button
           type="button"
           role="tab"
-          aria-selected={activeTab === "fields"}
-          className={`lts-tab${activeTab === "fields" ? " lts-tab--active" : ""}`}
-          onClick={() => setActiveTab("fields")}
+          aria-selected={activeTab === "text-guide"}
+          className={`lts-tab${activeTab === "text-guide" ? " lts-tab--active" : ""}`}
+          onClick={() => setActiveTab("text-guide")}
         >
-          Searchable Fields
+          Text Guide
         </button>
         <button
           type="button"
           role="tab"
-          aria-selected={activeTab === "syntax"}
-          className={`lts-tab${activeTab === "syntax" ? " lts-tab--active" : ""}`}
-          onClick={() => setActiveTab("syntax")}
+          aria-selected={activeTab === "syntax-guide"}
+          className={`lts-tab${activeTab === "syntax-guide" ? " lts-tab--active" : ""}`}
+          onClick={() => setActiveTab("syntax-guide")}
         >
-          Query Syntax
+          Syntax Guide
         </button>
       </div>
+
       <div className="lts-panel">
-        {activeTab === "card-element" && <CardSearchGuide />}
-        {activeTab === "fields" ? (
-          <table className="feature-table">
-            <thead>
-              <tr>
-                <th>I want cards with...</th>
-                <th>Use this query</th>
-                <th>Shorthand</th>
-                <th>Searches</th>
-                <th>Example</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fieldGuides.map((field) => (
-                <tr key={field.property}>
-                  <td>{field.property}</td>
-                  <td><code>{field.query}</code></td>
-                  <td>{field.shorthand ? <code>{field.shorthand}</code> : "None"}</td>
-                  <td>{field.searches}</td>
-                  <td><code>{field.example}</code></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : null}
-        {activeTab === "syntax" ? (
-          <table className="feature-table">
-            <thead>
-              <tr>
-                <th>Operation</th>
-                <th>Syntax Examples</th>
-                <th>Behavior</th>
-              </tr>
-            </thead>
-            <tbody>
-              {syntaxGuides.map((operation) => (
-                <tr key={operation.operation}>
-                  <td>{operation.operation}</td>
-                  <td>
-                    <div className="example-list">
-                      {operation.examples.map((example) => (
-                        <code key={example}>{example}</code>
-                      ))}
-                    </div>
-                  </td>
-                  <td>{operation.behavior}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : null}
+        {activeTab === "visual-guide" && (
+          <CardSearchGuide
+            onSelectZone={setDetailItem}
+            onAppend={onAppendToSearch}
+          />
+        )}
+
+        {activeTab === "text-guide" && (
+          <ul className="lts-field-list" aria-label="Searchable fields">
+            {fieldGuides.map((field) => (
+              <li key={field.property}>
+                <div className="lts-field-row">
+                  <button
+                    type="button"
+                    className="lts-field-row-main"
+                    onClick={() => setDetailItem(fieldToDetail(field))}
+                    aria-label={`${field.property} — details`}
+                  >
+                    <span className="lts-field-row-name">{field.property}</span>
+                    <svg className="lts-field-row-arrow" aria-hidden="true" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M6 3l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  <QueryChip text={field.query} onAppend={onAppendToSearch} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {activeTab === "syntax-guide" && (
+          <ul className="lts-syntax-list" aria-label="Query syntax">
+            {syntaxGuides.map((op) => (
+              <li key={op.operation}>
+                <div className="lts-syntax-row">
+                  <button
+                    type="button"
+                    className="lts-syntax-row-header"
+                    onClick={() => setDetailItem(syntaxToDetail(op))}
+                  >
+                    <span className="lts-syntax-row-name">{op.operation}</span>
+                    <svg className="lts-field-row-arrow" aria-hidden="true" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M6 3l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  <p className="lts-syntax-row-desc">{op.behavior}</p>
+                  <div className="lts-syntax-row-chips">
+                    {op.examples.map((ex) => (
+                      <QueryChip key={ex} text={ex} onAppend={onAppendToSearch} />
+                    ))}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
+
+      <LtsDetailOverlay
+        item={detailItem}
+        onClose={() => setDetailItem(null)}
+        onAppend={onAppendToSearch}
+      />
     </div>
   );
 }
@@ -3008,7 +3043,12 @@ export default function App() {
           {route.kind === "cards" ? (
             <SearchView onError={setError} locationSearch={locationSearch} onNavigate={navigate} />
           ) : route.kind === "cards-learn-to-search" ? (
-            <LearnToSearchView onError={setError} />
+            <LearnToSearchView
+                onError={setError}
+                onAppendToSearch={(fragment) =>
+                  setHeaderSearchQuery((prev) => prev ? `${prev} ${fragment}` : fragment)
+                }
+              />
           ) : route.kind === "cards-query-builder" ? (
             <QueryBuilderView onNavigate={navigate} />
           ) : route.kind === "card-detail" ? (

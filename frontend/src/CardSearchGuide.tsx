@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { LtsDetailItem } from "./LtsDetailOverlay";
 
 type ZoneId =
   | "name" | "cost" | "energy" | "power" | "might"
@@ -6,56 +7,48 @@ type ZoneId =
   | "keyword" | "text"
   | "set" | "rarity" | "number" | "artist";
 
-type ZoneInfo = {
+type ZoneInfo = LtsDetailItem & {
   label: string;
-  query: string;
-  shorthand?: string;
-  description: string;
 };
 
 const ZONES: Record<ZoneId, ZoneInfo> = {
-  name:             { label: "Name",        query: 'name:"blitzcrank"',            shorthand: 'n:blitzcrank',             description: "Matches cards whose name contains this text." },
-  cost:             { label: "Cost",        query: "cost:5",                                                              description: "Matches by exact play cost. Use >=, <=, >, < for ranges (e.g. cost>=3)." },
-  energy:           { label: "Energy",      query: "energy:5",                     shorthand: "e:5",                      description: "Matches by energy value. Supports numeric comparisons." },
-  power:            { label: "Power",       query: "power:1",                      shorthand: "p:1",                      description: "Matches by power value. Supports numeric comparisons." },
-  might:            { label: "Might",       query: "might:5",                      shorthand: "m:5",                      description: "Matches by might value. Supports numeric comparisons." },
-  typeline:         { label: "Type line",   query: "t:champion",                                                          description: "Matches any word in the full type line in any order." },
-  cardtype:         { label: "Card type",   query: "cardtype:unit",                shorthand: "ct:unit",                  description: "Matches the card type segment (Unit, Event, Landmark, etc.)." },
-  supertype:        { label: "Supertype",   query: "supertype:champion",           shorthand: "u:champion",               description: "Matches the supertype segment (Champion, Landmark, etc.)." },
-  "tag-blitzcrank": { label: "Tag",         query: "tag:blitzcrank",                                                      description: "Matches a specific type tag. Tags include champions, tribes, and origins." },
-  "tag-zaun":       { label: "Tag",         query: "tag:zaun",                                                            description: "Matches a specific type tag. Tags include champions, tribes, and origins." },
-  "tag-mech":       { label: "Tag",         query: "tag:mech",                                                            description: "Matches a specific type tag. Tags include champions, tribes, and origins." },
-  keyword:          { label: "Keyword",     query: "keyword:tank",                 shorthand: "k:tank",                   description: "Matches cards that have this rules keyword." },
-  text:             { label: "Rules text",  query: "text:move",                    shorthand: "o:move",                   description: "Searches within the card's rules text." },
-  set:              { label: "Set",         query: "set:OGN",                      shorthand: "s:origins",                description: "Matches by set code or set name." },
-  rarity:           { label: "Rarity",      query: "rarity:rare",                                                         description: "Filters by rarity: Common, Uncommon, Rare, Epic, Showcase." },
-  number:           { label: "Collector #", query: "number:67",                    shorthand: "c:67",                     description: "Matches by collector number." },
-  artist:           { label: "Artist",      query: 'artist:"league splash team"',  shorthand: 'a:"league splash"',        description: "Searches by illustrator name." },
+  name:             { label: "Name",        category: "NAME",       description: "Matches cards whose name contains this text.", query: "name:blitzcrank", shorthand: "n:blitzcrank",             examples: ['name:jinx', 'n:"loose cannon"', "name:blitz*"] },
+  cost:             { label: "Cost",        category: "COST",       description: "Matches by exact play cost. Use >=, <=, >, < for ranges.", query: "cost:5",                                        examples: ["cost:5", "cost>=3", "cost<=2"] },
+  energy:           { label: "Energy",      category: "ENERGY",     description: "Matches by energy value. Supports numeric comparisons.", query: "energy:5",          shorthand: "e:5",             examples: ["e:5", "e>=3", "e<=2"] },
+  power:            { label: "Power",       category: "POWER",      description: "Matches by power value. Supports numeric comparisons.", query: "power:1",            shorthand: "p:1",             examples: ["p:1", "p>=3", "p=0"] },
+  might:            { label: "Might",       category: "MIGHT",      description: "Matches by might value. Supports numeric comparisons.", query: "might:5",            shorthand: "m:5",             examples: ["m:5", "m>=4", "m:none"] },
+  typeline:         { label: "Type line",   category: "TYPE LINE",  description: "Matches any word in the full type line in any order.", query: "t:champion",                                       examples: ["t:champion", 't:"champion unit"', "t:mech"] },
+  cardtype:         { label: "Card type",   category: "CARD TYPE",  description: "Matches the card type (Unit, Event, Landmark, etc.).", query: "cardtype:unit",     shorthand: "ct:unit",          examples: ["ct:unit", "ct:event", "ct:landmark"] },
+  supertype:        { label: "Supertype",   category: "SUPERTYPE",  description: "Matches the supertype segment (Champion, Landmark, etc.).", query: "supertype:champion", shorthand: "u:champion", examples: ["u:champion", "u:landmark"] },
+  "tag-blitzcrank": { label: "Tag",         category: "TAG",        description: "Matches a specific type tag — champions, tribes, and origins.", query: "tag:blitzcrank",                          examples: ["tag:blitzcrank", "tag:zaun", "tag:dragon"] },
+  "tag-zaun":       { label: "Tag",         category: "TAG",        description: "Matches a specific type tag — champions, tribes, and origins.", query: "tag:zaun",                                examples: ["tag:zaun", "tag:mech", "tag:piltover"] },
+  "tag-mech":       { label: "Tag",         category: "TAG",        description: "Matches a specific type tag — champions, tribes, and origins.", query: "tag:mech",                                examples: ["tag:mech", "tag:dragon", "tag:zaun"] },
+  keyword:          { label: "Keyword",     category: "KEYWORD",    description: "Matches cards that have this rules keyword.", query: "keyword:tank",      shorthand: "k:tank",                   examples: ["k:tank", "k:action", "k:overwhelm"] },
+  text:             { label: "Rules text",  category: "RULES TEXT", description: "Searches within the card's rules text.", query: "text:move",          shorthand: "o:move",                      examples: ['o:move', 'o:"draw a card"', "o:battlefield"] },
+  set:              { label: "Set",         category: "SET",        description: "Matches by set code or set name.", query: "set:OGN",              shorthand: "s:origins",                        examples: ["s:OGN", "s:unleashed", "s:UNL"] },
+  rarity:           { label: "Rarity",      category: "RARITY",     description: "Filters by rarity: Common, Uncommon, Rare, Epic, Showcase.", query: "rarity:rare",                             examples: ["rarity:rare", "rarity:epic", "rarity:common"] },
+  number:           { label: "Collector #", category: "COLLECTOR #", description: "Matches by collector number.", query: "number:67",            shorthand: "c:67",                               examples: ["c:67", "number:001", "c:298"] },
+  artist:           { label: "Artist",      category: "ARTIST",     description: "Searches by illustrator name.", query: 'artist:"league splash team"', shorthand: 'a:"league splash"',           examples: ['a:"league splash"', "a:sixmorevodka"] },
 };
 
-// ── Card data constants (sourced from cards.json) ────────────────────────────
-// Blitzcrank – Impassive: cost="{5}{C}", energy=5, power=1, might=5, OGN #067/298
-
 const CARD_IMAGE   = "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/654dcc4aef0a0b5a0c6e928d7aae397a52c3ab17-744x1039.png?accountingTag=RB";
-const CARD_COST    = "{5}{C}";  // canonical cost field from cards.json
+const CARD_COST    = "{5}{C}";
 const CARD_ENERGY  = 5;
 const CARD_POWER   = 1;
 const CARD_MIGHT   = 5;
 
-// ── Component ─────────────────────────────────────────────────────────────────
+type CardSearchGuideProps = {
+  onSelectZone?: (item: LtsDetailItem) => void;
+  onAppend?: (text: string) => void;
+};
 
-export function CardSearchGuide() {
+export function CardSearchGuide({ onSelectZone }: CardSearchGuideProps) {
   const [active, setActive] = useState<ZoneId | null>(null);
-  const [hovered, setHovered] = useState<ZoneId | null>(null);
-
-  const displayZone = active ?? hovered;
-  const zoneInfo = displayZone ? ZONES[displayZone] : null;
 
   function zc(id: ZoneId, extra?: string) {
     const parts = ["csg-zone"];
     if (extra) parts.push(extra);
     if (active === id) parts.push("csg-active");
-    else if (hovered === id) parts.push("csg-hovered");
     return parts.join(" ");
   }
 
@@ -63,20 +56,21 @@ export function CardSearchGuide() {
     return {
       onClick(e: React.MouseEvent) {
         e.stopPropagation();
-        setActive(prev => (prev === id ? null : id));
+        const wasActive = active === id;
+        setActive(wasActive ? null : id);
+        if (!wasActive) onSelectZone?.(ZONES[id]);
       },
-      onMouseEnter() { setHovered(id); },
-      onMouseLeave() { setHovered(null); },
     };
   }
 
   return (
     <div className="csg-wrap" onClick={() => setActive(null)}>
+      <p className="csg-hint">Tap any element to learn how to search for it.</p>
 
       {/* ── CARD DIAGRAM ── */}
-      <div className="csg-card" role="group" aria-label="Interactive card diagram — click any element for its query">
+      <div className="csg-card" role="group" aria-label="Interactive card diagram — tap any element for its query">
 
-        {/* Header: Cost · Energy · Power on the left, Might on the right */}
+        {/* Header: Cost · Energy · Power / Might */}
         <div className="csg-card-header">
           <div className="csg-stat-row">
             <button className={zc("cost", "csg-cost")} {...zh("cost")} aria-pressed={active === "cost"}>
@@ -143,7 +137,7 @@ export function CardSearchGuide() {
           </div>
         </div>
 
-        {/* Footer: [Set · #/total] [◆ Rarity] [Artist →] */}
+        {/* Footer */}
         <div className="csg-footer">
           <div className="csg-footer-row">
             <div className="csg-footer-left">
@@ -160,40 +154,6 @@ export function CardSearchGuide() {
           </div>
         </div>
       </div>
-
-      {/* ── QUERY PANEL ── */}
-      <div className="csg-panel" aria-live="polite" aria-atomic="true">
-        {zoneInfo ? (
-          <>
-            <div className="csg-panel-header">
-              <span className="csg-panel-label">{zoneInfo.label}</span>
-              {active && (
-                <button
-                  className="csg-panel-close"
-                  onClick={(e) => { e.stopPropagation(); setActive(null); }}
-                  aria-label="Dismiss"
-                >
-                  <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" strokeWidth="2.5" stroke="currentColor" fill="none">
-                    <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round"/>
-                  </svg>
-                </button>
-              )}
-            </div>
-            <div className="csg-panel-query">
-              <code>{zoneInfo.query}</code>
-            </div>
-            {zoneInfo.shorthand && (
-              <div className="csg-panel-short">
-                or <code>{zoneInfo.shorthand}</code>
-              </div>
-            )}
-            <p className="csg-panel-desc">{zoneInfo.description}</p>
-          </>
-        ) : (
-          <p className="csg-panel-idle">Hover or click any part of the card to see its query.</p>
-        )}
-      </div>
-
     </div>
   );
 }
