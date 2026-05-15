@@ -1,4 +1,4 @@
-import { type CSSProperties, type FormEvent, type MouseEvent, type PointerEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, type FormEvent, type MouseEvent, type PointerEvent, type ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { generateSealedPool, getCard, loadPackGeneratorOptions, loadQueryFeatures, searchCards } from "./api";
 import { CardSearchGuide } from "./CardSearchGuide";
 import DeckExplorerView from "./DeckExplorerView";
@@ -15,7 +15,7 @@ import {
   type PublishedPriceRow
 } from "./priceData";
 import QueryBuilderView from "./QueryBuilderView";
-import { resolveDesktopHeaderStage, type DesktopHeaderStage } from "./headerLayout";
+import { resolveDesktopHeaderStage, resolveHeaderShellMode, type DesktopHeaderStage, type HeaderShellMode } from "./headerLayout";
 import { HomePage as SiteHomePage } from "./siteSystem";
 import TradeBalancerView from "./TradeBalancerView";
 import { buildCardDetailPath, buildCardsSearchPath, normalizePathname, parseAppRoute, routeSection } from "./routes";
@@ -211,6 +211,130 @@ function QueryLanguageTables({
         </table>
       </CollapsibleFeatureTable>
     </section>
+  );
+}
+
+type LearnTab = "card-element" | "fields" | "syntax";
+
+function LearnToSearchView({
+  onError,
+}: {
+  onError: (message: string | null) => void;
+}) {
+  const [activeTab, setActiveTab] = useState<LearnTab>("card-element");
+  const [fieldGuides, setFieldGuides] = useState<QueryFieldGuide[]>([]);
+  const [syntaxGuides, setSyntaxGuides] = useState<QuerySyntaxGuide[]>([]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function boot() {
+      try {
+        const result = await loadQueryFeatures();
+        if (!ignore) {
+          setFieldGuides(result.fields);
+          setSyntaxGuides(result.syntax);
+        }
+      } catch (caught) {
+        if (!ignore) {
+          onError(caught instanceof Error ? caught.message : "Unable to load query features.");
+        }
+      }
+    }
+
+    void boot();
+    return () => {
+      ignore = true;
+    };
+  }, [onError]);
+
+  return (
+    <div className="learn-to-search-view">
+      <p className="eyebrow">Cards / Learn to Search</p>
+      <h1>Learn to Search</h1>
+      <div className="lts-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "card-element"}
+          className={`lts-tab${activeTab === "card-element" ? " lts-tab--active" : ""}`}
+          onClick={() => setActiveTab("card-element")}
+        >
+          Search by Card Element
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "fields"}
+          className={`lts-tab${activeTab === "fields" ? " lts-tab--active" : ""}`}
+          onClick={() => setActiveTab("fields")}
+        >
+          Searchable Fields
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "syntax"}
+          className={`lts-tab${activeTab === "syntax" ? " lts-tab--active" : ""}`}
+          onClick={() => setActiveTab("syntax")}
+        >
+          Query Syntax
+        </button>
+      </div>
+      <div className="lts-panel">
+        {activeTab === "card-element" && <CardSearchGuide />}
+        {activeTab === "fields" ? (
+          <table className="feature-table">
+            <thead>
+              <tr>
+                <th>I want cards with...</th>
+                <th>Use this query</th>
+                <th>Shorthand</th>
+                <th>Searches</th>
+                <th>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              {fieldGuides.map((field) => (
+                <tr key={field.property}>
+                  <td>{field.property}</td>
+                  <td><code>{field.query}</code></td>
+                  <td>{field.shorthand ? <code>{field.shorthand}</code> : "None"}</td>
+                  <td>{field.searches}</td>
+                  <td><code>{field.example}</code></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : null}
+        {activeTab === "syntax" ? (
+          <table className="feature-table">
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>Syntax Examples</th>
+                <th>Behavior</th>
+              </tr>
+            </thead>
+            <tbody>
+              {syntaxGuides.map((operation) => (
+                <tr key={operation.operation}>
+                  <td>{operation.operation}</td>
+                  <td>
+                    <div className="example-list">
+                      {operation.examples.map((example) => (
+                        <code key={example}>{example}</code>
+                      ))}
+                    </div>
+                  </td>
+                  <td>{operation.behavior}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -2498,8 +2622,9 @@ export default function App() {
   const toolsMenuRef = useRef<HTMLDivElement | null>(null);
   const [showCardsMenu, setShowCardsMenu] = useState(false);
   const cardsMenuRef = useRef<HTMLDivElement | null>(null);
-  const desktopNavRef = useRef<HTMLElement | null>(null);
+  const headerShellRef = useRef<HTMLElement | null>(null);
   const [desktopHeaderStage, setDesktopHeaderStage] = useState<DesktopHeaderStage>("full");
+  const [headerShellMode, setHeaderShellMode] = useState<HeaderShellMode>("mobile");
   const [showCompactMenu, setShowCompactMenu] = useState(false);
   const compactMenuRef = useRef<HTMLDivElement | null>(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -2522,17 +2647,23 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!desktopNavRef.current || typeof ResizeObserver === "undefined") {
+  useLayoutEffect(() => {
+    if (!headerShellRef.current || typeof ResizeObserver === "undefined") {
       return;
+    }
+
+    function updateHeaderLayout(nextWidth: number) {
+      setHeaderShellMode((currentMode) => resolveHeaderShellMode(nextWidth, currentMode));
+      setDesktopHeaderStage((currentStage) => resolveDesktopHeaderStage(nextWidth, currentStage));
     }
 
     const observer = new ResizeObserver((entries) => {
       const nextWidth = entries[0]?.contentRect.width ?? 0;
-      setDesktopHeaderStage(resolveDesktopHeaderStage(nextWidth));
+      updateHeaderLayout(nextWidth);
     });
 
-    observer.observe(desktopNavRef.current);
+    updateHeaderLayout(headerShellRef.current.getBoundingClientRect().width);
+    observer.observe(headerShellRef.current);
     return () => observer.disconnect();
   }, []);
 
@@ -2608,12 +2739,12 @@ export default function App() {
   }
 
   const navContent = (
-    <header className="site-header">
-      <nav
-        ref={desktopNavRef}
-        className={`site-nav site-nav--desktop site-nav--stage-${desktopHeaderStage}`}
-        aria-label="Primary navigation"
-      >
+    <header ref={headerShellRef} className="site-header">
+      {headerShellMode === "desktop" ? (
+        <nav
+          className={`site-nav site-nav--desktop site-nav--stage-${desktopHeaderStage}`}
+          aria-label="Primary navigation"
+        >
         <button
           type="button"
           className="site-nav-brand"
@@ -2666,6 +2797,9 @@ export default function App() {
                 <div className="site-nav-tools-popover" role="menu" aria-label="Cards">
                   <ProjectNavLink className="site-nav-menu-item" href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
                     Search
+                  </ProjectNavLink>
+                  <ProjectNavLink className="site-nav-menu-item" href="/cards/learn-to-search" current={route.kind === "cards-learn-to-search"} onNavigate={navigate}>
+                    Learn to Search
                   </ProjectNavLink>
                   <ProjectNavLink className="site-nav-menu-item" href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
                     Query Builder
@@ -2732,6 +2866,9 @@ export default function App() {
                   <ProjectNavLink href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
                     <span className="nav-drawer-link">Card Search</span>
                   </ProjectNavLink>
+                  <ProjectNavLink href="/cards/learn-to-search" current={route.kind === "cards-learn-to-search"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Learn to Search</span>
+                  </ProjectNavLink>
                   <ProjectNavLink href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
                     <span className="nav-drawer-link">Query Builder</span>
                   </ProjectNavLink>
@@ -2758,8 +2895,10 @@ export default function App() {
             ) : null}
           </div>
         </div>
-      </nav>
-      <div className="site-nav-mobile-shell">
+        </nav>
+      ) : null}
+      {headerShellMode === "mobile" ? (
+        <div className="site-nav-mobile-shell">
         <div className="site-nav-mobile-inline">
           <button
             type="button"
@@ -2817,6 +2956,9 @@ export default function App() {
                   <ProjectNavLink href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
                     <span className="nav-drawer-link">Card Search</span>
                   </ProjectNavLink>
+                  <ProjectNavLink href="/cards/learn-to-search" current={route.kind === "cards-learn-to-search"} onNavigate={navigate}>
+                    <span className="nav-drawer-link">Learn to Search</span>
+                  </ProjectNavLink>
                   <ProjectNavLink href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
                     <span className="nav-drawer-link">Query Builder</span>
                   </ProjectNavLink>
@@ -2843,7 +2985,8 @@ export default function App() {
             </div>
           </>
         ) : null}
-      </div>
+        </div>
+      ) : null}
     </header>
   );
 
@@ -2864,6 +3007,8 @@ export default function App() {
           {error ? <div className="error-banner">{error}</div> : null}
           {route.kind === "cards" ? (
             <SearchView onError={setError} locationSearch={locationSearch} onNavigate={navigate} />
+          ) : route.kind === "cards-learn-to-search" ? (
+            <LearnToSearchView onError={setError} />
           ) : route.kind === "cards-query-builder" ? (
             <QueryBuilderView onNavigate={navigate} />
           ) : route.kind === "card-detail" ? (

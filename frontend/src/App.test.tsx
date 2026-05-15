@@ -4,6 +4,44 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import type { CardRecord } from "./types";
 
+const DESKTOP_TEST_WIDTH = 1200;
+
+class TestResizeObserver {
+  private readonly callback: ResizeObserverCallback;
+
+  constructor(callback: ResizeObserverCallback) {
+    this.callback = callback;
+  }
+
+  observe(target: Element) {
+    this.callback(
+      [
+        {
+          target,
+          contentRect: {
+            width: DESKTOP_TEST_WIDTH,
+            height: 0,
+            x: 0,
+            y: 0,
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: DESKTOP_TEST_WIDTH,
+            toJSON() {
+              return this;
+            }
+          } as DOMRectReadOnly
+        } as ResizeObserverEntry
+      ],
+      this as unknown as ResizeObserver
+    );
+  }
+
+  unobserve() {}
+
+  disconnect() {}
+}
+
 function createCard({
   id,
   riotName,
@@ -730,10 +768,27 @@ function dragCardToSlot(cardName: string, slotTestId: string, pointerId: number)
 describe("App", () => {
   beforeEach(() => {
     window.history.pushState({}, "", "/");
+    vi.stubGlobal("ResizeObserver", TestResizeObserver);
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function () {
+      return {
+        width: this.tagName === "HEADER" ? DESKTOP_TEST_WIDTH : 0,
+        height: 0,
+        x: 0,
+        y: 0,
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: this.tagName === "HEADER" ? DESKTOP_TEST_WIDTH : 0,
+        toJSON() {
+          return this;
+        }
+      } as DOMRect;
+    });
     mockFetch();
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 
@@ -742,7 +797,7 @@ describe("App", () => {
     window.history.pushState({}, "", "/cards");
     render(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Card Search Results" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Riftbound Card Search" })).toBeInTheDocument();
     expect(screen.queryByAltText("Void Gate card image.")).not.toBeInTheDocument();
     expect(screen.queryByTestId("card-grid")).not.toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalledWith(expect.stringMatching(/^\/api\/cards/));
@@ -766,12 +821,12 @@ describe("App", () => {
 
     window.history.pushState({}, "", "/cards");
     render(<App />);
-    await screen.findByRole("heading", { name: "Card Search Results" });
+    await screen.findByRole("heading", { name: "Riftbound Card Search" });
 
     await submitCardsSearch(user, "name:void");
 
     await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid+unique%3Aid");
+      expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid");
     });
     expect(await screen.findByAltText("Void Gate card image.")).toBeInTheDocument();
     expect(screen.getByTestId("card-grid")).toHaveAttribute("data-columns", "4");
@@ -812,23 +867,35 @@ describe("App", () => {
       if (url === "/data/prices-d1/manifest.json") return Response.json(d1PriceManifest);
       if (url === "/data/prices-d1/riftbound/latest.json") return Response.json(d1PriceSnapshot);
       if (url === "/api/query/features") return Response.json({ fields, syntax });
+      if (url === "/api/cards/void-gate-ogn") return Response.json(ognPrinting);
       if (url.startsWith("/api/cards")) {
-        return Response.json({ total: 1, normalizedQuery: "void gate", diagnostics: [], items: [ognPrinting] });
+        return Response.json({
+          total: 1,
+          normalizedQuery: url.includes("unique%3Aprints") ? 'riftbound_id="void-gate-shared" unique:prints' : "void gate",
+          diagnostics: [],
+          items: [ognPrinting]
+        });
       }
       return new Response(null, { status: 404 });
     }));
 
     window.history.pushState({}, "", "/cards");
     render(<App />);
-    await screen.findByRole("heading", { name: "Card Search Results" });
+    await screen.findByRole("heading", { name: "Riftbound Card Search" });
 
     await submitCardsSearch(user, "void gate");
     await screen.findByAltText("Void Gate card image.");
 
-    await user.click(screen.getByLabelText("Show Variants"));
+    await user.click(screen.getByAltText("Void Gate card image."));
+    await user.click(await screen.findByRole("button", { name: /View full details/i }));
 
-    expect(screen.getByRole("button", { name: "OGN" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "UNL AA" })).not.toBeInTheDocument();
+    const detailHeading = await screen.findByRole("heading", { name: "Void Gate" });
+    const detailView = detailHeading.closest(".card-detail-view");
+    expect(detailView).not.toBeNull();
+    expect(within(detailView as HTMLElement).getByText("Printings")).toBeInTheDocument();
+    expect(within(detailView as HTMLElement).getByText("OGN #1")).toBeInTheDocument();
+    expect(within(detailView as HTMLElement).queryByText("UNL #201")).not.toBeInTheDocument();
+    expect(within(detailView as HTMLElement).queryByText("Alt Art")).not.toBeInTheDocument();
   });
 
   it("shows the published near mint market price in the Quick View", async () => {
@@ -836,7 +903,7 @@ describe("App", () => {
 
     window.history.pushState({}, "", "/cards");
     render(<App />);
-    await screen.findByRole("heading", { name: "Card Search Results" });
+    await screen.findByRole("heading", { name: "Riftbound Card Search" });
 
     await submitCardsSearch(user, "name:void");
     await screen.findByAltText("Void Gate card image.");
@@ -857,7 +924,7 @@ describe("App", () => {
 
     window.history.pushState({}, "", "/cards");
     render(<App />);
-    await screen.findByRole("heading", { name: "Card Search Results" });
+    await screen.findByRole("heading", { name: "Riftbound Card Search" });
 
     await submitCardsSearch(user, "name:twin");
     await screen.findByAltText("Twin Paths card image.");
@@ -961,7 +1028,7 @@ describe("App", () => {
     const user = userEvent.setup();
     window.history.pushState({}, "", "/cards");
     render(<App />);
-    await screen.findByRole("heading", { name: "Card Search Results" });
+    await screen.findByRole("heading", { name: "Riftbound Card Search" });
 
     await submitCardsSearch(user, "energy>>3");
 
@@ -981,10 +1048,10 @@ describe("App", () => {
     await waitFor(() => {
       expect(window.location.pathname).toBe("/cards");
       expect(window.location.search).toBe("?q=name%3Avoid");
-      expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid+unique%3Aid");
+      expect(fetchMock).toHaveBeenCalledWith("/api/cards?q=name%3Avoid");
     });
 
-    expect(await screen.findByRole("heading", { name: "Card Search Results" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Riftbound Card Search" })).toBeInTheDocument();
     expect(screen.getByLabelText("Query")).toHaveValue("name:void");
     expect(await screen.findByAltText("Void Gate card image.")).toBeInTheDocument();
   });

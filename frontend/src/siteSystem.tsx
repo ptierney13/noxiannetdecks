@@ -1,4 +1,4 @@
-import { type FormEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { type FormEvent, type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { resolveDesktopHeaderStage, type DesktopHeaderStage } from "./headerLayout";
 
 export const heroBackgroundAsset = "/design-assets/hero-background.png";
@@ -292,7 +292,7 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
             label="Learn"
             title="Learn to Search"
             description="Open the query builder and learn the search language."
-            href="/cards/query-builder"
+            href="/cards/learn-to-search"
             onNavigate={onNavigate}
           />
         </div>
@@ -344,16 +344,21 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
   const [showMobileCardsMenu, setShowMobileCardsMenu] = useState(false);
   const [showMobileToolsMenu, setShowMobileToolsMenu] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (mode !== "desktop" || !desktopPreviewRef.current || typeof ResizeObserver === "undefined") {
       return;
     }
 
+    function updateHeaderStage(nextWidth: number) {
+      setDesktopHeaderStage((currentStage) => resolveDesktopHeaderStage(nextWidth, currentStage));
+    }
+
     const observer = new ResizeObserver((entries) => {
       const nextWidth = entries[0]?.contentRect.width ?? 0;
-      setDesktopHeaderStage(resolveDesktopHeaderStage(nextWidth));
+      updateHeaderStage(nextWidth);
     });
 
+    updateHeaderStage(desktopPreviewRef.current.getBoundingClientRect().width);
     observer.observe(desktopPreviewRef.current);
     return () => observer.disconnect();
   }, [mode]);
@@ -468,6 +473,7 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
               {showCardsMenu ? (
                 <div className="site-nav-tools-popover" role="menu" aria-label="Cards">
                   <button type="button" className="storybook-menu-item">Search</button>
+                  <button type="button" className="storybook-menu-item">Learn to Search</button>
                   <button type="button" className="storybook-menu-item">Query Builder</button>
                 </div>
               ) : null}
@@ -516,6 +522,7 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
                 <section className="nav-drawer-section" aria-labelledby="storybook-compact-cards-heading">
                   <p id="storybook-compact-cards-heading" className="nav-drawer-heading">Cards</p>
                   <button type="button" className="nav-drawer-link">Card Search</button>
+                  <button type="button" className="nav-drawer-link">Learn to Search</button>
                   <button type="button" className="nav-drawer-link">Query Builder</button>
                 </section>
                 <section className="nav-drawer-section" aria-labelledby="storybook-compact-explore-heading">
