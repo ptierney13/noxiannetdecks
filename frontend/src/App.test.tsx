@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
+import { router } from "./app/router";
 import type { CardRecord } from "./types";
 
 const DESKTOP_TEST_WIDTH = 1200;
@@ -1134,7 +1135,16 @@ describe("App", () => {
   });
 
   it("supports canonical tool routes on direct load", async () => {
-    window.history.pushState({}, "", "/tools/sealed-pools");
+    // Pre-navigate via the router (not window.history.pushState) so the singleton
+    // router has fully-resolved matches before the Transitioner mounts.  When
+    // pushState is used instead, the Transitioner's first tryLoad() runs inside
+    // React.startTransition (deferred/concurrent mode), and the brief window
+    // between setPending() and the deferred setMatches() can cause the
+    // sealed-pools MatchInner to suspend, unmounting SealedSimulator before
+    // findByRole can resolve.  Pre-navigating here means matchStores already
+    // contains the sealed-pools match at status:"success" on the first render.
+    await router.navigate({ to: "/tools/sealed-pools" });
+    router.stores.resolvedLocation.set(router.stores.location.get());
 
     render(<App />);
 

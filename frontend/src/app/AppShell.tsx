@@ -1,11 +1,5 @@
 import { type FormEvent, type MouseEvent, type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
-import {
-  buildCardsSearchPath,
-  normalizePathname,
-  parseAppRoute,
-  routeSection,
-  type AppRoute,
-} from "../routes";
+import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   resolveDesktopHeaderStage,
   resolveHeaderShellMode,
@@ -13,21 +7,22 @@ import {
   type HeaderShellMode,
 } from "../lib";
 import { ChevronIcon, MenuIcon, SearchIcon } from "../ui";
-import RouteRenderer from "./RouteRenderer";
+import { useAppErrorState } from "./ErrorContext";
+import { useHeaderSearch } from "./HeaderSearchContext";
 
-function ProjectNavLink({
+function NavLink({
   href,
-  current,
-  onNavigate,
   className,
-  children
+  children,
 }: {
   href: string;
-  current: boolean;
-  onNavigate: (href: string) => void;
   className?: string;
   children: ReactNode;
 }) {
+  const navigate = useNavigate();
+  const { location: { pathname } } = useRouterState();
+  const isCurrent = pathname === href || (href !== "/" && pathname.startsWith(href + "/"));
+
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {
     if (
       event.defaultPrevented ||
@@ -39,23 +34,40 @@ function ProjectNavLink({
     ) {
       return;
     }
-
     event.preventDefault();
-    onNavigate(href);
+    void navigate({ href });
   }
 
   return (
-    <a href={href} className={className} aria-current={current ? "page" : undefined} onClick={handleClick}>
+    <a
+      href={href}
+      className={className}
+      aria-current={isCurrent ? "page" : undefined}
+      onClick={handleClick}
+    >
       {children}
     </a>
   );
 }
 
+function resolveActiveSection(pathname: string) {
+  if (pathname === "/" || pathname === "/home") return "home";
+  if (pathname.startsWith("/deck-explorer")) return "deck-explorer";
+  if (pathname.startsWith("/cards")) return "cards";
+  if (pathname.startsWith("/tools/tier-list")) return "tools-tier-list";
+  if (pathname.startsWith("/tools/sealed-pools")) return "tools-sealed-pools";
+  if (pathname.startsWith("/tools/trade-balancer")) return "tools-trade-balancer";
+  return "not-found";
+}
+
 export default function AppShell() {
-  const [route, setRoute] = useState<AppRoute>(() => parseAppRoute(window.location.pathname));
-  const [locationSearch, setLocationSearch] = useState(() => window.location.search);
-  const [error, setError] = useState<string | null>(null);
-  const [headerSearchQuery, setHeaderSearchQuery] = useState("");
+  const navigate = useNavigate();
+  const routerState = useRouterState();
+  const pathname = routerState.location.pathname;
+  const searchStr = routerState.location.searchStr;
+  const error = useAppErrorState();
+
+  const { query: headerSearchQuery, setQuery: setHeaderSearchQuery } = useHeaderSearch();
   const [showToolsMenu, setShowToolsMenu] = useState(false);
   const toolsMenuRef = useRef<HTMLDivElement | null>(null);
   const [showCardsMenu, setShowCardsMenu] = useState(false);
@@ -69,21 +81,11 @@ export default function AppShell() {
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    function handlePopState() {
-      setRoute(parseAppRoute(window.location.pathname));
-      setLocationSearch(window.location.search);
-      setError(null);
-      setShowToolsMenu(false);
-      setShowCardsMenu(false);
-      setShowCompactMenu(false);
-      setShowMobileMenu(false);
-    }
-
-    window.addEventListener("popstate", handlePopState);
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, []);
+    setShowToolsMenu(false);
+    setShowCardsMenu(false);
+    setShowCompactMenu(false);
+    setShowMobileMenu(false);
+  }, [pathname]);
 
   useLayoutEffect(() => {
     if (!headerShellRef.current || typeof ResizeObserver === "undefined") {
@@ -139,44 +141,24 @@ export default function AppShell() {
   }, []);
 
   useEffect(() => {
-    if (route.kind === "cards") {
-      setHeaderSearchQuery(new URLSearchParams(locationSearch).get("q") ?? "");
+    if (pathname === "/cards") {
+      setHeaderSearchQuery(new URLSearchParams(searchStr).get("q") ?? "");
       return;
     }
-
-    if (route.kind === "home") {
+    if (pathname === "/") {
       setHeaderSearchQuery("");
     }
-  }, [locationSearch, route.kind]);
+  }, [pathname, searchStr]);
 
-  function navigate(nextPath: string) {
-    const normalizedPath = normalizePathname(nextPath.split("?")[0]);
-    const search = nextPath.includes("?") ? nextPath.slice(nextPath.indexOf("?")) : "";
-    const fullPath = normalizedPath + search;
-
-    if (fullPath !== window.location.pathname + window.location.search) {
-      window.history.pushState({}, "", fullPath);
-      setRoute(parseAppRoute(normalizedPath));
-      setLocationSearch(search);
-    }
-
-    setError(null);
-    setShowToolsMenu(false);
-    setShowCardsMenu(false);
-    setShowCompactMenu(false);
-    setShowMobileMenu(false);
-  }
-
-  function handleAppendToSearch(fragment: string) {
-    setHeaderSearchQuery((prev) => prev ? `${prev} ${fragment}` : fragment);
-  }
-
-  const activeSection = routeSection(route);
+  const activeSection = resolveActiveSection(pathname);
   const useCompactInlineHeader = desktopHeaderStage === "compact" || desktopHeaderStage === "search";
 
   function handleHeaderSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    navigate(buildCardsSearchPath(headerSearchQuery));
+    void navigate({
+      to: "/cards",
+      search: { q: headerSearchQuery.trim() || undefined },
+    });
   }
 
   return (
@@ -190,7 +172,7 @@ export default function AppShell() {
           <button
             type="button"
             className="site-nav-brand"
-            onClick={() => navigate("/")}
+            onClick={() => void navigate({ to: "/" })}
             aria-label="Noxian Netdecks home"
           >
             <div className="site-nav-logo">N</div>
@@ -237,25 +219,24 @@ export default function AppShell() {
                 </button>
                 {showCardsMenu ? (
                   <div className="site-nav-tools-popover" role="menu" aria-label="Cards">
-                    <ProjectNavLink className="site-nav-menu-item" href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
+                    <NavLink className="site-nav-menu-item" href="/cards">
                       Search
-                    </ProjectNavLink>
-                    <ProjectNavLink className="site-nav-menu-item" href="/cards/learn-to-search" current={route.kind === "cards-learn-to-search"} onNavigate={navigate}>
+                    </NavLink>
+                    <NavLink className="site-nav-menu-item" href="/cards/learn-to-search">
                       Learn to Search
-                    </ProjectNavLink>
-                    <ProjectNavLink className="site-nav-menu-item" href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
+                    </NavLink>
+                    <NavLink className="site-nav-menu-item" href="/cards/query-builder">
                       Query Builder
-                    </ProjectNavLink>
+                    </NavLink>
                   </div>
                 ) : null}
               </div>
-              <ProjectNavLink
+              <NavLink
                 href="/deck-explorer"
-                current={activeSection === "deck-explorer"}
-                onNavigate={navigate}
+                className={`site-nav-link${activeSection === "deck-explorer" ? " active" : ""}`}
               >
-                <span className={`site-nav-link${activeSection === "deck-explorer" ? " active" : ""}`}>Deck Explorer</span>
-              </ProjectNavLink>
+                Deck Explorer
+              </NavLink>
               <div className="site-nav-tools-menu" ref={toolsMenuRef}>
                 <button
                   type="button"
@@ -273,15 +254,15 @@ export default function AppShell() {
                 </button>
                 {showToolsMenu ? (
                   <div className="site-nav-tools-popover" role="menu" aria-label="Tools">
-                    <ProjectNavLink className="site-nav-menu-item" href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
+                    <NavLink className="site-nav-menu-item" href="/tools/tier-list">
                       Tier List Generator
-                    </ProjectNavLink>
-                    <ProjectNavLink className="site-nav-menu-item" href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
+                    </NavLink>
+                    <NavLink className="site-nav-menu-item" href="/tools/sealed-pools">
                       Sealed Simulator
-                    </ProjectNavLink>
-                    <ProjectNavLink className="site-nav-menu-item" href="/tools/trade-balancer" current={activeSection === "tools-trade-balancer"} onNavigate={navigate}>
+                    </NavLink>
+                    <NavLink className="site-nav-menu-item" href="/tools/trade-balancer">
                       Trade Balancer
-                    </ProjectNavLink>
+                    </NavLink>
                   </div>
                 ) : null}
               </div>
@@ -305,33 +286,33 @@ export default function AppShell() {
                 <div className="site-nav-compact-popover" role="menu" aria-label="Compact navigation">
                   <section className="nav-drawer-section" aria-labelledby="compact-nav-cards-heading">
                     <p id="compact-nav-cards-heading" className="nav-drawer-heading">Cards</p>
-                    <ProjectNavLink href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
+                    <NavLink href="/cards">
                       <span className="nav-drawer-link">Card Search</span>
-                    </ProjectNavLink>
-                    <ProjectNavLink href="/cards/learn-to-search" current={route.kind === "cards-learn-to-search"} onNavigate={navigate}>
+                    </NavLink>
+                    <NavLink href="/cards/learn-to-search">
                       <span className="nav-drawer-link">Learn to Search</span>
-                    </ProjectNavLink>
-                    <ProjectNavLink href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
+                    </NavLink>
+                    <NavLink href="/cards/query-builder">
                       <span className="nav-drawer-link">Query Builder</span>
-                    </ProjectNavLink>
+                    </NavLink>
                   </section>
                   <section className="nav-drawer-section" aria-labelledby="compact-nav-explore-heading">
                     <p id="compact-nav-explore-heading" className="nav-drawer-heading">Explore</p>
-                    <ProjectNavLink href="/deck-explorer" current={activeSection === "deck-explorer"} onNavigate={navigate}>
+                    <NavLink href="/deck-explorer">
                       <span className="nav-drawer-link">Deck Explorer</span>
-                    </ProjectNavLink>
+                    </NavLink>
                   </section>
                   <section className="nav-drawer-section" aria-labelledby="compact-nav-tools-heading">
                     <p id="compact-nav-tools-heading" className="nav-drawer-heading">Tools</p>
-                    <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
+                    <NavLink href="/tools/sealed-pools">
                       <span className="nav-drawer-link">Sealed Simulator</span>
-                    </ProjectNavLink>
-                    <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
+                    </NavLink>
+                    <NavLink href="/tools/tier-list">
                       <span className="nav-drawer-link">Tier List Generator</span>
-                    </ProjectNavLink>
-                    <ProjectNavLink href="/tools/trade-balancer" current={activeSection === "tools-trade-balancer"} onNavigate={navigate}>
+                    </NavLink>
+                    <NavLink href="/tools/trade-balancer">
                       <span className="nav-drawer-link">Trade Balancer</span>
-                    </ProjectNavLink>
+                    </NavLink>
                   </section>
                 </div>
               ) : null}
@@ -345,7 +326,7 @@ export default function AppShell() {
             <button
               type="button"
               className="site-nav-brand"
-              onClick={() => navigate("/")}
+              onClick={() => void navigate({ to: "/" })}
               aria-label="Noxian Netdecks home"
             >
               <div className="site-nav-logo">N</div>
@@ -395,33 +376,33 @@ export default function AppShell() {
                 <div className="nav-drawer-links">
                   <section className="nav-drawer-section" aria-labelledby="mobile-nav-cards-heading">
                     <p id="mobile-nav-cards-heading" className="nav-drawer-heading">Cards</p>
-                    <ProjectNavLink href="/cards" current={route.kind === "cards"} onNavigate={navigate}>
+                    <NavLink href="/cards">
                       <span className="nav-drawer-link">Card Search</span>
-                    </ProjectNavLink>
-                    <ProjectNavLink href="/cards/learn-to-search" current={route.kind === "cards-learn-to-search"} onNavigate={navigate}>
+                    </NavLink>
+                    <NavLink href="/cards/learn-to-search">
                       <span className="nav-drawer-link">Learn to Search</span>
-                    </ProjectNavLink>
-                    <ProjectNavLink href="/cards/query-builder" current={route.kind === "cards-query-builder"} onNavigate={navigate}>
+                    </NavLink>
+                    <NavLink href="/cards/query-builder">
                       <span className="nav-drawer-link">Query Builder</span>
-                    </ProjectNavLink>
+                    </NavLink>
                   </section>
                   <section className="nav-drawer-section" aria-labelledby="mobile-nav-explore-heading">
                     <p id="mobile-nav-explore-heading" className="nav-drawer-heading">Explore</p>
-                    <ProjectNavLink href="/deck-explorer" current={activeSection === "deck-explorer"} onNavigate={navigate}>
+                    <NavLink href="/deck-explorer">
                       <span className="nav-drawer-link">Deck Explorer</span>
-                    </ProjectNavLink>
+                    </NavLink>
                   </section>
                   <section className="nav-drawer-section" aria-labelledby="mobile-nav-tools-heading">
                     <p id="mobile-nav-tools-heading" className="nav-drawer-heading">Tools</p>
-                    <ProjectNavLink href="/tools/sealed-pools" current={activeSection === "tools-sealed-pools"} onNavigate={navigate}>
+                    <NavLink href="/tools/sealed-pools">
                       <span className="nav-drawer-link">Sealed Simulator</span>
-                    </ProjectNavLink>
-                    <ProjectNavLink href="/tools/tier-list" current={activeSection === "tools-tier-list"} onNavigate={navigate}>
+                    </NavLink>
+                    <NavLink href="/tools/tier-list">
                       <span className="nav-drawer-link">Tier List Generator</span>
-                    </ProjectNavLink>
-                    <ProjectNavLink href="/tools/trade-balancer" current={activeSection === "tools-trade-balancer"} onNavigate={navigate}>
+                    </NavLink>
+                    <NavLink href="/tools/trade-balancer">
                       <span className="nav-drawer-link">Trade Balancer</span>
-                    </ProjectNavLink>
+                    </NavLink>
                   </section>
                 </div>
               </div>
@@ -430,14 +411,12 @@ export default function AppShell() {
           </div>
         ) : null}
       </header>
-      {error ? <div className="error-banner">{error}</div> : null}
-      <RouteRenderer
-        route={route}
-        locationSearch={locationSearch}
-        onError={setError}
-        onNavigate={navigate}
-        onAppendToSearch={handleAppendToSearch}
-      />
+      {error ? (
+        <div className="mt-[18px] rounded-2xl border border-[var(--color-negative-border)] bg-[var(--color-negative-soft)] text-[var(--color-text-primary)] px-4 py-[14px]">
+          {error}
+        </div>
+      ) : null}
+      <Outlet />
     </>
   );
 }

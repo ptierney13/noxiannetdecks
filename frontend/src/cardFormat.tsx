@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState, type MouseEvent, type ReactNode } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import {
+  buildCardDetailPath,
   buildTcgplayerAffiliateSearchLink,
   formatPrintingLabel,
   formatUsdPrice,
@@ -9,7 +11,6 @@ import {
   usePublishedPriceIndex,
   type PublishedPriceRow,
 } from "./lib";
-import { buildCardDetailPath } from "./routes";
 import type { CardRecord } from "./types";
 
 export function cardEnergy(card: CardRecord): number | null {
@@ -385,12 +386,11 @@ export function PriceHistoryChart({ rows, colorsByRowId }: { rows: PublishedPric
 export function CardQuickLookModal({
   card,
   onClose,
-  onNavigate
 }: {
   card: CardRecord;
   onClose: () => void;
-  onNavigate: (path: string) => void;
 }) {
+  const navigate = useNavigate();
   const { index: publishedPriceIndex } = usePublishedPriceIndex();
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -406,7 +406,7 @@ export function CardQuickLookModal({
 
   function handleViewDetails() {
     onClose();
-    onNavigate(buildCardDetailPath(card.id));
+    navigate({ href: buildCardDetailPath(card.id) });
   }
 
   const priceRows = useMemo(

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { searchCards } from "./api";
+import { CardQuickLookModal } from "./cardFormat";
 import {
   formatUsdPrice,
   getPublishedRowsForCard,
@@ -8,8 +9,7 @@ import {
   type PublishedPriceIndex,
   type PublishedPriceRow,
 } from "./lib";
-import { buildCardDetailPath } from "./routes";
-import { useDebounce } from "./lib";
+import { buildCardDetailPath, useDebounce } from "./lib";
 import type { CardRecord } from "./types";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -368,7 +368,7 @@ function TradeCardBar({
 
 // ── Main view ──────────────────────────────────────────────────────────────
 
-export default function TradeBalancerView({ onNavigate, onQuickLook }: { onNavigate: (path: string) => void; onQuickLook: (card: CardRecord) => void }) {
+export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: string) => void }) {
   const { index: priceIndex } = usePublishedPriceIndex();
 
   const [mine, setMine] = useState<TradeItem[]>([]);
@@ -383,6 +383,7 @@ export default function TradeBalancerView({ onNavigate, onQuickLook }: { onNavig
 
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [quickLookCard, setQuickLookCard] = useState<CardRecord | null>(null);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -638,6 +639,7 @@ export default function TradeBalancerView({ onNavigate, onQuickLook }: { onNavig
 
   // ── Render ──
   return (
+    <>
     <div className={`trade-page${searchFocused ? " trade-page--search-open" : ""}`}>
 
       {/* Mobile compact total strip — only visible when search is open */}
@@ -689,7 +691,7 @@ export default function TradeBalancerView({ onNavigate, onQuickLook }: { onNavig
                 onDragStart={() => handleDragStart(item.key, "mine")}
                 onDragEnd={handleDragEnd}
                 onNavigate={onNavigate}
-                onQuickLook={onQuickLook}
+                onQuickLook={setQuickLookCard}
               />
             ))
           )}
@@ -736,7 +738,7 @@ export default function TradeBalancerView({ onNavigate, onQuickLook }: { onNavig
                 onDragStart={() => handleDragStart(item.key, "yours")}
                 onDragEnd={handleDragEnd}
                 onNavigate={onNavigate}
-                onQuickLook={onQuickLook}
+                onQuickLook={setQuickLookCard}
               />
             ))
           )}
@@ -776,7 +778,10 @@ export default function TradeBalancerView({ onNavigate, onQuickLook }: { onNavig
           ? `You're offering ${formatUsdPrice(Math.abs(delta))} more`
           : `You're offering ${formatUsdPrice(Math.abs(delta))} less`}
       </div>
-
     </div>
+    {quickLookCard && (
+      <CardQuickLookModal card={quickLookCard} onClose={() => setQuickLookCard(null)} />
+    )}
+  </>
   );
 }

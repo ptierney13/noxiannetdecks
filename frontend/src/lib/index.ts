@@ -1,5 +1,13 @@
 export { useDebounce } from "./useDebounce";
 export {
+  buildCardDetailPath,
+  buildCardsSearchPath,
+  buildDeckExplorerEventPath,
+  buildDeckExplorerEventDeckPath,
+  buildDeckExplorerDeckPath,
+  buildDeckExplorerLegendPath,
+} from "./pathBuilders";
+export {
   usePublishedPriceIndex,
   loadPublishedPriceIndex,
   loadPublishedPriceIndexForPath,

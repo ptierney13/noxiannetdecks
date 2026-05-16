@@ -3,17 +3,19 @@ import { loadQueryFeatures } from "./api";
 import { CardSearchGuide } from "./CardSearchGuide";
 import { LtsDetailOverlay, type LtsDetailItem } from "./LtsDetailOverlay";
 import { QueryChip } from "./ui";
+import { useAppError } from "./app/ErrorContext";
+import { useHeaderSearch } from "./app/HeaderSearchContext";
 import type { QueryFieldGuide, QuerySyntaxGuide } from "./types";
 
 type LearnTab = "visual-guide" | "text-guide" | "syntax-guide";
 
-export default function LearnToSearchView({
-  onError,
-  onAppendToSearch,
-}: {
-  onError: (message: string | null) => void;
-  onAppendToSearch: (fragment: string) => void;
-}) {
+export default function LearnToSearchView() {
+  const setError = useAppError();
+  const { appendQuery } = useHeaderSearch();
+
+  function onAppendToSearch(fragment: string) {
+    appendQuery(fragment);
+  }
   const [activeTab, setActiveTab] = useState<LearnTab>("visual-guide");
   const [fieldGuides, setFieldGuides] = useState<QueryFieldGuide[]>([]);
   const [syntaxGuides, setSyntaxGuides] = useState<QuerySyntaxGuide[]>([]);
@@ -31,7 +33,7 @@ export default function LearnToSearchView({
         }
       } catch (caught) {
         if (!ignore) {
-          onError(caught instanceof Error ? caught.message : "Unable to load query features.");
+          setError(caught instanceof Error ? caught.message : "Unable to load query features.");
         }
       }
     }
@@ -40,7 +42,7 @@ export default function LearnToSearchView({
     return () => {
       ignore = true;
     };
-  }, [onError]);
+  }, [setError]);
 
   function fieldToDetail(field: QueryFieldGuide): LtsDetailItem {
     return {

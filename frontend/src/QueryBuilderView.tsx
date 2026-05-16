@@ -1,8 +1,5 @@
 import { useMemo, useState } from "react";
-
-type Props = {
-  onNavigate: (nextPath: string) => void;
-};
+import { useNavigate } from "@tanstack/react-router";
 
 const DOMAIN_ORDER = ["Fury", "Calm", "Mind", "Body", "Chaos", "Order"] as const;
 const CARD_TYPES = ["Unit", "Spell", "Gear", "Rune", "Battlefield", "Legend"] as const;
@@ -114,7 +111,8 @@ function TextField({ label, hint, placeholder, value, onChange }: TextFieldProps
   );
 }
 
-export default function QueryBuilderView({ onNavigate }: Props) {
+export default function QueryBuilderView() {
+  const navigate = useNavigate();
   const [selectedTypes, setSelectedTypes] = useState<Set<string>>(new Set());
   const [selectedSupertypes, setSelectedSupertypes] = useState<Set<string>>(new Set());
   const [selectedDomains, setSelectedDomains] = useState<Set<string>>(new Set());
@@ -176,7 +174,7 @@ export default function QueryBuilderView({ onNavigate }: Props) {
 
   function handleSearch() {
     const trimmed = builtQuery.trim();
-    onNavigate(trimmed ? `/cards?q=${encodeURIComponent(trimmed)}` : "/cards");
+    navigate({ to: "/cards", search: { q: trimmed || undefined } });
   }
 
   return (

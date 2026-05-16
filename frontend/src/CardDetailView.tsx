@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { getCard, searchCards } from "./api";
 import {
   formatCostText,
@@ -12,6 +13,7 @@ import {
   renderTokenizedText,
 } from "./cardFormat";
 import {
+  buildCardDetailPath,
   buildTcgplayerAffiliateLink,
   formatUsdPrice,
   getPublishedRowsForCard,
@@ -19,18 +21,12 @@ import {
   resolveNearMintMarketPrice,
   usePublishedPriceIndex,
 } from "./lib";
-import { buildCardDetailPath } from "./routes";
+import { useAppError } from "./app/ErrorContext";
 import type { CardRecord } from "./types";
 
-export default function CardDetailView({
-  cardId,
-  onError,
-  onNavigate
-}: {
-  cardId: string;
-  onError: (message: string | null) => void;
-  onNavigate: (path: string) => void;
-}) {
+export default function CardDetailView({ cardId }: { cardId: string }) {
+  const navigate = useNavigate();
+  const setError = useAppError();
   const [card, setCard] = useState<CardRecord | null>(null);
   const [allPrintings, setAllPrintings] = useState<CardRecord[]>([]);
   const [selectedPriceRowIds, setSelectedPriceRowIds] = useState<string[]>([]);
@@ -47,7 +43,7 @@ export default function CardDetailView({
     setSelectedPriceRowIds([]);
     priceSeriesColorsRef.current = {};
     nextPriceSeriesColorIndexRef.current = 0;
-    onError(null);
+    setError(null);
 
     async function load() {
       try {
@@ -71,7 +67,7 @@ export default function CardDetailView({
           }
         }
       } catch (caught) {
-        if (!ignore) onError(caught instanceof Error ? caught.message : "Failed to load card.");
+        if (!ignore) setError(caught instanceof Error ? caught.message : "Failed to load card.");
       } finally {
         if (!ignore) setLoading(false);
       }
@@ -79,7 +75,7 @@ export default function CardDetailView({
 
     void load();
     return () => { ignore = true; };
-  }, [cardId, onError]);
+  }, [cardId, setError]);
 
   const apiUrl = card ? `/api/cards/${encodeURIComponent(card.id)}` : "";
   const currentPriceRows = useMemo(
@@ -177,7 +173,7 @@ export default function CardDetailView({
   return (
     <section className="card-detail-view">
       <nav className="card-detail-breadcrumb">
-        <button type="button" className="text-button" onClick={() => onNavigate("/cards")}>
+        <button type="button" className="text-button" onClick={() => navigate({ href: "/cards" })}>
           ← Card Search
         </button>
       </nav>
@@ -237,7 +233,7 @@ export default function CardDetailView({
                       onClick={(event) => {
                         if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
                         event.preventDefault();
-                        onNavigate(href);
+                        navigate({ href });
                       }}
                     >
                       <span className="card-detail-version-set">{r.cardRec.set.set_id} #{r.cardRec.collector_number ?? "?"}</span>

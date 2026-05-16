@@ -1,23 +1,31 @@
 import { useEffect, useMemo, useState, type MouseEvent, type ReactNode } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { searchCards } from "./api";
 import { manualDeckExplorerEvents, type ManualEventDeckRecord, type ManualEventRecord } from "./deck-explorer/manualData";
 import {
-  type AppRoute,
   buildDeckExplorerDeckPath,
   buildDeckExplorerEventDeckPath,
   buildDeckExplorerEventPath,
-  buildDeckExplorerLegendPath
-} from "./routes";
+  buildDeckExplorerLegendPath,
+} from "./lib";
+import { useAppError } from "./app/ErrorContext";
 import type { CardRecord } from "./types";
 
 const domainOrder = ["Fury", "Calm", "Mind", "Body", "Chaos", "Order"] as const;
 const setOrder = ["OGN", "SFD", "UNL"] as const;
 const manualDataPath = "frontend/src/deck-explorer/manualData.ts";
 
+export type DeckExplorerSection =
+  | { kind: "home" }
+  | { kind: "events" }
+  | { kind: "event"; eventId: string }
+  | { kind: "event-deck"; eventId: string; deckId: string }
+  | { kind: "deck"; deckId: string }
+  | { kind: "legends" }
+  | { kind: "legend"; legendSlug: string };
+
 type DeckExplorerViewProps = {
-  route: AppRoute;
-  onError: (message: string | null) => void;
-  onNavigate: (path: string) => void;
+  section: DeckExplorerSection;
 };
 
 type IndexedDeckRecord = ManualEventDeckRecord & {
@@ -98,15 +106,15 @@ function RouteLink({
   href,
   current = false,
   className,
-  onNavigate,
   children
 }: {
   href: string;
   current?: boolean;
   className?: string;
-  onNavigate: (path: string) => void;
   children: ReactNode;
 }) {
+  const navigate = useNavigate();
+
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {
     if (
       event.defaultPrevented ||
@@ -120,7 +128,7 @@ function RouteLink({
     }
 
     event.preventDefault();
-    onNavigate(href);
+    navigate({ href });
   }
 
   return (
@@ -142,7 +150,8 @@ function EmptyState({ title, body }: { title: string; body: string }) {
   );
 }
 
-export default function DeckExplorerView({ route, onError, onNavigate }: DeckExplorerViewProps) {
+export default function DeckExplorerView({ section }: DeckExplorerViewProps) {
+  const setError = useAppError();
   const [legendCards, setLegendCards] = useState<CardRecord[]>([]);
   const [isLoadingLegends, setIsLoadingLegends] = useState(true);
 
@@ -159,13 +168,13 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
         }
 
         setLegendCards(response.items);
-        onError(null);
+        setError(null);
       } catch (caught) {
         if (ignore) {
           return;
         }
 
-        onError(caught instanceof Error ? caught.message : "Failed to load legend catalog.");
+        setError(caught instanceof Error ? caught.message : "Failed to load legend catalog.");
       } finally {
         if (!ignore) {
           setIsLoadingLegends(false);
@@ -178,7 +187,7 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
     return () => {
       ignore = true;
     };
-  }, [onError]);
+  }, [setError]);
 
   const indexedDecks = useMemo<IndexedDeckRecord[]>(() => {
     return manualDeckExplorerEvents
@@ -263,28 +272,28 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
   const deckById = useMemo(() => new Map(indexedDecks.map((deck) => [deck.id, deck])), [indexedDecks]);
   const eventById = useMemo(() => new Map(manualDeckExplorerEvents.map((event) => [event.id, event])), []);
 
-  const activeLegend = route.kind === "deck-explorer-legend"
-    ? legends.find((legend) => legend.slug === route.legendSlug) ?? null
+  const activeLegend = section.kind === "legend"
+    ? legends.find((legend) => legend.slug === section.legendSlug) ?? null
     : null;
   const activeLegendDecks = activeLegend
     ? indexedDecks.filter((deck) => deck.legendSlug === activeLegend.slug)
     : [];
 
-  const activeEvent = route.kind === "deck-explorer-event" || route.kind === "deck-explorer-event-deck"
-    ? eventById.get(route.eventId) ?? null
+  const activeEvent = (section.kind === "event" || section.kind === "event-deck")
+    ? eventById.get(section.eventId) ?? null
     : null;
 
-  const activeDeck = route.kind === "deck-explorer-deck" || route.kind === "deck-explorer-event-deck"
-    ? deckById.get(route.deckId) ?? null
+  const activeDeck = (section.kind === "deck" || section.kind === "event-deck")
+    ? deckById.get(section.deckId) ?? null
     : null;
 
-  const activeSection = route.kind.startsWith("deck-explorer-event")
+  const activeSection = (section.kind === "event" || section.kind === "event-deck")
     ? "events"
-    : route.kind.startsWith("deck-explorer-legend")
+    : section.kind === "legend"
       ? "legends"
-      : route.kind === "deck-explorer-home"
+      : section.kind === "home"
         ? "home"
-        : route.kind === "deck-explorer-deck"
+        : section.kind === "deck"
           ? "events"
           : "home";
 
@@ -319,11 +328,11 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
         </section>
 
         <div className="deck-explorer-choice-grid">
-          <RouteLink href="/deck-explorer/events" className="deck-explorer-choice" onNavigate={onNavigate}>
+          <RouteLink href="/deck-explorer/events" className="deck-explorer-choice">
             <strong>By Event</strong>
             <span>See the events you have imported and drill into placements, players, and linked decks.</span>
           </RouteLink>
-          <RouteLink href="/deck-explorer/legends" className="deck-explorer-choice" onNavigate={onNavigate}>
+          <RouteLink href="/deck-explorer/legends" className="deck-explorer-choice">
             <strong>By Legend</strong>
             <span>Browse every legend by set and color, then open detail pages for whichever ones you are tracking.</span>
           </RouteLink>
@@ -351,8 +360,7 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
                 key={event.id}
                 href={buildDeckExplorerEventPath(event.id)}
                 className="deck-explorer-list-item"
-                onNavigate={onNavigate}
-              >
+                  >
                 <div>
                   <strong>{event.name}</strong>
                   <span>{formatDate(event.startDate)}</span>
@@ -418,8 +426,7 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
                 {deck.status === "available" ? (
                   <RouteLink
                     href={buildDeckExplorerEventDeckPath(activeEvent.id, deck.id)}
-                    onNavigate={onNavigate}
-                  >
+                                     >
                     {deck.deckName ?? "Untitled deck"}
                   </RouteLink>
                 ) : (
@@ -455,11 +462,11 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
           </p>
         </div>
         <div className="deck-explorer-detail-meta">
-          <RouteLink href={buildDeckExplorerLegendPath(activeDeck.legendSlug)} onNavigate={onNavigate}>
+          <RouteLink href={buildDeckExplorerLegendPath(activeDeck.legendSlug)}>
             {activeDeck.legendName}
           </RouteLink>
           {activeDeck.event ? (
-            <RouteLink href={buildDeckExplorerEventPath(activeDeck.event.id)} onNavigate={onNavigate}>
+            <RouteLink href={buildDeckExplorerEventPath(activeDeck.event.id)}>
               Back to event
             </RouteLink>
           ) : null}
@@ -515,8 +522,7 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
                     key={legend.slug}
                     href={buildDeckExplorerLegendPath(legend.slug)}
                     className="legend-card"
-                    onNavigate={onNavigate}
-                  >
+                                     >
                     <strong>{legend.name}</strong>
                     <span>{legend.primaryDomain ?? "Color pending"}</span>
                     <span>{legendCounts.get(legend.slug) ?? 0} linked entries</span>
@@ -563,7 +569,7 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
                 : buildDeckExplorerEventPath(deck.event.id);
 
               return (
-                <RouteLink key={deck.id} href={href} className="deck-explorer-list-item" onNavigate={onNavigate}>
+                <RouteLink key={deck.id} href={href} className="deck-explorer-list-item">
                   <div>
                     <strong>{deck.deckName ?? deck.event.name}</strong>
                     <span>{deck.playerName ?? "Unknown player"}</span>
@@ -582,19 +588,19 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
   }
 
   function renderCurrentRoute() {
-    switch (route.kind) {
-      case "deck-explorer-home":
+    switch (section.kind) {
+      case "home":
         return renderHome();
-      case "deck-explorer-events":
+      case "events":
         return renderEventsIndex();
-      case "deck-explorer-event":
+      case "event":
         return renderEventDetail();
-      case "deck-explorer-event-deck":
-      case "deck-explorer-deck":
+      case "event-deck":
+      case "deck":
         return renderDeckDetail();
-      case "deck-explorer-legends":
+      case "legends":
         return renderLegendsIndex();
-      case "deck-explorer-legend":
+      case "legend":
         return renderLegendDetail();
       default:
         return null;
@@ -608,7 +614,6 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
           href="/deck-explorer/events"
           current={activeSection === "events"}
           className="view-tab-link"
-          onNavigate={onNavigate}
         >
           By Event
         </RouteLink>
@@ -616,7 +621,6 @@ export default function DeckExplorerView({ route, onError, onNavigate }: DeckExp
           href="/deck-explorer/legends"
           current={activeSection === "legends"}
           className="view-tab-link"
-          onNavigate={onNavigate}
         >
           By Legend
         </RouteLink>

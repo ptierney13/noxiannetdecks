@@ -2,6 +2,7 @@ import { type CSSProperties, type FormEvent, type PointerEvent, type ReactNode, 
 import { generateSealedPool, loadPackGeneratorOptions } from "./api";
 import { cardEnergy } from "./cardFormat";
 import { CardsIcon } from "./ui";
+import { useAppError } from "./app/ErrorContext";
 import type {
   CardRecord,
   GeneratedPoolCard,
@@ -839,7 +840,8 @@ function PreRiftSeedMenu({
   );
 }
 
-export default function SealedSimulator({ onError }: { onError: (message: string | null) => void }) {
+export default function SealedSimulator() {
+  const setError = useAppError();
   const [options, setOptions] = useState<PackGeneratorOptions | null>(null);
   const [sealedMode, setSealedMode] = useState<SealedMode>("pre-rift-UNL");
   const [seededPackId, setSeededPackId] = useState("random");
@@ -890,7 +892,7 @@ export default function SealedSimulator({ onError }: { onError: (message: string
         const loadedOptions = await loadPackGeneratorOptions();
         if (!ignore) setOptions(loadedOptions);
       } catch (caught) {
-        if (!ignore) onError(caught instanceof Error ? caught.message : "Unable to load pack generator.");
+        if (!ignore) setError(caught instanceof Error ? caught.message : "Unable to load pack generator.");
       }
     }
 
@@ -899,7 +901,7 @@ export default function SealedSimulator({ onError }: { onError: (message: string
     return () => {
       ignore = true;
     };
-  }, [onError]);
+  }, [setError]);
 
   useEffect(() => {
     setSeededPackId("random");
@@ -924,7 +926,7 @@ export default function SealedSimulator({ onError }: { onError: (message: string
 
   async function newPool() {
     setIsGenerating(true);
-    onError(null);
+    setError(null);
 
     try {
       const generated = await generateSealedPool(requestForMode());
@@ -938,7 +940,7 @@ export default function SealedSimulator({ onError }: { onError: (message: string
       setIsSnapshotDialogOpen(false);
       setSnapshotName("");
     } catch (caught) {
-      onError(caught instanceof Error ? caught.message : "Pool generation failed.");
+      setError(caught instanceof Error ? caught.message : "Pool generation failed.");
     } finally {
       setIsGenerating(false);
     }

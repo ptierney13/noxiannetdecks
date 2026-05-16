@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { loadQueryFeatures, searchCards } from "./api";
 import { CardSearchGuide } from "./CardSearchGuide";
 import {
@@ -9,7 +10,7 @@ import {
   renderTokenizedText,
 } from "./cardFormat";
 import { SearchIcon } from "./ui";
-import { normalizePathname } from "./routes";
+import { useAppError } from "./app/ErrorContext";
 import type { CardRecord, QueryDiagnostic, QueryFieldGuide, QuerySyntaxGuide } from "./types";
 
 type SortKey = "energy-asc" | "energy-desc" | "name-asc" | "name-desc" | "set";
@@ -233,15 +234,10 @@ function CardGrid({ cards, onCardClick }: { cards: CardRecord[]; onCardClick?: (
   );
 }
 
-export default function SearchView({
-  onError,
-  locationSearch,
-  onNavigate
-}: {
-  onError: (message: string | null) => void;
-  locationSearch: string;
-  onNavigate: (nextPath: string) => void;
-}) {
+export default function SearchView() {
+  const navigate = useNavigate();
+  const setError = useAppError();
+  const { q: searchParamQuery = "" } = useSearch({ from: "/cards" });
   const [query, setQuery] = useState("");
   const [cards, setCards] = useState<CardRecord[]>([]);
   const [diagnostics, setDiagnostics] = useState<QueryDiagnostic[]>([]);
@@ -251,11 +247,10 @@ export default function SearchView({
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [quickLookCard, setQuickLookCard] = useState<CardRecord | null>(null);
-  const searchParamQuery = new URLSearchParams(locationSearch).get("q") ?? "";
 
   async function runSearch(nextQuery: string) {
     setIsSearching(true);
-    onError(null);
+    setError(null);
     setHasSearched(true);
     try {
       const result = await searchCards(nextQuery);
@@ -263,7 +258,7 @@ export default function SearchView({
       setDiagnostics(result.diagnostics);
       setNormalizedQuery(result.normalizedQuery);
     } catch (caught) {
-      onError(caught instanceof Error ? caught.message : "Search failed.");
+      setError(caught instanceof Error ? caught.message : "Search failed.");
     } finally {
       setIsSearching(false);
     }
@@ -281,7 +276,7 @@ export default function SearchView({
         }
       } catch (caught) {
         if (!ignore) {
-          onError(caught instanceof Error ? caught.message : "Unable to load card search.");
+          setError(caught instanceof Error ? caught.message : "Unable to load card search.");
         }
       }
     }
@@ -291,13 +286,23 @@ export default function SearchView({
     return () => {
       ignore = true;
     };
-  }, [onError]);
+  }, [setError]);
 
   useEffect(() => {
     let ignore = false;
 
     setQuery(searchParamQuery);
-    onError(null);
+    setError(null);
+
+    // Guard against stale router state: if the router's resolved search param
+    // doesn't match window.location yet (concurrent-mode speculative render),
+    // skip the auto-search to avoid a flash of isSearching=true.
+    const windowQ = new URLSearchParams(window.location.search).get("q") ?? "";
+    if (searchParamQuery !== windowQ) {
+      return () => {
+        ignore = true;
+      };
+    }
 
     if (searchParamQuery.trim().length === 0) {
       setCards([]);
@@ -324,7 +329,7 @@ export default function SearchView({
         setNormalizedQuery(result.normalizedQuery);
       } catch (caught) {
         if (!ignore) {
-          onError(caught instanceof Error ? caught.message : "Search failed.");
+          setError(caught instanceof Error ? caught.message : "Search failed.");
         }
       } finally {
         if (!ignore) {
@@ -338,20 +343,18 @@ export default function SearchView({
     return () => {
       ignore = true;
     };
-  }, [locationSearch, onError, searchParamQuery]);
+  }, [searchParamQuery, setError]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmedQuery = query.trim();
-    const nextPath = trimmedQuery.length > 0 ? `/cards?q=${encodeURIComponent(query)}` : "/cards";
-    const currentPath = `${normalizePathname(window.location.pathname)}${window.location.search}`;
 
-    if (nextPath === currentPath) {
+    if (trimmedQuery === searchParamQuery) {
       void runSearch(query);
       return;
     }
 
-    onNavigate(nextPath);
+    navigate({ to: "/cards", search: { q: trimmedQuery.length > 0 ? trimmedQuery : undefined } });
   }
 
   return (
@@ -387,7 +390,7 @@ export default function SearchView({
       <QueryLanguageTables fields={fieldGuides} syntax={syntaxGuides} />
       {hasSearched ? <CardGrid cards={cards} onCardClick={setQuickLookCard} /> : null}
       {quickLookCard ? (
-        <CardQuickLookModal card={quickLookCard} onClose={() => setQuickLookCard(null)} onNavigate={onNavigate} />
+        <CardQuickLookModal card={quickLookCard} onClose={() => setQuickLookCard(null)} />
       ) : null}
     </>
   );

@@ -1,5 +1,6 @@
 import { Fragment, type CSSProperties, type FormEvent, type PointerEvent as ReactPointerEvent, useEffect, useMemo, useRef, useState } from "react";
 import { searchCards } from "./api";
+import { useAppError } from "./app/ErrorContext";
 import type { CardRecord, QueryDiagnostic } from "./types";
 
 const defaultTierLabels = ["S", "A", "B", "C", "D"] as const;
@@ -12,10 +13,6 @@ const tierAccentPairs = [
   { solid: "#6a5fb7", soft: "rgba(106,95,183,0.10)" },
   { solid: "#8b5fa3", soft: "rgba(139,95,163,0.10)" }
 ] as const;
-
-type TierViewProps = {
-  onError: (message: string | null) => void;
-};
 
 type TierRow = {
   id: string;
@@ -410,7 +407,8 @@ function TierDragPreview({ dragState, card }: { dragState: TierDragState | null;
   );
 }
 
-export default function TierListView({ onError }: TierViewProps) {
+export default function TierListView() {
+  const setError = useAppError();
   const [draftQuery, setDraftQuery] = useState("");
   const [generatedCards, setGeneratedCards] = useState<CardRecord[]>([]);
   const [diagnostics, setDiagnostics] = useState<QueryDiagnostic[]>([]);
@@ -502,7 +500,7 @@ export default function TierListView({ onError }: TierViewProps) {
 
   async function generateTierList() {
     setIsGenerating(true);
-    onError(null);
+    setError(null);
 
     try {
       const result = await searchCards(draftQuery);
@@ -514,7 +512,7 @@ export default function TierListView({ onError }: TierViewProps) {
       setDragState(null);
       setHasGenerated(true);
     } catch (caught) {
-      onError(caught instanceof Error ? caught.message : "Tier list generation failed.");
+      setError(caught instanceof Error ? caught.message : "Tier list generation failed.");
     } finally {
       setIsGenerating(false);
     }

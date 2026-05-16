@@ -1,2 +1,3 @@
 export { default as AppShell } from "./AppShell";
-export { default as RouteRenderer } from "./RouteRenderer";
+export { ErrorProvider, useAppError, useAppErrorState } from "./ErrorContext";
+export { createAppRouter } from "./router";
