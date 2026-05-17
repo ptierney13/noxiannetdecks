@@ -60,7 +60,7 @@ These decisions are locked. Stage plans must not reopen them.
 
 | Concern | Decision |
 |---|---|
-| CSS / styling | Tailwind CSS — utility classes on components; no new raw CSS selectors |
+| CSS / styling | Tailwind CSS — utility classes on components; no new raw CSS selectors. Token strategy: **Option B** — `@theme` block in `ui-foundation.css` so tokens are available as named Tailwind utilities (e.g. `bg-app-bg`, `text-primary`, `border-accent`). See Stage 5 Step 0 for setup instructions. |
 | Query / server state | TanStack Query (`@tanstack/react-query`) |
 | Routing | TanStack Router (`@tanstack/react-router`) |
 | Search params | TanStack Router `validateSearch` — the canonical URL-state API |
