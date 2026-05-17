@@ -104,15 +104,18 @@ rules:
 
 The approved stage plans should preserve these import expectations:
 
-- `app -> routes/features/ui/data/lib`
-- `routes -> features/ui/data/lib`
+- `app -> features/ui/data/lib` (routes live in `app/router.tsx`, not a separate `routes/` layer)
 - `features -> ui/data/lib`
 - `ui -> lib`
 - `data -> lib`
 - `lib -> (nothing in this repo)`
 
-If a later stage proposes exceptions, that stage plan must call them out
-explicitly and explain why the default boundary is not sufficient.
+**`routes/` directory:** The original architecture contract listed `routes/`
+as a target layer. This has been superseded. Route definitions live in
+`app/router.tsx` and will remain there. Do not create a `routes/` directory.
+
+If a later stage proposes import boundary exceptions, that stage plan must call
+them out explicitly and explain why the default boundary is not sufficient.
 
 ## Key Changes
 
@@ -179,39 +182,44 @@ explicitly and explain why the default boundary is not sufficient.
 
 ## Migration Guardrails
 
-- Stage 0 updates documentation and frontend instructions only. It must not
-  move components, alter routing behavior, change data-loading behavior, or
-  begin the styling migration itself.
+**Completed stages (0–3) — do not reopen:**
+- Routing: TanStack Router is the router. `app/router.tsx` owns all route
+  definitions. The `routes/` directory will not be created — routes stay in
+  `app/router.tsx` permanently.
+- Shell: `AppShell` uses `<Outlet />`. `PageShell` wraps every route component.
+  These are settled.
+- Layer boundaries: `app/`, `ui/`, `lib/`, `features/` are established.
+  Import rules in the Target Architecture Contract apply.
 
-- Stage 2 extracts shell and presentational boundaries only. It must leave
-  `App.tsx` with a single `<RouteRenderer route={currentRoute} />` call as the
-  seam for Stage 3. The hand-rolled router is not touched.
-- Stage 3 swaps the router only. No component UI changes, no data fetching
-  changes. `RouteRenderer` is replaced by TanStack Router's outlet. If the
-  router migration exposes a Stage 2 extraction that needs adjustment, record
-  the delta in the Stage 3 plan before implementing it.
-- Stage 4 wires TanStack Query only. Routing is already settled and must not be
-  reopened. No unrelated design changes.
-- Stage 5 focuses on rollout and cleanup. Core architectural decisions must be
-  settled in Stages 0–4; Stage 5 must not reopen them.
+**Active and upcoming stages (4–7):**
+- Stage 4 installs TanStack Query and creates the `data/` skeleton only.
+  No UI changes. No page rewrites.
+- Stage 5 rewrites Home and AppShell in Tailwind — same visuals, correct code.
+  Extracts shared components to `ui/`. No other pages touched.
+- Stage 6 moves `cardFormat.tsx` exports to the correct layers.
+  No visual or behavioral changes.
+- Stage 7 rewrites legacy pages one at a time, each driven by a user-provided
+  mockup. TanStack Query is wired per page during each rewrite.
 
 ## Done Criteria For The Initiative
 
 The initiative should not be considered complete until all of the following are
 true:
 
-- `frontend/src/App.tsx` is no longer the primary owner of route parsing,
-  route switching, navigation state orchestration, and shared shell rendering
-- route entrypoints live under a dedicated route boundary instead of primarily
-  inside a monolithic app component
-- direct `window.history` orchestration is removed from feature and shell code
-  in favor of the approved routing boundary
-- shared UI components are discoverable under a dedicated shared UI area with
-  Storybook coverage for exported surfaces
-- shared async state helpers and route-loading helpers are discoverable under a
-  dedicated data boundary
-- documentation reflects the final boundaries and tells future agents where new
-  work should go by default
+**Already satisfied by Stages 0–3:**
+- ✅ `App.tsx` owns only providers and `<RouterProvider>` — no route switching or shell rendering
+- ✅ All route definitions live in `app/router.tsx` as TanStack Router route objects
+- ✅ Zero `window.history` calls remain in non-test code
+- ✅ Layer boundaries (`app/`, `ui/`, `lib/`, `features/`, `data/`) are established
+
+**Remaining (Stages 4–7):**
+- All 8 legacy pages rewritten in Tailwind with user-approved visual designs
+- All pages use TanStack Query for data loading; zero `useEffect` data fetches remain
+- `cardFormat.tsx` dissolved — all exports live in `ui/`, `features/`, or `lib/`
+- `styles.css` reduced to CSS variable declarations, resets, and nothing else
+- Shared UI components in `ui/` with barrel exports and Storybook coverage
+- `App.test.tsx` disbanded; all tests co-located with their source files
+- Documentation reflects the final architecture and tells future agents where new work goes
 
 ### 6. Finish the transition from mixed legacy styling to a disciplined design system
 
@@ -222,32 +230,27 @@ true:
 
 ## Stage Overview
 
-Stage 3 and Stage 4 intentionally separate router adoption from data-loading
-modernization. They are mechanically different operations touching different
-files; combining them in one stage makes debugging harder and exit criteria
-ambiguous.
+**Stages 0–3 are complete.** The scaffold is in place: TanStack Router is
+wired, `AppShell` uses `<Outlet />`, all routes are defined in
+`app/router.tsx`, `PageShell` wraps every route, and the `app/`, `ui/`,
+`lib/`, and `features/` layer boundaries are established.
 
-1. Stage 0 draft:
-   documentation alignment, instruction cleanup, and migration-era handoff so
-   later agents do not inherit contradictory frontend guidance
-2. Stage 1 draft:
-   component inventory, Storybook policy refinement, and frontend boundary
-   definition on top of the aligned Stage 0 docs
-3. Stage 2 draft:
-   shared shell/component extraction and Storybook coverage expansion;
-   `App.tsx` exits this stage owning only provider wrappers and a single
-   `<RouteRenderer>` call
-4. Stage 3 draft:
-   TanStack Router adoption — pure routing swap, no data-loading changes;
-   exit criteria: navigation works, zero `window.history` calls remain
-5. Stage 4 draft:
-   TanStack Query adoption — replace `useEffect` waterfalls, wire route loaders
-   to `queryClient.ensureQueryData()`; routing is not touched
-6. Stage 5 draft:
-   route-by-route rollout, Storybook completion, and follow-through cleanup
+**Stages 4–7 are the active work.** Each must be finalized and approved before
+implementation begins.
 
-Each stage summary below is a draft and must be finalized and approved before
-implementation begins for that stage.
+| Stage | Status | Summary |
+|---|---|---|
+| 0 | ✅ Complete | Documentation alignment and instruction handoff |
+| 1 | ✅ Complete | Component inventory, Storybook policy, boundary definitions |
+| 2 | ✅ Complete | Shared shell/component extraction; `App.tsx` reduced to providers + router |
+| 3 | ✅ Complete | TanStack Router adoption; zero `window.history` calls remain |
+| 4 | 🔄 Active | Documentation refresh, TanStack Query install, `data/` skeleton |
+| 5 | 📋 Planned | Home Tailwind rewrite + component extraction; AppShell Tailwind rewrite |
+| 6 | 📋 Planned | `cardFormat.tsx` analysis and placement into correct layers |
+| 7 | 📋 Planned | Page-by-page UI rewrites with mockup-driven iteration |
+
+Stage plans live in `plans/todo/frontend-ui-architecture-alignment/`.
+Completed stage plans are moved to `plans/executed/frontend-ui-architecture-alignment/`.
 
 ## Test Plan
 
