@@ -13,9 +13,7 @@ export default function AppShell() {
         </div>
       ) : null}
       <main className="app-shell">
-        <div className="site-page-shell">
-          <Outlet />
-        </div>
+        <Outlet />
       </main>
     </>
   );
