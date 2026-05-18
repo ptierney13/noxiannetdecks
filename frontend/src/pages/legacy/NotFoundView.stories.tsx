@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { NotFoundView } from "./NotFoundView";
 
 const meta = {
-  title: "UI/NotFoundView",
+  title: "Pages/Legacy/NotFoundView",
   component: NotFoundView,
   args: { onNavigate: () => {} },
 } satisfies Meta<typeof NotFoundView>;

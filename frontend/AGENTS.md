@@ -49,6 +49,8 @@ styling and TanStack Router/Query. The full initiative plan lives in
 - New domain-shared UI goes under `src/features/`.
 - New API/query helpers go under `src/data/`.
 - New non-domain utilities go under `src/lib/`.
+- New pages (migrated) go under `src/pages/`.
+- Unmigrated pages belong in `src/pages/legacy/` — see that folder's `AGENTS.md`.
 
 **Legacy patterns you will encounter — do not extend:**
 
@@ -61,12 +63,17 @@ styling and TanStack Router/Query. The full initiative plan lives in
 
 | Layer      | Location        | What belongs here                                                     |
 | ---------- | --------------- | --------------------------------------------------------------------- |
-| `app/`     | `src/app/`      | Providers, app shell, top-level route mounting                        |
-| `routes/`  | `src/routes/`   | TanStack Router route definitions, loaders, search param schemas      |
+| `app/`     | `src/app/`      | App shell, header, router, providers — no page-level content          |
+| `pages/`   | `src/pages/`    | Migrated page components using the current UI paradigm                |
+| `pages/legacy/` | `src/pages/legacy/` | Unmigrated page components — **do not use as style or pattern reference** (see `src/pages/legacy/AGENTS.md`) |
 | `features/`| `src/features/` | Domain UI shared by more than one route                               |
 | `ui/`      | `src/ui/`       | Product-agnostic primitives — Tailwind, no API calls, no domain logic |
 | `data/`    | `src/data/`     | TanStack Query keys, queryOptions, API client                         |
 | `lib/`     | `src/lib/`      | Shared React utilities (`useDebounce`, formatters, etc.)              |
+
+Note: `src/routes/` is the eventual target layer for route definitions and loaders
+(TanStack Router convention). `src/pages/` is the current pragmatic location while
+the migration is in progress.
 
 Import direction (strictly one-way):
 

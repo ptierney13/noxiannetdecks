@@ -4,7 +4,6 @@ import { QueryChip } from "./QueryChip";
 const meta = {
   title: "UI/QueryChip",
   component: QueryChip,
-  tags: ["autodocs"],
   args: {
     onAppend: () => {},
   },

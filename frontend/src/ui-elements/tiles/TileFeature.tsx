@@ -1,4 +1,5 @@
-import { SearchIcon } from "./Icon";
+import { SearchIcon } from "../Icon";
+import { TileBase } from "./TileBase";
 
 function TradeIcon() {
   return (
@@ -18,7 +19,7 @@ function SealedIcon() {
   );
 }
 
-export type FeatureCardProps = {
+export type TileFeatureProps = {
   title: string;
   description: string;
   href: string;
@@ -26,18 +27,15 @@ export type FeatureCardProps = {
   icon: "search" | "trade" | "sealed";
 };
 
-export function FeatureCard({ title, description, href, onNavigate, icon }: FeatureCardProps) {
+export function TileFeature({ title, description, href, onNavigate, icon }: TileFeatureProps) {
   const glyph =
     icon === "search" ? <SearchIcon /> : icon === "trade" ? <TradeIcon /> : <SealedIcon />;
 
   return (
-    <a
+    <TileBase
       href={href}
-      className="grid gap-[0.8rem] @[768px]:gap-[1rem] justify-items-start p-[1.05rem_0.95rem_1rem] @[640px]:p-[1.15rem] @[768px]:p-[1.25rem] @[1280px]:p-[1.35rem] rounded-[22px] border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,rgba(196,44,67,0.12),rgba(216,170,73,0.06)),rgba(10,13,20,0.9)] shadow-[var(--shadow-surface-1)] no-underline text-inherit text-left transition-[transform,border-color,box-shadow] duration-[180ms] hover:-translate-y-[2px] hover:border-[rgba(243,198,95,0.54)] hover:shadow-[0_20px_46px_rgba(0,0,0,0.38),0_0_0_1px_rgba(209,53,76,0.28)]"
-      onClick={(event) => {
-        event.preventDefault();
-        onNavigate(href);
-      }}
+      onNavigate={onNavigate}
+      className="gap-[0.8rem] @[768px]:gap-[1rem] justify-items-start text-left p-[1.05rem_0.95rem_1rem]"
     >
       <div className="flex justify-between items-start gap-[0.75rem] w-full">
         <div className="w-[3.4rem] h-[3.4rem] rounded-[1rem] grid place-items-center text-[#fff8f2] bg-[linear-gradient(135deg,#bf2b45_0%,#d8aa49_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] [&_svg]:w-[1.45rem] [&_svg]:h-[1.45rem]">
@@ -49,6 +47,6 @@ export function FeatureCard({ title, description, href, onNavigate, icon }: Feat
         <h3 className="m-0 text-text-primary max-w-full text-[1.08rem] @[768px]:text-[1.22rem] @[1280px]:text-[1.45rem] leading-[1.12] overflow-anywhere text-balance">{title}</h3>
         <p className="m-0 text-text-secondary leading-[1.55] block text-[0.94rem]">{description}</p>
       </div>
-    </a>
+    </TileBase>
   );
 }

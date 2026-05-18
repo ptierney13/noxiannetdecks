@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { loadQueryFeatures, searchCards } from "./api";
+import { loadQueryFeatures, searchCards } from "../../api";
 import { CardSearchGuide } from "./CardSearchGuide";
 import {
   CardQuickLookModal,
@@ -8,10 +8,10 @@ import {
   domainChipClass,
   formatCostText,
   renderTokenizedText,
-} from "./cardFormat";
-import { SearchIcon } from "./ui";
-import { useAppError } from "./app/ErrorContext";
-import type { CardRecord, QueryDiagnostic, QueryFieldGuide, QuerySyntaxGuide } from "./types";
+} from "../../cardFormat";
+import { SearchIcon } from "../../ui-elements";
+import { useAppError } from "../../app/ErrorContext";
+import type { CardRecord, QueryDiagnostic, QueryFieldGuide, QuerySyntaxGuide } from "../../types";
 
 type SortKey = "energy-asc" | "energy-desc" | "name-asc" | "name-desc" | "set";
 

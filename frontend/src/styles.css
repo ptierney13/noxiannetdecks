@@ -1,3 +1,11 @@
+/* ============================================================
+   LEGACY — do not add new CSS here.
+   All new styles and tokens belong in ui-foundation.css.
+   Do not reference values from this file in new code.
+   As old components are rewritten to use ui-foundation.css
+   tokens, remove the corresponding rules from this file.
+   ============================================================ */
+
 :root {
   --bg: #0a0b10;
   --surface: #14151e;
@@ -38,62 +46,6 @@ select {
 }
 
 /* ── CHEVRON ── */
-
-.chevron {
-  width: 16px;
-  height: 16px;
-  transition: transform 160ms ease;
-}
-
-.chevron.expanded {
-  transform: rotate(180deg);
-}
-
-/* ── VIEW TABS (inner page sub-nav) ── */
-
-.view-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  margin-top: 18px;
-  padding-bottom: 4px;
-}
-
-.view-tabs button,
-.view-tabs a {
-  display: inline-flex;
-  min-height: 36px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border-mid);
-  border-radius: 8px;
-  padding: 0 14px;
-  color: var(--text);
-  text-decoration: none;
-  background: var(--surface);
-  cursor: pointer;
-  font-size: 0.88rem;
-  font-weight: 600;
-  transition: color 120ms, background 120ms, border-color 120ms;
-}
-
-.view-tabs button:hover,
-.view-tabs a:hover {
-  color: var(--text-strong);
-  border-color: var(--border-strong);
-}
-
-.view-tabs button[aria-pressed="true"],
-.view-tabs a[aria-current="page"] {
-  color: #fff;
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-}
-
-.view-tab-link {
-  text-decoration: none;
-}
 
 /* ── SEARCH PANEL (card search) ── */
 
@@ -862,15 +814,6 @@ select {
 
 /* ── TYPOGRAPHY ── */
 
-.eyebrow {
-  margin: 0 0 8px;
-  color: var(--red);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 h1,
 h2,
 h3 {
@@ -926,19 +869,6 @@ code {
 .feature-section,
 .results-section {
   margin-top: 28px;
-}
-
-.section-heading {
-  display: flex;
-  gap: 16px;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.section-heading p {
-  margin: 0;
-  color: var(--text-muted);
 }
 
 .results-controls {
@@ -2659,11 +2589,6 @@ code {
     --tier-landscape-card-width: 204px;
   }
 
-  .app-shell {
-    width: min(100% - 24px, 1480px);
-    padding-top: 18px;
-  }
-
   .search-panel {
     grid-template-columns: 1fr;
     gap: 18px;
@@ -2675,11 +2600,6 @@ code {
 
   .search-row {
     grid-template-columns: 1fr;
-  }
-
-  .section-heading {
-    display: grid;
-    gap: 4px;
   }
 
   .card-grid {
@@ -4639,51 +4559,3 @@ body {
   min-height: 100vh;
 }
 
-.app-shell {
-  position: relative;
-  max-width: var(--content-max-width);
-  margin: 0 auto;
-  padding: 1.5rem var(--space-shell-x) 3rem;
-}
-
-.app-shell::before {
-  content: "";
-  position: absolute;
-  inset: 1rem var(--space-shell-x) auto;
-  height: 18rem;
-  border-radius: 30px;
-  background:
-    linear-gradient(180deg, rgba(3, 5, 9, 0.08), rgba(3, 5, 9, 0.82)),
-    radial-gradient(circle at center, rgba(211, 48, 62, 0.18), transparent 60%),
-    url("/design-assets/hero-background.png") center 24% / cover no-repeat;
-  opacity: 0.38;
-  pointer-events: none;
-  filter: saturate(1.04);
-}
-
-.site-page-shell {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 1.25rem;
-}
-
-.site-page-shell > section,
-.site-page-shell > div:not(.error-banner) {
-  position: relative;
-  padding: 1.25rem;
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-    rgba(10, 13, 20, 0.9);
-  box-shadow: var(--shadow-surface-1);
-}
-
-@media (min-width: 640px) {
-  .app-shell::before {
-    inset-inline: var(--space-shell-x);
-    height: 18rem;
-    border-radius: 30px;
-  }
-}

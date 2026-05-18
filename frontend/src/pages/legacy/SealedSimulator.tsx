@@ -1,8 +1,8 @@
 import { type CSSProperties, type FormEvent, type PointerEvent, type ReactNode, useEffect, useMemo, useState } from "react";
-import { generateSealedPool, loadPackGeneratorOptions } from "./api";
-import { cardEnergy } from "./cardFormat";
-import { CardsIcon } from "./ui";
-import { useAppError } from "./app/ErrorContext";
+import { generateSealedPool, loadPackGeneratorOptions } from "../../api";
+import { cardEnergy } from "../../cardFormat";
+import { CardsIcon } from "../../ui-elements";
+import { useAppError } from "../../app/ErrorContext";
 import type {
   CardRecord,
   GeneratedPoolCard,
@@ -10,7 +10,7 @@ import type {
   GenerateSealedPoolRequest,
   PackGeneratorOptions,
   PackSetId,
-} from "./types";
+} from "../../types";
 
 const domainOrder = ["Fury", "Calm", "Mind", "Body", "Chaos", "Order"] as const;
 const domainSectionOrder = [...domainOrder, "Multicolor", "Other"] as const;

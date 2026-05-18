@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { getCard, searchCards } from "./api";
+import { getCard, searchCards } from "../../api";
 import {
   formatCostText,
   formatHeadlinePrice,
@@ -11,7 +11,7 @@ import {
   PRICE_SERIES_COLORS,
   PriceHistoryChart,
   renderTokenizedText,
-} from "./cardFormat";
+} from "../../cardFormat";
 import {
   buildCardDetailPath,
   buildTcgplayerAffiliateLink,
@@ -20,9 +20,9 @@ import {
   normalizePrinting,
   resolveNearMintMarketPrice,
   usePublishedPriceIndex,
-} from "./lib";
-import { useAppError } from "./app/ErrorContext";
-import type { CardRecord } from "./types";
+} from "../../lib";
+import { useAppError } from "../../app/ErrorContext";
+import type { CardRecord } from "../../types";
 
 export default function CardDetailView({ cardId }: { cardId: string }) {
   const navigate = useNavigate();

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { loadQueryFeatures } from "./api";
+import { loadQueryFeatures } from "../../api";
 import { CardSearchGuide } from "./CardSearchGuide";
 import { LtsDetailOverlay, type LtsDetailItem } from "./LtsDetailOverlay";
-import { QueryChip } from "./ui";
-import { useAppError } from "./app/ErrorContext";
-import { useHeaderSearch } from "./app/HeaderSearchContext";
-import type { QueryFieldGuide, QuerySyntaxGuide } from "./types";
+import { QueryChip } from "../../ui-elements";
+import { useAppError } from "../../app/ErrorContext";
+import { useHeaderSearch } from "../../app/HeaderSearchContext";
+import type { QueryFieldGuide, QuerySyntaxGuide } from "../../types";
 
 type LearnTab = "visual-guide" | "text-guide" | "syntax-guide";
 

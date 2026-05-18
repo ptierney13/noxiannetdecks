@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState, type MouseEvent, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { searchCards } from "./api";
-import { manualDeckExplorerEvents, type ManualEventDeckRecord, type ManualEventRecord } from "./deck-explorer/manualData";
+import { searchCards } from "../../api";
+import { manualDeckExplorerEvents, type ManualEventDeckRecord, type ManualEventRecord } from "../../deck-explorer/manualData";
 import {
   buildDeckExplorerDeckPath,
   buildDeckExplorerEventDeckPath,
   buildDeckExplorerEventPath,
   buildDeckExplorerLegendPath,
-} from "./lib";
-import { useAppError } from "./app/ErrorContext";
-import type { CardRecord } from "./types";
+} from "../../lib";
+import { useAppError } from "../../app/ErrorContext";
+import type { CardRecord } from "../../types";
 
 const domainOrder = ["Fury", "Calm", "Mind", "Body", "Chaos", "Order"] as const;
 const setOrder = ["OGN", "SFD", "UNL"] as const;

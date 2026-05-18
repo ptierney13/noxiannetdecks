@@ -1,7 +1,5 @@
 import { type FormEvent, useState } from "react";
-import { SearchIcon } from "./ui";
-import { FeatureCard } from "./ui/FeatureCard";
-import { PromoCard } from "./ui/PromoCard";
+import { SearchIcon, TileFeature, TilePromo } from "../ui-elements";
 
 export const heroBackgroundAsset = "/design-assets/hero-background.png";
 
@@ -80,21 +78,21 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
         <div className="grid gap-[0.85rem] @[768px]:gap-4 @[1280px]:gap-[1.1rem] pt-[0.9rem] @[768px]:pt-4">
           {/* feature grid */}
           <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[768px]:grid-cols-2 @[1024px]:grid-cols-3 [container-type:inline-size]">
-            <FeatureCard
+            <TileFeature
               title="Trade Balancer"
               description="Compare offers, price cards, and tune fair swaps."
               href="/tools/trade-balancer"
               icon="trade"
               onNavigate={onNavigate}
             />
-            <FeatureCard
+            <TileFeature
               title="Card Search"
               description="Find cards by name, type, keyword and more."
               href="/cards"
               icon="search"
               onNavigate={onNavigate}
             />
-            <FeatureCard
+            <TileFeature
               title="Sealed Simulator"
               description="Generate pools from any format. Build and save decks."
               href="/tools/sealed-pools"
@@ -105,14 +103,14 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
 
           {/* promo grid */}
           <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[640px]:grid-cols-2 [container-type:inline-size]">
-            <PromoCard
+            <TilePromo
               label="Tool"
               title="Tier List Generator"
               description="Create and share tier lists."
               href="/tools/tier-list"
               onNavigate={onNavigate}
             />
-            <PromoCard
+            <TilePromo
               label="Learn"
               title="Learn to Search"
               description="Open the query builder and learn the search language."

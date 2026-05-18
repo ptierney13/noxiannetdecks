@@ -1,7 +1,13 @@
-:root {
+@import "tailwindcss";
+
+/* ============================================================
+   THEME — all primitive tokens
+   Rule: static values only, no var() references.
+   Tailwind reads this block to generate utilities and emits
+   every entry as a CSS custom property on :root automatically.
+   ============================================================ */
+@theme {
   --color-app-bg: #05060a;
-  --color-app-bg-elevated: #0b0d14;
-  --color-app-bg-atmosphere: #13040b;
   --color-surface-1: rgba(13, 16, 24, 0.9);
   --color-surface-2: rgba(16, 20, 30, 0.94);
   --color-surface-3: rgba(25, 30, 42, 0.96);
@@ -24,32 +30,23 @@
   --color-accent-warm-soft: rgba(215, 170, 73, 0.16);
   --color-focus-ring: rgba(211, 78, 92, 0.32);
   --color-warning: #f0aa5b;
-  --color-warning-soft: rgba(240, 170, 91, 0.12);
-  --color-warning-border: rgba(240, 170, 91, 0.28);
   --color-info: #9ab4e8;
   --color-info-soft: rgba(154, 180, 232, 0.08);
   --color-info-border: rgba(154, 180, 232, 0.3);
   --color-positive: #6dba8a;
   --color-positive-strong: #7de8a0;
-  --color-positive-soft: rgba(109, 186, 138, 0.08);
-  --color-positive-border: rgba(109, 186, 138, 0.28);
   --color-positive-emphasis: rgba(42, 143, 82, 0.15);
-  --color-negative: #e88;
+  --color-negative: #e88888;
   --color-negative-soft: rgba(181, 32, 56, 0.12);
   --color-negative-border: rgba(181, 32, 56, 0.3);
   --color-negative-emphasis: rgba(181, 32, 56, 0.15);
   --gradient-accent-hero: linear-gradient(135deg, #b32744 0%, #d8aa49 100%);
   --gradient-accent-button: linear-gradient(135deg, #b32643 0%, #cf3c49 44%, #e0b455 100%);
-  --gradient-accent-surface: linear-gradient(180deg, rgba(203, 62, 77, 0.2) 0%, rgba(203, 62, 77, 0) 100%);
   --shadow-surface-1: 0 16px 42px rgba(0, 0, 0, 0.32);
   --shadow-surface-2: 0 22px 60px rgba(0, 0, 0, 0.42);
-  --shadow-focus: 0 0 0 3px var(--color-focus-ring);
   --radius-sm: 12px;
   --radius-md: 18px;
-  --radius-lg: 26px;
-  --radius-xl: 34px;
   --space-shell-x: clamp(1rem, 2vw, 1.75rem);
-  --space-shell-y: clamp(1rem, 2vw, 1.5rem);
   --content-max-width: 1240px;
   --site-header-height: 60px;
   --chart-series-1: #f59e0b;
@@ -90,73 +87,179 @@
   --rarity-promo-soft: rgba(239, 83, 80, 0.15);
 }
 
-@theme {
-  --color-app-bg: #05060a;
-  --color-app-bg-elevated: #0b0d14;
-  --color-app-bg-atmosphere: #13040b;
-  --color-surface-1: rgba(13, 16, 24, 0.9);
-  --color-surface-2: rgba(16, 20, 30, 0.94);
-  --color-surface-3: rgba(25, 30, 42, 0.96);
-  --color-surface-inset: rgba(8, 11, 18, 0.82);
-  --color-surface-glass: rgba(10, 13, 20, 0.76);
-  --color-text-primary: #f8f4f1;
-  --color-text-secondary: rgba(240, 232, 227, 0.82);
-  --color-text-tertiary: rgba(219, 203, 195, 0.58);
-  --color-text-dim: rgba(190, 171, 160, 0.38);
-  --color-border-subtle: rgba(255, 255, 255, 0.08);
-  --color-border-default: rgba(255, 255, 255, 0.12);
-  --color-border-strong: rgba(255, 255, 255, 0.2);
-  --color-border-accent: rgba(203, 62, 77, 0.42);
-  --color-accent: #c53247;
-  --color-accent-hover: #d74255;
-  --color-accent-soft: rgba(203, 62, 77, 0.13);
-  --color-accent-soft-hover: rgba(203, 62, 77, 0.2);
-  --color-accent-soft-strong: rgba(203, 62, 77, 0.28);
-  --color-accent-warm: #d7aa49;
-  --color-accent-warm-soft: rgba(215, 170, 73, 0.16);
-  --color-focus-ring: rgba(211, 78, 92, 0.32);
-  --color-warning: #f0aa5b;
-  --color-warning-soft: rgba(240, 170, 91, 0.12);
-  --color-warning-border: rgba(240, 170, 91, 0.28);
-  --color-info: #9ab4e8;
-  --color-info-soft: rgba(154, 180, 232, 0.08);
-  --color-info-border: rgba(154, 180, 232, 0.3);
-  --color-positive: #6dba8a;
-  --color-positive-strong: #7de8a0;
-  --color-positive-soft: rgba(109, 186, 138, 0.08);
-  --color-positive-border: rgba(109, 186, 138, 0.28);
-  --color-positive-emphasis: rgba(42, 143, 82, 0.15);
-  --color-negative: #e88888;
-  --color-negative-soft: rgba(181, 32, 56, 0.12);
-  --color-negative-border: rgba(181, 32, 56, 0.3);
-  --color-negative-emphasis: rgba(181, 32, 56, 0.15);
+/* ============================================================
+   ROOT — compositions only
+   Rule: only tokens that reference other tokens via var().
+   Cannot live in @theme because Tailwind resolves theme values
+   statically and cannot follow var() references at build time.
+   ============================================================ */
+:root {
+  --shadow-focus: 0 0 0 3px var(--color-focus-ring);
 }
 
-.ui-panel {
-  background: var(--color-surface-1);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-surface-1);
+/* ============================================================
+   COMPONENTS — named classes migrated from legacy styles.css.
+   Uses @layer components so Tailwind utilities still win on
+   specificity. Each block here replaces a class removed from
+   styles.css; remove from here when the consumer is rewritten
+   to use inline Tailwind.
+   ============================================================ */
+@layer components {
+  /* Chevron — still used by legacy SearchView; Icon.tsx is inlined */
+  .chevron {
+    width: 16px;
+    height: 16px;
+    transition: transform 160ms ease;
+  }
+
+  .chevron.expanded {
+    transform: rotate(180deg);
+  }
+
+  /* Eyebrow — small uppercase label */
+  .eyebrow {
+    margin: 0 0 8px;
+    color: var(--color-accent);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* View tabs — inner page sub-nav */
+  .view-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-top: 18px;
+    padding-bottom: 4px;
+  }
+
+  .view-tabs button,
+  .view-tabs a {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border-default);
+    border-radius: 8px;
+    padding: 0 14px;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    background: var(--color-surface-1);
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: color 120ms, background 120ms, border-color 120ms;
+  }
+
+  .view-tabs button:hover,
+  .view-tabs a:hover {
+    color: var(--color-text-primary);
+    border-color: var(--color-border-strong);
+  }
+
+  .view-tabs button[aria-pressed="true"],
+  .view-tabs a[aria-current="page"] {
+    color: #fff;
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+  }
+
+  .view-tab-link {
+    text-decoration: none;
+  }
+
+  /* Section heading — flex row with baseline alignment */
+  .section-heading {
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-heading p {
+    margin: 0;
+    color: var(--color-text-dim);
+  }
+
+  @media (max-width: 780px) {
+    .section-heading {
+      display: grid;
+      gap: 4px;
+    }
+  }
+
+  /* App shell — page-level layout with atmospheric hero glow */
+  .app-shell {
+    position: relative;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 1.5rem var(--space-shell-x) 3rem;
+  }
+
+  .app-shell::before {
+    content: "";
+    position: absolute;
+    inset: 1rem var(--space-shell-x) auto;
+    height: 18rem;
+    border-radius: 30px;
+    background:
+      linear-gradient(180deg, rgba(3, 5, 9, 0.08), rgba(3, 5, 9, 0.82)),
+      radial-gradient(circle at center, rgba(211, 48, 62, 0.18), transparent 60%),
+      url("/design-assets/hero-background.png") center 24% / cover no-repeat;
+    opacity: 0.38;
+    pointer-events: none;
+    filter: saturate(1.04);
+  }
+
+  @media (max-width: 780px) {
+    .app-shell {
+      width: min(100% - 24px, 1480px);
+      padding-top: 18px;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .app-shell::before {
+      inset-inline: var(--space-shell-x);
+      height: 18rem;
+      border-radius: 30px;
+    }
+  }
+
+  /* Site page shell — grid wrapper for page sections */
+  .site-page-shell {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .site-page-shell > section,
+  .site-page-shell > div:not(.error-banner) {
+    position: relative;
+    padding: 1.25rem;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+      rgba(10, 13, 20, 0.9);
+    box-shadow: var(--shadow-surface-1);
+  }
 }
 
-.ui-input,
-.ui-select {
-  min-height: 44px;
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface-inset);
-  color: var(--color-text-primary);
+.qb-domain-chip {
+  --domain-color: var(--color-text-tertiary);
+  --domain-bg: var(--color-accent-soft);
+  --domain-bg-hover: var(--color-accent-soft-hover);
 }
 
-.ui-input:focus,
-.ui-select:focus {
-  outline: none;
-  border-color: var(--color-accent);
-  box-shadow: var(--shadow-focus);
-}
-
-.ui-placeholder-muted::placeholder {
-  color: var(--color-text-tertiary);
+.qb-rarity-chip {
+  --rarity-color: var(--color-text-tertiary);
+  --rarity-bg: var(--color-accent-soft);
 }
 
 .qb-domain-chip[data-domain="Fury"] {

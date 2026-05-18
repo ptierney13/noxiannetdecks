@@ -3,7 +3,6 @@ import { SearchIcon, CardsIcon, MenuIcon, ChevronIcon } from "./Icon";
 
 const meta = {
   title: "UI/Icons",
-  tags: ["autodocs"],
   parameters: {
     layout: "centered",
   },
@@ -28,7 +27,7 @@ export const Cards: Story = {
   ),
 };
 
-export const MenuClosed: Story = {
+export const HamburgerMenuClosed: Story = {
   render: () => (
     <span style={{ display: "inline-block", color: "white" }}>
       <MenuIcon open={false} />
@@ -36,7 +35,7 @@ export const MenuClosed: Story = {
   ),
 };
 
-export const MenuOpen: Story = {
+export const HamburgerMenuOpen: Story = {
   render: () => (
     <span style={{ display: "inline-block", color: "white" }}>
       <MenuIcon open={true} />

@@ -35,7 +35,7 @@ export function ChevronIcon({ expanded }: { expanded: boolean }) {
       aria-hidden="true"
       viewBox="0 0 24 24"
       focusable="false"
-      className={expanded ? "chevron expanded" : "chevron"}
+      className={`w-4 h-4 transition-transform duration-[160ms] ease${expanded ? " rotate-180" : ""}`}
     >
       <path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6 1.4-1.4Z" fill="currentColor" />
     </svg>

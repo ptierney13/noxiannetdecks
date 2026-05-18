@@ -1,10 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { HomePage } from "./home";
-import { StorybookViewportFrame } from "./lib";
+import { StorybookViewportFrame } from "../lib";
 
 const meta = {
-  title: "Design System/Home",
-  tags: ["autodocs"],
+  title: "Pages/Home",
   parameters: {
     layout: "fullscreen"
   }

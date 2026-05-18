@@ -1,7 +1,7 @@
 import { Fragment, type CSSProperties, type FormEvent, type PointerEvent as ReactPointerEvent, useEffect, useMemo, useRef, useState } from "react";
-import { searchCards } from "./api";
-import { useAppError } from "./app/ErrorContext";
-import type { CardRecord, QueryDiagnostic } from "./types";
+import { searchCards } from "../../api";
+import { useAppError } from "../../app/ErrorContext";
+import type { CardRecord, QueryDiagnostic } from "../../types";
 
 const defaultTierLabels = ["S", "A", "B", "C", "D"] as const;
 const tierAccentPairs = [

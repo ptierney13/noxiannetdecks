@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { searchCards } from "./api";
-import { CardQuickLookModal } from "./cardFormat";
+import { searchCards } from "../../api";
+import { CardQuickLookModal } from "../../cardFormat";
 import {
   formatUsdPrice,
   getPublishedRowsForCard,
@@ -8,9 +8,9 @@ import {
   usePublishedPriceIndex,
   type PublishedPriceIndex,
   type PublishedPriceRow,
-} from "./lib";
-import { buildCardDetailPath, useDebounce } from "./lib";
-import type { CardRecord } from "./types";
+} from "../../lib";
+import { buildCardDetailPath, useDebounce } from "../../lib";
+import type { CardRecord } from "../../types";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

@@ -1,16 +1,15 @@
 import { createRootRoute, createRoute, createRouter, useNavigate } from "@tanstack/react-router";
 import AppShell from "./AppShell";
-import { PageShell } from "../ui";
-import { HomePage } from "../home";
-import { NotFoundView } from "../ui";
-import SearchView from "../SearchView";
-import LearnToSearchView from "../LearnToSearchView";
-import QueryBuilderView from "../QueryBuilderView";
-import CardDetailView from "../CardDetailView";
-import DeckExplorerView from "../DeckExplorerView";
-import TierListView from "../TierListView";
-import SealedSimulator from "../SealedSimulator";
-import TradeBalancerView from "../TradeBalancerView";
+import { HomePage } from "../pages/home";
+import { NotFoundView } from "../pages/legacy/NotFoundView";
+import SearchView from "../pages/legacy/SearchView";
+import LearnToSearchView from "../pages/legacy/LearnToSearchView";
+import QueryBuilderView from "../pages/legacy/QueryBuilderView";
+import CardDetailView from "../pages/legacy/CardDetailView";
+import DeckExplorerView from "../pages/legacy/DeckExplorerView";
+import TierListView from "../pages/legacy/TierListView";
+import SealedSimulator from "../pages/legacy/SealedSimulator";
+import TradeBalancerView from "../pages/legacy/TradeBalancerView";
 
 export const rootRoute = createRootRoute({ component: AppShell });
 
@@ -20,18 +19,16 @@ const indexRoute = createRoute({
   component: function HomeRoute() {
     const navigate = useNavigate();
     return (
-      <PageShell>
-        <HomePage
-          onNavigate={(href) => {
-            const url = new URL(href, window.location.origin);
-            if (url.pathname === "/cards") {
-              void navigate({ to: "/cards", search: { q: url.searchParams.get("q") ?? undefined } });
-            } else {
-              void navigate({ href });
-            }
-          }}
-        />
-      </PageShell>
+      <HomePage
+        onNavigate={(href) => {
+          const url = new URL(href, window.location.origin);
+          if (url.pathname === "/cards") {
+            void navigate({ to: "/cards", search: { q: url.searchParams.get("q") ?? undefined } });
+          } else {
+            void navigate({ href });
+          }
+        }}
+      />
     );
   },
 });
@@ -42,19 +39,19 @@ const cardsRoute = createRoute({
   validateSearch: (search: Record<string, unknown>) => ({
     q: typeof search.q === "string" ? search.q : undefined,
   }),
-  component: () => <PageShell><SearchView /></PageShell>,
+  component: () => <SearchView />,
 });
 
 const cardsLearnToSearchRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "cards/learn-to-search",
-  component: () => <PageShell><LearnToSearchView /></PageShell>,
+  component: () => <LearnToSearchView />,
 });
 
 const cardsQueryBuilderRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "cards/query-builder",
-  component: () => <PageShell><QueryBuilderView /></PageShell>,
+  component: () => <QueryBuilderView />,
 });
 
 const cardDetailRoute = createRoute({
@@ -62,20 +59,20 @@ const cardDetailRoute = createRoute({
   path: "cards/$cardId",
   component: function CardDetailRoute() {
     const { cardId } = cardDetailRoute.useParams();
-    return <PageShell><CardDetailView cardId={cardId} /></PageShell>;
+    return <CardDetailView cardId={cardId} />;
   },
 });
 
 const deckExplorerIndexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "deck-explorer",
-  component: () => <PageShell><DeckExplorerView section={{ kind: "home" }} /></PageShell>,
+  component: () => <DeckExplorerView section={{ kind: "home" }} />,
 });
 
 const deckExplorerEventsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "deck-explorer/events",
-  component: () => <PageShell><DeckExplorerView section={{ kind: "events" }} /></PageShell>,
+  component: () => <DeckExplorerView section={{ kind: "events" }} />,
 });
 
 const deckExplorerEventRoute = createRoute({
@@ -83,7 +80,7 @@ const deckExplorerEventRoute = createRoute({
   path: "deck-explorer/events/$eventId",
   component: function DeckExplorerEventRoute() {
     const { eventId } = deckExplorerEventRoute.useParams();
-    return <PageShell><DeckExplorerView section={{ kind: "event", eventId }} /></PageShell>;
+    return <DeckExplorerView section={{ kind: "event", eventId }} />;
   },
 });
 
@@ -92,7 +89,7 @@ const deckExplorerEventDeckRoute = createRoute({
   path: "deck-explorer/events/$eventId/decks/$deckId",
   component: function DeckExplorerEventDeckRoute() {
     const { eventId, deckId } = deckExplorerEventDeckRoute.useParams();
-    return <PageShell><DeckExplorerView section={{ kind: "event-deck", eventId, deckId }} /></PageShell>;
+    return <DeckExplorerView section={{ kind: "event-deck", eventId, deckId }} />;
   },
 });
 
@@ -101,14 +98,14 @@ const deckExplorerDeckRoute = createRoute({
   path: "deck-explorer/decks/$deckId",
   component: function DeckExplorerDeckRoute() {
     const { deckId } = deckExplorerDeckRoute.useParams();
-    return <PageShell><DeckExplorerView section={{ kind: "deck", deckId }} /></PageShell>;
+    return <DeckExplorerView section={{ kind: "deck", deckId }} />;
   },
 });
 
 const deckExplorerLegendsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "deck-explorer/legends",
-  component: () => <PageShell><DeckExplorerView section={{ kind: "legends" }} /></PageShell>,
+  component: () => <DeckExplorerView section={{ kind: "legends" }} />,
 });
 
 const deckExplorerLegendRoute = createRoute({
@@ -116,20 +113,20 @@ const deckExplorerLegendRoute = createRoute({
   path: "deck-explorer/legends/$legendSlug",
   component: function DeckExplorerLegendRoute() {
     const { legendSlug } = deckExplorerLegendRoute.useParams();
-    return <PageShell><DeckExplorerView section={{ kind: "legend", legendSlug }} /></PageShell>;
+    return <DeckExplorerView section={{ kind: "legend", legendSlug }} />;
   },
 });
 
 const toolsTierListRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "tools/tier-list",
-  component: () => <PageShell><TierListView /></PageShell>,
+  component: () => <TierListView />,
 });
 
 const toolsSealedPoolsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "tools/sealed-pools",
-  component: () => <PageShell><SealedSimulator /></PageShell>,
+  component: () => <SealedSimulator />,
 });
 
 const toolsTradeBalancerRoute = createRoute({
@@ -137,14 +134,14 @@ const toolsTradeBalancerRoute = createRoute({
   path: "tools/trade-balancer",
   component: function TradeBalancerRoute() {
     const navigate = useNavigate();
-    return <PageShell><TradeBalancerView onNavigate={(path) => void navigate({ href: path })} /></PageShell>;
+    return <TradeBalancerView onNavigate={(path) => void navigate({ href: path })} />;
   },
 });
 
 const notFoundRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "*",
-  component: () => <PageShell><NotFoundView /></PageShell>,
+  component: () => <NotFoundView />,
 });
 
 const routeTree = rootRoute.addChildren([
