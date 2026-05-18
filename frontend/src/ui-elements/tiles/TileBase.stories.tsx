@@ -25,6 +25,7 @@ const placeholder = (
 );
 
 export const Default: Story = {
+  args: { children: placeholder },
   render: () => (
     <TileBase href="/example" onNavigate={() => undefined} className="gap-4 p-5">
       {placeholder}
@@ -33,6 +34,7 @@ export const Default: Story = {
 };
 
 export const AsDiv: Story = {
+  args: { children: placeholder },
   render: () => (
     <TileBase className="gap-4 p-5">
       {placeholder}
