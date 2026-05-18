@@ -185,7 +185,7 @@ export function AppHeader() {
             onClick={() => void navigate({ to: "/" })}
             aria-label="Noxian Netdecks home"
           >
-            <div className="w-[2.2rem] h-[2.2rem] shrink-0 rounded-[0.7rem] grid place-items-center bg-[var(--gradient-accent-hero)] text-[#fff8f3] text-[1.3rem] font-extrabold shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
+            <div className="w-[2.2rem] h-[2.2rem] shrink-0 rounded-[0.7rem] grid place-items-center bg-[image:var(--gradient-accent-hero)] text-[#fff8f3] text-[1.3rem] font-extrabold shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
               N
             </div>
             <span className={`text-[1.1rem] font-bold tracking-[-0.02em] whitespace-nowrap overflow-hidden transition-[max-width,opacity,margin-left] duration-[220ms,180ms,220ms] ease-[cubic-bezier(0.22,1,0.36,1),ease,ease] ${desktopHeaderStage === "full" ? "max-w-[12rem] opacity-100 ml-0" : "max-w-0 opacity-0 -ml-[0.35rem]"}`}>
@@ -214,7 +214,7 @@ export function AppHeader() {
             />
             <button
               type="submit"
-              className={`inline-flex items-center justify-center min-h-[42px] border-0 rounded-[12px] px-[1.2rem] bg-[var(--gradient-accent-button)] text-[#fff9f5] font-bold cursor-pointer whitespace-nowrap shadow-[0_10px_24px_rgba(133,18,32,0.32),inset_0_1px_0_rgba(255,242,218,0.28)] overflow-hidden transition-[max-width,opacity,padding,margin,filter] duration-[220ms,180ms,220ms,220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease,cubic-bezier(0.22,1,0.36,1),ease,ease] hover:brightness-[1.08] hover:saturate-[1.04] max-w-[8rem] opacity-100 pointer-events-auto w-auto`}
+              className={`inline-flex items-center justify-center min-h-[42px] border-0 rounded-[12px] px-[1.2rem] bg-[image:var(--gradient-accent-button)] text-[#fff9f5] font-bold cursor-pointer whitespace-nowrap shadow-[0_10px_24px_rgba(133,18,32,0.32),inset_0_1px_0_rgba(255,242,218,0.28)] overflow-hidden transition-[max-width,opacity,padding,margin,filter] duration-[220ms,180ms,220ms,220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease,cubic-bezier(0.22,1,0.36,1),ease,ease] hover:brightness-[1.08] hover:saturate-[1.04] max-w-[8rem] opacity-100 pointer-events-auto w-auto`}
             >
               Search
             </button>
@@ -322,7 +322,7 @@ export function AppHeader() {
               onClick={() => void navigate({ to: "/" })}
               aria-label="Noxian Netdecks home"
             >
-              <div className="w-[2.2rem] h-[2.2rem] shrink-0 rounded-[0.7rem] grid place-items-center bg-[var(--gradient-accent-hero)] text-[#fff8f3] text-[1.3rem] font-extrabold shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
+              <div className="w-[2.2rem] h-[2.2rem] shrink-0 rounded-[0.7rem] grid place-items-center bg-[image:var(--gradient-accent-hero)] text-[#fff8f3] text-[1.3rem] font-extrabold shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
                 N
               </div>
               <span className="text-[1.1rem] font-bold tracking-[-0.02em] whitespace-nowrap overflow-hidden max-w-0 opacity-0 -ml-[0.35rem]">
@@ -351,7 +351,7 @@ export function AppHeader() {
               />
               <button
                 type="submit"
-                className="inline-flex items-center justify-center min-h-[42px] border-0 rounded-[12px] px-[1.2rem] bg-[var(--gradient-accent-button)] text-[#fff9f5] font-bold cursor-pointer whitespace-nowrap shadow-[0_10px_24px_rgba(133,18,32,0.32),inset_0_1px_0_rgba(255,242,218,0.28)] hover:brightness-[1.08] hover:saturate-[1.04] w-auto"
+                className="inline-flex items-center justify-center min-h-[42px] border-0 rounded-[12px] px-[1.2rem] bg-[image:var(--gradient-accent-button)] text-[#fff9f5] font-bold cursor-pointer whitespace-nowrap shadow-[0_10px_24px_rgba(133,18,32,0.32),inset_0_1px_0_rgba(255,242,218,0.28)] hover:brightness-[1.08] hover:saturate-[1.04] w-auto"
               >
                 Search
               </button>
