@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { StorybookHeaderPreview, StorybookViewportFrame } from "./home";
+import App from "./App";
+import { StorybookViewportFrame } from "./home";
 
 const meta = {
   title: "Design System/Header",
@@ -16,7 +17,7 @@ type Story = StoryObj<typeof meta>;
 export const Desktop: Story = {
   render: () => (
     <StorybookViewportFrame mode="desktop">
-      <StorybookHeaderPreview mode="desktop" />
+      <App />
     </StorybookViewportFrame>
   )
 };
@@ -24,13 +25,13 @@ export const Desktop: Story = {
 export const DesktopCompact: Story = {
   render: () => (
     <StorybookViewportFrame mode="desktop" desktopWidth={520}>
-      <StorybookHeaderPreview mode="desktop" />
+      <App />
     </StorybookViewportFrame>
   ),
   parameters: {
     docs: {
       description: {
-        story: "Compact desktop header preview for narrow canvases without changing the overall browser viewport."
+        story: "Compact desktop header — narrow canvas collapses wordmark and expands search bar to fill."
       }
     }
   }
@@ -39,13 +40,13 @@ export const DesktopCompact: Story = {
 export const DesktopSearchStage: Story = {
   render: () => (
     <StorybookViewportFrame mode="desktop" desktopWidth={680}>
-      <StorybookHeaderPreview mode="desktop" />
+      <App />
     </StorybookViewportFrame>
   ),
   parameters: {
     docs: {
       description: {
-        story: "Compact desktop header with the inline Search button restored before the full dropdown navigation expands."
+        story: "Search-stage desktop header — inline Search button visible before full dropdown nav expands."
       }
     }
   }
@@ -54,13 +55,13 @@ export const DesktopSearchStage: Story = {
 export const DesktopNavStage: Story = {
   render: () => (
     <StorybookViewportFrame mode="desktop" desktopWidth={860}>
-      <StorybookHeaderPreview mode="desktop" />
+      <App />
     </StorybookViewportFrame>
   ),
   parameters: {
     docs: {
       description: {
-        story: "Mid-stage desktop header with real dropdown navigation restored before the full wordmark returns."
+        story: "Nav-stage desktop header — dropdown navigation visible before wordmark returns."
       }
     }
   }
@@ -69,13 +70,13 @@ export const DesktopNavStage: Story = {
 export const Mobile: Story = {
   render: () => (
     <StorybookViewportFrame mode="mobile">
-      <StorybookHeaderPreview mode="mobile" />
+      <App />
     </StorybookViewportFrame>
   ),
   parameters: {
     docs: {
       description: {
-        story: "Use the menu button to preview the mobile navigation state inside the fixed phone viewport."
+        story: "Mobile header — compact bar with hamburger menu. Use the menu button to open the nav drawer."
       }
     }
   }
@@ -84,13 +85,13 @@ export const Mobile: Story = {
 export const MobileNarrow: Story = {
   render: () => (
     <StorybookViewportFrame mode="mobile" mobileWidth={320}>
-      <StorybookHeaderPreview mode="mobile" />
+      <App />
     </StorybookViewportFrame>
   ),
   parameters: {
     docs: {
       description: {
-        story: "Narrow-width mobile header preview for the smallest screens."
+        story: "Narrow-width mobile header — smallest supported screen size."
       }
     }
   }
