@@ -3,15 +3,13 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import * as headerStories from "./header.stories";
 import * as homeStories from "./home.stories";
-import * as sharedFeatureCardStories from "./home-shared-feature-cards.stories";
-import * as sharedPromoCardStories from "./home-shared-promo-cards.stories";
-import * as sharedRouteSurfaceStories from "./home-shared-route-surface.stories";
+import * as featureCardStories from "../ui/FeatureCard.stories";
+import * as promoCardStories from "../ui/PromoCard.stories";
 
 const header = composeStories(headerStories);
 const home = composeStories(homeStories);
-const sharedFeatureCards = composeStories(sharedFeatureCardStories);
-const sharedPromoCards = composeStories(sharedPromoCardStories);
-const sharedRouteSurface = composeStories(sharedRouteSurfaceStories);
+const featureCards = composeStories(featureCardStories);
+const promoCards = composeStories(promoCardStories);
 
 describe("design system stories", () => {
   afterEach(() => {
@@ -47,21 +45,16 @@ describe("design system stories", () => {
     expect(screen.getByText("Trade Balancer")).toBeInTheDocument();
   });
 
-  it("renders the shared feature cards story", async () => {
-    render(<sharedFeatureCards.Desktop />);
+  it("renders the FeatureCard AllThree story", async () => {
+    render(<featureCards.AllThree />);
     expect(await screen.findByText("Trade Balancer")).toBeInTheDocument();
     expect(screen.getByText("Sealed Simulator")).toBeInTheDocument();
+    expect(screen.getByText("Card Search")).toBeInTheDocument();
   });
 
-  it("renders the shared promo cards story", async () => {
-    render(<sharedPromoCards.Desktop />);
+  it("renders the PromoCard BothVariants story", async () => {
+    render(<promoCards.BothVariants />);
     expect(await screen.findByText("Tier List Generator")).toBeInTheDocument();
     expect(screen.getByText("Learn to Search")).toBeInTheDocument();
-  });
-
-  it("renders the shared route surface story", async () => {
-    render(<sharedRouteSurface.Desktop />);
-    expect(await screen.findByText("Shared route surfaces")).toBeInTheDocument();
-    expect(screen.getByText("Search workflow")).toBeInTheDocument();
   });
 });

@@ -6,53 +6,6 @@ import { PromoCard } from "./ui/PromoCard";
 
 export const heroBackgroundAsset = "/design-assets/hero-background.png";
 
-export function ArtworkShowcasePanel() {
-  return (
-    <section
-      className="rounded-[22px] border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0)),rgba(10,13,20,0.9)] shadow-[var(--shadow-surface-1)] p-4 [container-type:inline-size] [container-name:surface-shell]"
-      aria-labelledby="artwork-showcase-heading"
-    >
-      <div className="mb-3">
-        <p
-          id="artwork-showcase-heading"
-          className="m-0 text-accent-warm uppercase tracking-[0.08em] text-[0.76rem] font-bold"
-        >
-          Background Artwork
-        </p>
-      </div>
-      <div className="overflow-hidden rounded-[18px] aspect-[2.8/1]">
-        <img src={heroBackgroundAsset} alt="" className="w-full h-full block object-cover object-center" />
-      </div>
-    </section>
-  );
-}
-
-export function RouteSurfacePreview() {
-  return (
-    <section
-      className="rounded-[22px] border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0)),rgba(10,13,20,0.9)] shadow-[var(--shadow-surface-1)] p-4 [container-type:inline-size] [container-name:surface-shell]"
-      aria-labelledby="route-surface-preview-heading"
-    >
-      <div className="mb-4">
-        <p className="eyebrow">Design System</p>
-        <h2 id="route-surface-preview-heading" className="m-0 text-text-primary text-xl font-bold leading-tight">Shared route surfaces</h2>
-        <p className="m-0 text-text-secondary leading-[1.55] text-sm mt-1">Standard pages inherit atmosphere, panel treatment, and spacing from the top-level shell.</p>
-      </div>
-      <div className="grid gap-4 @[768px]:grid-cols-2">
-        <article className="p-[1.2rem] rounded-[18px] bg-[rgba(255,255,255,0.025)] border border-[rgba(255,255,255,0.06)]">
-          <p className="m-0 text-accent-warm uppercase tracking-[0.08em] text-[0.76rem] font-bold">Cards</p>
-          <h3 className="m-0 text-text-primary text-[1.08rem] leading-[1.12]">Search workflow</h3>
-          <p className="m-0 text-text-secondary leading-[1.55] text-[0.94rem]">Hero panel, content shelves, and inputs all align to the same system tokens.</p>
-        </article>
-        <article className="p-[1.2rem] rounded-[18px] bg-[rgba(255,255,255,0.025)] border border-[rgba(255,255,255,0.06)]">
-          <p className="m-0 text-accent-warm uppercase tracking-[0.08em] text-[0.76rem] font-bold">Explorer</p>
-          <h3 className="m-0 text-text-primary text-[1.08rem] leading-[1.12]">Data-rich views</h3>
-          <p className="m-0 text-text-secondary leading-[1.55] text-[0.94rem]">Dense tools keep their behavior while inheriting a more atmospheric shell and stronger hierarchy.</p>
-        </article>
-      </div>
-    </section>
-  );
-}
 
 export function StorybookViewportFrame({
   mode,
@@ -205,39 +158,6 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-export function StorybookFeatureCardsPreview() {
-  return (
-    <div className="w-[min(100%,var(--content-max-width))] mx-auto [container-type:inline-size]">
-      <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[768px]:grid-cols-2 @[1024px]:grid-cols-3 [container-type:inline-size]">
-        <FeatureCard title="Trade Balancer" description="Compare offers, price cards, and tune fair swaps." href="/tools/trade-balancer" icon="trade" onNavigate={() => undefined} />
-        <FeatureCard title="Card Search" description="Find cards by name, type, keyword and more." href="/cards" icon="search" onNavigate={() => undefined} />
-        <FeatureCard title="Sealed Simulator" description="Generate pools from any format. Build and save decks." href="/tools/sealed-pools" icon="sealed" onNavigate={() => undefined} />
-      </div>
-    </div>
-  );
-}
-
-export function StorybookPromoCardsPreview() {
-  return (
-    <div className="w-[min(100%,var(--content-max-width))] mx-auto [container-type:inline-size]">
-      <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[640px]:grid-cols-2 [container-type:inline-size]">
-        <PromoCard label="Tool" title="Tier List Generator" description="Create and share tier lists." muted />
-        <PromoCard label="Learn" title="Learn to Search" description="Open the query builder and learn the search language." muted />
-      </div>
-    </div>
-  );
-}
-
-export function StorybookSurfaceGallery() {
-  return (
-    <div className="grid gap-4 p-4 w-[min(100%,var(--content-max-width))] mx-auto [container-type:inline-size]">
-      <StorybookFeatureCardsPreview />
-      <StorybookPromoCardsPreview />
-      <RouteSurfacePreview />
     </div>
   );
 }
