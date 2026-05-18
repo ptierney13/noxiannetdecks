@@ -223,7 +223,6 @@ html {
 
   @media (max-width: 780px) {
     .app-shell {
-      width: min(100% - 24px, 1480px);
       padding-top: 18px;
     }
   }
