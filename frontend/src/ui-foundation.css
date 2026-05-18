@@ -97,6 +97,13 @@
   --shadow-focus: 0 0 0 3px var(--color-focus-ring);
 }
 
+/* Restore subpixel antialiasing — Tailwind Preflight sets antialiased
+   which makes Outfit render noticeably thinner than intended. */
+html {
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
 /* ============================================================
    COMPONENTS — named classes migrated from legacy styles.css.
    Uses @layer components so Tailwind utilities still win on
@@ -195,7 +202,6 @@
   /* App shell — page-level layout with atmospheric hero glow */
   .app-shell {
     position: relative;
-    max-width: var(--content-max-width);
     margin: 0 auto;
     padding: 1.5rem var(--space-shell-x) 3rem;
   }

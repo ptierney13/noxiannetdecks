@@ -60,7 +60,7 @@ function resolveActiveSection(pathname: string) {
 }
 
 // Shared Tailwind classes for nav shell elements
-const navShellBase = "max-w-[var(--content-max-width)] mx-auto min-h-[72px] items-center gap-4 p-[0.7rem_1rem] rounded-3xl bg-[rgba(9,12,18,0.86)] border border-[rgba(255,255,255,0.08)] shadow-[0_18px_60px_rgba(0,0,0,0.45)] backdrop-blur-[16px]";
+const navShellBase = "mx-auto min-h-[72px] items-center gap-4 p-[0.7rem_1rem] rounded-3xl bg-[rgba(9,12,18,0.86)] border border-[rgba(255,255,255,0.08)] shadow-[0_18px_60px_rgba(0,0,0,0.45)] backdrop-blur-[16px]";
 
 const navLinkBase = "inline-flex items-center justify-between gap-[0.45rem] min-h-[42px] px-[0.95rem] border-0 rounded-[12px] bg-transparent text-text-secondary font-semibold no-underline cursor-pointer hover:text-text-primary hover:bg-[rgba(255,255,255,0.04)]";
 

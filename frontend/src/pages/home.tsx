@@ -15,7 +15,7 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
   return (
     <div className="p-[0.8rem_var(--space-shell-x)_3rem]">
       {/* grid shell — container for all home content */}
-      <div className="w-[min(100%,var(--content-max-width))] mx-auto [container-type:inline-size] [container-name:home-shell]">
+      <div className="w-full [container-type:inline-size] [container-name:home-shell]">
         {/* hero shell */}
         <div className="pt-[0.2rem]">
           {/* hero card — inner container for hero-specific breakpoints */}
