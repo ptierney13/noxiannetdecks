@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import App from "./App";
-import { StorybookViewportFrame } from "./home";
+import { StorybookViewportFrame } from "./lib";
 
 const meta = {
   title: "Design System/Header",

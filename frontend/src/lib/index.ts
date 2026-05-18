@@ -35,3 +35,4 @@ export {
   type HeaderShellMode,
   type DesktopHeaderStage,
 } from "./headerLayout";
+export { StorybookViewportFrame } from "./StorybookViewportFrame";
