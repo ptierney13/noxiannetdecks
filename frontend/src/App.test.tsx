@@ -852,8 +852,8 @@ describe("App", () => {
     const chip = await screen.findByRole("button", { name: "e>=3" });
     await user.click(chip);
 
-    const searchInput = document.querySelector<HTMLInputElement>(".site-nav-search-input");
-    expect(searchInput?.value).toBe("e>=3");
+    const searchInput = screen.getByRole<HTMLInputElement>("searchbox", { name: "Search cards" });
+    expect(searchInput.value).toBe("e>=3");
   });
 
   it("searches when the user clicks Search", async () => {
@@ -1108,7 +1108,6 @@ describe("App", () => {
     expect(await screen.findByRole("heading", { name: "Tier List" })).toBeInTheDocument();
 
     expect(window.location.pathname).toBe("/tools/tier-list");
-    expect(screen.getByRole("button", { name: "Tools" })).toHaveClass("active");
     await user.click(screen.getByRole("button", { name: "Tools" }));
     expect(screen.getByRole("link", { name: "Tier List Generator" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("Generate a filtered card pool")).toBeInTheDocument();

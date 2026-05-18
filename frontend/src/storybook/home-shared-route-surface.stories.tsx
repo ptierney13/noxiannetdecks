@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { RouteSurfacePreview, StorybookViewportFrame } from "../siteSystem";
+import { RouteSurfacePreview, StorybookViewportFrame } from "../home";
 
 const meta = {
   title: "Design System/Shared/Route Surface",

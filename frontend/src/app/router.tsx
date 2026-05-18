@@ -1,7 +1,7 @@
 import { createRootRoute, createRoute, createRouter, useNavigate } from "@tanstack/react-router";
 import AppShell from "./AppShell";
 import { PageShell } from "../ui";
-import { HomePage } from "../siteSystem";
+import { HomePage } from "../home";
 import { NotFoundView } from "../ui";
 import SearchView from "../SearchView";
 import LearnToSearchView from "../LearnToSearchView";

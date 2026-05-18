@@ -1,154 +1,27 @@
 import { type FormEvent, type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { resolveDesktopHeaderStage, type DesktopHeaderStage } from "./lib";
+import { ChevronIcon, MenuIcon, SearchIcon } from "./ui";
+import { FeatureCard } from "./ui/FeatureCard";
+import { PromoCard } from "./ui/PromoCard";
 
 export const heroBackgroundAsset = "/design-assets/hero-background.png";
 
-function SearchGlyph() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-      <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="1.9" />
-      <path d="m20 20-4.2-4.2" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.9" />
-    </svg>
-  );
-}
-
-function ChevronGlyph({ expanded = false }: { expanded?: boolean }) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false" className={expanded ? "chevron expanded" : "chevron"}>
-      <path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6 1.4-1.4Z" fill="currentColor" />
-    </svg>
-  );
-}
-
-function MenuGlyph({ open = false }: { open?: boolean }) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false" className="menu-icon">
-      {open ? (
-        <path d="M6 6 18 18M18 6 6 18" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-      ) : (
-        <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-      )}
-    </svg>
-  );
-}
-
-function CardsGlyph() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-      <rect x="5" y="5" width="11" height="15" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <rect x="9" y="3" width="11" height="15" rx="2" fill="none" opacity="0.48" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M8.5 9.5h4.8M8.5 12.5h4.8" fill="none" opacity="0.56" stroke="currentColor" strokeLinecap="round" strokeWidth="1.4" />
-    </svg>
-  );
-}
-
-function DeckGlyph() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-      <path d="M5.5 8.2 12 5l6.5 3.2v7.6L12 19l-6.5-3.2V8.2Z" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M12 5v14M5.5 8.2 12 12l6.5-3.8" fill="none" opacity="0.7" stroke="currentColor" strokeWidth="1.6" />
-    </svg>
-  );
-}
-
-function SealedGlyph() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-      <rect x="4.5" y="7.5" width="15" height="11.5" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M7 7.5c0-1.7 1.6-3 5-3s5 1.3 5 3" fill="none" opacity="0.7" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M8 12h8M12 8.8v6.4" fill="none" opacity="0.7" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6" />
-    </svg>
-  );
-}
-
-type FeatureCardProps = {
-  title: string;
-  description: string;
-  href: string;
-  onNavigate: (href: string) => void;
-  icon: "search" | "trade" | "sealed";
-};
-
-function FeatureCard({ title, description, href, onNavigate, icon }: FeatureCardProps) {
-  const glyph = icon === "search"
-    ? <SearchGlyph />
-    : icon === "trade"
-      ? (
-        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-          <path d="M7 7h8.5l-2.7-2.7L14.2 3 19 7.8l-4.8 4.8-1.4-1.3L15.5 9H7V7Zm10 8H8.5l2.7 2.7-1.4 1.3L5 14.2l4.8-4.8 1.4 1.3L8.5 13H17v2Z" fill="currentColor" />
-        </svg>
-      )
-      : <SealedGlyph />;
-
-  return (
-    <a
-      href={href}
-      className="home-feature-card"
-      onClick={(event) => {
-        event.preventDefault();
-        onNavigate(href);
-      }}
-    >
-      <div className="home-feature-icon-row">
-        <div className="home-feature-icon-tile">{glyph}</div>
-        <span className="home-feature-arrow" aria-hidden="true">→</span>
-      </div>
-      <div className="home-feature-copy">
-        <h3 className="home-feature-title">{title}</h3>
-        <p className="home-feature-desc">{description}</p>
-      </div>
-    </a>
-  );
-}
-
-type PromoCardProps = {
-  label: string;
-  title: string;
-  description: string;
-  href?: string;
-  onNavigate?: (href: string) => void;
-  muted?: boolean;
-};
-
-function PromoCard({ label, title, description, href, onNavigate, muted = false }: PromoCardProps) {
-  const className = muted ? "home-promo-card home-promo-card--muted" : "home-promo-card";
-
-  if (!href || !onNavigate) {
-    return (
-      <div className={className}>
-        <div className="home-promo-label">{label}</div>
-        <h3>{title}</h3>
-        <p>{description}</p>
-        <span className="home-promo-arrow" aria-hidden="true">→</span>
-      </div>
-    );
-  }
-
-  return (
-    <a
-      href={href}
-      className={className}
-      onClick={(event) => {
-        event.preventDefault();
-        onNavigate(href);
-      }}
-    >
-      <div className="home-promo-label">{label}</div>
-      <h3>{title}</h3>
-      <p>{description}</p>
-      <span className="home-promo-arrow" aria-hidden="true">→</span>
-    </a>
-  );
-}
-
 export function ArtworkShowcasePanel() {
   return (
-    <section className="artwork-showcase" aria-labelledby="artwork-showcase-heading">
-      <div className="artwork-showcase-header">
-        <p id="artwork-showcase-heading">Background Artwork</p>
+    <section
+      className="rounded-[22px] border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0)),rgba(10,13,20,0.9)] shadow-[var(--shadow-surface-1)] p-4 [container-type:inline-size] [container-name:surface-shell]"
+      aria-labelledby="artwork-showcase-heading"
+    >
+      <div className="mb-3">
+        <p
+          id="artwork-showcase-heading"
+          className="m-0 text-accent-warm uppercase tracking-[0.08em] text-[0.76rem] font-bold"
+        >
+          Background Artwork
+        </p>
       </div>
-      <div className="artwork-showcase-frame">
-        <img src={heroBackgroundAsset} alt="" />
+      <div className="overflow-hidden rounded-[18px] aspect-[2.8/1]">
+        <img src={heroBackgroundAsset} alt="" className="w-full h-full block object-cover object-center" />
       </div>
     </section>
   );
@@ -156,22 +29,25 @@ export function ArtworkShowcasePanel() {
 
 export function RouteSurfacePreview() {
   return (
-    <section className="route-surface-preview" aria-labelledby="route-surface-preview-heading">
-      <div className="section-heading section-heading--compact">
+    <section
+      className="rounded-[22px] border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0)),rgba(10,13,20,0.9)] shadow-[var(--shadow-surface-1)] p-4 [container-type:inline-size] [container-name:surface-shell]"
+      aria-labelledby="route-surface-preview-heading"
+    >
+      <div className="mb-4">
         <p className="eyebrow">Design System</p>
-        <h2 id="route-surface-preview-heading">Shared route surfaces</h2>
-        <p>Standard pages inherit atmosphere, panel treatment, and spacing from the top-level shell.</p>
+        <h2 id="route-surface-preview-heading" className="m-0 text-text-primary text-xl font-bold leading-tight">Shared route surfaces</h2>
+        <p className="m-0 text-text-secondary leading-[1.55] text-sm mt-1">Standard pages inherit atmosphere, panel treatment, and spacing from the top-level shell.</p>
       </div>
-      <div className="route-surface-preview-grid">
-        <article className="route-surface-card">
-          <p className="route-surface-kicker">Cards</p>
-          <h3>Search workflow</h3>
-          <p>Hero panel, content shelves, and inputs all align to the same system tokens.</p>
+      <div className="grid gap-4 @[768px]:grid-cols-2">
+        <article className="p-[1.2rem] rounded-[18px] bg-[rgba(255,255,255,0.025)] border border-[rgba(255,255,255,0.06)]">
+          <p className="m-0 text-accent-warm uppercase tracking-[0.08em] text-[0.76rem] font-bold">Cards</p>
+          <h3 className="m-0 text-text-primary text-[1.08rem] leading-[1.12]">Search workflow</h3>
+          <p className="m-0 text-text-secondary leading-[1.55] text-[0.94rem]">Hero panel, content shelves, and inputs all align to the same system tokens.</p>
         </article>
-        <article className="route-surface-card">
-          <p className="route-surface-kicker">Explorer</p>
-          <h3>Data-rich views</h3>
-          <p>Dense tools keep their behavior while inheriting a more atmospheric shell and stronger hierarchy.</p>
+        <article className="p-[1.2rem] rounded-[18px] bg-[rgba(255,255,255,0.025)] border border-[rgba(255,255,255,0.06)]">
+          <p className="m-0 text-accent-warm uppercase tracking-[0.08em] text-[0.76rem] font-bold">Explorer</p>
+          <h3 className="m-0 text-text-primary text-[1.08rem] leading-[1.12]">Data-rich views</h3>
+          <p className="m-0 text-text-secondary leading-[1.55] text-[0.94rem]">Dense tools keep their behavior while inheriting a more atmospheric shell and stronger hierarchy.</p>
         </article>
       </div>
     </section>
@@ -195,12 +71,17 @@ export function StorybookViewportFrame({
       ? { width: `${desktopWidth}px`, maxWidth: `${desktopWidth}px` }
       : undefined;
 
+  const outerClass = mode === "mobile"
+    ? "min-h-screen p-[1.5rem_1rem_2.5rem] overflow-auto grid justify-center content-start overflow-x-auto"
+    : "min-h-screen p-6 overflow-auto";
+
+  const innerClass = mode === "mobile"
+    ? "w-full max-w-[393px] min-h-[852px] flex-none mx-auto"
+    : "w-[min(100%,1280px)] mx-auto";
+
   return (
-    <div className={`storybook-viewport storybook-viewport--${mode}`}>
-      <div
-        className={`storybook-viewport-inner storybook-viewport-inner--${mode}`}
-        style={widthStyle}
-      >
+    <div className={outerClass}>
+      <div className={innerClass} style={widthStyle}>
         {children}
       </div>
     </div>
@@ -217,94 +98,121 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
   }
 
   return (
-    <div className="home-page">
-      <section className="home-hero-shell">
-        <div className="home-hero home-grid-shell">
-          <div className="home-hero-art">
-            <div className="home-hero-art-frame">
-              <img src={heroBackgroundAsset} alt="" className="home-hero-art-image" />
+    <div className="p-[0.8rem_var(--space-shell-x)_3rem]">
+      {/* grid shell — container for all home content */}
+      <div className="w-[min(100%,var(--content-max-width))] mx-auto [container-type:inline-size] [container-name:home-shell]">
+        {/* hero shell */}
+        <div className="pt-[0.2rem]">
+          {/* hero card — inner container for hero-specific breakpoints */}
+          <div className="relative grid min-h-[min(35rem,calc(100svh-6.85rem))] @[768px]:min-h-[35rem] items-end rounded-[32px] overflow-hidden isolate bg-[#080b11] border border-[rgba(255,255,255,0.08)] shadow-[var(--shadow-surface-2)] [container-type:inline-size] [container-name:hero-shell]">
+            {/* background art */}
+            <div className="absolute inset-0 z-0">
+              <div className="relative w-full h-full overflow-hidden">
+                <div className="absolute inset-0 z-[1] transition-[background,transform] duration-[180ms] bg-[linear-gradient(180deg,rgba(4,6,10,0.04)_0%,rgba(4,6,10,0.14)_32%,rgba(4,6,10,0.46)_100%),linear-gradient(180deg,rgba(5,7,11,0.04)_0%,rgba(5,7,11,0.24)_100%)] @[640px]:bg-[linear-gradient(180deg,rgba(4,6,10,0.03)_0%,rgba(4,6,10,0.1)_24%,rgba(4,6,10,0.34)_100%),linear-gradient(90deg,rgba(5,7,11,0)_0%,rgba(5,7,11,0.03)_82%,rgba(5,7,11,0.14)_112%)] @[768px]:bg-[linear-gradient(180deg,rgba(4,6,10,0.05)_0%,rgba(4,6,10,0.12)_24%,rgba(4,6,10,0.42)_100%),linear-gradient(180deg,rgba(5,7,11,0.04)_0%,rgba(5,7,11,0.24)_100%)]" />
+                <div className="absolute inset-0 z-[2] pointer-events-none transition-[background,transform] duration-[180ms] bg-[radial-gradient(circle_at_72%_18%,rgba(215,170,73,0.12),transparent_18%),radial-gradient(circle_at_64%_34%,rgba(202,45,63,0.2),transparent_38%),linear-gradient(180deg,rgba(6,8,12,0)_0%,rgba(6,8,12,0.18)_100%)] @[640px]:bg-[radial-gradient(circle_at_74%_16%,rgba(215,170,73,0.14),transparent_18%),radial-gradient(circle_at_66%_30%,rgba(202,45,63,0.2),transparent_36%),linear-gradient(180deg,rgba(6,8,12,0)_0%,rgba(6,8,12,0.14)_100%)]" />
+                <img
+                  src={heroBackgroundAsset}
+                  alt=""
+                  className="relative z-0 w-full h-full object-cover object-[62%_top] @[768px]:object-[center_22%] @[1024px]:object-[center_24%] block [filter:saturate(1.08)_brightness(0.98)] min-h-[min(35rem,calc(100svh-6.85rem))] @[768px]:min-h-[35rem] @[1024px]:min-h-[35rem]"
+                />
+              </div>
+            </div>
+            {/* copy */}
+            <div className="relative z-[2] flex flex-col items-center justify-center gap-[1.05rem] @[640px]:gap-[1.1rem] @[768px]:gap-[1.15rem] w-full @[768px]:w-[min(100%,46rem)] min-h-[min(35rem,calc(100svh-6.85rem))] @[768px]:min-h-[35rem] px-[1.2rem] py-[1.85rem_1.55rem] @[640px]:p-[1.9rem_1.35rem_1.7rem] @[768px]:p-[2.2rem_2rem] @[1024px]:p-[2.5rem_2.5rem_3rem] text-center @[1024px]:translate-y-[2rem] transition-[width,min-height,padding,transform] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] bg-[linear-gradient(180deg,rgba(8,11,18,0.04)_0%,rgba(8,11,18,0.22)_26%,rgba(8,11,18,0.82)_62%,rgba(8,11,18,0.96)_100%)] @[768px]:bg-[linear-gradient(180deg,rgba(8,11,18,0.04)_0%,rgba(8,11,18,0.16)_20%,rgba(8,11,18,0.64)_56%,rgba(8,11,18,0.92)_100%)]">
+              <p className="eyebrow">Noxian Netdecks</p>
+              <h1 className="flex flex-col items-center gap-[0.05em] m-0 text-[clamp(4.65rem,17cqi,6.8rem)] @[640px]:text-[clamp(3.1rem,8.4vw,4.25rem)] @[768px]:text-[4.75rem] @[1024px]:text-[4.75rem] leading-[0.94] tracking-[-0.055em] transition-[font-size,transform] duration-[180ms]">
+                <span className="text-text-primary text-[0.68em] @[768px]:text-[0.7em]">The Complete</span>
+                <span className="bg-[linear-gradient(180deg,#fff5ec_0%,#d73c51_18%,#c62f45_88%)] bg-clip-text text-transparent">Riftbound</span>
+                <span className="bg-[linear-gradient(180deg,#fdecc2_0%,#d8aa49_84%)] bg-clip-text text-transparent">Archive</span>
+              </h1>
+              <p className="hidden @[768px]:block max-w-[30rem] @[1024px]:max-w-[26rem] @[1024px]:text-[1.15rem] m-0 text-text-secondary text-base leading-[1.55]">Search cards, understand price trends.</p>
+              <form
+                className="grid [grid-template-columns:minmax(0,1fr)_auto] gap-[0.7rem] mt-[0.3rem] w-full max-w-full @[640px]:w-[min(100%,34rem)] @[768px]:w-[min(100%,40rem)] @[1024px]:w-[min(100%,50rem)] transition-[width] duration-[180ms]"
+                onSubmit={handleSearchSubmit}
+              >
+                <label
+                  className="flex items-center gap-[0.7rem] min-h-[58px] px-4 rounded-[16px] bg-[rgba(11,14,22,0.48)] border border-[rgba(255,219,155,0.18)] backdrop-blur-[12px] focus-within:border-[rgba(247,198,91,0.72)] focus-within:shadow-[0_0_0_3px_rgba(215,170,73,0.2)]"
+                  aria-label="Search cards, decks, pools"
+                >
+                  <span className="grid place-items-center text-text-tertiary [&_svg]:w-4 [&_svg]:h-4" aria-hidden="true">
+                    <SearchIcon />
+                  </span>
+                  <input
+                    className="flex-1 w-full min-w-0 border-0 bg-transparent text-text-primary outline-none placeholder:text-text-tertiary"
+                    type="text"
+                    placeholder="Search cards, decks, pools..."
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
+                  />
+                </label>
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center min-h-[42px] border-0 rounded-[12px] px-[1.2rem] bg-[var(--gradient-accent-button)] text-[#fff9f5] font-bold cursor-pointer whitespace-nowrap shadow-[0_10px_24px_rgba(133,18,32,0.32),inset_0_1px_0_rgba(255,242,218,0.28)] hover:brightness-[1.08] hover:saturate-[1.04]"
+                >
+                  Search
+                </button>
+              </form>
             </div>
           </div>
-          <div className="home-hero-copy">
-            <p className="eyebrow">Noxian Netdecks</p>
-            <h1 className="hero-heading">
-              <span className="hero-heading-plain">The Complete</span>
-              <span className="hero-heading-accent">Riftbound</span>
-              <span className="hero-heading-warm">Archive</span>
-            </h1>
-            <p className="hero-sub">Search cards, understand price trends.</p>
-            <form className="hero-search-box" onSubmit={handleSearchSubmit}>
-              <label className="hero-search-field" aria-label="Search cards, decks, pools">
-                <span className="hero-search-icon">
-                  <SearchGlyph />
-                </span>
-                <input
-                  className="hero-search-input"
-                  type="text"
-                  placeholder="Search cards, decks, pools..."
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  spellCheck={false}
-                />
-              </label>
-              <button type="submit" className="hero-search-btn">Search</button>
-            </form>
+        </div>
+
+        {/* content section */}
+        <div className="grid gap-[0.85rem] @[768px]:gap-4 @[1280px]:gap-[1.1rem] pt-[0.9rem] @[768px]:pt-4">
+          {/* feature grid */}
+          <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[768px]:grid-cols-2 @[1024px]:grid-cols-3 [container-type:inline-size]">
+            <FeatureCard
+              title="Trade Balancer"
+              description="Compare offers, price cards, and tune fair swaps."
+              href="/tools/trade-balancer"
+              icon="trade"
+              onNavigate={onNavigate}
+            />
+            <FeatureCard
+              title="Card Search"
+              description="Find cards by name, type, keyword and more."
+              href="/cards"
+              icon="search"
+              onNavigate={onNavigate}
+            />
+            <FeatureCard
+              title="Sealed Simulator"
+              description="Generate pools from any format. Build and save decks."
+              href="/tools/sealed-pools"
+              icon="sealed"
+              onNavigate={onNavigate}
+            />
+          </div>
+
+          {/* promo grid */}
+          <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[640px]:grid-cols-2 [container-type:inline-size]">
+            <PromoCard
+              label="Tool"
+              title="Tier List Generator"
+              description="Create and share tier lists."
+              href="/tools/tier-list"
+              onNavigate={onNavigate}
+            />
+            <PromoCard
+              label="Learn"
+              title="Learn to Search"
+              description="Open the query builder and learn the search language."
+              href="/cards/learn-to-search"
+              onNavigate={onNavigate}
+            />
           </div>
         </div>
-      </section>
-
-      <section className="home-content home-grid-shell" aria-label="Primary features">
-        <div className="home-feature-grid">
-          <FeatureCard
-            title="Trade Balancer"
-            description="Compare offers, price cards, and tune fair swaps."
-            href="/tools/trade-balancer"
-            icon="trade"
-            onNavigate={onNavigate}
-          />
-          <FeatureCard
-            title="Card Search"
-            description="Find cards by name, type, keyword and more."
-            href="/cards"
-            icon="search"
-            onNavigate={onNavigate}
-          />
-          <FeatureCard
-            title="Sealed Simulator"
-            description="Generate pools from any format. Build and save decks."
-            href="/tools/sealed-pools"
-            icon="sealed"
-            onNavigate={onNavigate}
-          />
-        </div>
-
-        <div className="home-promo-grid">
-          <PromoCard
-            label="Tool"
-            title="Tier List Generator"
-            description="Create and share tier lists."
-            href="/tools/tier-list"
-            onNavigate={onNavigate}
-          />
-          <PromoCard
-            label="Learn"
-            title="Learn to Search"
-            description="Open the query builder and learn the search language."
-            href="/cards/learn-to-search"
-            onNavigate={onNavigate}
-          />
-        </div>
-      </section>
+      </div>
     </div>
   );
 }
 
 export function StorybookFeatureCardsPreview() {
   return (
-    <div className="home-grid-shell">
-      <div className="home-feature-grid">
+    <div className="w-[min(100%,var(--content-max-width))] mx-auto [container-type:inline-size]">
+      <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[768px]:grid-cols-2 @[1024px]:grid-cols-3 [container-type:inline-size]">
         <FeatureCard title="Trade Balancer" description="Compare offers, price cards, and tune fair swaps." href="/tools/trade-balancer" icon="trade" onNavigate={() => undefined} />
         <FeatureCard title="Card Search" description="Find cards by name, type, keyword and more." href="/cards" icon="search" onNavigate={() => undefined} />
         <FeatureCard title="Sealed Simulator" description="Generate pools from any format. Build and save decks." href="/tools/sealed-pools" icon="sealed" onNavigate={() => undefined} />
@@ -315,8 +223,8 @@ export function StorybookFeatureCardsPreview() {
 
 export function StorybookPromoCardsPreview() {
   return (
-    <div className="home-grid-shell">
-      <div className="home-promo-grid">
+    <div className="w-[min(100%,var(--content-max-width))] mx-auto [container-type:inline-size]">
+      <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[640px]:grid-cols-2 [container-type:inline-size]">
         <PromoCard label="Tool" title="Tier List Generator" description="Create and share tier lists." muted />
         <PromoCard label="Learn" title="Learn to Search" description="Open the query builder and learn the search language." muted />
       </div>
@@ -326,7 +234,7 @@ export function StorybookPromoCardsPreview() {
 
 export function StorybookSurfaceGallery() {
   return (
-    <div className="storybook-surface-gallery home-grid-shell">
+    <div className="grid gap-4 p-4 w-[min(100%,var(--content-max-width))] mx-auto [container-type:inline-size]">
       <StorybookFeatureCardsPreview />
       <StorybookPromoCardsPreview />
       <RouteSurfacePreview />
@@ -373,7 +281,7 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
           </div>
           <div className="site-nav-search-form site-nav-search-form--static site-nav-search-form--mobile-inline mobile-nav-search">
             <span className="site-nav-search-icon" aria-hidden="true">
-              <SearchGlyph />
+              <SearchIcon />
             </span>
             <input className="site-nav-search-input" readOnly placeholder="Search" />
             <button type="button" className="site-nav-search-btn">Search</button>
@@ -384,7 +292,7 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
             aria-expanded={showMobileMenu}
             onClick={() => setShowMobileMenu((current) => !current)}
           >
-            <MenuGlyph open={showMobileMenu} />
+            <MenuIcon open={showMobileMenu} />
           </button>
         </div>
         {showMobileMenu ? (
@@ -400,7 +308,7 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
                 }}
               >
                 <span>Cards</span>
-                <ChevronGlyph expanded={showMobileCardsMenu} />
+                <ChevronIcon expanded={showMobileCardsMenu} />
               </button>
               {showMobileCardsMenu ? (
                 <div className="storybook-mobile-submenu">
@@ -419,7 +327,7 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
                 }}
               >
                 <span>Tools</span>
-                <ChevronGlyph expanded={showMobileToolsMenu} />
+                <ChevronIcon expanded={showMobileToolsMenu} />
               </button>
               {showMobileToolsMenu ? (
                 <div className="storybook-mobile-submenu">
@@ -448,7 +356,7 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
         </div>
         <div className={`site-nav-search-form site-nav-search-form--static${useCompactInlineHeader ? " site-nav-search-form--mobile-inline mobile-nav-search" : ""}`}>
           <span className="site-nav-search-icon" aria-hidden="true">
-            <SearchGlyph />
+            <SearchIcon />
           </span>
           <input className="site-nav-search-input" readOnly placeholder={desktopHeaderStage === "full" ? "Search for Riftbound Cards" : "Search"} />
           <button type="button" className="site-nav-search-btn">Search</button>
@@ -468,7 +376,7 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
                 }}
               >
                 Cards
-                <ChevronGlyph expanded={showCardsMenu} />
+                <ChevronIcon expanded={showCardsMenu} />
               </button>
               {showCardsMenu ? (
                 <div className="site-nav-tools-popover" role="menu" aria-label="Cards">
@@ -492,7 +400,7 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
                 }}
               >
                 Tools
-                <ChevronGlyph expanded={showToolsMenu} />
+                <ChevronIcon expanded={showToolsMenu} />
               </button>
               {showToolsMenu ? (
                 <div className="site-nav-tools-popover" role="menu" aria-label="Tools">
@@ -515,7 +423,7 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
                 setShowToolsMenu(false);
               }}
             >
-              <MenuGlyph open={showCompactMenu} />
+              <MenuIcon open={showCompactMenu} />
             </button>
             {showCompactMenu ? (
               <div className="site-nav-compact-popover" role="menu" aria-label="Compact navigation">
@@ -543,5 +451,3 @@ export function StorybookHeaderPreview({ mode = "desktop" }: { mode?: "desktop" 
     </div>
   );
 }
-
-export { CardsGlyph, SearchGlyph };

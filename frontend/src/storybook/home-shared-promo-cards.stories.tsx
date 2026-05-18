@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { StorybookPromoCardsPreview, StorybookViewportFrame } from "../siteSystem";
+import { StorybookPromoCardsPreview, StorybookViewportFrame } from "../home";
 
 const meta = {
   title: "Design System/Shared/Promo Cards",

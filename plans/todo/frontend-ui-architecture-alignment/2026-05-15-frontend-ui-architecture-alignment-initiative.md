@@ -191,11 +191,17 @@ them out explicitly and explain why the default boundary is not sufficient.
 - Layer boundaries: `app/`, `ui/`, `lib/`, `features/` are established.
   Import rules in the Target Architecture Contract apply.
 
-**Active and upcoming stages (4–7):**
-- Stage 4 installs TanStack Query and creates the `data/` skeleton only.
+**Completed stages (4–5) — do not reopen:**
+- Stage 4 installed TanStack Query and created the `data/` skeleton.
   No UI changes. No page rewrites.
-- Stage 5 rewrites Home and AppShell in Tailwind — same visuals, correct code.
-  Extracts shared components to `ui/`. No other pages touched.
+- Stage 5 rewrote Home and AppShell in Tailwind — same visuals, correct code.
+  Extracted `FeatureCard` and `PromoCard` to `ui/`. `siteSystem.tsx` deleted.
+  `@theme` token block added to `ui-foundation.css`. AppShell uses pure Tailwind
+  with stage-based state (no CSS class modifiers). `StorybookHeaderPreview`
+  still uses legacy CSS class names — `site-nav-*` selectors remain in
+  `styles.css` until that component is migrated.
+
+**Active and upcoming stages (6–7):**
 - Stage 6 moves `cardFormat.tsx` exports to the correct layers.
   No visual or behavioral changes.
 - Stage 7 rewrites legacy pages one at a time, each driven by a user-provided
@@ -235,7 +241,7 @@ wired, `AppShell` uses `<Outlet />`, all routes are defined in
 `app/router.tsx`, `PageShell` wraps every route, and the `app/`, `ui/`,
 `lib/`, and `features/` layer boundaries are established.
 
-**Stages 4–7 are the active work.** Each must be finalized and approved before
+**Stages 6–7 are the active work.** Each must be finalized and approved before
 implementation begins.
 
 | Stage | Status | Summary |
@@ -244,8 +250,8 @@ implementation begins.
 | 1 | ✅ Complete | Component inventory, Storybook policy, boundary definitions |
 | 2 | ✅ Complete | Shared shell/component extraction; `App.tsx` reduced to providers + router |
 | 3 | ✅ Complete | TanStack Router adoption; zero `window.history` calls remain |
-| 4 | 🔄 Active | Documentation refresh, TanStack Query install, `data/` skeleton |
-| 5 | 📋 Planned | Home Tailwind rewrite + component extraction; AppShell Tailwind rewrite |
+| 4 | ✅ Complete | Documentation refresh, TanStack Query install, `data/` skeleton |
+| 5 | ✅ Complete | Home Tailwind rewrite + component extraction; AppShell Tailwind rewrite |
 | 6 | 📋 Planned | `cardFormat.tsx` analysis and placement into correct layers |
 | 7 | 📋 Planned | Page-by-page UI rewrites with mockup-driven iteration |
 
