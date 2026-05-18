@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { StorybookHeaderPreview, StorybookViewportFrame } from "../home";
+import { StorybookHeaderPreview, StorybookViewportFrame } from "./home";
 
 const meta = {
   title: "Design System/Header",

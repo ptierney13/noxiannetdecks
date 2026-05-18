@@ -192,8 +192,11 @@ Use `@storybook/test` play functions for meaningful interaction states.
 
 ### Story Structure
 
-- Group stories by system area, not by arbitrary catch-all demo pages.
-- Shared patterns live in shared folders, not buried inside a page story.
+**Stories are colocated with the file they test.** A story for
+`src/ui/FeatureCard.tsx` lives at `src/ui/FeatureCard.stories.tsx`. A story
+for `src/home.tsx` lives at `src/home.stories.tsx`. There is no `src/storybook/`
+directory — do not create one.
+
 - Prefer focused stories for individual reusable primitives.
 - Build route-level stories from shared components so Storybook supports both
   isolated and assembled review.
@@ -326,16 +329,15 @@ When a component is migrated to Tailwind, delete its corresponding section.
 
 ### Storybook Coverage Gaps
 
-Current stories (6 files under `src/storybook/`):
+Current stories (colocated with their source files):
 
 | Story file | What it covers |
 | ---------- | -------------- |
-| `design-system.stories.test.tsx` | Design system token tests |
-| `header.stories.tsx` | Header component stories |
-| `home-shared-feature-cards.stories.tsx` | Feature card component |
-| `home-shared-promo-cards.stories.tsx` | Promo card component |
-| `home-shared-route-surface.stories.tsx` | Route surface |
-| `home.stories.tsx` | Home page |
+| `src/header.stories.tsx` | Header component (desktop/mobile stages) |
+| `src/home.stories.tsx` | Home page (desktop/mobile) |
+| `src/App.stories.tsx` | Full app shell |
+| `src/ui/FeatureCard.stories.tsx` | FeatureCard component |
+| `src/ui/PromoCard.stories.tsx` | PromoCard component |
 
 Missing coverage (required before stage completion):
 

@@ -24,7 +24,7 @@ this one.
 | Data fetching or API calls                      | `src/data/` — TanStack Query keys and queryOptions     |
 | Non-domain hooks or utilities                   | `src/lib/`                                             |
 | CSS migration of an existing component          | Migration Era Contract section below                   |
-| Any Storybook story addition or update          | Storybook Requirement section below                    |
+| Any Storybook story addition or update          | Storybook Requirement section below — stories are always colocated with their source file |
 | Stage-level architectural decisions             | `plans/todo/frontend-ui-architecture-alignment/`       |
 
 ## Migration Era Contract (active during this initiative)
@@ -147,11 +147,16 @@ are purpose-built for their interaction model.
 
 Storybook is the primary UI review harness. It is required, not optional.
 
+**Stories are always colocated with the file they test.** A story for
+`src/ui/FeatureCard.tsx` lives at `src/ui/FeatureCard.stories.tsx`. A story
+for `src/home.tsx` lives at `src/home.stories.tsx`. There is no `src/storybook/`
+folder — that directory was removed. Do not recreate it.
+
 | Surface | Story required? |
 | ------- | --------------- |
-| Exported `ui/` component | Yes |
-| Exported `features/` component | Yes |
-| Route-shell or feature state the user should inspect | Yes |
+| Exported `ui/` component | Yes — colocated in `ui/ComponentName.stories.tsx` |
+| Exported `features/` component | Yes — colocated in `features/ComponentName.stories.tsx` |
+| Route-shell or feature state the user should inspect | Yes — colocated with the source file |
 | Tiny private leaf helper with no meaningful inspectable state | No |
 
 Stories must cover: default, loading, empty, and error states where applicable.
