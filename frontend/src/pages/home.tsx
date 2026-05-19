@@ -40,12 +40,12 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
             {/* background art */}
             <div className="absolute inset-0 z-0">
               <div className="relative w-full h-full overflow-hidden">
-                <div className="absolute inset-0 z-[1] transition-[background,transform] duration-[180ms] bg-[linear-gradient(180deg,rgba(4,6,10,0.04)_0%,rgba(4,6,10,0.14)_32%,rgba(4,6,10,0.46)_100%),linear-gradient(180deg,rgba(5,7,11,0.04)_0%,rgba(5,7,11,0.24)_100%)] @[640px]:bg-[linear-gradient(180deg,rgba(4,6,10,0.03)_0%,rgba(4,6,10,0.1)_24%,rgba(4,6,10,0.34)_100%),linear-gradient(90deg,rgba(5,7,11,0)_0%,rgba(5,7,11,0.03)_82%,rgba(5,7,11,0.14)_112%)] @[768px]:bg-[linear-gradient(180deg,rgba(4,6,10,0.05)_0%,rgba(4,6,10,0.12)_24%,rgba(4,6,10,0.42)_100%),linear-gradient(180deg,rgba(5,7,11,0.04)_0%,rgba(5,7,11,0.24)_100%)]" />
-                <div className="absolute inset-0 z-[2] pointer-events-none transition-[background,transform] duration-[180ms] bg-[radial-gradient(circle_at_72%_18%,rgba(215,170,73,0.12),transparent_18%),radial-gradient(circle_at_64%_34%,rgba(202,45,63,0.2),transparent_38%),linear-gradient(180deg,rgba(6,8,12,0)_0%,rgba(6,8,12,0.18)_100%)] @[640px]:bg-[radial-gradient(circle_at_74%_16%,rgba(215,170,73,0.14),transparent_18%),radial-gradient(circle_at_66%_30%,rgba(202,45,63,0.2),transparent_36%),linear-gradient(180deg,rgba(6,8,12,0)_0%,rgba(6,8,12,0.14)_100%)]" />
+                <div className="absolute inset-0 z-[1] transition-[background,transform] duration-[180ms] bg-[linear-gradient(180deg,rgba(4,6,10,0.02)_0%,rgba(4,6,10,0.06)_32%,rgba(4,6,10,0.28)_100%),linear-gradient(180deg,rgba(5,7,11,0.02)_0%,rgba(5,7,11,0.12)_100%)] @[640px]:bg-[linear-gradient(180deg,rgba(4,6,10,0.02)_0%,rgba(4,6,10,0.05)_24%,rgba(4,6,10,0.22)_100%),linear-gradient(180deg,rgba(5,7,11,0.01)_0%,rgba(5,7,11,0.08)_100%)] @[768px]:bg-[linear-gradient(180deg,rgba(4,6,10,0.02)_0%,rgba(4,6,10,0.05)_24%,rgba(4,6,10,0.24)_100%),linear-gradient(180deg,rgba(5,7,11,0.02)_0%,rgba(5,7,11,0.1)_100%)]" />
+                <div className="absolute inset-0 z-[2] pointer-events-none bg-[linear-gradient(180deg,rgba(6,8,12,0)_0%,rgba(6,8,12,0.1)_100%)]" />
                 <img
                   src={heroBackgroundAsset}
                   alt=""
-                  className="relative z-0 w-full h-full object-cover object-[center_top] block [filter:saturate(1.08)_brightness(0.98)] min-h-[min(44rem,calc(100svh-2rem))] @[768px]:min-h-[50rem]"
+                  className="relative z-0 w-full h-full object-cover object-[center_bottom] block [filter:saturate(1.05)_brightness(1.18)] min-h-[min(44rem,calc(100svh-2rem))] @[768px]:min-h-[50rem]"
                 />
                 {/* atmospheric fade — blends art into page background */}
                 <div className="absolute bottom-0 inset-x-0 z-[3] h-[32%] pointer-events-none bg-[image:linear-gradient(to_bottom,transparent,#05060a)]" />
