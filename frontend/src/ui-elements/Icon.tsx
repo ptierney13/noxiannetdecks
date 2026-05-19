@@ -29,6 +29,24 @@ export function MenuIcon({ open }: { open: boolean }) {
   );
 }
 
+export function TradeIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+      <path d="M7 7h8.5l-2.7-2.7L14.2 3 19 7.8l-4.8 4.8-1.4-1.3L15.5 9H7V7Zm10 8H8.5l2.7 2.7-1.4 1.3L5 14.2l4.8-4.8 1.4 1.3L8.5 13H17v2Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function SealedIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+      <rect x="4.5" y="7.5" width="15" height="11.5" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M7 7.5c0-1.7 1.6-3 5-3s5 1.3 5 3" fill="none" opacity="0.7" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M8 12h8M12 8.8v6.4" fill="none" opacity="0.7" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
 export function ChevronIcon({ expanded }: { expanded: boolean }) {
   return (
     <svg

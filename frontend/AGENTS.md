@@ -138,7 +138,9 @@ when container width is the actual layout signal. Storybook stories must render
 correctly when the canvas is resized.
 
 After meaningful CSS architecture changes, restart Storybook fresh rather than
-relying on hot reload.
+relying on hot reload. Always stop the existing instance before starting a new
+one — Storybook runs on port 6006 and never emits a ready signal, so do not
+wait for startup confirmation; check console logs for errors instead.
 
 Navigation should be authored mobile-first and scaled upward. Prefer separate
 mobile and desktop navigation implementations that share tokens and data but

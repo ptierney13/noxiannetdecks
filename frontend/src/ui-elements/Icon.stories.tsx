@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { SearchIcon, CardsIcon, MenuIcon, ChevronIcon } from "./Icon";
+import { SearchIcon, CardsIcon, MenuIcon, ChevronIcon, TradeIcon, SealedIcon } from "./Icon";
 
 const meta = {
   title: "UI/Icons",
@@ -55,6 +55,22 @@ export const ChevronExpanded: Story = {
   render: () => (
     <span style={{ display: "inline-block", width: 24, height: 24, color: "white" }}>
       <ChevronIcon expanded={true} />
+    </span>
+  ),
+};
+
+export const Trade: Story = {
+  render: () => (
+    <span style={{ display: "inline-block", width: 24, height: 24, color: "white" }}>
+      <TradeIcon />
+    </span>
+  ),
+};
+
+export const Sealed: Story = {
+  render: () => (
+    <span style={{ display: "inline-block", width: 24, height: 24, color: "white" }}>
+      <SealedIcon />
     </span>
   ),
 };
