@@ -171,7 +171,7 @@ export function AppHeader() {
   return (
     <header
       ref={headerShellRef}
-      className="sticky top-0 z-60 bg-[var(--color-surface-header)] backdrop-blur-[16px] border-b border-[rgba(255,255,255,0.06)]"
+      className="sticky top-0 z-60 [background:linear-gradient(180deg,#5c1623_0%,#3a0c15_100%)] border-b border-[rgba(255,160,160,0.16)] shadow-[0_4px_30px_rgba(255,50,50,0.16)]"
     >
       {headerShellMode === "desktop" ? (
         <nav
