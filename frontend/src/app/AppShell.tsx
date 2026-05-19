@@ -12,7 +12,7 @@ export default function AppShell() {
           {error}
         </div>
       ) : null}
-      <main className="app-shell">
+      <main>
         <Outlet />
       </main>
     </>

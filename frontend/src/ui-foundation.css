@@ -199,17 +199,6 @@ html {
     }
   }
 
-  /* App shell — page-level padding */
-  .app-shell {
-    padding: 1.5rem 0 3rem;
-  }
-
-  @media (max-width: 780px) {
-    .app-shell {
-      padding-top: 18px;
-    }
-  }
-
   /* Site page shell — grid wrapper for page sections */
   .site-page-shell {
     position: relative;
