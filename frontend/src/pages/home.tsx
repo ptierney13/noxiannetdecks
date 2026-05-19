@@ -38,7 +38,7 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
         {/* hero — full-bleed, no card border */}
         <div>
           {/* hero card — inner container for hero-specific breakpoints */}
-          <div className="relative grid place-items-center min-h-[min(40rem,calc(100svh-4rem))] @[768px]:min-h-[46rem] overflow-hidden isolate bg-[#05060a] [container-type:inline-size] [container-name:hero-shell]">
+          <div className="relative grid place-items-center min-h-[min(34rem,calc(100svh-4rem))] @[768px]:min-h-[40rem] overflow-hidden isolate bg-[#05060a] [container-type:inline-size] [container-name:hero-shell]">
             {/* background art */}
             <div className="absolute inset-0 z-0">
               <div className="relative w-full h-full overflow-hidden">
@@ -77,7 +77,7 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
         </div>
 
         {/* content section — negative margin pulls first tile row over the hero bottom */}
-        <div className="relative z-10 grid gap-[0.85rem] @[768px]:gap-4 @[1280px]:gap-[1.1rem] -mt-[6rem] @[768px]:-mt-[7rem] px-[var(--space-shell-x)]">
+        <div className="relative z-10 grid gap-[0.85rem] @[768px]:gap-4 @[1280px]:gap-[1.1rem] -mt-[9rem] @[768px]:-mt-[10rem] px-[var(--space-shell-x)]">
           {[0, 1, 2, 3, 4].map((i) => (
             <div key={i} className="grid gap-[0.85rem] @[768px]:gap-4">
               {/* feature grid */}
