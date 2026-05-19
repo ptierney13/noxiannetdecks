@@ -6,7 +6,7 @@ import {
   type DesktopHeaderStage,
   type HeaderShellMode,
 } from "../lib";
-import { ChevronIcon, MenuIcon, SearchIcon } from "../ui-elements";
+import { ChevronIcon, LogoBadge, MenuIcon, SearchIcon } from "../ui-elements";
 import { useHeaderSearch } from "./HeaderSearchContext";
 
 function NavLink({
@@ -74,7 +74,7 @@ export function AppHeader() {
   const pathname = routerState.location.pathname;
   const searchStr = routerState.location.searchStr;
 
-  const { query: headerSearchQuery, setQuery: setHeaderSearchQuery } = useHeaderSearch();
+  const { query: headerSearchQuery, setQuery: setHeaderSearchQuery, headerSearchVisible } = useHeaderSearch();
   const [showToolsMenu, setShowToolsMenu] = useState(false);
   const toolsMenuRef = useRef<HTMLDivElement | null>(null);
   const [showCardsMenu, setShowCardsMenu] = useState(false);
@@ -176,7 +176,7 @@ export function AppHeader() {
     >
       {headerShellMode === "desktop" ? (
         <nav
-          className={`${navShellBase} grid w-full min-w-0 relative transition-[grid-template-columns,gap] duration-[220ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${isCompact ? "grid-cols-[auto_minmax(0,1fr)_auto] gap-x-3" : "grid-cols-[auto_minmax(280px,1fr)_auto]"}`}
+          className={`${navShellBase} grid w-full min-w-0 relative transition-[grid-template-columns,gap] duration-[220ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${!headerSearchVisible ? "grid-cols-[auto_1fr]" : isCompact ? "grid-cols-[auto_minmax(0,1fr)_auto] gap-x-3" : "grid-cols-[auto_minmax(280px,1fr)_auto]"}`}
           aria-label="Primary navigation"
         >
           <button
@@ -185,40 +185,40 @@ export function AppHeader() {
             onClick={() => void navigate({ to: "/" })}
             aria-label="Noxian Netdecks home"
           >
-            <div className="w-[2.2rem] h-[2.2rem] shrink-0 rounded-[0.7rem] grid place-items-center bg-[image:var(--gradient-accent-hero)] text-[#fff8f3] text-[1.3rem] font-extrabold shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
-              N
-            </div>
+            <LogoBadge />
             <span className={`text-[1.1rem] font-bold tracking-[-0.02em] whitespace-nowrap overflow-hidden transition-[max-width,opacity,margin-left] duration-[220ms,180ms,220ms] ease-[cubic-bezier(0.22,1,0.36,1),ease,ease] ${desktopHeaderStage === "full" ? "max-w-[12rem] opacity-100 ml-0" : "max-w-0 opacity-0 -ml-[0.35rem]"}`}>
               Noxian Netdecks
             </span>
           </button>
-          <form
-            className={`flex items-center gap-[0.65rem] min-h-[50px] p-[0.35rem_0.4rem_0.35rem_0.85rem] rounded-[16px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] min-w-0 transition-[gap,padding,border-color,box-shadow] duration-[180ms,220ms,180ms,180ms] ease-[ease,cubic-bezier(0.22,1,0.36,1),ease,ease] focus-within:border-border-accent focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.05),var(--shadow-focus)] ${isCompact ? "w-full max-w-none self-stretch gap-[0.5rem] px-[0.75rem]" : ""}`}
-            onSubmit={handleHeaderSearchSubmit}
-            role="search"
-            aria-label="Site card search"
-          >
-            <div className="grid place-items-center text-text-tertiary [&_svg]:w-4 [&_svg]:h-4" aria-hidden="true">
-              <SearchIcon />
-            </div>
-            <input
-              className="flex-1 w-full min-w-0 border-0 bg-transparent text-text-primary outline-none placeholder:text-text-tertiary"
-              type="search"
-              placeholder={desktopHeaderStage === "full" ? "Search for Riftbound Cards" : "Search"}
-              value={headerSearchQuery}
-              onChange={(event) => setHeaderSearchQuery(event.target.value)}
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              aria-label="Search cards"
-            />
-            <button
-              type="submit"
-              className={`inline-flex items-center justify-center min-h-[42px] border-0 rounded-[12px] px-[1.2rem] bg-[image:var(--gradient-accent-button)] text-[#fff9f5] font-bold cursor-pointer whitespace-nowrap shadow-[0_10px_24px_rgba(133,18,32,0.32),inset_0_1px_0_rgba(255,242,218,0.28)] overflow-hidden transition-[max-width,opacity,padding,margin,filter] duration-[220ms,180ms,220ms,220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease,cubic-bezier(0.22,1,0.36,1),ease,ease] hover:brightness-[1.08] hover:saturate-[1.04] max-w-[8rem] opacity-100 pointer-events-auto w-auto`}
+          {headerSearchVisible ? (
+            <form
+              className={`flex items-center gap-[0.65rem] min-h-[50px] p-[0.35rem_0.4rem_0.35rem_0.85rem] rounded-[16px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] min-w-0 transition-[gap,padding,border-color,box-shadow] duration-[180ms,220ms,180ms,180ms] ease-[ease,cubic-bezier(0.22,1,0.36,1),ease,ease] focus-within:border-border-accent focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.05),var(--shadow-focus)] animate-[search-grow-in_280ms_cubic-bezier(0.22,1,0.36,1)_forwards] ${isCompact ? "w-full max-w-none self-stretch gap-[0.5rem] px-[0.75rem]" : ""}`}
+              onSubmit={handleHeaderSearchSubmit}
+              role="search"
+              aria-label="Site card search"
             >
-              Search
-            </button>
-          </form>
+              <div className="grid place-items-center text-text-tertiary [&_svg]:w-4 [&_svg]:h-4" aria-hidden="true">
+                <SearchIcon />
+              </div>
+              <input
+                className="flex-1 w-full min-w-0 border-0 bg-transparent text-text-primary outline-none placeholder:text-text-tertiary"
+                type="search"
+                placeholder={desktopHeaderStage === "full" ? "Search for Riftbound Cards" : "Search"}
+                value={headerSearchQuery}
+                onChange={(event) => setHeaderSearchQuery(event.target.value)}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                aria-label="Search cards"
+              />
+              <button
+                type="submit"
+                className="inline-flex items-center justify-center min-h-[42px] border-0 rounded-[12px] px-[1.2rem] bg-[image:var(--gradient-accent-button)] text-[#fff9f5] font-bold cursor-pointer whitespace-nowrap shadow-[0_10px_24px_rgba(133,18,32,0.32),inset_0_1px_0_rgba(255,242,218,0.28)] overflow-hidden hover:brightness-[1.08] hover:saturate-[1.04] w-auto"
+              >
+                Search
+              </button>
+            </form>
+          ) : null}
           <div className={`relative inline-flex justify-end items-center transition-[width,min-width,gap] duration-[220ms,220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),ease] ${isCompact ? "w-12 min-w-12 gap-0 justify-items-end" : "w-auto min-w-0 gap-[0.65rem]"}`}>
             <div className={`inline-flex justify-end items-center gap-[0.4rem] min-w-0 overflow-hidden transition-[max-width,opacity,transform] duration-[240ms,180ms,220ms] ease-[cubic-bezier(0.22,1,0.36,1),ease,ease] ${isFullNav ? "max-w-[34rem] opacity-100 overflow-visible pointer-events-auto" : "max-w-0 opacity-0 translate-x-[0.35rem] pointer-events-none"}`}>
               <div className="relative" ref={cardsMenuRef}>
@@ -315,47 +315,49 @@ export function AppHeader() {
       ) : null}
       {headerShellMode === "mobile" ? (
         <div className="grid w-full">
-          <div className={`${navShellBase} grid w-full grid-cols-[auto_minmax(0,1fr)_auto]`}>
+          <div className={`${navShellBase} flex w-full`}>
             <button
               type="button"
-              className="inline-flex items-center gap-[0.8rem] border-0 p-0 bg-transparent text-text-primary cursor-pointer overflow-hidden min-w-0 max-w-[2.2rem]"
+              className="inline-flex items-center gap-[0.8rem] border-0 p-0 bg-transparent text-text-primary cursor-pointer overflow-hidden min-w-0 max-w-[2.2rem] shrink-0"
               onClick={() => void navigate({ to: "/" })}
               aria-label="Noxian Netdecks home"
             >
-              <div className="w-[2.2rem] h-[2.2rem] shrink-0 rounded-[0.7rem] grid place-items-center bg-[image:var(--gradient-accent-hero)] text-[#fff8f3] text-[1.3rem] font-extrabold shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
-                N
-              </div>
+              <LogoBadge />
               <span className="text-[1.1rem] font-bold tracking-[-0.02em] whitespace-nowrap overflow-hidden max-w-0 opacity-0 -ml-[0.35rem]">
                 Noxian Netdecks
               </span>
             </button>
-            <form
-              className="flex items-center gap-[0.5rem] min-h-[50px] p-[0.35rem_0.4rem_0.35rem_0.75rem] rounded-[16px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] min-w-0 w-full self-stretch focus-within:border-border-accent focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.05),var(--shadow-focus)]"
-              onSubmit={handleHeaderSearchSubmit}
-              role="search"
-              aria-label="Mobile site card search"
-            >
-              <div className="grid place-items-center text-text-tertiary [&_svg]:w-4 [&_svg]:h-4" aria-hidden="true">
-                <SearchIcon />
-              </div>
-              <input
-                className="flex-1 w-full min-w-0 border-0 bg-transparent text-text-primary outline-none placeholder:text-text-tertiary"
-                type="search"
-                placeholder="Search"
-                value={headerSearchQuery}
-                onChange={(event) => setHeaderSearchQuery(event.target.value)}
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
-                aria-label="Search cards"
-              />
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center min-h-[42px] border-0 rounded-[12px] px-[1.2rem] bg-[image:var(--gradient-accent-button)] text-[#fff9f5] font-bold cursor-pointer whitespace-nowrap shadow-[0_10px_24px_rgba(133,18,32,0.32),inset_0_1px_0_rgba(255,242,218,0.28)] hover:brightness-[1.08] hover:saturate-[1.04] w-auto"
-              >
-                Search
-              </button>
-            </form>
+            <div className="flex-1 min-w-0 mx-3">
+              {headerSearchVisible ? (
+                <form
+                  className="flex items-center gap-[0.5rem] min-h-[50px] p-[0.35rem_0.4rem_0.35rem_0.75rem] rounded-[16px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] min-w-0 w-full focus-within:border-border-accent focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.05),var(--shadow-focus)] animate-[search-grow-in_280ms_cubic-bezier(0.22,1,0.36,1)_forwards]"
+                  onSubmit={handleHeaderSearchSubmit}
+                  role="search"
+                  aria-label="Mobile site card search"
+                >
+                  <div className="grid place-items-center text-text-tertiary [&_svg]:w-4 [&_svg]:h-4" aria-hidden="true">
+                    <SearchIcon />
+                  </div>
+                  <input
+                    className="flex-1 w-full min-w-0 border-0 bg-transparent text-text-primary outline-none placeholder:text-text-tertiary"
+                    type="search"
+                    placeholder="Search"
+                    value={headerSearchQuery}
+                    onChange={(event) => setHeaderSearchQuery(event.target.value)}
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    aria-label="Search cards"
+                  />
+                  <button
+                    type="submit"
+                    className="inline-flex items-center justify-center min-h-[42px] border-0 rounded-[12px] px-[1.2rem] bg-[image:var(--gradient-accent-button)] text-[#fff9f5] font-bold cursor-pointer whitespace-nowrap shadow-[0_10px_24px_rgba(133,18,32,0.32),inset_0_1px_0_rgba(255,242,218,0.28)] hover:brightness-[1.08] hover:saturate-[1.04] w-auto"
+                  >
+                    Search
+                  </button>
+                </form>
+              ) : null}
+            </div>
             <button
               type="button"
               className="inline-flex items-center justify-center w-12 h-12 border border-[rgba(255,255,255,0.08)] rounded-[0.95rem] bg-[rgba(255,255,255,0.03)] text-text-primary cursor-pointer"

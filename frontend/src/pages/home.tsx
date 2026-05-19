@@ -1,10 +1,28 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useLayoutEffect, useRef } from "react";
 import { SearchIcon, TileFeature, TilePromo } from "../ui-elements";
+import { useHeaderSearch } from "../app/HeaderSearchContext";
 
 export const heroBackgroundAsset = "/design-assets/hero-background.png";
 
 export function HomePage({ onNavigate }: { onNavigate: (href: string) => void }) {
-  const [query, setQuery] = useState("");
+  const { query, setQuery, setHeaderSearchVisible } = useHeaderSearch();
+  const heroFormRef = useRef<HTMLFormElement>(null);
+
+  useLayoutEffect(() => {
+    setHeaderSearchVisible(false);
+    return () => setHeaderSearchVisible(true);
+  }, [setHeaderSearchVisible]);
+
+  useEffect(() => {
+    const el = heroFormRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => setHeaderSearchVisible(!entry!.isIntersecting),
+      { threshold: 0 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [setHeaderSearchVisible]);
 
   function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -44,6 +62,7 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
               </h1>
               <p className="hidden @[768px]:block max-w-[30rem] @[1024px]:max-w-[26rem] @[1024px]:text-[1.15rem] m-0 text-text-secondary text-base leading-[1.55]">Search cards, understand price trends.</p>
               <form
+                ref={heroFormRef}
                 className="grid [grid-template-columns:minmax(0,1fr)_auto] gap-[0.7rem] mt-[0.3rem] w-full max-w-full @[640px]:w-[min(100%,34rem)] @[768px]:w-[min(100%,40rem)] @[1024px]:w-[min(100%,50rem)] transition-[width] duration-[180ms]"
                 onSubmit={handleSearchSubmit}
               >
@@ -78,48 +97,52 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
 
         {/* content section */}
         <div className="grid gap-[0.85rem] @[768px]:gap-4 @[1280px]:gap-[1.1rem] pt-[0.9rem] @[768px]:pt-4 px-[var(--space-shell-x)]">
-          {/* feature grid */}
-          <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[768px]:grid-cols-2 @[1024px]:grid-cols-3 [container-type:inline-size]">
-            <TileFeature
-              title="Trade Balancer"
-              description="Compare offers, price cards, and tune fair swaps."
-              href="/tools/trade-balancer"
-              icon="trade"
-              onNavigate={onNavigate}
-            />
-            <TileFeature
-              title="Card Search"
-              description="Find cards by name, type, keyword and more."
-              href="/cards"
-              icon="search"
-              onNavigate={onNavigate}
-            />
-            <TileFeature
-              title="Sealed Simulator"
-              description="Generate pools from any format. Build and save decks."
-              href="/tools/sealed-pools"
-              icon="sealed"
-              onNavigate={onNavigate}
-            />
-          </div>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div key={i} className="grid gap-[0.85rem] @[768px]:gap-4">
+              {/* feature grid */}
+              <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[768px]:grid-cols-2 @[1024px]:grid-cols-3 [container-type:inline-size]">
+                <TileFeature
+                  title="Trade Balancer"
+                  description="Compare offers, price cards, and tune fair swaps."
+                  href="/tools/trade-balancer"
+                  icon="trade"
+                  onNavigate={onNavigate}
+                />
+                <TileFeature
+                  title="Card Search"
+                  description="Find cards by name, type, keyword and more."
+                  href="/cards"
+                  icon="search"
+                  onNavigate={onNavigate}
+                />
+                <TileFeature
+                  title="Sealed Simulator"
+                  description="Generate pools from any format. Build and save decks."
+                  href="/tools/sealed-pools"
+                  icon="sealed"
+                  onNavigate={onNavigate}
+                />
+              </div>
 
-          {/* promo grid */}
-          <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[640px]:grid-cols-2 [container-type:inline-size]">
-            <TilePromo
-              label="Tool"
-              title="Tier List Generator"
-              description="Create and share tier lists."
-              href="/tools/tier-list"
-              onNavigate={onNavigate}
-            />
-            <TilePromo
-              label="Learn"
-              title="Learn to Search"
-              description="Open the query builder and learn the search language."
-              href="/cards/learn-to-search"
-              onNavigate={onNavigate}
-            />
-          </div>
+              {/* promo grid */}
+              <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[640px]:grid-cols-2 [container-type:inline-size]">
+                <TilePromo
+                  label="Tool"
+                  title="Tier List Generator"
+                  description="Create and share tier lists."
+                  href="/tools/tier-list"
+                  onNavigate={onNavigate}
+                />
+                <TilePromo
+                  label="Learn"
+                  title="Learn to Search"
+                  description="Open the query builder and learn the search language."
+                  href="/cards/learn-to-search"
+                  onNavigate={onNavigate}
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -87,6 +87,11 @@
   --rarity-promo-soft: rgba(239, 83, 80, 0.15);
 }
 
+@keyframes search-grow-in {
+  from { clip-path: inset(0 50%); opacity: 0; }
+  to   { clip-path: inset(0 0%);  opacity: 1; }
+}
+
 /* ============================================================
    ROOT — compositions only
    Rule: only tokens that reference other tokens via var().
