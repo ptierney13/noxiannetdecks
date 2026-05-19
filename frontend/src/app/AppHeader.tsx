@@ -60,7 +60,7 @@ function resolveActiveSection(pathname: string) {
 }
 
 // Shared Tailwind classes for nav shell elements
-const navShellBase = "mx-auto min-h-[72px] items-center gap-4 p-[0.7rem_1rem] rounded-3xl bg-[rgba(9,12,18,0.86)] border border-[rgba(255,255,255,0.08)] shadow-[0_18px_60px_rgba(0,0,0,0.45)] backdrop-blur-[16px]";
+const navShellBase = "min-h-[60px] items-center gap-4 px-[var(--space-shell-x)] py-[0.6rem] bg-transparent";
 
 const navLinkBase = "inline-flex items-center justify-between gap-[0.45rem] min-h-[42px] px-[0.95rem] border-0 rounded-[12px] bg-transparent text-text-secondary font-semibold no-underline cursor-pointer hover:text-text-primary hover:bg-[rgba(255,255,255,0.04)]";
 
@@ -172,7 +172,7 @@ export function AppHeader() {
   return (
     <header
       ref={headerShellRef}
-      className="sticky top-0 z-60 pt-3 px-[var(--space-shell-x)] sm:pt-4 xl:pt-[1.1rem]"
+      className="sticky top-0 z-60 bg-[rgba(5,6,10,0.92)] backdrop-blur-[16px] border-b border-[rgba(255,255,255,0.06)]"
     >
       {headerShellMode === "desktop" ? (
         <nav
@@ -314,7 +314,7 @@ export function AppHeader() {
         </nav>
       ) : null}
       {headerShellMode === "mobile" ? (
-        <div className="grid w-full gap-[0.85rem]">
+        <div className="grid w-full">
           <div className={`${navShellBase} grid w-full grid-cols-[auto_minmax(0,1fr)_auto]`}>
             <button
               type="button"
