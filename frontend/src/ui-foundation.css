@@ -199,39 +199,14 @@ html {
     }
   }
 
-  /* App shell — page-level layout with atmospheric hero glow */
+  /* App shell — page-level padding */
   .app-shell {
-    position: relative;
-    margin: 0 auto;
-    padding: 1.5rem var(--space-shell-x) 3rem;
-  }
-
-  .app-shell::before {
-    content: "";
-    position: absolute;
-    inset: 1rem var(--space-shell-x) auto;
-    height: 18rem;
-    border-radius: 30px;
-    background:
-      linear-gradient(180deg, rgba(3, 5, 9, 0.08), rgba(3, 5, 9, 0.82)),
-      radial-gradient(circle at center, rgba(211, 48, 62, 0.18), transparent 60%),
-      url("/design-assets/hero-background.png") center 24% / cover no-repeat;
-    opacity: 0.38;
-    pointer-events: none;
-    filter: saturate(1.04);
+    padding: 1.5rem 0 3rem;
   }
 
   @media (max-width: 780px) {
     .app-shell {
       padding-top: 18px;
-    }
-  }
-
-  @media (min-width: 640px) {
-    .app-shell::before {
-      inset-inline: var(--space-shell-x);
-      height: 18rem;
-      border-radius: 30px;
     }
   }
 

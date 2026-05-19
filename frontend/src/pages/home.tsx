@@ -16,10 +16,10 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
     <div>
       {/* grid shell — container for all home content */}
       <div className="w-full [container-type:inline-size] [container-name:home-shell]">
-        {/* hero shell */}
-        <div className="pt-[0.2rem]">
+        {/* hero — full-bleed, no card border */}
+        <div>
           {/* hero card — inner container for hero-specific breakpoints */}
-          <div className="relative grid min-h-[min(35rem,calc(100svh-6.85rem))] @[768px]:min-h-[35rem] items-end rounded-[32px] overflow-hidden isolate bg-[#080b11] border border-[rgba(255,255,255,0.08)] shadow-[var(--shadow-surface-2)] [container-type:inline-size] [container-name:hero-shell]">
+          <div className="relative grid min-h-[min(35rem,calc(100svh-6.85rem))] @[768px]:min-h-[35rem] items-end overflow-hidden isolate bg-[#05060a] [container-type:inline-size] [container-name:hero-shell]">
             {/* background art */}
             <div className="absolute inset-0 z-0">
               <div className="relative w-full h-full overflow-hidden">
@@ -30,6 +30,8 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
                   alt=""
                   className="relative z-0 w-full h-full object-cover object-[62%_top] @[768px]:object-[center_22%] @[1024px]:object-[center_24%] block [filter:saturate(1.08)_brightness(0.98)] min-h-[min(35rem,calc(100svh-6.85rem))] @[768px]:min-h-[35rem] @[1024px]:min-h-[35rem]"
                 />
+                {/* atmospheric fade — blends art into page background */}
+                <div className="absolute bottom-0 inset-x-0 z-[3] h-[30%] pointer-events-none bg-[image:linear-gradient(to_bottom,transparent,#05060a)]" />
               </div>
             </div>
             {/* copy */}
@@ -75,7 +77,7 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
         </div>
 
         {/* content section */}
-        <div className="grid gap-[0.85rem] @[768px]:gap-4 @[1280px]:gap-[1.1rem] pt-[0.9rem] @[768px]:pt-4">
+        <div className="grid gap-[0.85rem] @[768px]:gap-4 @[1280px]:gap-[1.1rem] pt-[0.9rem] @[768px]:pt-4 px-[var(--space-shell-x)]">
           {/* feature grid */}
           <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[768px]:grid-cols-2 @[1024px]:grid-cols-3 [container-type:inline-size]">
             <TileFeature
