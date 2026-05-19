@@ -1,4 +1,4 @@
-import { type FormEvent, type MouseEvent, type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type MouseEvent, type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   resolveDesktopHeaderStage,
@@ -6,7 +6,7 @@ import {
   type DesktopHeaderStage,
   type HeaderShellMode,
 } from "../lib";
-import { ChevronIcon, LogoBadge, MenuIcon, SearchIcon } from "../ui-elements";
+import { CardSearchInput, ChevronIcon, LogoBadge, MenuIcon } from "../ui-elements";
 import { useHeaderSearch } from "./HeaderSearchContext";
 
 function NavLink({
@@ -161,11 +161,10 @@ export function AppHeader() {
   const isCompact = desktopHeaderStage === "compact" || desktopHeaderStage === "search";
   const isFullNav = desktopHeaderStage === "nav" || desktopHeaderStage === "full";
 
-  function handleHeaderSearchSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function handleHeaderSearchSubmit(value: string) {
     void navigate({
       to: "/cards",
-      search: { q: headerSearchQuery.trim() || undefined },
+      search: { q: value.trim() || undefined },
     });
   }
 
@@ -191,33 +190,12 @@ export function AppHeader() {
             </span>
           </button>
           {headerSearchVisible ? (
-            <form
-              className={`flex items-center gap-[0.65rem] min-h-[50px] p-[0.35rem_0.4rem_0.35rem_0.85rem] rounded-[16px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] min-w-0 transition-[gap,padding,border-color,box-shadow] duration-[180ms,220ms,180ms,180ms] ease-[ease,cubic-bezier(0.22,1,0.36,1),ease,ease] focus-within:border-border-accent focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.05),var(--shadow-focus)] animate-[search-grow-in_280ms_cubic-bezier(0.22,1,0.36,1)_forwards] ${isCompact ? "w-full max-w-none self-stretch gap-[0.5rem] px-[0.75rem]" : ""}`}
+            <CardSearchInput
+              value={headerSearchQuery}
+              onChange={setHeaderSearchQuery}
               onSubmit={handleHeaderSearchSubmit}
-              role="search"
-              aria-label="Site card search"
-            >
-              <div className="grid place-items-center text-text-tertiary [&_svg]:w-4 [&_svg]:h-4" aria-hidden="true">
-                <SearchIcon />
-              </div>
-              <input
-                className="flex-1 w-full min-w-0 border-0 bg-transparent text-text-primary outline-none placeholder:text-text-tertiary"
-                type="search"
-                placeholder={desktopHeaderStage === "full" ? "Search for Riftbound Cards" : "Search"}
-                value={headerSearchQuery}
-                onChange={(event) => setHeaderSearchQuery(event.target.value)}
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
-                aria-label="Search cards"
-              />
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center min-h-[42px] border-0 rounded-[12px] px-[1.2rem] bg-[image:var(--gradient-accent-button)] text-[#fff9f5] font-bold cursor-pointer whitespace-nowrap shadow-[0_10px_24px_rgba(133,18,32,0.32),inset_0_1px_0_rgba(255,242,218,0.28)] overflow-hidden hover:brightness-[1.08] hover:saturate-[1.04] w-auto"
-              >
-                Search
-              </button>
-            </form>
+              className={`animate-[search-grow-in_280ms_cubic-bezier(0.22,1,0.36,1)_forwards]${isCompact ? " w-full max-w-none self-stretch" : ""}`}
+            />
           ) : null}
           <div className={`relative inline-flex justify-end items-center transition-[width,min-width,gap] duration-[220ms,220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),ease] ${isCompact ? "w-12 min-w-12 gap-0 justify-items-end" : "w-auto min-w-0 gap-[0.65rem]"}`}>
             <div className={`inline-flex justify-end items-center gap-[0.4rem] min-w-0 overflow-hidden transition-[max-width,opacity,transform] duration-[240ms,180ms,220ms] ease-[cubic-bezier(0.22,1,0.36,1),ease,ease] ${isFullNav ? "max-w-[34rem] opacity-100 overflow-visible pointer-events-auto" : "max-w-0 opacity-0 translate-x-[0.35rem] pointer-events-none"}`}>
@@ -329,33 +307,12 @@ export function AppHeader() {
             </button>
             <div className="flex-1 min-w-0 mx-3">
               {headerSearchVisible ? (
-                <form
-                  className="flex items-center gap-[0.5rem] min-h-[50px] p-[0.35rem_0.4rem_0.35rem_0.75rem] rounded-[16px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] min-w-0 w-full focus-within:border-border-accent focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.05),var(--shadow-focus)] animate-[search-grow-in_280ms_cubic-bezier(0.22,1,0.36,1)_forwards]"
+                <CardSearchInput
+                  value={headerSearchQuery}
+                  onChange={setHeaderSearchQuery}
                   onSubmit={handleHeaderSearchSubmit}
-                  role="search"
-                  aria-label="Mobile site card search"
-                >
-                  <div className="grid place-items-center text-text-tertiary [&_svg]:w-4 [&_svg]:h-4" aria-hidden="true">
-                    <SearchIcon />
-                  </div>
-                  <input
-                    className="flex-1 w-full min-w-0 border-0 bg-transparent text-text-primary outline-none placeholder:text-text-tertiary"
-                    type="search"
-                    placeholder="Search"
-                    value={headerSearchQuery}
-                    onChange={(event) => setHeaderSearchQuery(event.target.value)}
-                    autoCapitalize="none"
-                    autoCorrect="off"
-                    spellCheck={false}
-                    aria-label="Search cards"
-                  />
-                  <button
-                    type="submit"
-                    className="inline-flex items-center justify-center min-h-[42px] border-0 rounded-[12px] px-[1.2rem] bg-[image:var(--gradient-accent-button)] text-[#fff9f5] font-bold cursor-pointer whitespace-nowrap shadow-[0_10px_24px_rgba(133,18,32,0.32),inset_0_1px_0_rgba(255,242,218,0.28)] hover:brightness-[1.08] hover:saturate-[1.04] w-auto"
-                  >
-                    Search
-                  </button>
-                </form>
+                  className="animate-[search-grow-in_280ms_cubic-bezier(0.22,1,0.36,1)_forwards] w-full"
+                />
               ) : null}
             </div>
             <button

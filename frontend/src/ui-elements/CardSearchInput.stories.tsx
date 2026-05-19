@@ -5,8 +5,11 @@ import { CardSearchInput } from "./CardSearchInput";
 const meta = {
   title: "UI/CardSearchInput",
   component: CardSearchInput,
-  parameters: {
-    layout: "padded",
+  parameters: { layout: "padded" },
+  args: {
+    value: "",
+    onChange: () => undefined,
+    onSubmit: () => undefined,
   },
 } satisfies Meta<typeof CardSearchInput>;
 
