@@ -40,15 +40,14 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
             {/* background art */}
             <div className="absolute inset-0 z-0">
               <div className="relative w-full h-full overflow-hidden">
-                <div className="absolute inset-0 z-[1] transition-[background,transform] duration-[180ms] bg-[linear-gradient(180deg,rgba(4,6,10,0.02)_0%,rgba(4,6,10,0.06)_32%,rgba(4,6,10,0.28)_100%),linear-gradient(180deg,rgba(5,7,11,0.02)_0%,rgba(5,7,11,0.12)_100%)] @[640px]:bg-[linear-gradient(180deg,rgba(4,6,10,0.02)_0%,rgba(4,6,10,0.05)_24%,rgba(4,6,10,0.22)_100%),linear-gradient(180deg,rgba(5,7,11,0.01)_0%,rgba(5,7,11,0.08)_100%)] @[768px]:bg-[linear-gradient(180deg,rgba(4,6,10,0.02)_0%,rgba(4,6,10,0.05)_24%,rgba(4,6,10,0.24)_100%),linear-gradient(180deg,rgba(5,7,11,0.02)_0%,rgba(5,7,11,0.1)_100%)]" />
-                <div className="absolute inset-0 z-[2] pointer-events-none bg-[linear-gradient(180deg,rgba(6,8,12,0)_0%,rgba(6,8,12,0.1)_100%)]" />
+                <div className="absolute inset-0 z-[1] pointer-events-none bg-[linear-gradient(180deg,rgba(6,8,12,0)_0%,rgba(6,8,12,0.1)_100%)]" />
                 <img
                   src={heroBackgroundAsset}
                   alt=""
-                  className="relative z-0 w-full h-full object-cover object-[center_bottom] block [filter:saturate(1.05)_brightness(1.18)] min-h-[min(44rem,calc(100svh-2rem))] @[768px]:min-h-[50rem]"
+                  className="relative z-0 w-full h-full object-cover object-[center_bottom] block [filter:saturate(1.05)_brightness(1.15)] min-h-[min(44rem,calc(100svh-2rem))] @[768px]:min-h-[50rem]"
                 />
-                {/* atmospheric fade — blends art into page background */}
-                <div className="absolute bottom-0 inset-x-0 z-[3] h-[32%] pointer-events-none bg-[image:linear-gradient(to_bottom,transparent,#05060a)]" />
+                {/* atmospheric fade — tight sliver below the tile row, inside bottom padding only */}
+                <div className="absolute bottom-0 inset-x-0 z-[2] h-[1.1rem] pointer-events-none bg-[image:linear-gradient(to_bottom,transparent,#05060a)]" />
               </div>
             </div>
             {/* copy zone — flex-1 so it fills all space above the tile row */}
