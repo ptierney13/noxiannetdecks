@@ -16,9 +16,11 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
   useEffect(() => {
     const el = heroFormRef.current;
     if (!el) return;
+    const headerH =
+      parseInt(getComputedStyle(document.documentElement).getPropertyValue("--site-header-height")) || 60;
     const obs = new IntersectionObserver(
       ([entry]) => setHeaderSearchVisible(!entry!.isIntersecting),
-      { threshold: 0 }
+      { threshold: 0, rootMargin: `-${headerH}px 0px 0px 0px` }
     );
     obs.observe(el);
     return () => obs.disconnect();
