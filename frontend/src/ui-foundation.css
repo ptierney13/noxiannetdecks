@@ -41,8 +41,8 @@
   --color-negative-soft: rgba(181, 32, 56, 0.12);
   --color-negative-border: rgba(181, 32, 56, 0.3);
   --color-negative-emphasis: rgba(181, 32, 56, 0.15);
-  --gradient-accent-hero: linear-gradient(135deg, #b32744 0%, #d8aa49 100%);
-  --gradient-accent-button: linear-gradient(135deg, #b32643 0%, #cf3c49 44%, #e0b455 100%);
+  --gradient-accent-hero: linear-gradient(135deg, #3A3A3F 0%, #1C1C20 100%);
+  --gradient-accent-button: linear-gradient(180deg, #F2C15A 0%, #E26A2C 100%);
   --shadow-surface-1: 0 16px 42px rgba(0, 0, 0, 0.32);
   --shadow-surface-2: 0 22px 60px rgba(0, 0, 0, 0.42);
   --radius-sm: 12px;

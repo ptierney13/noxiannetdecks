@@ -60,7 +60,7 @@ export function CardSearchInput({ value, onChange, onSubmit, isCompact, classNam
         )}
         <button
           type="submit"
-          className="self-stretch border-0 rounded-none px-[1.2rem] bg-[image:var(--gradient-accent-button)] text-[#fff9f5] font-bold cursor-pointer whitespace-nowrap shadow-[0_10px_24px_rgba(133,18,32,0.32),inset_0_1px_0_rgba(255,242,218,0.28)] hover:brightness-[1.08] hover:saturate-[1.04]"
+          className="self-stretch border-0 rounded-none px-[1.2rem] bg-[image:var(--gradient-accent-button)] text-[#1A0D05] font-bold cursor-pointer whitespace-nowrap shadow-[0_0_12px_rgba(242,193,90,0.35),0_4px_12px_rgba(0,0,0,0.4)] hover:brightness-[1.08] hover:saturate-[1.04]"
         >
           Search
         </button>
