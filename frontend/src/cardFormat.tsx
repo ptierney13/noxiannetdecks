@@ -383,15 +383,75 @@ export function PriceHistoryChart({ rows, colorsByRowId }: { rows: PublishedPric
   );
 }
 
+function variantButtonLabel(card: CardRecord, finish: string): string {
+  const parts: string[] = [card.set.set_id];
+  if (card.variant.alternate_art) parts.push("AA");
+  if (card.variant.signed) parts.push("SIG");
+  else if (card.variant.overnumbered) parts.push("ON");
+  if (finish === "foil" && card.finishes.includes("nonfoil")) parts.push("FOIL");
+  return parts.join(" ");
+}
+
+export function VariantButtonRow({
+  cards,
+  showPrice,
+  publishedPriceIndex,
+  onVariantClick,
+  activeKey,
+}: {
+  cards: CardRecord[];
+  showPrice: boolean;
+  publishedPriceIndex: ReturnType<typeof usePublishedPriceIndex>["index"];
+  onVariantClick: (card: CardRecord, finish: "foil" | "nonfoil") => void;
+  activeKey?: string;
+}) {
+  return (
+    <div className="variant-buttons" onClick={(e) => e.stopPropagation()}>
+      {cards.flatMap((card) =>
+        card.finishes.map((finish) => {
+          const key = `${card.id}-${finish}`;
+          const label = variantButtonLabel(card, finish);
+          const priceRows = getPublishedRowsForCard(publishedPriceIndex, card.tcgplayer_id);
+          const priceRow = showPrice ? resolveNearMintMarketPrice(priceRows, finish) : null;
+          const priceStr = showPrice ? formatPriceOnly(priceRow) : null;
+          return (
+            <button
+              key={key}
+              type="button"
+              className={`variant-btn${activeKey === key ? " variant-btn--active" : ""}`}
+              onClick={() => onVariantClick(card, finish)}
+            >
+              <span className="variant-btn-label">{label}</span>
+              {priceStr && <span className="variant-btn-price">{priceStr}</span>}
+            </button>
+          );
+        })
+      )}
+    </div>
+  );
+}
+
 export function CardQuickLookModal({
-  card,
+  group,
+  initialCard,
+  initialFinish,
   onClose,
 }: {
-  card: CardRecord;
+  group: CardRecord[];
+  initialCard: CardRecord;
+  initialFinish: "foil" | "nonfoil";
   onClose: () => void;
 }) {
   const navigate = useNavigate();
   const { index: publishedPriceIndex } = usePublishedPriceIndex();
+  const [activeCard, setActiveCard] = useState(initialCard);
+  const [activeFinish, setActiveFinish] = useState(initialFinish);
+
+  useEffect(() => {
+    setActiveCard(initialCard);
+    setActiveFinish(initialFinish);
+  }, [initialCard, initialFinish]);
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
@@ -406,68 +466,61 @@ export function CardQuickLookModal({
 
   function handleViewDetails() {
     onClose();
-    navigate({ href: buildCardDetailPath(card.id) });
+    navigate({ href: buildCardDetailPath(activeCard.id) });
   }
 
-  const priceRows = useMemo(
-    () => getPublishedRowsForCard(publishedPriceIndex, card.tcgplayer_id),
-    [publishedPriceIndex, card.tcgplayer_id]
-  );
-  const nearMintPrice = useMemo(
-    () => resolveNearMintMarketPrice(priceRows),
-    [priceRows]
-  );
-  const headlinePrice = formatPriceOnly(nearMintPrice);
   const quickViewBuyHref = useMemo(
     () =>
       buildTcgplayerAffiliateSearchLink({
-        query: card.riot_name,
+        query: activeCard.riot_name,
         gameSlug: "riftbound-league-of-legends-trading-card-game",
         productLineName: "riftbound-league-of-legends-trading-card-game"
       }),
-    [card.riot_name]
+    [activeCard.riot_name]
   );
 
   return (
     <div className="card-quick-look-backdrop" onClick={handleBackdropClick} role="presentation">
-      <div className="card-quick-look-dialog" role="dialog" aria-label={card.riot_name} aria-modal="true">
+      <div className="card-quick-look-dialog" role="dialog" aria-label={activeCard.riot_name} aria-modal="true">
         <div className="card-quick-look-image-col">
-          {card.media.image_url ? (
-            <img src={card.media.image_url} alt={card.media.accessibility_text ?? card.riot_name} />
+          {activeCard.media.image_url ? (
+            <img src={activeCard.media.image_url} alt={activeCard.media.accessibility_text ?? activeCard.riot_name} />
           ) : (
-            <div className="missing-image">{card.riot_name}</div>
+            <div className="missing-image">{activeCard.riot_name}</div>
           )}
         </div>
         <div className="card-quick-look-info-col">
           <div className="card-quick-look-header">
-            <h2 className="card-quick-look-name">{card.riot_name}</h2>
+            <h2 className="card-quick-look-name">{activeCard.riot_name}</h2>
             <button type="button" className="card-quick-look-close" onClick={onClose} aria-label="Close">✕</button>
           </div>
-          <p className="card-quick-look-typeline">{formatTypeline(card)}</p>
+          <p className="card-quick-look-typeline">{formatTypeline(activeCard)}</p>
           <div className="card-quick-look-attrs">
-            {formatCostText(card) != null && (
+            {formatCostText(activeCard) != null && (
               <span className="card-attr-chip card-attr-chip--symbolic">
-                {renderTokenizedText(formatCostText(card) ?? "", { size: "chip" })}
+                {renderTokenizedText(formatCostText(activeCard) ?? "", { size: "chip" })}
               </span>
             )}
-            {card.attributes.might != null && (
+            {activeCard.attributes.might != null && (
               <span className="card-attr-chip card-attr-chip--symbolic">
                 <span className="card-inline-metric">
-                  <span>{card.attributes.might}</span>
+                  <span>{activeCard.attributes.might}</span>
                   {renderTokenizedText("{T}", { size: "chip" })}
                 </span>
               </span>
             )}
-            {card.attributes.domain.length > 0 && (
-              <span className={domainChipClass(card.attributes.domain)}>{card.attributes.domain.join(", ")}</span>
+            {activeCard.attributes.domain.length > 0 && (
+              <span className={domainChipClass(activeCard.attributes.domain)}>{activeCard.attributes.domain.join(", ")}</span>
             )}
           </div>
-          {card.text.rich && <p className="card-quick-look-text">{renderTokenizedText(normalizeCardText(card.text.rich))}</p>}
-          <div className="card-quick-look-meta">
-            <span>{card.set.label} · {card.set.set_id} {card.collector_number ?? "?"}</span>
-            {card.rarity && <span>{card.rarity}</span>}
-            {headlinePrice ? <span className="card-quick-look-price">{headlinePrice}</span> : null}
-          </div>
+          {activeCard.text.rich && <p className="card-quick-look-text">{renderTokenizedText(normalizeCardText(activeCard.text.rich))}</p>}
+          <VariantButtonRow
+            cards={group}
+            showPrice={true}
+            publishedPriceIndex={publishedPriceIndex}
+            onVariantClick={(card, finish) => { setActiveCard(card); setActiveFinish(finish); }}
+            activeKey={`${activeCard.id}-${activeFinish}`}
+          />
           <div className="card-quick-view-actions">
             {quickViewBuyHref ? (
               <a

@@ -780,7 +780,12 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
       </div>
     </div>
     {quickLookCard && (
-      <CardQuickLookModal card={quickLookCard} onClose={() => setQuickLookCard(null)} />
+      <CardQuickLookModal
+          group={[quickLookCard]}
+          initialCard={quickLookCard}
+          initialFinish={quickLookCard.finishes[0] ?? "nonfoil"}
+          onClose={() => setQuickLookCard(null)}
+        />
     )}
   </>
   );
