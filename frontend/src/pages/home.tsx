@@ -13,7 +13,7 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
   }
 
   return (
-    <div className="p-[0.8rem_var(--space-shell-x)_3rem]">
+    <div>
       {/* grid shell — container for all home content */}
       <div className="w-full [container-type:inline-size] [container-name:home-shell]">
         {/* hero shell */}
