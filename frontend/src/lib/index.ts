@@ -36,3 +36,4 @@ export {
   type DesktopHeaderStage,
 } from "./headerLayout";
 export { StorybookViewportFrame } from "./StorybookViewportFrame";
+export { LayoutModeBreakpoints } from "./constants";

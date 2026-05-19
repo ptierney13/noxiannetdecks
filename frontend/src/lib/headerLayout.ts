@@ -1,14 +1,18 @@
+import { LayoutModeBreakpoints } from "./constants";
+
+// CSS counterparts: @sm: / @md: / @lg: container query variants in Tailwind,
+// which resolve to the same values (sm=640, md=768, lg=1024) at build time.
 export const DESKTOP_HEADER_STAGE_BREAKPOINTS = {
-  search: 640,
-  nav: 768,
-  full: 1024
+  search: LayoutModeBreakpoints.sm,
+  nav:    LayoutModeBreakpoints.md,
+  full:   LayoutModeBreakpoints.lg,
 } as const;
 
 export type DesktopHeaderStage = "compact" | "search" | "nav" | "full";
 export type HeaderShellMode = "mobile" | "desktop";
 
 const HEADER_STAGE_HYSTERESIS = 24;
-const HEADER_SHELL_BREAKPOINT = 640;
+const HEADER_SHELL_BREAKPOINT = LayoutModeBreakpoints.sm;
 const HEADER_SHELL_HYSTERESIS = 24;
 
 export function resolveHeaderShellMode(
