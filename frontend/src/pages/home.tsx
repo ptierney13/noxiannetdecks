@@ -37,8 +37,8 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
       <div className="w-full [container-type:inline-size] [container-name:home-shell]">
         {/* hero — full-bleed, no card border */}
         <div>
-          {/* hero card — inner container for hero-specific breakpoints */}
-          <div className="relative grid place-items-center min-h-[min(34rem,calc(100svh-4rem))] @[768px]:min-h-[40rem] overflow-hidden isolate bg-[#05060a] [container-type:inline-size] [container-name:hero-shell]">
+          {/* hero card — flex-col so copy zone fills space above pinned tile row */}
+          <div className="relative flex flex-col min-h-[min(44rem,calc(100svh-2rem))] @[768px]:min-h-[50rem] overflow-hidden isolate bg-[#05060a] [container-type:inline-size] [container-name:hero-shell]">
             {/* background art */}
             <div className="absolute inset-0 z-0">
               <div className="relative w-full h-full overflow-hidden">
@@ -47,14 +47,14 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
                 <img
                   src={heroBackgroundAsset}
                   alt=""
-                  className="relative z-0 w-full h-full object-cover object-[62%_top] @[768px]:object-[center_22%] @[1024px]:object-[center_24%] block [filter:saturate(1.08)_brightness(0.98)] min-h-[min(35rem,calc(100svh-6.85rem))] @[768px]:min-h-[35rem] @[1024px]:min-h-[35rem]"
+                  className="relative z-0 w-full h-full object-cover object-[center_top] block [filter:saturate(1.08)_brightness(0.98)] min-h-[min(44rem,calc(100svh-2rem))] @[768px]:min-h-[50rem]"
                 />
                 {/* atmospheric fade — blends art into page background */}
-                <div className="absolute bottom-0 inset-x-0 z-[3] h-[30%] pointer-events-none bg-[image:linear-gradient(to_bottom,transparent,#05060a)]" />
+                <div className="absolute bottom-0 inset-x-0 z-[3] h-[32%] pointer-events-none bg-[image:linear-gradient(to_bottom,transparent,#05060a)]" />
               </div>
             </div>
-            {/* copy */}
-            <div className="relative z-[2] flex flex-col items-center justify-center gap-[1.05rem] @[640px]:gap-[1.1rem] @[768px]:gap-[1.15rem] w-full @[768px]:w-[min(100%,46rem)] px-[1.2rem] py-[2rem] @[640px]:p-[2rem_1.35rem] @[768px]:p-[2.5rem_2rem] @[1024px]:p-[3rem_2.5rem] text-center transition-[width,padding] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)]">
+            {/* copy zone — flex-1 so it fills all space above the tile row */}
+            <div className="relative z-[2] flex-1 flex flex-col items-center justify-center gap-[1.05rem] @[640px]:gap-[1.1rem] @[768px]:gap-[1.15rem] w-full @[768px]:w-[min(100%,46rem)] self-center px-[1.2rem] py-[2rem] @[640px]:p-[2rem_1.35rem] @[768px]:p-[2.5rem_2rem] @[1024px]:p-[3rem_2.5rem] text-center transition-[width,padding] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)]">
               <p className="eyebrow">Noxian Netdecks</p>
               <h1 className="flex flex-col items-center gap-[0.05em] m-0 text-[clamp(4.65rem,17cqi,6.8rem)] @[640px]:text-[clamp(3.1rem,8.4vw,4.25rem)] @[768px]:text-[4.75rem] @[1024px]:text-[4.75rem] leading-[0.94] tracking-[-0.055em] transition-[font-size,transform] duration-[180ms]">
                 <span className="text-text-primary text-[0.68em] @[768px]:text-[0.7em]">The Complete</span>
@@ -73,14 +73,8 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
                 />
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* content section — negative margin pulls first tile row over the hero bottom */}
-        <div className="relative z-10 grid gap-[0.85rem] @[768px]:gap-4 @[1280px]:gap-[1.1rem] -mt-[9rem] @[768px]:-mt-[10rem] px-[var(--space-shell-x)]">
-          {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className="grid gap-[0.85rem] @[768px]:gap-4">
-              {/* feature grid */}
+            {/* feature tile row — pinned to hero bottom, sits above atmospheric fade */}
+            <div className="relative z-[4] px-[var(--space-shell-x)] pt-[1rem] pb-[1.5rem] @[768px]:pb-[2rem]">
               <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[768px]:grid-cols-2 @[1024px]:grid-cols-3 [container-type:inline-size]">
                 <TileFeature
                   title="Trade Balancer"
@@ -104,7 +98,14 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
                   onNavigate={onNavigate}
                 />
               </div>
+            </div>
+          </div>
+        </div>
 
+        {/* content section */}
+        <div className="grid gap-[0.85rem] @[768px]:gap-4 @[1280px]:gap-[1.1rem] pt-[0.85rem] @[768px]:pt-4 px-[var(--space-shell-x)]">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div key={i} className="grid gap-[0.85rem] @[768px]:gap-4">
               {/* promo grid */}
               <div className="grid gap-[0.85rem] [grid-template-columns:1fr] @[640px]:grid-cols-2 [container-type:inline-size]">
                 <TilePromo
