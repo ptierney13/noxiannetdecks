@@ -20,12 +20,12 @@ export function StorybookViewportFrame({
 
   const outerClass =
     mode === "mobile"
-      ? "min-h-screen p-[1.5rem_1rem_2.5rem] overflow-auto grid justify-center content-start overflow-x-auto"
+      ? "min-h-screen p-[1.5rem_1rem_2.5rem] overflow-auto flex justify-center items-start overflow-x-auto"
       : "min-h-screen p-6 overflow-auto";
 
   const innerClass =
     mode === "mobile"
-      ? "w-full max-w-[393px] min-h-[852px] flex-none mx-auto"
+      ? "w-full max-w-[393px] min-h-[852px] mx-auto"
       : "w-[min(100%,1280px)] mx-auto";
 
   return (

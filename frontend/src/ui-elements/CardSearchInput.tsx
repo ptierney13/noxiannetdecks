@@ -1,28 +1,16 @@
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { type FormEvent, useRef } from "react";
 import { SearchIcon } from "./Icon";
 
 export type CardSearchInputProps = {
   value: string;
   onChange: (value: string) => void;
   onSubmit: (value: string) => void;
+  isCompact?: boolean;
   className?: string;
 };
 
-export function CardSearchInput({ value, onChange, onSubmit, className }: CardSearchInputProps) {
-  const formRef = useRef<HTMLFormElement>(null);
+export function CardSearchInput({ value, onChange, onSubmit, isCompact, className }: CardSearchInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isNarrow, setIsNarrow] = useState(false);
-
-  useEffect(() => {
-    const el = formRef.current;
-    if (!el || typeof ResizeObserver === "undefined") return;
-    setIsNarrow(el.getBoundingClientRect().width < 300);
-    const obs = new ResizeObserver(([entry]) => {
-      setIsNarrow((entry?.contentRect.width ?? 0) < 300);
-    });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,7 +24,6 @@ export function CardSearchInput({ value, onChange, onSubmit, className }: CardSe
 
   return (
     <form
-      ref={formRef}
       className={`min-w-0 ${className ?? ""}`}
       onSubmit={handleSubmit}
       role="search"
@@ -53,7 +40,7 @@ export function CardSearchInput({ value, onChange, onSubmit, className }: CardSe
           ref={inputRef}
           className="flex-1 min-w-0 border-0 bg-transparent text-text-primary outline-none placeholder:text-text-tertiary [&::-webkit-search-cancel-button]:hidden"
           type="search"
-          placeholder={isNarrow ? "Search" : "Search for Riftbound Cards"}
+          placeholder={isCompact ? "Search" : "Search for Riftbound Cards"}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           autoCapitalize="none"

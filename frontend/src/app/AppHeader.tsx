@@ -171,7 +171,7 @@ export function AppHeader() {
   return (
     <header
       ref={headerShellRef}
-      className="sticky top-0 z-60 bg-[rgba(28,8,18,0.96)] backdrop-blur-[16px] border-b border-[rgba(255,255,255,0.06)]"
+      className="sticky top-0 z-60 bg-[var(--color-surface-header)] backdrop-blur-[16px] border-b border-[rgba(255,255,255,0.06)]"
     >
       {headerShellMode === "desktop" ? (
         <nav
@@ -194,6 +194,7 @@ export function AppHeader() {
               value={headerSearchQuery}
               onChange={setHeaderSearchQuery}
               onSubmit={handleHeaderSearchSubmit}
+              isCompact={isCompact}
               className={`animate-[search-grow-in_280ms_cubic-bezier(0.22,1,0.36,1)_forwards]${isCompact ? " w-full max-w-none self-stretch" : ""}`}
             />
           ) : null}
@@ -215,7 +216,7 @@ export function AppHeader() {
                   <ChevronIcon expanded={showCardsMenu} />
                 </button>
                 {showCardsMenu ? (
-                  <div className="absolute right-0 top-[calc(100%+0.65rem)] min-w-[14rem] p-[0.55rem] grid gap-[0.2rem] rounded-[16px] bg-[rgba(10,13,20,0.96)] border border-[rgba(255,255,255,0.08)] shadow-[var(--shadow-surface-2)] z-10" role="menu" aria-label="Cards">
+                  <div className="absolute right-0 top-[calc(100%+0.65rem)] min-w-[14rem] p-[0.55rem] grid gap-[0.2rem] rounded-[16px] bg-[var(--color-surface-header)] border border-[rgba(255,255,255,0.08)] shadow-[var(--shadow-surface-2)] z-10" role="menu" aria-label="Cards">
                     <NavLink className={navMenuItemBase} href="/cards">Search</NavLink>
                     <NavLink className={navMenuItemBase} href="/cards/learn-to-search">Learn to Search</NavLink>
                     <NavLink className={navMenuItemBase} href="/cards/query-builder">Query Builder</NavLink>
@@ -244,7 +245,7 @@ export function AppHeader() {
                   <ChevronIcon expanded={showToolsMenu} />
                 </button>
                 {showToolsMenu ? (
-                  <div className="absolute right-0 top-[calc(100%+0.65rem)] min-w-[14rem] p-[0.55rem] grid gap-[0.2rem] rounded-[16px] bg-[rgba(10,13,20,0.96)] border border-[rgba(255,255,255,0.08)] shadow-[var(--shadow-surface-2)] z-10" role="menu" aria-label="Tools">
+                  <div className="absolute right-0 top-[calc(100%+0.65rem)] min-w-[14rem] p-[0.55rem] grid gap-[0.2rem] rounded-[16px] bg-[var(--color-surface-header)] border border-[rgba(255,255,255,0.08)] shadow-[var(--shadow-surface-2)] z-10" role="menu" aria-label="Tools">
                     <NavLink className={navMenuItemBase} href="/tools/tier-list">Tier List Generator</NavLink>
                     <NavLink className={navMenuItemBase} href="/tools/sealed-pools">Sealed Simulator</NavLink>
                     <NavLink className={navMenuItemBase} href="/tools/trade-balancer">Trade Balancer</NavLink>
@@ -268,7 +269,7 @@ export function AppHeader() {
                 <MenuIcon open={showCompactMenu} />
               </button>
               {showCompactMenu ? (
-                <div className="absolute top-[calc(100%+0.65rem)] right-0 z-[8] min-w-[min(22rem,82vw)] p-[0.9rem] grid gap-[0.85rem] rounded-[20px] bg-[rgba(8,11,18,0.97)] border border-[rgba(255,255,255,0.08)] shadow-[var(--shadow-surface-2)]" role="menu" aria-label="Compact navigation">
+                <div className="absolute top-[calc(100%+0.65rem)] right-0 z-[8] min-w-[min(22rem,82vw)] p-[0.9rem] grid gap-[0.85rem] rounded-[20px] bg-[var(--color-surface-header)] border border-[rgba(255,255,255,0.08)] shadow-[var(--shadow-surface-2)]" role="menu" aria-label="Compact navigation">
                   <section className="grid gap-[0.55rem]" aria-labelledby="compact-nav-cards-heading">
                     <p id="compact-nav-cards-heading" className="m-0 px-[0.2rem] text-accent-warm uppercase tracking-[0.08em] text-[0.75rem] font-bold">Cards</p>
                     <NavLink href="/cards"><span className={navDrawerLinkBase}>Card Search</span></NavLink>
@@ -311,6 +312,7 @@ export function AppHeader() {
                   value={headerSearchQuery}
                   onChange={setHeaderSearchQuery}
                   onSubmit={handleHeaderSearchSubmit}
+                  isCompact={true}
                   className="animate-[search-grow-in_280ms_cubic-bezier(0.22,1,0.36,1)_forwards] w-full"
                 />
               ) : null}
@@ -337,7 +339,7 @@ export function AppHeader() {
               <div
                 id="mobile-primary-navigation"
                 ref={mobileMenuRef}
-                className="fixed top-[9.5rem] right-[var(--space-shell-x)] left-[var(--space-shell-x)] z-70 grid gap-4 p-4 rounded-3xl bg-[rgba(8,11,18,0.97)] border border-[rgba(255,255,255,0.08)] shadow-[var(--shadow-surface-2)]"
+                className="fixed top-[9.5rem] right-[var(--space-shell-x)] left-[var(--space-shell-x)] z-70 grid gap-4 p-4 rounded-3xl bg-[var(--color-surface-header)] border border-[rgba(255,255,255,0.08)] shadow-[var(--shadow-surface-2)]"
               >
                 <div className="grid gap-[0.85rem]">
                   <section className="grid gap-[0.55rem]" aria-labelledby="mobile-nav-cards-heading">

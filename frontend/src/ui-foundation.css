@@ -8,6 +8,7 @@
    ============================================================ */
 @theme {
   --color-app-bg: #05060a;
+  --color-surface-header: rgba(28, 8, 18, 0.96);
   --color-surface-1: rgba(13, 16, 24, 0.9);
   --color-surface-2: rgba(16, 20, 30, 0.94);
   --color-surface-3: rgba(25, 30, 42, 0.96);
