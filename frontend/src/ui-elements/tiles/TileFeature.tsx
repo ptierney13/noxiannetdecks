@@ -26,7 +26,7 @@ export function TileFeature({ title, description, href, onNavigate, icon }: Tile
         <span className="hidden @md:inline text-text-tertiary text-[1.15rem]" aria-hidden="true">→</span>
       </div>
       <div className="grid gap-0 @md:gap-[0.4rem] w-full min-w-0 justify-items-start">
-        <h3 className="m-0 text-text-primary max-w-full text-[1.08rem] @md:text-[1.22rem] @xl:text-[1.45rem] leading-[1.12] overflow-anywhere text-balance">{title}</h3>
+        <h3 className="m-0 text-text-primary max-w-full text-[1.08rem] @md:text-[1.35rem] leading-[1.12] overflow-anywhere text-balance">{title}</h3>
         <p className="m-0 text-text-secondary leading-[1.55] block text-[0.94rem]">{description}</p>
       </div>
     </TileBase>
