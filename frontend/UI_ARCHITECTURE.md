@@ -106,9 +106,9 @@ progressively using the standard expansion breakpoints:
 - `1024px`
 - `1280px`
 
-### Container Queries First
+### Container Queries For Component-Level Adaptation
 
-Use `@container` for component-level adaptation:
+Use `@container` for components that respond to their own containing surface:
 
 - cards
 - hero content blocks
@@ -120,39 +120,52 @@ Components should respond to the width of their containing surface, not assume
 the full browser viewport is the layout signal. This ensures correct behavior in
 Storybook canvases, embedded layouts, and future split-pane or dashboard contexts.
 
-### Viewport Queries Only For Shell-Level Changes
+**Tailwind v4 container query scale gotcha:** Named container breakpoints
+(`@sm:`, `@md:`, `@lg:`, `@xl:`) use a compact scale designed for component
+containers — they are **not** equivalent to viewport breakpoints of the same
+name:
 
-Reserve viewport media queries for true app-shell behavior:
+| Class | Type | Fires at |
+|---|---|---|
+| `lg:` | Viewport media query | 1024px |
+| `@lg:` | Container query | ~512px (32rem) |
 
-- showing or hiding desktop-only chrome
-- changing global page framing that depends on the actual browser window
+Use explicit pixel values when you need a container query to fire at a specific
+threshold: `@[420px]:`, `@[640px]:`, `@[1024px]:`. Reserve named container
+breakpoints (`@sm:`, `@lg:`) only when the compact scale is intentionally
+appropriate (e.g. a card that adapts at ~512px wide).
 
-Do not use viewport queries for component internals when container width is the
-real signal.
+### Viewport Queries For Shell-Level Changes
 
-**Shell components (header, nav) must use container queries** (`@container` on
-the element, `@sm:`/`@md:`/`@lg:` inside) even though they are full-width. This
-ensures Storybook width-frame stories are accurate: the CSS-constrained container
-drives responsive behavior rather than the browser viewport. In production the
-header is always `w-full`, so behavior is identical to viewport queries.
+Reserve viewport media queries (`sm:`, `lg:`, `xl:`) for true app-shell
+behavior that depends on actual browser window width:
 
-Do not re-introduce viewport breakpoints (`md:`, `lg:`) into shell navigation
-components. If you are unsure which to use, ask: does the Storybook
-`StorybookViewportFrame` constraint need to affect this element? If yes, use a
-container query.
+- showing or hiding the inline nav vs. hamburger
+- revealing or hiding the wordmark
+- changing global page framing
+
+**Shell components (header, nav) use viewport breakpoints**, not container
+queries. Storybook shell stories use `parameters.viewport.defaultViewport` to
+resize the iframe, which makes viewport queries reflect the intended width
+accurately. See `.storybook/VIEWPORTS.md` for canonical viewport keys and the
+full rationale.
+
+Do not use container queries for shell nav breakpoints. If you are unsure which
+to use, ask: is this component always full-viewport-width? If yes, use viewport
+queries and set `parameters.viewport` in the story.
 
 ## Navigation Architecture
 
 Navigation is authored mobile-first and expanded upward. There is **no separate
 mobile implementation** — a single template scales from the narrowest screen to
-the widest using CSS container breakpoints. Elements appear, animate, or change
-behavior at `@sm` (640px), `@md` (768px), and `@lg` (1024px).
+the widest using viewport breakpoints. Elements appear, animate, or change
+behavior at `sm` (640px), `lg` (1024px), and `xl` (1280px).
 
 The reference implementation is `AppHeader.tsx`:
-- Below `@md`: hamburger visible, inline nav collapsed.
-- At `@sm`–`@md`: hamburger dropdown switches from fixed full-width to compact absolute.
-- At `@md`+: inline nav expands, hamburger collapses (crossfade via `max-w`/`opacity`).
-- At `@lg`+: wordmark slides in.
+- Below `sm` (640px): full-width fixed hamburger dropdown with backdrop overlay.
+- At `sm`–`lg` (640–1024px): hamburger dropdown switches to compact absolute, backdrop hidden.
+- At `lg`+ (1024px+): inline nav expands, hamburger collapses (crossfade via `max-w`/`opacity`).
+- At `xl`+ (1280px+): wordmark slides in.
 
 ### Navigation Interaction Requirements
 
@@ -341,8 +354,8 @@ Current stories (colocated with their source files):
 | `src/ui-elements/Menu.stories.tsx` | Menu component |
 | `src/ui-elements/CardSearchInput.stories.tsx` | CardSearchInput — empty, filled, narrow, wide |
 
-See `.storybook/VIEWPORTS.md` for the canonical viewport naming convention and
-width values used across all shell and page stories.
+See `.storybook/VIEWPORTS.md` for the canonical viewport keys, width values,
+and guidance on viewport vs. container query usage in stories.
 
 Missing coverage (required before stage completion):
 

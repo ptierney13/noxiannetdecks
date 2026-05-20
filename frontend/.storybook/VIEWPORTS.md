@@ -1,57 +1,68 @@
 # Storybook Viewport Conventions
 
-Stories in this codebase use four canonical viewport sizes. Use these names consistently in `StorybookViewportFrame` and in story descriptions.
+Stories that test responsive or shell-level components set the Storybook iframe
+viewport using `parameters.viewport.defaultViewport`. This resizes the actual
+iframe, making viewport media queries (`sm:`, `lg:`, `xl:`) behave correctly.
 
-| Viewport | Width | Breakpoint context | What to verify |
+The canonical viewports are defined in `.storybook/preview.ts` and cover the
+meaningful breakpoint zones for the current nav/shell design:
+
+| Viewport key | Width | Breakpoint zone | What to verify |
 |---|---|---|---|
-| `Mobile` | 393px | Below `sm` (640px) — full-width fixed hamburger dropdown, backdrop visible | Touch targets, hamburger menu, no wordmark |
-| `DesktopSmall` | 700px | `sm`–`md` (640–768px) — compact absolute hamburger dropdown, no backdrop | Dropdown positioning, no inline nav |
-| `Desktop` | 900px | `md`–`lg` (768–1024px) — inline nav visible, no wordmark | Cards/Tools dropdowns, hamburger collapsed |
-| `DesktopWide` | 1280px | `lg`+ (1024px+) — inline nav + wordmark | Wordmark slide-in, full expanded nav |
+| `mobile` | 393px | Below `sm` (640px) — full-width fixed hamburger dropdown, backdrop visible | Touch targets, hamburger menu, no wordmark |
+| `desktop-small` | 700px | `sm`–`lg` (640–1024px) — compact absolute hamburger dropdown, no backdrop | Dropdown positioning, no inline nav |
+| `nav-items-edge` | 767px | Just below `sm`–`lg` range midpoint — edge case only | Confirm nav items are zero-width, no bleed |
+| `desktop` | 900px | `sm`–`lg` (640–1024px) — hamburger still visible | No inline nav yet, no wordmark |
+| `desktop-wide` | 1280px | `xl`+ (1280px+) — inline nav + wordmark | Wordmark slide-in, full expanded nav |
 
 ## Usage in stories
 
 ```tsx
-import { StorybookViewportFrame } from "../lib";
-
-export const Mobile: Story = {
-  render: () => (
-    <StorybookViewportFrame viewport="Mobile">
-      <App />
-    </StorybookViewportFrame>
-  ),
-};
-
-export const DesktopWide: Story = {
-  render: () => (
-    <StorybookViewportFrame viewport="DesktopWide">
-      <App />
-    </StorybookViewportFrame>
-  ),
+export const DesktopSmall: Story = {
+  parameters: {
+    viewport: { defaultViewport: "desktop-small" },
+  },
 };
 ```
 
-For edge-case testing at an exact pixel boundary, pass a `width` override:
+No wrapper component is needed. The viewport parameter resizes the Storybook
+iframe directly, so any responsive code in the story renders exactly as it
+would in a real browser at that width.
 
-```tsx
-<StorybookViewportFrame viewport="DesktopSmall" width={767}>
-  <App />
-</StorybookViewportFrame>
-```
+For ad-hoc edge-case testing, use the viewport picker in the Storybook toolbar
+or add a custom key to the `VIEWPORTS` object in `preview.ts`.
 
-## Why these four sizes
+## Why viewport queries (not container queries) for shell stories
 
-The app breakpoints are `sm=640px`, `md=768px`, `lg=1024px`.
+Shell components (`AppHeader`) use Tailwind **viewport** breakpoints (`sm:`,
+`lg:`, `xl:`) rather than container queries (`@sm:`, `@lg:`). The `parameters.viewport`
+approach resizes the iframe, so viewport queries reflect the story's intended
+width correctly.
 
-- **Mobile** sits below all breakpoints — the base starting point.
-- **Desktop Small** sits between `sm` and `md` — tests the intermediate hamburger state where the dropdown switches from fixed full-width to compact absolute.
-- **Desktop** sits between `md` and `lg` — tests the inline nav without the wordmark.
-- **Desktop Wide** sits above `lg` — tests the full expanded nav with wordmark.
+**Important Tailwind v4 gotcha — container query breakpoints use a different scale:**
 
-Always cover all four sizes for any shell-level component. Use intermediate widths only for specific edge-case testing (e.g. verifying nothing leaks at exactly 767px, one pixel before the `md` container breakpoint fires).
+| Tailwind class | Type | Fires at |
+|---|---|---|
+| `lg:` | Viewport media query | **1024px** |
+| `@lg:` | Container query | **512px** (32rem) |
 
-## Container queries vs. viewport queries
+Container query named breakpoints (`@sm`, `@md`, `@lg`, `@xl`) in Tailwind v4
+use a compact scale designed for component-level containers (cards, panels,
+sidebars). They are **not** equivalent to the viewport breakpoints of the same
+name. If you need a container query to fire at a specific pixel value, use an
+explicit arbitrary value: `@[1024px]:`, `@[640px]:`, etc.
 
-Shell components (`AppHeader`) use Tailwind **container queries** (`@container` on the element, then `@md:` etc. inside). This means `StorybookViewportFrame`'s CSS width constraint correctly drives responsive behavior without needing the Storybook viewport addon to resize the iframe. Container queries respond to the element's rendered width; since the header is always `w-full` in production, behavior is identical.
+## When to use container queries vs. viewport queries
 
-Do **not** use viewport media queries (`md:`) for shell components — they respond to the browser viewport width, which ignores `StorybookViewportFrame`'s CSS constraints.
+| Pattern | Use | Why |
+|---|---|---|
+| Shell nav / header | Viewport queries (`lg:`, `xl:`) | Header is always full viewport width; Storybook viewport parameter sets iframe width |
+| Cards, tiles, panels | Container queries (`@[Xpx]:` or Tailwind `@sm:`/`@lg:` if size fits the compact scale) | Component responds to its own containing surface, not the viewport |
+| Hero content blocks | Container queries on the hero shell element | Ensures correct layout in any embedding context |
+
+## Always cover these four zones for shell-level components
+
+- **Mobile** (393px) — below all breakpoints, base state
+- **Desktop Small** (700px) — after `sm`, before `lg`, tests compact hamburger
+- **Desktop** (900px) — still before `lg`, confirms inline nav still collapsed
+- **Desktop Wide** (1280px) — at `xl`, tests full expanded state with wordmark

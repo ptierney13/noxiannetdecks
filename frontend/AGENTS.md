@@ -129,9 +129,20 @@ Standard expansion breakpoints:
 - `1024px`
 - `1280px`
 
-Use `@container` queries for component-level layout adaptation. Reserve
-viewport media queries for true shell-level changes (switching mobile/desktop
-nav, showing/hiding desktop-only chrome).
+Use `@container` queries for component-level layout adaptation (cards, tiles,
+hero blocks, panels). Reserve viewport media queries (`sm:`, `lg:`, `xl:`) for
+true shell-level changes: switching mobile/desktop nav, showing/hiding
+desktop-only chrome, responding to actual browser window width.
+
+**Shell components (header, nav) use viewport breakpoints**, not container
+queries. Storybook shell stories use `parameters.viewport.defaultViewport` to
+resize the iframe, which makes viewport queries behave correctly at the intended
+width. Do not use container queries on shell/nav elements.
+
+**Tailwind v4 container query scale warning:** Named container breakpoints
+(`@sm:`, `@lg:`) are NOT equivalent to viewport breakpoints of the same name.
+`@lg:` fires at ~512px, not 1024px. Use explicit pixel values for container
+queries when a specific threshold matters: `@[420px]:`, `@[1024px]:`, etc.
 
 Do not make cards, heroes, or shared surfaces depend on browser viewport width
 when container width is the actual layout signal. Storybook stories must render
@@ -142,19 +153,10 @@ relying on hot reload. Always stop the existing instance before starting a new
 one — Storybook runs on port 6006 and never emits a ready signal, so do not
 wait for startup confirmation; check console logs for errors instead.
 
-Navigation should be authored mobile-first and scaled upward. The small/narrow
-starting point should be designed with mobile interaction in mind, but there
-should be no separate "mobile version" of any component. Elements should
-naturally appear, grow, or change behavior at progressively larger breakpoints
-— a single implementation that scales up. Avoid code duplication between
-viewport sizes; use CSS breakpoints to change behavior rather than
-conditionally rendering separate trees.
-
-Shell components (header, nav) must use **container queries** (`@container` on
-the element, then `@sm:`/`@md:`/`@lg:` inside) rather than viewport media
-queries (`sm:`/`md:`/`lg:`). This keeps Storybook width-frame stories
-accurate: the CSS-constrained container drives responsive behavior, not the
-browser viewport. See `.storybook/VIEWPORTS.md` for canonical viewport sizes.
+Navigation is authored mobile-first and scaled upward. There is no separate
+"mobile version" of any component — a single implementation scales up via CSS
+breakpoints. See `.storybook/VIEWPORTS.md` for canonical viewport keys and
+the shell breakpoint reference.
 
 ## Mobile Interaction Rules
 
