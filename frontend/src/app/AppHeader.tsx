@@ -122,7 +122,7 @@ export function AppHeader() {
           aria-label="Noxian Netdecks home"
         >
           <LogoBadge />
-          <span className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap @lg:max-w-[12rem] @lg:opacity-100 transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] text-[1.1rem] font-bold tracking-[-0.02em]">
+          <span className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap @xl:max-w-[12rem] @xl:opacity-100 transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] text-[1.1rem] font-bold tracking-[-0.02em]">
             Noxian Netdecks
           </span>
         </button>
@@ -143,7 +143,7 @@ export function AppHeader() {
           {/* Hamburger wrapper — collapses at @md+.
               No overflow-hidden: absolutely-positioned dropdowns inside must not be clipped. */}
           <div
-            className="relative max-w-[3rem] opacity-100 pointer-events-auto transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] @md:max-w-0 @md:opacity-0 @md:pointer-events-none"
+            className="relative max-w-[3rem] opacity-100 pointer-events-auto transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] @lg:max-w-0 @lg:opacity-0 @lg:pointer-events-none"
             ref={menuRef}
           >
             <button
@@ -180,7 +180,7 @@ export function AppHeader() {
               No overflow-hidden: absolutely-positioned dropdowns inside must not be clipped. */}
           <div
             data-nav-items=""
-            className="inline-flex items-center gap-[0.4rem] max-w-0 opacity-0 pointer-events-none transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] @md:max-w-[34rem] @md:opacity-100 @md:pointer-events-auto"
+            className="inline-flex items-center gap-[0.4rem] max-w-0 opacity-0 pointer-events-none transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] @lg:max-w-[34rem] @lg:opacity-100 @lg:pointer-events-auto"
           >
             <div className="relative" ref={cardsMenuRef}>
               <MenuItem
