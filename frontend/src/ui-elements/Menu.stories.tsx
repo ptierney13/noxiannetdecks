@@ -43,6 +43,22 @@ export const DesktopDropdown: Story = {
   },
 };
 
+export const DesktopDropdownWithSelection: Story = {
+  args: {
+    sections: [
+      {
+        items: [
+          { href: "/cards", label: "Card Search" },
+          { href: "/cards/learn-to-search", label: "Learn to Search" },
+          { href: "/cards/query-builder", label: "Query Builder" },
+        ],
+      },
+    ],
+    "aria-label": "Cards",
+  },
+  decorators: [withRouter("/cards")],
+};
+
 export const DrawerSectioned: Story = {
   args: {
     sections: [
@@ -69,4 +85,33 @@ export const DrawerSectioned: Story = {
     ],
     "aria-label": "Navigation",
   },
+};
+
+export const DrawerSectionedWithSelection: Story = {
+  args: {
+    sections: [
+      {
+        title: "Cards",
+        items: [
+          { href: "/cards", label: "Card Search" },
+          { href: "/cards/learn-to-search", label: "Learn to Search" },
+          { href: "/cards/query-builder", label: "Query Builder" },
+        ],
+      },
+      {
+        title: "Explore",
+        items: [{ href: "/deck-explorer", label: "Deck Explorer" }],
+      },
+      {
+        title: "Tools",
+        items: [
+          { href: "/tools/tier-list", label: "Tier List Generator" },
+          { href: "/tools/sealed-pools", label: "Sealed Simulator" },
+          { href: "/tools/trade-balancer", label: "Trade Balancer" },
+        ],
+      },
+    ],
+    "aria-label": "Navigation",
+  },
+  decorators: [withRouter("/tools/tier-list")],
 };

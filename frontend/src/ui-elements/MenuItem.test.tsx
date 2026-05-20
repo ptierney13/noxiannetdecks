@@ -141,16 +141,34 @@ describe("MenuItem", () => {
   });
 
   describe("hover interaction", () => {
-    it("includes hover transition utility classes in the element className", async () => {
-      // CSS :hover pseudo-class does not activate in jsdom, but we can verify the
-      // Tailwind hover: utilities are present in the class string — confirming they
-      // will apply in a real browser on pointer entry.
-      renderWithRouter({ href: "/cards", label: "Cards" });
+    it("all items carry the raised-button base surface classes", async () => {
+      renderWithRouter({ href: "/cards", label: "Cards" }, "/deck-explorer");
+      const link = await screen.findByRole("link", { name: "Cards" });
+      expect(link.className).toMatch(/bg-\[rgba\(255,255,255,0\.04\)\]/);
+      expect(link.className).toMatch(/border/);
+      expect(link.className).toMatch(/border-\[rgba\(255,255,255,0\.07\)\]/);
+    });
+
+    it("inactive items show red border glow and brighten to text-primary on hover", async () => {
+      // CSS :hover does not activate in jsdom, but we verify the Tailwind hover:
+      // utilities are present in the class string — confirming browser behaviour.
+      renderWithRouter({ href: "/cards", label: "Cards" }, "/deck-explorer");
       const link = await screen.findByRole("link", { name: "Cards" });
       expect(link.className).toMatch(/hover:text-text-primary/);
-      expect(link.className).toMatch(/hover:bg-\[rgba\(255,255,255,0\.05\)\]/);
-      expect(link.className).toMatch(/transition-colors/);
+      expect(link.className).toMatch(/hover:bg-\[var\(--color-accent-soft\)\]/);
+      expect(link.className).toMatch(/hover:border-\[var\(--color-accent\)\]/);
+      expect(link.className).toMatch(/hover:shadow-/);
+      expect(link.className).toMatch(/transition-\[color,background-color,border-color,box-shadow\]/);
       expect(link.className).toMatch(/duration-\[120ms\]/);
+    });
+
+    it("active items stay gold on hover but still get the red border glow", async () => {
+      renderWithRouter({ href: "/cards", label: "Cards" }, "/cards");
+      const link = await screen.findByRole("link", { name: "Cards" });
+      expect(link.className).toMatch(/hover:text-accent-warm/);
+      expect(link.className).not.toMatch(/hover:text-text-primary/);
+      expect(link.className).toMatch(/hover:border-\[var\(--color-accent\)\]/);
+      expect(link.className).toMatch(/hover:shadow-/);
     });
 
     it("fires hover and unhover events on a link item without throwing", async () => {

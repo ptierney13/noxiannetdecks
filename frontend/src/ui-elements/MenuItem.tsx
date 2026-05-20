@@ -42,10 +42,15 @@ export function MenuItem({
   const colorClass = highlighted ? "text-accent-warm" : "text-text-secondary";
   const weightClass = highlighted ? "font-bold" : "font-semibold";
   const decorationClass = highlighted ? "underline underline-offset-[3px]" : "no-underline";
+  // Selected items stay gold on hover; unselected items brighten to text-primary.
+  const hoverColorClass = highlighted ? "hover:text-accent-warm" : "hover:text-text-primary";
 
   const className =
-    `rounded-[12px] bg-transparent border-0 cursor-pointer ${colorClass} ${weightClass} ${decorationClass} ` +
-    `hover:text-text-primary hover:bg-[rgba(255,255,255,0.05)] transition-colors duration-[120ms] ${variants[variant]}`;
+    `rounded-[12px] bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.07)] cursor-pointer ` +
+    `${colorClass} ${weightClass} ${decorationClass} ` +
+    `${hoverColorClass} hover:bg-[var(--color-accent-soft)] hover:border-[var(--color-accent)] ` +
+    `hover:shadow-[0_0_0_1px_rgba(197,50,71,0.25),0_0_16px_rgba(197,50,71,0.18)] ` +
+    `transition-[color,background-color,border-color,box-shadow] duration-[120ms] ${variants[variant]}`;
 
   if (href !== undefined) {
     return (
