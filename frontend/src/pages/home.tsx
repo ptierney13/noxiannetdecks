@@ -63,7 +63,7 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
 
         {/* feature tiles */}
         <div className="relative z-[4] px-[var(--space-shell-x)] pt-[1rem] pb-[1.5rem]">
-          <div className="grid grid-cols-1 gap-[0.85rem] sm:grid-cols-2 md:grid-cols-3 [container-type:inline-size]">
+          <div className="grid grid-cols-1 gap-[0.85rem] sm:grid-cols-2 md:grid-cols-3">
             <div className="sm:col-span-2 md:col-span-1">
               <TileFeature
                 title="Trade Balancer"
@@ -92,7 +92,7 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
       </div>
 
       {/* promo row */}
-      <div className="grid grid-cols-1 gap-[0.85rem] sm:grid-cols-2 [container-type:inline-size] pt-[0.85rem] px-[var(--space-shell-x)]">
+      <div className="grid grid-cols-1 gap-[0.85rem] sm:grid-cols-2 pt-[0.85rem] px-[var(--space-shell-x)]">
         <TilePromo
           label="Tool"
           title="Tier List Generator"
