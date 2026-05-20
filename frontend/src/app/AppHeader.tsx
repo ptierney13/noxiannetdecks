@@ -180,7 +180,7 @@ export function AppHeader() {
         >
           <button
             type="button"
-            className={`inline-flex items-center gap-[0.8rem] border-0 p-0 bg-transparent text-text-primary cursor-pointer overflow-hidden min-w-0 transition-[max-width,opacity,transform] duration-[220ms,180ms,220ms] ease-[cubic-bezier(0.22,1,0.36,1),ease,ease] ${isCompact ? "max-w-[2.2rem]" : "max-w-[18rem]"}`}
+            className={`inline-flex items-center gap-[0.8rem] border-0 p-0 bg-transparent text-text-primary cursor-pointer overflow-hidden min-w-0 ml-[calc(12px_-_var(--space-shell-x))] transition-[max-width,opacity,transform] duration-[220ms,180ms,220ms] ease-[cubic-bezier(0.22,1,0.36,1),ease,ease] ${isCompact ? "max-w-[2.2rem]" : "max-w-[18rem]"}`}
             onClick={() => void navigate({ to: "/" })}
             aria-label="Noxian Netdecks home"
           >
