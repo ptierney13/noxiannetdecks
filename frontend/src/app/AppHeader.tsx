@@ -26,12 +26,6 @@ const toolNavItems = [
   { href: "/tools/trade-balancer", label: "Trade Balancer" },
 ];
 
-const navSections: MenuSection[] = [
-  { title: "Cards", items: cardNavItems },
-  { title: "Explore", items: [{ href: "/deck-explorer", label: "Deck Explorer" }] },
-  { title: "Tools", items: toolNavItems },
-];
-
 export function AppHeader() {
   const navigate = useNavigate();
   const routerState = useRouterState();
@@ -93,6 +87,14 @@ export function AppHeader() {
   }, [pathname, searchStr]);
 
   const activeSection = resolveActiveSection(pathname);
+
+  const cardItems = cardNavItems.map(item => ({ ...item, selected: pathname === item.href }));
+  const toolItems = toolNavItems.map(item => ({ ...item, selected: pathname === item.href }));
+  const navSections: MenuSection[] = [
+    { title: "Cards", items: cardItems },
+    { title: "Explore", items: [{ href: "/deck-explorer", label: "Deck Explorer", selected: pathname === "/deck-explorer" }] },
+    { title: "Tools", items: toolItems },
+  ];
 
   function handleHeaderSearchSubmit(value: string) {
     void navigate({
@@ -192,7 +194,7 @@ export function AppHeader() {
               />
               {showCardsMenu ? (
                 <Menu
-                  sections={[{ items: cardNavItems }]}
+                  sections={[{ items: cardItems }]}
                   aria-label="Cards"
                   className="absolute right-0 top-[calc(100%+0.65rem)] min-w-[14rem] z-10"
                 />
@@ -215,7 +217,7 @@ export function AppHeader() {
               />
               {showToolsMenu ? (
                 <Menu
-                  sections={[{ items: toolNavItems }]}
+                  sections={[{ items: toolItems }]}
                   aria-label="Tools"
                   className="absolute right-0 top-[calc(100%+0.65rem)] min-w-[14rem] z-10"
                 />

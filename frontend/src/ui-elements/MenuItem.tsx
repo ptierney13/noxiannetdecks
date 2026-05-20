@@ -1,5 +1,5 @@
 import { type MouseEvent } from "react";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { ChevronIcon } from "./Icon";
 
 export type MenuItemProps = {
@@ -29,21 +29,11 @@ export function MenuItem({
   "aria-haspopup": ariaHaspopup,
 }: MenuItemProps) {
   const navigate = useNavigate();
-  const {
-    location: { pathname },
-  } = useRouterState();
 
-  const isActive =
-    href !== undefined &&
-    (pathname === href || (href !== "/" && pathname.startsWith(href + "/")));
-
-  const highlighted = href !== undefined ? isActive : (selected ?? false);
-
-  const colorClass = highlighted ? "text-accent-warm" : "text-text-secondary";
-  const weightClass = highlighted ? "font-bold" : "font-semibold";
-  const decorationClass = highlighted ? "underline underline-offset-[3px]" : "no-underline";
-  // Selected items stay gold on hover; unselected items brighten to text-primary.
-  const hoverColorClass = highlighted ? "hover:text-accent-warm" : "hover:text-text-primary";
+  const colorClass = selected ? "text-accent-warm" : "text-text-secondary";
+  const weightClass = selected ? "font-bold" : "font-semibold";
+  const decorationClass = selected ? "underline underline-offset-[3px]" : "no-underline";
+  const hoverColorClass = selected ? "hover:text-accent-warm" : "hover:text-text-primary";
 
   const className =
     `rounded-[12px] bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.07)] cursor-pointer ` +
@@ -57,7 +47,7 @@ export function MenuItem({
       <a
         href={href}
         className={className}
-        aria-current={isActive ? "page" : undefined}
+        aria-current={selected ? "page" : undefined}
         aria-expanded={ariaExpanded}
         onClick={(event: MouseEvent<HTMLAnchorElement>) => {
           if (
