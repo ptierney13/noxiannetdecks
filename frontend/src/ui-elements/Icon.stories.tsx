@@ -82,10 +82,10 @@ export const NoxianLogoFull: Story = {
 
 export const NoxianLogoMedium: Story = {
   name: "NoxianLogo / Medium (64px)",
-  render: () => <NoxianLogoIcon size={64} />,
+  render: () => <NoxianLogoIcon className="w-16 h-16" />,
 };
 
 export const NoxianLogoHeader: Story = {
   name: "NoxianLogo / Header (35px)",
-  render: () => <NoxianLogoIcon size={35} />,
+  render: () => <NoxianLogoIcon className="w-[35px] h-[35px]" />,
 };
