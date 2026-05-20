@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { HomePage } from "./home";
-import { StorybookViewportFrame } from "../lib";
 
 const meta = {
   title: "Pages/Home",
@@ -14,17 +13,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Mobile: Story = {
-  render: () => (
-    <StorybookViewportFrame viewport="Mobile">
-      <HomePage onNavigate={() => undefined} />
-    </StorybookViewportFrame>
-  ),
+  render: () => <HomePage onNavigate={() => undefined} />,
+  parameters: {
+    viewport: { defaultViewport: "mobile" },
+  },
 };
 
 export const Desktop: Story = {
-  render: () => (
-    <StorybookViewportFrame viewport="Desktop">
-      <HomePage onNavigate={() => undefined} />
-    </StorybookViewportFrame>
-  ),
+  render: () => <HomePage onNavigate={() => undefined} />,
+  parameters: {
+    viewport: { defaultViewport: "desktop" },
+  },
 };

@@ -28,6 +28,3 @@ export {
   type TcgplayerAffiliateLinkOptions,
   type TcgplayerAffiliateSearchLinkOptions,
 } from "./priceData";
-export { StorybookViewportFrame } from "./StorybookViewportFrame";
-export type { StorybookViewport } from "./StorybookViewportFrame";
-export { LayoutModeBreakpoints } from "./constants";

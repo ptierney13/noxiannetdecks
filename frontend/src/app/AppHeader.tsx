@@ -104,13 +104,7 @@ export function AppHeader() {
   }
 
   return (
-    // @container establishes this element as the container query root.
-    // Responsive classes inside use @sm:/@md:/@lg: (container breakpoints),
-    // not sm:/md:/lg: (viewport breakpoints). This keeps Storybook width-frame
-    // stories correct: the CSS-constrained container drives behavior, not the
-    // browser viewport. In production the header is always w-full so the
-    // behavior is identical.
-    <header className="@container sticky top-0 z-60 [background:linear-gradient(180deg,#5c1623_0%,#3a0c15_100%)] border-b border-[rgba(255,160,160,0.16)] shadow-[0_4px_30px_rgba(255,50,50,0.16)]">
+    <header className="sticky top-0 z-60 [background:linear-gradient(180deg,#5c1623_0%,#3a0c15_100%)] border-b border-[rgba(255,160,160,0.16)] shadow-[0_4px_30px_rgba(255,50,50,0.16)]">
       <nav
         className="flex items-center gap-4 min-h-[60px] w-full px-[var(--space-shell-x)] py-[0.6rem]"
         aria-label="Primary navigation"
@@ -122,7 +116,7 @@ export function AppHeader() {
           aria-label="Noxian Netdecks home"
         >
           <LogoBadge />
-          <span className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap @xl:max-w-[12rem] @xl:opacity-100 transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] text-[1.1rem] font-bold tracking-[-0.02em]">
+          <span className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap xl:max-w-[12rem] xl:opacity-100 transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] text-[1.1rem] font-bold tracking-[-0.02em]">
             Noxian Netdecks
           </span>
         </button>
@@ -140,10 +134,10 @@ export function AppHeader() {
         </div>
 
         <div className="flex items-center justify-end shrink-0">
-          {/* Hamburger wrapper — collapses at @md+.
+          {/* Hamburger wrapper — collapses at lg (1024px)+.
               No overflow-hidden: absolutely-positioned dropdowns inside must not be clipped. */}
           <div
-            className="relative max-w-[3rem] opacity-100 pointer-events-auto transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] @lg:max-w-0 @lg:opacity-0 @lg:pointer-events-none"
+            className="relative max-w-[3rem] opacity-100 pointer-events-auto transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] lg:max-w-0 lg:opacity-0 lg:pointer-events-none"
             ref={menuRef}
           >
             <button
@@ -158,29 +152,29 @@ export function AppHeader() {
             </button>
             {showMenu ? (
               <>
-                {/* Backdrop — full-viewport overlay; hidden at @sm+ where the compact
+                {/* Backdrop — full-viewport overlay; hidden at sm (640px)+ where the compact
                     absolute dropdown handles its own click-outside via the pointer handler */}
                 <button
                   type="button"
-                  className="fixed inset-0 border-0 p-0 bg-[rgba(2,3,7,0.48)] z-[69] @sm:hidden"
+                  className="fixed inset-0 border-0 p-0 bg-[rgba(2,3,7,0.48)] z-[69] sm:hidden"
                   aria-label="Close navigation menu"
                   onClick={() => setShowMenu(false)}
                 />
-                {/* Dropdown: fixed full-width below @sm; compact absolute at @sm+ */}
+                {/* Dropdown: fixed full-width below sm (640px); compact absolute at sm+ */}
                 <Menu
                   sections={navSections}
                   aria-label="Navigation"
-                  className="fixed left-[var(--space-shell-x)] right-[var(--space-shell-x)] top-[4.5rem] z-70 @sm:absolute @sm:left-auto @sm:right-0 @sm:top-[calc(100%+0.65rem)] @sm:w-[min(22rem,82vw)]"
+                  className="fixed left-[var(--space-shell-x)] right-[var(--space-shell-x)] top-[4.5rem] z-70 sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+0.65rem)] sm:w-[min(22rem,82vw)]"
                 />
               </>
             ) : null}
           </div>
 
-          {/* Inline nav wrapper — expands at @md+.
+          {/* Inline nav wrapper — expands at lg (1024px)+.
               No overflow-hidden: absolutely-positioned dropdowns inside must not be clipped. */}
           <div
             data-nav-items=""
-            className="inline-flex items-center gap-[0.4rem] max-w-0 opacity-0 pointer-events-none transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] @lg:max-w-[34rem] @lg:opacity-100 @lg:pointer-events-auto"
+            className="inline-flex items-center gap-[0.4rem] max-w-0 opacity-0 pointer-events-none transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] lg:max-w-[34rem] lg:opacity-100 lg:pointer-events-auto"
           >
             <div className="relative" ref={cardsMenuRef}>
               <MenuItem
