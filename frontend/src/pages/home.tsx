@@ -32,14 +32,14 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
   return (
     <div>
       {/* hero */}
-      <div className="relative flex flex-col min-h-[min(44rem,calc(100svh-2rem))] lg:min-h-[50rem] overflow-hidden isolate bg-[#05060a]">
-        <div className="absolute inset-0 z-0">
+      <div className="relative flex flex-col overflow-hidden isolate bg-[#05060a]">
+        <div className="absolute inset-x-0 top-0 z-0 h-[56rem]">
           <div className="relative w-full h-full overflow-hidden">
             <div className="absolute inset-0 z-[1] pointer-events-none bg-[linear-gradient(180deg,rgba(6,8,12,0)_0%,rgba(6,8,12,0.1)_100%)]" />
             <img
               src={heroBackgroundAsset}
               alt=""
-              className="relative z-0 w-full h-full object-cover object-[center_bottom] block [filter:saturate(1.05)_brightness(1.15)] min-h-[min(44rem,calc(100svh-2rem))] lg:min-h-[50rem]"
+              className="relative z-0 w-full h-full object-cover object-[center_bottom] block [filter:saturate(1.05)_brightness(1.15)]"
             />
             <div className="absolute bottom-0 inset-x-0 z-[2] h-[1.1rem] pointer-events-none bg-[image:linear-gradient(to_bottom,transparent,#05060a)]" />
           </div>
@@ -82,7 +82,7 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
             />
             <TileFeature
               title="Sealed Simulator"
-              description="Generate pools from any format. Build and save decks."
+              description="Generate pools and build decks."
               href="/tools/sealed-pools"
               icon="sealed"
               onNavigate={onNavigate}
