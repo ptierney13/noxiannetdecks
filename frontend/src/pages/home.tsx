@@ -32,7 +32,7 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
   return (
     <div>
       {/* hero */}
-      <div className="relative flex flex-col overflow-hidden isolate bg-[#05060a]">
+      <div className="relative flex flex-col min-h-[56rem] overflow-hidden isolate bg-[#05060a]">
         <div className="absolute inset-x-0 top-0 z-0 h-[56rem]">
           <div className="relative w-full h-full overflow-hidden">
             <div className="absolute inset-0 z-[1] pointer-events-none bg-[linear-gradient(180deg,rgba(6,8,12,0)_0%,rgba(6,8,12,0.1)_100%)]" />
