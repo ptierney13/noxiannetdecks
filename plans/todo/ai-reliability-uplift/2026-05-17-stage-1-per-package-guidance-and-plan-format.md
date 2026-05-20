@@ -4,6 +4,8 @@
 > begins. When Stage 1 is complete, update Stage 2–4 draft plans with any
 > newly relevant decisions or changed assumptions.
 
+> **See also:** [`2026-05-20-claude-codex-discovery-audit.md`](2026-05-20-claude-codex-discovery-audit.md) — audit of how Claude and Codex each discover repo context, with specific gaps (G1–G5) that Stage 1 should resolve alongside the AGENTS.md work.
+
 ## Summary
 
 Documentation-only stage. Add AGENTS.md files to each workspace that currently
