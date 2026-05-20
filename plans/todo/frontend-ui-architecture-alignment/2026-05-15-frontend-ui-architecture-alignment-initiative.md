@@ -197,9 +197,18 @@ them out explicitly and explain why the default boundary is not sufficient.
 - Stage 5 rewrote Home and AppShell in Tailwind — same visuals, correct code.
   Extracted `FeatureCard` and `PromoCard` to `ui/`. `siteSystem.tsx` deleted.
   `@theme` token block added to `ui-foundation.css`. AppShell uses pure Tailwind
-  with stage-based state (no CSS class modifiers). `StorybookHeaderPreview`
-  still uses legacy CSS class names — `site-nav-*` selectors remain in
-  `styles.css` until that component is migrated.
+  with stage-based state (no CSS class modifiers).
+
+**Out-of-band shell work (post Stage 5) — do not reopen:**
+- `AppHeader` was rewritten to a single Tailwind template driven by CSS container
+  queries (`@container` on `<header>`, then `@sm:`/`@md:`/`@lg:` inside). The
+  JS ResizeObserver state machine (`headerLayout.ts`) and dual mobile/desktop JSX
+  trees were removed. `site-nav-*` legacy CSS selectors are fully gone. The only
+  remaining `site-header` token in `styles.css` is a `var(--site-header-height)`
+  reference — a CSS custom property, not a legacy selector.
+- Navigation philosophy updated: single template, mobile-first, no separate
+  mobile implementation. Shell components must use container queries, not viewport
+  queries. See `frontend/AGENTS.md` and `frontend/.storybook/VIEWPORTS.md`.
 
 **Active and upcoming stages (6–7):**
 - Stage 6 moves `cardFormat.tsx` exports to the correct layers.

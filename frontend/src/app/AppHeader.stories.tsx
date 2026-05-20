@@ -57,7 +57,7 @@ export const DesktopSmall: Story = {
  */
 export const NavItemsEdge: Story = {
   render: () => (
-    <StorybookViewportFrame viewport="DesktopSmall" width={767}>
+    <StorybookViewportFrame viewport="DesktopSmall" width={767 /* LayoutModeBreakpoints.md - 1 */}>
       <App />
     </StorybookViewportFrame>
   ),

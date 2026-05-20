@@ -17,6 +17,11 @@ Significant work includes:
 
 Trivial typo fixes, small documentation edits, and narrow cleanup may proceed without a plan.
 
+Before implementing an approved plan, review it critically: flag antipatterns,
+gaps between stated decisions and their implementation consequences, missing
+edge cases, and assumptions that may not hold. Surface concerns and confirm how
+they will be handled before writing any code.
+
 Once a plan has been manually approved, later edits to that existing plan do not require a second approval before implementation. Keep the plan updated so it reflects the work actually being done, and ask for approval again only when the change is better represented as a separate new plan.
 
 For large self-contained initiatives that are split into multiple stages,
@@ -49,7 +54,9 @@ Plans live under `plans/`:
   the feature folder so new context windows can read prior completed stages plus
   the current stage draft before producing the finalized stage plan.
 
-When significant work is completed, move or record the plan in `plans/executed/`.
+When significant work is completed, move the plan file from `plans/todo/` to
+`plans/executed/` as part of the final implementation commit — not as a
+separate follow-up commit.
 
 ## Plan Contents
 
