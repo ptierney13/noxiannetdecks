@@ -45,7 +45,7 @@ export const NarrowViewport: Story = {
     </div>
   ),
   parameters: {
-    docs: { description: { story: "Below 300px — placeholder collapses to 'Search'." } },
+    docs: { description: { story: "240px container — input and button remain usable at narrow widths." } },
   },
 };
 
@@ -56,6 +56,6 @@ export const WideViewport: Story = {
     </div>
   ),
   parameters: {
-    docs: { description: { story: "Above 300px — full 'Search for Riftbound Cards' placeholder." } },
+    docs: { description: { story: "600px container — full input width with standard placeholder." } },
   },
 };

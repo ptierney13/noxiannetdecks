@@ -5,11 +5,10 @@ export type CardSearchInputProps = {
   value: string;
   onChange: (value: string) => void;
   onSubmit: (value: string) => void;
-  isCompact?: boolean;
   className?: string;
 };
 
-export function CardSearchInput({ value, onChange, onSubmit, isCompact, className }: CardSearchInputProps) {
+export function CardSearchInput({ value, onChange, onSubmit, className }: CardSearchInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -40,7 +39,7 @@ export function CardSearchInput({ value, onChange, onSubmit, isCompact, classNam
           ref={inputRef}
           className="flex-1 min-w-0 border-0 bg-transparent text-text-primary outline-none placeholder:text-text-tertiary [&::-webkit-search-cancel-button]:hidden"
           type="search"
-          placeholder={isCompact ? "Search" : "Search for Riftbound Cards"}
+          placeholder="Search for Cards"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           autoCapitalize="none"

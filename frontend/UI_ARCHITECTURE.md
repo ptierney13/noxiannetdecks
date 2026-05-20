@@ -124,39 +124,40 @@ Storybook canvases, embedded layouts, and future split-pane or dashboard context
 
 Reserve viewport media queries for true app-shell behavior:
 
-- switching between separate desktop and mobile navigation implementations
 - showing or hiding desktop-only chrome
 - changing global page framing that depends on the actual browser window
 
 Do not use viewport queries for component internals when container width is the
 real signal.
 
+**Shell components (header, nav) must use container queries** (`@container` on
+the element, `@sm:`/`@md:`/`@lg:` inside) even though they are full-width. This
+ensures Storybook width-frame stories are accurate: the CSS-constrained container
+drives responsive behavior rather than the browser viewport. In production the
+header is always `w-full`, so behavior is identical to viewport queries.
+
+Do not re-introduce viewport breakpoints (`md:`, `lg:`) into shell navigation
+components. If you are unsure which to use, ask: does the Storybook
+`StorybookViewportFrame` constraint need to affect this element? If yes, use a
+container query.
+
 ## Navigation Architecture
 
-Navigation is authored mobile-first and expanded upward.
+Navigation is authored mobile-first and expanded upward. There is **no separate
+mobile implementation** — a single template scales from the narrowest screen to
+the widest using CSS container breakpoints. Elements appear, animate, or change
+behavior at `@sm` (640px), `@md` (768px), and `@lg` (1024px).
 
-### Separate Mobile And Desktop Nav
+The reference implementation is `AppHeader.tsx`:
+- Below `@md`: hamburger visible, inline nav collapsed.
+- At `@sm`–`@md`: hamburger dropdown switches from fixed full-width to compact absolute.
+- At `@md`+: inline nav expands, hamburger collapses (crossfade via `max-w`/`opacity`).
+- At `@lg`+: wordmark slides in.
 
-Implement separate mobile and desktop navigation experiences that share tokens,
-iconography, labels, and navigation data, but are purpose-built for their
-interaction model.
+### Navigation Interaction Requirements
 
-Mobile nav:
-- hamburger or drawer based
-- tap friendly with at least `44px` touch targets
-- organized around grouped actions
-- explicit expandable controls for nested actions
-
-Desktop nav:
-- full-width
-- directly scannable
-- optimized for pointer and keyboard use
-
-### Mobile Interaction Requirements
-
-- minimum `44px` touch target height
-- no hover-only critical behavior
-- tap equivalents for anything desktop exposes on hover
+- minimum `44px` touch target height on mobile
+- no hover-only critical behavior; provide tap/click equivalents
 - enough spacing for imprecise input
 
 ## Homepage And Hero Rules
@@ -270,7 +271,7 @@ agents. Update it as migrations complete.
 | `routes.ts` | 180 | Hand-rolled router + URL builders | Replaced by TanStack Router route files in Stage 3; delete after |
 | `api.ts` | — | Raw fetch API client | Move to `data/api.ts` in Stage 4 |
 | `useDebounce.ts` | — | Debounce hook | Move to `lib/useDebounce.ts` in Stage 2 |
-| `headerLayout.ts` | — | Responsive header state logic | Move to `app/` or `ui/` in Stage 2 |
+| ~~`headerLayout.ts`~~ | — | Deleted — replaced by container-query CSS | — |
 | `priceData.ts` | — | Price formatting utilities | Move to `lib/priceData.ts` in Stage 2 |
 | `types.ts` | — | Type re-exports from card-store | Stays or distributes per consuming layer |
 | `QueryChip.tsx` | — | Query syntax chip/button — shared | Move to `ui/QueryChip.tsx` in Stage 2 |
@@ -333,11 +334,15 @@ Current stories (colocated with their source files):
 
 | Story file | What it covers |
 | ---------- | -------------- |
-| `src/header.stories.tsx` | Header component (desktop/mobile stages) |
-| `src/home.stories.tsx` | Home page (desktop/mobile) |
+| `src/app/AppHeader.stories.tsx` | Header — Mobile, DesktopSmall, NavItemsEdge, Desktop, DesktopWide |
+| `src/pages/home.stories.tsx` | Home page — Mobile, Desktop |
 | `src/App.stories.tsx` | Full app shell |
-| `src/ui/FeatureCard.stories.tsx` | FeatureCard component |
-| `src/ui/PromoCard.stories.tsx` | PromoCard component |
+| `src/ui-elements/MenuItem.stories.tsx` | MenuItem — inline and menu variants |
+| `src/ui-elements/Menu.stories.tsx` | Menu component |
+| `src/ui-elements/CardSearchInput.stories.tsx` | CardSearchInput — empty, filled, narrow, wide |
+
+See `.storybook/VIEWPORTS.md` for the canonical viewport naming convention and
+width values used across all shell and page stories.
 
 Missing coverage (required before stage completion):
 

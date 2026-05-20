@@ -28,12 +28,6 @@ export {
   type TcgplayerAffiliateLinkOptions,
   type TcgplayerAffiliateSearchLinkOptions,
 } from "./priceData";
-export {
-  resolveHeaderShellMode,
-  resolveDesktopHeaderStage,
-  DESKTOP_HEADER_STAGE_BREAKPOINTS,
-  type HeaderShellMode,
-  type DesktopHeaderStage,
-} from "./headerLayout";
 export { StorybookViewportFrame } from "./StorybookViewportFrame";
+export type { StorybookViewport } from "./StorybookViewportFrame";
 export { LayoutModeBreakpoints } from "./constants";

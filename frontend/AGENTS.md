@@ -142,9 +142,19 @@ relying on hot reload. Always stop the existing instance before starting a new
 one — Storybook runs on port 6006 and never emits a ready signal, so do not
 wait for startup confirmation; check console logs for errors instead.
 
-Navigation should be authored mobile-first and scaled upward. Prefer separate
-mobile and desktop navigation implementations that share tokens and data but
-are purpose-built for their interaction model.
+Navigation should be authored mobile-first and scaled upward. The small/narrow
+starting point should be designed with mobile interaction in mind, but there
+should be no separate "mobile version" of any component. Elements should
+naturally appear, grow, or change behavior at progressively larger breakpoints
+— a single implementation that scales up. Avoid code duplication between
+viewport sizes; use CSS breakpoints to change behavior rather than
+conditionally rendering separate trees.
+
+Shell components (header, nav) must use **container queries** (`@container` on
+the element, then `@sm:`/`@md:`/`@lg:` inside) rather than viewport media
+queries (`sm:`/`md:`/`lg:`). This keeps Storybook width-frame stories
+accurate: the CSS-constrained container drives responsive behavior, not the
+browser viewport. See `.storybook/VIEWPORTS.md` for canonical viewport sizes.
 
 ## Mobile Interaction Rules
 
