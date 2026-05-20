@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { SearchIcon, CardsIcon, MenuIcon, ChevronIcon, TradeIcon, SealedIcon } from "./Icon";
+import { SearchIcon, CardsIcon, MenuIcon, ChevronIcon, TradeIcon, SealedIcon, NoxianLogoIcon } from "./Icon";
 
 const meta = {
   title: "UI/Icons",
@@ -73,4 +73,19 @@ export const Sealed: Story = {
       <SealedIcon />
     </span>
   ),
+};
+
+export const NoxianLogoFull: Story = {
+  name: "NoxianLogo / Full (128px)",
+  render: () => <NoxianLogoIcon />,
+};
+
+export const NoxianLogoMedium: Story = {
+  name: "NoxianLogo / Medium (64px)",
+  render: () => <NoxianLogoIcon size={64} />,
+};
+
+export const NoxianLogoHeader: Story = {
+  name: "NoxianLogo / Header (35px)",
+  render: () => <NoxianLogoIcon size={35} />,
 };

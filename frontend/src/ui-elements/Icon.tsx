@@ -1,3 +1,14 @@
+export function NoxianLogoIcon({ size = 128, className }: { size?: number; className?: string }) {
+  return (
+    <img
+      src="/design-assets/NoxianLogo.png"
+      alt="Noxian Netdecks"
+      className={`shrink-0 object-contain ${className ?? ""}`}
+      style={{ width: size, height: size }}
+    />
+  );
+}
+
 export function SearchIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
