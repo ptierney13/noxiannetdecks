@@ -1,7 +1,6 @@
-import { type FormEvent, useEffect, useMemo, useState, type ReactNode } from "react";
-import { useNavigate, useSearch } from "@tanstack/react-router";
-import { loadQueryFeatures, searchCards } from "../../api";
-import { CardSearchGuide } from "./CardSearchGuide";
+import { useEffect, useMemo, useState } from "react";
+import { useSearch } from "@tanstack/react-router";
+import { searchCards } from "../../api";
 import {
   CardQuickLookModal,
   VariantButtonRow,
@@ -11,9 +10,8 @@ import {
   renderTokenizedText,
 } from "../../cardFormat";
 import { usePublishedPriceIndex } from "../../lib";
-import { SearchIcon } from "../../ui-elements";
 import { useAppError } from "../../app/ErrorContext";
-import type { CardRecord, QueryDiagnostic, QueryFieldGuide, QuerySyntaxGuide } from "../../types";
+import type { CardRecord, QueryDiagnostic } from "../../types";
 
 type SortKey = "energy-asc" | "energy-desc" | "name-asc" | "name-desc" | "set";
 type VariantMode = "unique-cards" | "unique-printings";
@@ -96,125 +94,6 @@ function Diagnostics({ diagnostics }: { diagnostics: QueryDiagnostic[] }) {
   );
 }
 
-function CollapsibleFeatureTable({
-  title,
-  expanded,
-  onToggle,
-  children
-}: {
-  title: string;
-  expanded: boolean;
-  onToggle: () => void;
-  children: ReactNode;
-}) {
-  const contentId = `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-table`;
-
-  return (
-    <div className="feature-table-group">
-      <div className="feature-table-heading">
-        <h3>{title}</h3>
-        <button
-          type="button"
-          className="icon-button"
-          aria-controls={contentId}
-          aria-expanded={expanded}
-          aria-label={`${expanded ? "Hide" : "Show"} ${title}`}
-          title={`${expanded ? "Hide" : "Show"} ${title}`}
-          onClick={onToggle}
-        >
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            focusable="false"
-            className={expanded ? "chevron expanded" : "chevron"}
-          >
-            <path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6 1.4-1.4Z" fill="currentColor" />
-          </svg>
-        </button>
-      </div>
-      {expanded ? (
-        <div id={contentId} className="feature-table-wrap">
-          {children}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function QueryLanguageTables({
-  fields,
-  syntax
-}: {
-  fields: QueryFieldGuide[];
-  syntax: QuerySyntaxGuide[];
-}) {
-  const [showGuide, setShowGuide] = useState(false);
-  const [showFields, setShowFields] = useState(false);
-  const [showSyntax, setShowSyntax] = useState(false);
-
-  return (
-    <section className="feature-section" aria-labelledby="query-language-heading">
-      <div className="section-heading">
-        <h2 id="query-language-heading">Query Language</h2>
-        <p>Find cards by property, then combine searches with syntax operations.</p>
-      </div>
-      <CollapsibleFeatureTable title="Search by Card Element" expanded={showGuide} onToggle={() => setShowGuide((current) => !current)}>
-        <CardSearchGuide />
-      </CollapsibleFeatureTable>
-      <CollapsibleFeatureTable title="Searchable Fields" expanded={showFields} onToggle={() => setShowFields((current) => !current)}>
-        <table className="feature-table">
-          <thead>
-            <tr>
-              <th>I want cards with...</th>
-              <th>Use this query</th>
-              <th>Shorthand</th>
-              <th>Searches</th>
-              <th>Example</th>
-            </tr>
-          </thead>
-          <tbody>
-            {fields.map((field) => (
-              <tr key={field.property}>
-                <td>{field.property}</td>
-                <td><code>{field.query}</code></td>
-                <td>{field.shorthand ? <code>{field.shorthand}</code> : "None"}</td>
-                <td>{field.searches}</td>
-                <td><code>{field.example}</code></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </CollapsibleFeatureTable>
-      <CollapsibleFeatureTable title="Query Syntax" expanded={showSyntax} onToggle={() => setShowSyntax((current) => !current)}>
-        <table className="feature-table">
-          <thead>
-            <tr>
-              <th>Operation</th>
-              <th>Syntax Examples</th>
-              <th>Behavior</th>
-            </tr>
-          </thead>
-          <tbody>
-            {syntax.map((operation) => (
-              <tr key={operation.operation}>
-                <td>{operation.operation}</td>
-                <td>
-                  <div className="example-list">
-                    {operation.examples.map((example) => (
-                      <code key={example}>{example}</code>
-                    ))}
-                  </div>
-                </td>
-                <td>{operation.behavior}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </CollapsibleFeatureTable>
-    </section>
-  );
-}
-
 function SearchResultsGrid({
   cards,
   sort,
@@ -275,16 +154,11 @@ function SearchResultsGrid({
 }
 
 export default function SearchView() {
-  const navigate = useNavigate();
   const setError = useAppError();
   const { q: searchParamQuery = "" } = useSearch({ from: "/cards" });
-  const [query, setQuery] = useState("");
   const [cards, setCards] = useState<CardRecord[]>([]);
   const [diagnostics, setDiagnostics] = useState<QueryDiagnostic[]>([]);
-  const [fieldGuides, setFieldGuides] = useState<QueryFieldGuide[]>([]);
-  const [syntaxGuides, setSyntaxGuides] = useState<QuerySyntaxGuide[]>([]);
   const [normalizedQuery, setNormalizedQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [quickLook, setQuickLook] = useState<{ group: CardRecord[]; card: CardRecord; finish: "foil" | "nonfoil" } | null>(null);
   const [sort, setSort] = useState<SortKey>("energy-asc");
@@ -292,50 +166,9 @@ export default function SearchView() {
   const [variantMode, setVariantMode] = useState<VariantMode>("unique-cards");
   const [showVariants, setShowVariants] = useState(false);
 
-  async function runSearch(rawQuery: string) {
-    setIsSearching(true);
-    setError(null);
-    setHasSearched(true);
-    try {
-      const result = await searchCards(buildApiQuery(rawQuery));
-      setCards(result.items);
-      setDiagnostics(result.diagnostics);
-      setNormalizedQuery(result.normalizedQuery);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Search failed.");
-    } finally {
-      setIsSearching(false);
-    }
-  }
-
   useEffect(() => {
     let ignore = false;
 
-    async function boot() {
-      try {
-        const featureResult = await loadQueryFeatures();
-        if (!ignore) {
-          setFieldGuides(featureResult.fields);
-          setSyntaxGuides(featureResult.syntax);
-        }
-      } catch (caught) {
-        if (!ignore) {
-          setError(caught instanceof Error ? caught.message : "Unable to load card search.");
-        }
-      }
-    }
-
-    void boot();
-
-    return () => {
-      ignore = true;
-    };
-  }, [setError]);
-
-  useEffect(() => {
-    let ignore = false;
-
-    setQuery(searchParamQuery);
     setError(null);
     setVariantMode(queryRequestsAllPrintings(searchParamQuery) ? "unique-printings" : "unique-cards");
 
@@ -352,7 +185,6 @@ export default function SearchView() {
       return () => { ignore = true; };
     }
 
-    setIsSearching(true);
     setHasSearched(true);
 
     async function syncSearchFromUrl() {
@@ -364,8 +196,6 @@ export default function SearchView() {
         setNormalizedQuery(result.normalizedQuery);
       } catch (caught) {
         if (!ignore) setError(caught instanceof Error ? caught.message : "Search failed.");
-      } finally {
-        if (!ignore) setIsSearching(false);
       }
     }
 
@@ -374,51 +204,12 @@ export default function SearchView() {
     return () => { ignore = true; };
   }, [searchParamQuery, setError]);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const trimmedQuery = query.trim();
-
-    if (trimmedQuery === searchParamQuery) {
-      void runSearch(query);
-      return;
-    }
-
-    navigate({ to: "/cards", search: { q: trimmedQuery.length > 0 ? trimmedQuery : undefined } });
-  }
-
   const cardGroups = useMemo(() => groupCardsByRiftboundId(cards), [cards]);
   const resultCount = variantMode === "unique-cards" ? cardGroups.length : cards.length;
   const displayedNormalizedQuery = stripUniqueFromNormalized(normalizedQuery);
 
   return (
     <>
-      <section className="search-panel" aria-labelledby="search-heading">
-        <div className="search-copy">
-          <p className="eyebrow">Noxian Netdecks</p>
-          <h1 id="search-heading">Riftbound Card Search</h1>
-        </div>
-        <form className="search-form" onSubmit={handleSubmit}>
-          <label htmlFor="query-input">Query</label>
-          <div className="search-row">
-            <input
-              id="query-input"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder='t:unit d:body e>=3'
-              autoComplete="off"
-              autoCapitalize="none"
-            />
-            <button type="submit" disabled={isSearching}>
-              <SearchIcon />
-              <span>{isSearching ? "Searching" : "Search"}</span>
-            </button>
-          </div>
-          <output className="normalized-query" aria-live="polite">
-            {normalizedQuery ? `Normalized: ${normalizedQuery}` : "Run a search to show matching cards."}
-          </output>
-        </form>
-      </section>
-
       <div className="search-controls-panel">
         <div className="search-controls-row">
           <div className="search-control-group">
@@ -475,7 +266,6 @@ export default function SearchView() {
       )}
 
       <Diagnostics diagnostics={diagnostics} />
-      <QueryLanguageTables fields={fieldGuides} syntax={syntaxGuides} />
       {hasSearched ? (
         <SearchResultsGrid
           cards={cards}
