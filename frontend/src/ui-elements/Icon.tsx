@@ -1,10 +1,9 @@
-export function NoxianLogoIcon({ size = 128, className }: { size?: number; className?: string }) {
+export function NoxianLogoIcon({ className }: { className?: string }) {
   return (
     <img
       src="/design-assets/NoxianLogo.png"
       alt="Noxian Netdecks"
-      className={`shrink-0 object-contain ${className ?? ""}`}
-      style={{ width: size, height: size }}
+      className={`object-contain ${className ?? ""}`}
     />
   );
 }
