@@ -20,29 +20,6 @@
   --text: #b8bccf;
   --text-strong: #e8eaf2;
   --text-muted: #44485e;
-  color: var(--color-text-primary);
-  background: var(--color-app-bg);
-  font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background: var(--color-app-bg);
-  color: var(--color-text-secondary);
-}
-
-button,
-input,
-select {
-  font: inherit;
 }
 
 /* ── CHEVRON ── */
@@ -4529,31 +4506,6 @@ code {
 }
 .trade-card-expand-image {
   cursor: pointer;
-}
-
-/* Top-level 2026 design system overhaul */
-
-:root {
-  color: var(--color-text-primary);
-  background:
-    radial-gradient(circle at top center, rgba(161, 20, 33, 0.28), transparent 33%),
-    linear-gradient(180deg, #08090d 0%, #040508 100%);
-  font-family: "Outfit", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-html {
-  background: #040508;
-}
-
-body {
-  background:
-    radial-gradient(circle at 50% 0%, rgba(156, 14, 28, 0.24), transparent 30%),
-    linear-gradient(180deg, #06070b 0%, #040508 100%);
-  color: var(--color-text-secondary);
-}
-
-#root {
-  min-height: 100vh;
 }
 
 /* ── SEARCH CONTROLS PANEL ── */

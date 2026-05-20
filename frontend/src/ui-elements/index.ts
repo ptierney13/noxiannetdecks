@@ -3,3 +3,6 @@ export { SearchIcon, CardsIcon, MenuIcon, ChevronIcon, TradeIcon, SealedIcon } f
 export { LogoBadge } from "./LogoBadge";
 export { CardSearchInput } from "./CardSearchInput";
 export { TileBase, TileFeature, TilePromo } from "./tiles";
+export { MenuItem } from "./MenuItem";
+export { Menu } from "./Menu";
+export type { MenuSection } from "./Menu";

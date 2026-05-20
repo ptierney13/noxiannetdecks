@@ -111,6 +111,36 @@ html {
 }
 
 /* ============================================================
+   BASE — global element defaults.
+   @layer base so Tailwind utilities can always override these.
+   ============================================================ */
+@layer base {
+  html {
+    font-family: "Outfit", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    color: var(--color-text-primary);
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100svh;
+    color: var(--color-text-primary);
+  }
+
+  #root {
+    min-height: 100svh;
+  }
+}
+
+/* background-color must live outside any layer because Tailwind v4 preflight
+   resets it inside @layer base — an unlayered rule wins that fight. */
+html,
+body {
+  background-color: var(--color-app-bg);
+}
+
+/* ============================================================
    COMPONENTS — named classes migrated from legacy styles.css.
    Uses @layer components so Tailwind utilities still win on
    specificity. Each block here replaces a class removed from
