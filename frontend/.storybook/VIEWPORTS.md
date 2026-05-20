@@ -10,10 +10,10 @@ meaningful breakpoint zones for the current nav/shell design:
 | Viewport key | Width | Breakpoint zone | What to verify |
 |---|---|---|---|
 | `mobile` | 393px | Below `sm` (640px) — full-width fixed hamburger dropdown, backdrop visible | Touch targets, hamburger menu, no wordmark |
-| `desktop-small` | 700px | `sm`–`lg` (640–1024px) — compact absolute hamburger dropdown, no backdrop | Dropdown positioning, no inline nav |
-| `nav-items-edge` | 767px | Just below `sm`–`lg` range midpoint — edge case only | Confirm nav items are zero-width, no bleed |
-| `desktop` | 900px | `sm`–`lg` (640–1024px) — hamburger still visible | No inline nav yet, no wordmark |
-| `desktop-wide` | 1280px | `xl`+ (1280px+) — inline nav + wordmark | Wordmark slide-in, full expanded nav |
+| `desktop-small` | 700px | `sm`–`md` (640–768px) — compact absolute hamburger dropdown, no backdrop | Dropdown positioning, no inline nav |
+| `nav-items-edge` | 767px | Just below `md` (768px) — edge case only | Confirm nav items are zero-width, no bleed |
+| `desktop` | 900px | `md`–`lg` (768–1024px) — inline nav visible, hamburger collapsed | No wordmark yet |
+| `desktop-wide` | 1280px | `lg`+ (1024px+) — inline nav + wordmark | Wordmark slide-in, full expanded nav |
 
 ## Usage in stories
 
@@ -35,7 +35,7 @@ or add a custom key to the `VIEWPORTS` object in `preview.ts`.
 ## Why viewport queries (not container queries) for shell stories
 
 Shell components (`AppHeader`) use Tailwind **viewport** breakpoints (`sm:`,
-`lg:`, `xl:`) rather than container queries (`@sm:`, `@lg:`). The `parameters.viewport`
+`md:`, `lg:`) rather than container queries (`@sm:`, `@lg:`). The `parameters.viewport`
 approach resizes the iframe, so viewport queries reflect the story's intended
 width correctly.
 
@@ -56,13 +56,13 @@ explicit arbitrary value: `@[1024px]:`, `@[640px]:`, etc.
 
 | Pattern | Use | Why |
 |---|---|---|
-| Shell nav / header | Viewport queries (`lg:`, `xl:`) | Header is always full viewport width; Storybook viewport parameter sets iframe width |
+| Shell nav / header | Viewport queries (`md:`, `lg:`) | Header is always full viewport width; Storybook viewport parameter sets iframe width |
 | Cards, tiles, panels | Container queries (`@[Xpx]:` or Tailwind `@sm:`/`@lg:` if size fits the compact scale) | Component responds to its own containing surface, not the viewport |
 | Hero content blocks | Container queries on the hero shell element | Ensures correct layout in any embedding context |
 
 ## Always cover these four zones for shell-level components
 
 - **Mobile** (393px) — below all breakpoints, base state
-- **Desktop Small** (700px) — after `sm`, before `lg`, tests compact hamburger
-- **Desktop** (900px) — still before `lg`, confirms inline nav still collapsed
-- **Desktop Wide** (1280px) — at `xl`, tests full expanded state with wordmark
+- **Desktop Small** (700px) — after `sm`, before `md`, tests compact hamburger
+- **Desktop** (900px) — after `md`, before `lg`, confirms inline nav visible and hamburger collapsed, no wordmark
+- **Desktop Wide** (1280px) — at `lg`+, tests full expanded state with wordmark

@@ -29,7 +29,7 @@ export const DesktopSmall: Story = {
     viewport: { defaultViewport: "desktop-small" },
     docs: {
       description: {
-        story: "Desktop Small (700px) — hamburger still visible, no wordmark. Opening the menu shows a compact absolute dropdown with no backdrop.",
+        story: "Desktop Small (700px) — between sm (640px) and md (768px). Hamburger still visible; dropdown switches from fixed full-width to compact absolute.",
       },
     },
   },
@@ -40,7 +40,7 @@ export const NavItemsEdge: Story = {
     viewport: { defaultViewport: "nav-items-edge" },
     docs: {
       description: {
-        story: "Edge case at 767px — one pixel below the lg (1024px) breakpoint. Hamburger visible, inline nav fully collapsed (zero layout width, opacity-0).",
+        story: "Edge case at 767px — one pixel below the md (768px) breakpoint. Hamburger visible, inline nav fully collapsed (zero layout width, opacity-0).",
       },
     },
   },
@@ -51,7 +51,7 @@ export const Desktop: Story = {
     viewport: { defaultViewport: "desktop" },
     docs: {
       description: {
-        story: "Desktop (900px) — hamburger still visible, no wordmark. Inline nav is collapsed; lg breakpoint (1024px) not yet reached.",
+        story: "Desktop (900px) — between md (768px) and lg (1024px). Inline nav visible (Cards, Deck Explorer, Tools), hamburger collapsed, no wordmark yet.",
       },
     },
   },
@@ -62,7 +62,7 @@ export const DesktopWide: Story = {
     viewport: { defaultViewport: "desktop-wide" },
     docs: {
       description: {
-        story: "Desktop Wide (1280px) — inline nav visible (Cards, Deck Explorer, Tools), hamburger collapsed, 'Noxian Netdecks' wordmark visible. Full expanded header state.",
+        story: "Desktop Wide (1280px) — at lg+ (1024px+). Inline nav visible, hamburger collapsed, 'Noxian Netdecks' wordmark slides in. Full expanded header state.",
       },
     },
   },
