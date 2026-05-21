@@ -52,12 +52,18 @@ sidebars). They are **not** equivalent to the viewport breakpoints of the same
 name. If you need a container query to fire at a specific pixel value, use an
 explicit arbitrary value: `@[1024px]:`, `@[640px]:`, etc.
 
+Unless explicitly stated otherwise, conversational references to
+`sm`/`md`/`lg`/`xl` should be interpreted as viewport-number semantics. If a
+component uses container queries instead of viewport queries, translate those
+values into explicit numeric container thresholds rather than named Tailwind
+container breakpoints.
+
 ## When to use container queries vs. viewport queries
 
 | Pattern | Use | Why |
 |---|---|---|
 | Shell nav / header | Viewport queries (`md:`, `lg:`) | Header is always full viewport width; Storybook viewport parameter sets iframe width |
-| Cards, tiles, panels | Container queries (`@[Xpx]:` or Tailwind `@sm:`/`@lg:` if size fits the compact scale) | Component responds to its own containing surface, not the viewport |
+| Cards, tiles, panels | Container queries (`@[Xpx]:` preferred when matching viewport-number semantics; Tailwind `@sm:`/`@lg:` only when the compact scale is intentionally desired) | Component responds to its own containing surface, not the viewport |
 | Hero content blocks | Container queries on the hero shell element | Ensures correct layout in any embedding context |
 
 ## Always cover these four zones for shell-level components

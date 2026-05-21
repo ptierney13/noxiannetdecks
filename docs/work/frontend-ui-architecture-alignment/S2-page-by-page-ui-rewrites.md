@@ -6,7 +6,7 @@
 
 Stage 7 rewrites each legacy page one at a time. Every page gets a full
 visual overhaul — not a translation of existing styles. The user provides a
-mockup image, the agent reads the current page code and the available `ui/`
+mockup image, the agent reads the current page code and the available `ui-elements/`
 component inventory (built in Stages 5–6), and together they produce a
 concrete plan before any code is written. Each page is executed and approved
 independently before the next begins.
@@ -21,7 +21,7 @@ data-loading stage.
 | Styling | Tailwind only. No new `styles.css` selectors. Remove replaced selectors from `styles.css` as each page is done. |
 | Data loading | TanStack Query per page. Wire `useQuery` during the rewrite; do not leave `useEffect` data fetches in place. |
 | Routing | TanStack Router is settled. Only fix route search param schemas if the page rewrite requires it. |
-| Shared components | Use existing `ui/` and `features/` components first. Propose new shared components only when no existing component fits. New shared components go to `ui/` or `features/` with Storybook coverage before being used in the page. |
+| Shared components | Use existing `ui-elements/` and `features/` components first. Propose new shared components only when no existing component fits. New shared components go to `ui-elements/` or `features/` with Storybook coverage before being used in the page. |
 | Visual target | Mockups are organizational guides, not pixel-perfect specs. Match the visual intent; iterate with the user before finalizing. |
 
 ## Execution Order

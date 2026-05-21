@@ -29,7 +29,7 @@ Use the repo-local preview skill at
 
 | If you are doing...                             | Read this first                                        |
 | ----------------------------------------------- | ------------------------------------------------------ |
-| Any new component or shared UI work             | `frontend/AGENTS.md` (here), then `src/ui/index.ts`   |
+| Any new component or shared UI work             | `frontend/AGENTS.md` (here), then `src/ui-elements/index.ts` |
 | Feature-level UI used by multiple routes        | `src/features/` barrel + Storybook coverage rule below |
 | Routing or navigation changes                   | `src/routes/` — TanStack Router owns all navigation    |
 | Data fetching or API calls                      | `src/data/` — TanStack Query keys and queryOptions     |
@@ -56,12 +56,21 @@ styling and TanStack Router/Query. The full initiative plan lives in
   (token definitions only). Do not add utility selectors there.
 - Storybook verification is required for every extracted shared component and
   every exported UI surface. See Storybook Requirement below.
-- New shared UI goes under `src/ui/` (barrel-exported via `ui/index.ts`).
+- New shared presentational UI goes under `src/ui-elements/` (barrel-exported via `ui-elements/index.ts`) unless an approved initiative explicitly changes that layer name.
 - New domain-shared UI goes under `src/features/`.
 - New API/query helpers go under `src/data/`.
 - New non-domain utilities go under `src/lib/`.
 - New pages (migrated) go under `src/pages/`.
 - Unmigrated pages belong in `src/pages/legacy/` — see that folder's `AGENTS.md`.
+- Shared extraction should be conservative. Prefer route-local or feature-local
+  composition until reuse is real or immediately imminent.
+- Feature-only composition files may live inside `src/features/` without being
+  barrel-exported yet. Export only the reusable feature API surface.
+- When building a shared feature for the first time, keep parent ownership
+  minimal: pass the primary input in, and let the feature own fetch, selection,
+  popup, and other interaction state unless proven reuse requires lifting it.
+- Shared/frontend component names should describe their actual UI role. Avoid
+  vague umbrella names unless the boundary is already established in docs.
 
 **Legacy patterns you will encounter — do not extend:**
 
@@ -119,6 +128,12 @@ If a visual value is used in more than one component and represents a reusable
 design decision, promote it to a CSS custom property in `ui-foundation.css`
 before using it.
 
+Repeated layout thresholds, column switches, and spacing invariants should come
+from one named source of truth. Use either a shared token in
+`ui-foundation.css` when the invariant applies across multiple surfaces, or
+local named constants with plain-English comments describing what part of the
+UI they affect.
+
 ## Component Styling
 
 - Style components with Tailwind utility classes.
@@ -140,6 +155,9 @@ Standard expansion breakpoints:
 - `1024px`
 - `1280px`
 
+Unless the user explicitly says otherwise, conversational references to
+`sm`/`md`/`lg`/`xl` should be interpreted as viewport-number semantics.
+
 Use `@container` queries for component-level layout adaptation (cards, tiles,
 hero blocks, panels). Reserve viewport media queries (`sm:`, `lg:`, `xl:`) for
 true shell-level changes: switching mobile/desktop nav, showing/hiding
@@ -154,6 +172,11 @@ width. Do not use container queries on shell/nav elements.
 (`@sm:`, `@lg:`) are NOT equivalent to viewport breakpoints of the same name.
 `@lg:` fires at ~512px, not 1024px. Use explicit pixel values for container
 queries when a specific threshold matters: `@[420px]:`, `@[1024px]:`, etc.
+
+When a component-level design uses viewport-number language but must be
+implemented with container queries, translate those values into explicit
+numeric container thresholds. Do not use named container breakpoints as
+shorthand for viewport-equivalent behavior.
 
 Do not make cards, heroes, or shared surfaces depend on browser viewport width
 when container width is the actual layout signal. Storybook stories must render
@@ -180,7 +203,7 @@ the shell breakpoint reference.
 Storybook is the primary UI review harness. It is required, not optional.
 
 **Stories are always colocated with the file they test.** A story for
-`src/ui/FeatureCard.tsx` lives at `src/ui/FeatureCard.stories.tsx`. A story
+`src/ui-elements/FeatureCard.tsx` lives at `src/ui-elements/FeatureCard.stories.tsx`. A story
 for `src/home.tsx` lives at `src/home.stories.tsx`. There is no `src/storybook/`
 folder — that directory was removed. Do not recreate it.
 
@@ -208,6 +231,9 @@ Before adding a new UI pattern:
 3. If the pattern is route-local, keep it in the route file and style it with
    Tailwind.
 4. Do not clone styles. Use the barrel import.
+5. If typed user input live-updates nearby UI, use the repo's canonical
+   debounce/live-update pattern rather than introducing ad hoc timers. The
+   canonical example lives in `src/lib/useDebounce.ts`.
 
 ## Verification
 

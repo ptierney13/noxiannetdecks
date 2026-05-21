@@ -42,6 +42,25 @@ Multi-stage or feature-level initiative docs should also include:
   - `plan`
   - `in progress`
   - `completed`
+- Lightweight work-item stub statuses use this order:
+  - `proposed`
+  - `draft`
+  - `plan`
+  - `in progress`
+  - `completed`
+- For docs at `draft` status:
+  - treat them as planning notes, not authoritative execution docs
+  - finalize them against the current repository state before implementation
+  - for multi-stage initiatives, reconcile them with completed stages before
+    finalizing
+  - keep future-stage drafts roughly updated, but do not optimize for precise
+    correctness
+- For lightweight work-item stubs:
+  - `proposed` means a minimal tracking item with enough human-readable detail
+    to understand the big-picture work it is tracking
+  - no additional content-shape rules apply at `proposed` status
+  - status belongs in the visible status line, not in the filename or title
+  - `completed` items belong in archive rather than the active work surface
 - A staged initiative folder stays active if any stage has moved beyond
   `plan`.
 - A staged initiative folder is complete only when every stage is

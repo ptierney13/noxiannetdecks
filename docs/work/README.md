@@ -41,3 +41,28 @@ Stage statuses inside staged initiative folders:
 - `plan`
 - `in progress`
 - `completed`
+
+Lightweight work-item stub statuses use this order:
+
+- `proposed`
+- `draft`
+- `plan`
+- `in progress`
+- `completed`
+
+For work-item stubs:
+
+- `proposed` means a lightweight tracking item with enough human-readable
+  detail to understand the big-picture work it is tracking
+- no additional content-shape rules apply at `proposed` status
+- status belongs in the visible status line, not in the filename or title
+- `completed` items belong in archive rather than the active work surface
+
+For draft plans:
+
+- draft plans are working notes, not a source of truth
+- finalize draft plans against the current code state before implementation
+- for multi-stage work, also check completed stages before finalizing
+- future-stage drafts should be updated in good faith, but precision is not the
+  goal while they remain drafts
+- the goal of a future-stage draft is overview plus rough execution order

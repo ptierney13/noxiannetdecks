@@ -72,6 +72,19 @@ from internal files.
 - New non-domain hook or utility → `lib/`
 - New page route → `routes/`
 
+Additional boundary rules:
+
+- Shared extraction should be conservative. Prefer route-local or feature-local
+  composition until reuse is real or immediately imminent.
+- Feature-only composition files may live inside `features/` without being
+  barrel-exported yet. Export only the reusable feature API surface.
+- When building a shared feature for the first time, prefer a single smart
+  feature component that accepts the upstream source-of-truth input and owns
+  fetch, selection, popup, and similar interaction state locally unless proven
+  reuse requires lifting that state.
+- Shared/frontend component names should describe their actual UI role. Avoid
+  vague umbrella names unless the boundary is already established in docs.
+
 ## Shared Design System
 
 Semantic tokens are defined as CSS custom properties in `ui-foundation.css`.
@@ -90,6 +103,14 @@ Examples of token-backed decisions:
 Promote a value to a CSS custom property in `ui-foundation.css` if it
 represents a shared design decision used in more than one component.
 
+Repeated layout thresholds, column switches, and spacing invariants should come
+from one named source of truth. Use either:
+
+- shared design-system values in `ui-foundation.css` when the invariant applies
+  across multiple surfaces, or
+- local named constants with plain-English comments describing what part of the
+  UI they affect
+
 Do not introduce new raw colors or shadows directly in feature files if the
 value is reusable. Do not add utility selectors to `ui-foundation.css`.
 `styles.css` must not receive any new rules.
@@ -105,6 +126,9 @@ progressively using the standard expansion breakpoints:
 - `768px`
 - `1024px`
 - `1280px`
+
+Unless the user explicitly says otherwise, conversational references to
+`sm`/`md`/`lg`/`xl` should be interpreted as viewport-number semantics.
 
 ### Container Queries For Component-Level Adaptation
 
@@ -134,6 +158,11 @@ Use explicit pixel values when you need a container query to fire at a specific
 threshold: `@[420px]:`, `@[640px]:`, `@[1024px]:`. Reserve named container
 breakpoints (`@sm:`, `@lg:`) only when the compact scale is intentionally
 appropriate (e.g. a card that adapts at ~512px wide).
+
+When component-level work uses viewport-number language but must not use
+viewport queries, translate those values into explicit numeric container
+thresholds. Do not use named container breakpoints as shorthand for
+viewport-equivalent behavior.
 
 ### Viewport Queries For Shell-Level Changes
 
@@ -203,6 +232,10 @@ Stories must cover: default, loading, empty, and error states where applicable.
 Use `@storybook/test` play functions for meaningful interaction states.
 
 **Completion notes must list the Storybook story paths to open for inspection.**
+
+For live-updating controls driven by typed user input, use the repo's canonical
+debounce/live-update pattern rather than adding ad hoc timers. The canonical
+example lives in `src/lib/useDebounce.ts`.
 
 ### Story Structure
 

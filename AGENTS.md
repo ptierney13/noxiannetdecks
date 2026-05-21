@@ -81,6 +81,8 @@ For details, read [docs/README.md](/C:/Users/ptier/repos/Deck Archive Project/do
   implementation.
 - Trivial typo fixes, small documentation edits, and narrow cleanup may proceed
   without a plan.
+- Treat draft initiative and stage docs as non-authoritative until finalized
+  against the current codebase and any completed earlier stages.
 - Before implementing an approved plan, review it critically and surface
   missing edge cases, invalid assumptions, and architectural risks.
 

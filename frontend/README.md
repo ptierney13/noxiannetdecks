@@ -12,13 +12,13 @@ The current site provides:
 
 ## UI Terms
 
-- `Quick View` is the canonical product term for the compact dialog that opens
-  when a search-result card is clicked.
-- Quick View shows a lightweight card summary and actions such as `Buy on TCG`
-  and `View full details`.
+- `Card Summary Popup` is the canonical product term for the compact dialog
+  that opens when a search-result card is clicked.
+- Card Summary Popup shows a lightweight card summary and actions such as
+  `Buy on TCG` and `View full details`.
 - Some older internal code and CSS still use `quick-look` in names like
   `CardQuickLookModal` and `.card-quick-look-*`. Treat those as legacy internal
-  identifiers for the same Quick View surface rather than a different UI.
+  identifiers for the same Card Summary Popup surface rather than a different UI.
 
 ## UI Foundation
 
