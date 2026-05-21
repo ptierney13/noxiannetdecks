@@ -273,12 +273,15 @@ this unit can be finished.
 
 ### Unit 3: Card presentation
 
-Before creating `ResultCard` and `CardMetaChips`, migrate `renderTokenizedText`
-and any formatting helpers they require from `src/cardFormat.tsx` to
-`src/lib/cardFormat.ts`. These are pure functions with no state — they belong
-in `lib/` by the placement rules. `ui-elements/` components may not import from
-the root `src/` level. This extraction is a prerequisite for the components in
-this unit.
+The `cardPresentation` extraction prerequisite for this unit is already
+complete. `renderTokenizedText`, `normalizeCardText`, `formatCostText`,
+`formatTypeline`, `domainChipClass`, `cardEnergy`, and their supporting
+helpers and types have been migrated from `src/cardFormat.tsx` to
+`src/lib/cardPresentation.tsx` and are available through the `lib/` barrel.
+
+If a component in this unit requires something from `src/cardFormat.tsx` that
+is not in `src/lib/` or another lib module, stop immediately and ask why it is
+needed and whether it should be migrated or a different approach taken.
 
 Create:
 

@@ -1,5 +1,20 @@
 export { useDebounce } from "./useDebounce";
 export {
+  SYMBOL_MAP,
+  RIFTBOUND_REGIONS,
+  inlineSymbolSrc,
+  renderMultilineText,
+  renderTokenizedText,
+  applySymbols,
+  normalizeCardText,
+  cardEnergy,
+  formatCostText,
+  formatTypeline,
+  domainChipClass,
+  type InlineSymbolVariant,
+  type InlineSymbolSize,
+} from "./cardPresentation";
+export {
   buildCardDetailPath,
   buildCardsSearchPath,
   buildDeckExplorerEventPath,

@@ -1,6 +1,6 @@
 import { type CSSProperties, type FormEvent, type PointerEvent, type ReactNode, useEffect, useMemo, useState } from "react";
 import { generateSealedPool, loadPackGeneratorOptions } from "../../api";
-import { cardEnergy } from "../../cardFormat";
+import { cardEnergy } from "../../lib";
 import { CardsIcon } from "../../ui-elements";
 import { useAppError } from "../../app/ErrorContext";
 import type {

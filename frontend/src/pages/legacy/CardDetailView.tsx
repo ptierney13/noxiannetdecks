@@ -2,22 +2,22 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { getCard, searchCards } from "../../api";
 import {
-  formatCostText,
   formatHeadlinePrice,
   formatSeriesToggleLabel,
-  formatTypeline,
   groupRowsByPrinting,
-  normalizeCardText,
   PRICE_SERIES_COLORS,
   PriceHistoryChart,
-  renderTokenizedText,
 } from "../../cardFormat";
 import {
   buildCardDetailPath,
   buildTcgplayerAffiliateLink,
+  formatCostText,
+  formatTypeline,
   formatUsdPrice,
   getPublishedRowsForCard,
   normalizePrinting,
+  normalizeCardText,
+  renderTokenizedText,
   resolveNearMintMarketPrice,
   usePublishedPriceIndex,
 } from "../../lib";

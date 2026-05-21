@@ -1,15 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearch } from "@tanstack/react-router";
 import { searchCards } from "../../api";
+import { CardQuickLookModal, VariantButtonRow } from "../../cardFormat";
 import {
-  CardQuickLookModal,
-  VariantButtonRow,
   cardEnergy,
   domainChipClass,
   formatCostText,
   renderTokenizedText,
-} from "../../cardFormat";
-import { usePublishedPriceIndex } from "../../lib";
+  usePublishedPriceIndex,
+} from "../../lib";
 import { useAppError } from "../../app/ErrorContext";
 import type { CardRecord, QueryDiagnostic } from "../../types";
 
