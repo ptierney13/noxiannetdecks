@@ -1,0 +1,36 @@
+{
+  "stages": [
+    {
+      "path": "docs/work/price-store/S1-frontend-static-read-integration.md",
+      "status": "draft"
+    },
+    {
+      "path": "docs/work/price-store/S2-cloudflare-scheduled-capture-and-internal-publish.md",
+      "status": "plan"
+    },
+    {
+      "path": "docs/work/price-store/S3-deploy-automation.md",
+      "status": "draft"
+    },
+    {
+      "path": "docs/work/price-store/S4-live-d1-worker-rollout.md",
+      "status": "plan"
+    },
+    {
+      "path": "docs/work/price-store/S5-old-price-method-removal.md",
+      "status": "draft"
+    },
+    {
+      "path": "docs/work/price-store/S6-monitoring-runbooks.md",
+      "status": "draft"
+    },
+    {
+      "path": "docs/work/price-store/S7-affiliate-rollout.md",
+      "status": "draft"
+    },
+    {
+      "path": "docs/work/price-store/S10-server-owned-price-data-delivery.md",
+      "status": "draft"
+    }
+  ]
+}

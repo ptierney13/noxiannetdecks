@@ -1,0 +1,12 @@
+{
+  "stages": [
+    {
+      "path": "docs/work/frontend-ui-architecture-alignment/S1-cardformat-analysis-and-placement.md",
+      "status": "plan"
+    },
+    {
+      "path": "docs/work/frontend-ui-architecture-alignment/S2-page-by-page-ui-rewrites.md",
+      "status": "plan"
+    }
+  ]
+}

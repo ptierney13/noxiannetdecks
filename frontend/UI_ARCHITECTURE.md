@@ -8,7 +8,7 @@ responsive design, and UI patterns. It is the detailed companion to
 
 The frontend is mid-migration toward a layered architecture with Tailwind
 styling, TanStack Router, and TanStack Query. The full initiative plan lives in
-`plans/todo/frontend-ui-architecture-alignment/`.
+`docs/work/frontend-ui-architecture-alignment/`.
 
 During the migration, two sets of patterns coexist:
 

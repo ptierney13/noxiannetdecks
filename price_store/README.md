@@ -126,9 +126,5 @@ Stage 7.1 now adds:
 
 ## Plans
 
-- [Stage 1 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-1-foundation-and-raw-capture.md)
-- [Stage 2 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-2-tcgplayer-approval-and-samples.md)
-- [Stage 3 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-3-justtcg-approval-auth-and-first-live-capture.md)
-- [Stage 4 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-4-justtcg-contracts-and-repositories.md)
-- [Stage 5 executed plan](../plans/executed/price-store/2026-05-06-price-store-stage-5-justtcg-publishable-snapshot-pipeline.md)
-- [Stage 7.1 executed plan](../plans/executed/price-store/2026-05-11-price-store-stage-7-1-d1-relational-local-validation-and-dual-price-display.md)
+- [Active initiative](../docs/work/price-store/README.md)
+- [Archived executed plans](../docs/archive/work/price-store/)

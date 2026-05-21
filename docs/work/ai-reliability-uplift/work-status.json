@@ -1,0 +1,20 @@
+{
+  "stages": [
+    {
+      "path": "docs/work/ai-reliability-uplift/S1-agent-guidance-and-documentation-model-realignment.md",
+      "status": "completed"
+    },
+    {
+      "path": "docs/work/ai-reliability-uplift/S2-lint-formatting-and-ci.md",
+      "status": "draft"
+    },
+    {
+      "path": "docs/work/ai-reliability-uplift/S3-custom-skills.md",
+      "status": "draft"
+    },
+    {
+      "path": "docs/work/ai-reliability-uplift/S4-smoke-tests-and-dev-entrypoint.md",
+      "status": "draft"
+    }
+  ]
+}

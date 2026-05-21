@@ -14,6 +14,17 @@ Before significant UI work, also read:
 Treat that file as the detailed design and responsive-architecture companion to
 this one.
 
+## Execution Defaults
+
+For meaningful frontend work, completion defaults to:
+
+1. commit the intended changes
+2. ship the branch
+3. return the branch preview URL as the last item in the response
+
+Use the repo-local preview skill at
+`.agents/skills/noxiannet-preview-url/SKILL.md` for preview URL handling.
+
 ## Task Routing
 
 | If you are doing...                             | Read this first                                        |
@@ -25,13 +36,13 @@ this one.
 | Non-domain hooks or utilities                   | `src/lib/`                                             |
 | CSS migration of an existing component          | Migration Era Contract section below                   |
 | Any Storybook story addition or update          | Storybook Requirement section below — stories are always colocated with their source file |
-| Stage-level architectural decisions             | `plans/todo/frontend-ui-architecture-alignment/`       |
+| Stage-level architectural decisions             | `docs/work/frontend-ui-architecture-alignment/`        |
 
 ## Migration Era Contract (active during this initiative)
 
 The frontend is mid-migration toward a layered architecture with Tailwind
 styling and TanStack Router/Query. The full initiative plan lives in
-`plans/todo/frontend-ui-architecture-alignment/`.
+`docs/work/frontend-ui-architecture-alignment/`.
 
 **Active rules for all new and migrated work:**
 

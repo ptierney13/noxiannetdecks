@@ -1,129 +1,97 @@
-# Agent Instructions
+# Agent Guide
 
-This repository uses plan-first development for significant project work.
+This file is a task router and behavior harness, not the full project wiki.
 
-## Planning Requirement
+## Start Here (always)
 
-Significant feature work requires a manually approved plan before implementation.
+1. Read this file.
+2. Read [README.md](/C:/Users/ptier/repos/Deck Archive Project/README.md)
+   sections:
+   - `Documentation Map`
+   - `Documentation Principles`
+3. Read task-specific docs from the routing table below before editing.
+4. If the task touches a subtree with its own `AGENTS.md`, read that file
+   before editing anything there. If work spans multiple subtrees, read every
+   in-scope `AGENTS.md`.
 
-Significant work includes:
+## Repo Map
 
-- New features or user-facing capabilities
-- Service architecture changes
-- Data model or storage changes
-- Migrations
-- External integrations
-- Broad refactors
+- `frontend/` - user-facing web app
+- `card_store/` - canonical card data, search logic, and API service behavior
+- `price_store/` - published price-data pipeline
+- `deck_store/` - in-progress deck and event data package
+- `functions/` - Cloudflare-exposed API and data-serving adapters
+- `docs/` - reference docs, runbooks, active work, and archive
+- `.agents/skills/` - repo-local Codex skills for recurring tasks
 
-Trivial typo fixes, small documentation edits, and narrow cleanup may proceed without a plan.
+## Non-Negotiables
 
-Before implementing an approved plan, review it critically: flag antipatterns,
-gaps between stated decisions and their implementation consequences, missing
-edge cases, and assumptions that may not hold. Surface concerns and confirm how
-they will be handled before writing any code.
+- `AGENTS.md` is the authoritative agent guidance surface in this repo.
+- Every directory with an `AGENTS.md` must also have a sibling `CLAUDE.md`
+  that uses the minimal `@AGENTS.md` forwarding pattern.
+- Use plain `git`. Do not rely on `gh`; it is not installed on this machine.
+- Ignore `.claude/` worktree snapshots. They are non-authoritative historical
+  artifacts and may be stale.
+- Prefer an existing repo-local skill over inventing a new recurring process.
+- Multi-agent safety: do not touch, revert, stage, or "clean up" unrelated
+  changes.
+- Never run destructive git cleanup commands unless explicitly asked.
 
-Once a plan has been manually approved, later edits to that existing plan do not require a second approval before implementation. Keep the plan updated so it reflects the work actually being done, and ask for approval again only when the change is better represented as a separate new plan.
+## Execution Defaults
 
-For large self-contained initiatives that are split into multiple stages,
-expect the workflow to be:
+- Run commands from the repo root unless there is a clear reason not to.
+- `main` is expected to live in the dedicated worktree at
+  `C:\Users\ptier\repos\Deck Archive Project-main-merge`.
+- Before starting implementation work, check for unrelated local changes. If
+  they exist, stop and ask whether to continue in the current worktree or start
+  from a new worktree/clean branch flow instead.
+- Do not continue new implementation work on an older existing branch unless
+  the user explicitly asks to resume that branch.
+- If a task changes behavior, interfaces, or workflow expectations, update the
+  owning docs in the same change.
 
-- one initiative-level plan that explains the overall sequence
-- one draft summary plan per planned stage so a later worker can start from a
-  bounded context
-- one finalized, approved plan for the current stage before implementation
-  begins for that stage
-- a requirement that completing a stage also updates the remaining future-stage
-  draft summaries with any newly relevant decisions, constraints, or changed
-  assumptions
+## Task Routing
 
-## Plan Locations
+This table is mandatory, not a suggestion.
 
-Plans live under `plans/`:
+| If you are doing... | Read this first |
+| --- | --- |
+| Query engine or API work | `card_store/AGENTS.md`, `card_store/README.md` |
+| Frontend UI work | `frontend/AGENTS.md`, `frontend/UI_ARCHITECTURE.md`, `frontend/README.md` |
+| Price scraping or pipeline work | `price_store/AGENTS.md`, `price_store/README.md` |
+| Deck archive or ingestion work | `deck_store/AGENTS.md`, `deck_store/README.md` |
+| Cloudflare deployment architecture | `docs/reference/cloudflare-deployment/README.md` |
+| Significant new initiative work | `docs/work/README.md`, `docs/work/work-status.json`, `docs/reference/initiative-doc-authoring.md` |
+| Documentation model or doc placement | `docs/README.md`, `docs/reference/README.md` |
+| Releasing or deploying | this file, `README.md`, `.agents/skills/noxiannet-preview-url/SKILL.md` |
 
-- `plans/todo/` contains proposed or approved plans that have not yet been enacted.
-- `plans/executed/` contains plans that have been enacted.
-- One-off or isolated work may use a single plan file directly under `plans/todo/`
-  or `plans/executed/`.
-- Large self-contained initiatives that are expected to need multiple related
-  plans should get matching feature folders under both `plans/todo/` and
-  `plans/executed/`.
-- Feature-folder plans should stay grouped under
-  `plans/todo/<feature-slug>/` while pending and under
-  `plans/executed/<feature-slug>/` once enacted.
-- For multi-stage initiatives, keep draft summary plans for future stages in
-  the feature folder so new context windows can read prior completed stages plus
-  the current stage draft before producing the finalized stage plan.
+## Documentation Model
 
-When significant work is completed, move the plan file from `plans/todo/` to
-`plans/executed/` as part of the final implementation commit — not as a
-separate follow-up commit.
+- `README.md` is canonical for repo and folder semantics.
+- `docs/reference/` holds evergreen reference and policy docs.
+- `docs/runbooks/` holds repeatable operational procedures.
+- `docs/work/` holds active initiative planning and execution docs.
+- `docs/archive/` holds completed or superseded historical docs.
 
-## Plan Contents
+For details, read [docs/README.md](/C:/Users/ptier/repos/Deck Archive Project/docs/README.md).
 
-Plan documents should include:
+## Initiative Workflow
 
-- Summary
-- Key changes
-- Test plan
-- Assumptions
+- Significant work requires a manually approved initiative doc before
+  implementation.
+- Trivial typo fixes, small documentation edits, and narrow cleanup may proceed
+  without a plan.
+- Before implementing an approved plan, review it critically and surface
+  missing edge cases, invalid assumptions, and architectural risks.
 
-## Frontend UI Guidance
+For active-work structure and status rules, read
+[docs/work/README.md](/C:/Users/ptier/repos/Deck Archive Project/docs/work/README.md).
+For initiative-doc shape, read
+[docs/reference/initiative-doc-authoring.md](/C:/Users/ptier/repos/Deck Archive Project/docs/reference/initiative-doc-authoring.md).
 
-When editing files under `frontend/`, read `frontend/AGENTS.md` first.
+## Release And Branch Workflow
 
-For significant UI or responsive design work under `frontend/`, also read:
-
-- `frontend/UI_ARCHITECTURE.md`
-
-Treat `frontend/AGENTS.md` as the task router and migration-era rule set for:
-
-- where new UI, feature, route, data, and utility code belongs
-- Tailwind migration protocol and CSS legacy-pattern rules
-- Storybook coverage requirements
-- target architecture layers (`ui/`, `features/`, `routes/`, `data/`, `lib/`)
-
-Treat `frontend/UI_ARCHITECTURE.md` as the detailed companion for:
-
-- mobile-first responsive design expectations
-- container-query vs viewport-query usage
-- navigation architecture preferences
-- Storybook-driven UI review structure
-- migration era contract and target layer descriptions
-
-**Frontend task routing:**
-
-| If you are doing...                         | Read this first                                          |
-| ------------------------------------------- | -------------------------------------------------------- |
-| Any new component or shared UI work         | `frontend/AGENTS.md`, then check `src/ui/`               |
-| Feature-level domain UI                     | `frontend/AGENTS.md` `features/` section                 |
-| Routing or navigation work                  | `frontend/AGENTS.md`, TanStack Router docs               |
-| Data fetching or query definitions          | `frontend/AGENTS.md`, `src/data/` barrel                 |
-| CSS migration of a legacy component         | `frontend/AGENTS.md` Migration Era Contract section      |
-| Storybook story work                        | `frontend/AGENTS.md` Storybook Requirement section       |
-| Stage-level architecture decisions          | `plans/todo/frontend-ui-architecture-alignment/`         |
-
-Draft summary plans for future stages should also state clearly that:
-
-- they are drafts
-- they must be finalized and approved before implementation begins
-- completing the current stage requires refreshing future-stage draft summaries
-  with any newly pertinent information
-
-## GitHub Workflow
-
-The `gh` CLI is **not installed** on this machine. All GitHub operations use plain `git`.
-
-`main` is permanently checked out in a dedicated worktree at:
-
-```
-C:\Users\ptier\repos\Deck Archive Project-main-merge
-```
-
-Before starting implementation work on an approved plan or other new code
-changes, always begin from a fresh branch created off `main` after that
-worktree has been pulled and synced with `origin`.
-
-Expected start-of-work flow:
+Before starting implementation on an approved initiative, prefer:
 
 ```bash
 git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" fetch --prune origin
@@ -131,40 +99,37 @@ git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" pull --ff-only ori
 git -C "C:\Users\ptier\repos\Deck Archive Project" checkout -b codex/<task-name> "origin/main"
 ```
 
-Do not continue new implementation work on an older existing branch unless the
-user explicitly asks to resume that branch.
-
-To merge a finished branch to main and deploy:
-
-```bash
-git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" merge --ff-only <branch-name>
-git -C "C:\Users\ptier\repos\Deck Archive Project-main-merge" push origin main
-```
-
-Use `--ff-only` to keep history linear. Cloudflare Pages deploys automatically when `main` is pushed - there is no separate deploy step.
-
-## Release Commands
-
-Use the checked-in release helper to keep conversational release behavior
-consistent:
-
-```bash
-npm run release:ship
-npm run release:publish
-```
-
-- `ship it` or similar means:
-  - push the current branch to `origin`
-  - treat the resulting Cloudflare Pages branch preview as the default
-    verification target
-  - include the preview URL as the last item in the final response
-- `publish it` or similar means:
-  - merge the current branch into the dedicated `main` worktree with
-    `--ff-only`
-  - push `origin main`
-  - treat that push as the live publish step
-- When significant feature work is completed and the result is reasonably
-  verifiable on a branch deploy, the default close-out path is to ship the
-  branch preview even if the user does not explicitly ask for the preview URL.
+- `ship it` means push the current branch to `origin`, use the Cloudflare
+  Pages branch preview as the default verification target, and include the
+  preview URL in the close-out.
+- `publish it` means fast-forward merge the current branch into the dedicated
+  `main` worktree and push `origin main`.
 - Never publish directly to `main` without an explicit publish instruction.
-- If the fast-forward merge fails, stop and ask the user before proceeding.
+- If the fast-forward merge fails, stop and ask before proceeding.
+
+## Mid-Execution Approval Rules
+
+If an agent believes it needs user approval mid-execution, it should first
+self-approve:
+
+- changes explicitly called for by the currently approved initiative doc
+- requests that only read files within this repository
+- requests that match an explicit self-approval pattern listed below
+
+Self-approval pattern list:
+
+- none yet; this list is intentionally empty until the user populates it
+
+If approval requests still need to be sent, the agent should:
+
+- keep track of each request it sent
+- derive categories from the actual requests it sent during that task
+- include numerical counts per category in the final after-work summary
+- include only categories with non-zero counts
+
+## Repo-local Skills
+
+- `noxiannet-preview-url`
+  - Use when you need the expected Cloudflare Pages preview URL for a branch,
+    need the branch-preview URL pattern, or need the documented preview-link
+    workflow.

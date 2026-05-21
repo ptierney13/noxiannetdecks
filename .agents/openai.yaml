@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deck Archive Project Agents"
+  short_description: "Repo-local agent extensions and skills for Deck Archive Project."
+  default_prompt: "Use the repo-local skills in `.agents/skills/` when their documented trigger conditions are met. Implicit invocation is allowed for `noxiannet-preview-url` when a task involves Cloudflare Pages branch preview URLs, preview alias rules, or release-preview verification."

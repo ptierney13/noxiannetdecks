@@ -1,0 +1,19 @@
+{
+  "initiatives": [
+    {
+      "path": "docs/work/ai-reliability-uplift",
+      "type": "staged-folder",
+      "status": "in progress"
+    },
+    {
+      "path": "docs/work/frontend-ui-architecture-alignment",
+      "type": "staged-folder",
+      "status": "in progress"
+    },
+    {
+      "path": "docs/work/price-store",
+      "type": "staged-folder",
+      "status": "in progress"
+    }
+  ]
+}
