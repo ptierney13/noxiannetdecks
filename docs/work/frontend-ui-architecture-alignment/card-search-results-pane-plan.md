@@ -1,6 +1,6 @@
 # Plan: Card Search Results Pane
 
-> Status: plan
+> Status: in progress
 
 ## Summary
 
@@ -17,6 +17,38 @@ before the legacy surface is retired.
 This plan treats the new results pane as the canonical future implementation
 for surfaced card search results. It should be designed so the `/cards` route
 can adopt it later without reworking its internal boundaries.
+
+## Implementation Note 2026-05-21
+
+The first Query Builder integration pass exists. The legacy `/cards` route is
+still untouched.
+
+Implemented surfaces:
+
+- `frontend/src/data/cards.ts`
+- `frontend/src/lib/cardSearchResults.ts`
+- `frontend/src/ui-elements/ResultCard.tsx`
+- `frontend/src/ui-elements/CardMetaChips.tsx`
+- `frontend/src/features/card-search/CardSearchResultsPane.tsx`
+- `frontend/src/features/card-search/CardSearchResultsContent.tsx`
+- `frontend/src/features/VariantSelectorRow.tsx`
+- `frontend/src/features/card/CardSummaryPopup.tsx`
+
+Container sizing values are centralized as top-of-file constants in
+`CardSearchResultsContent.tsx`. The implementation uses explicit numeric
+container-query thresholds (`640px`, `768px`, `1024px`, `1280px`, `1536px`)
+rather than Tailwind named container breakpoints.
+
+Validation status:
+
+- `npm run build -w @noxiannet/frontend` passes.
+- `npm run build-storybook -w @noxiannet/frontend` passes.
+- Browser smoke test of the built `Features/CardSearchResultsPane` Storybook
+  story passed, including opening the Card Summary Popup.
+- `npm run test -w @noxiannet/frontend` still fails in legacy/stale areas not
+  introduced by this implementation.
+- `npm run test:storybook -w @noxiannet/frontend` still exits because its
+  configured test include points at removed `src/storybook/` coverage.
 
 ## Key Changes
 

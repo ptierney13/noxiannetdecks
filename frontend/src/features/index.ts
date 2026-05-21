@@ -1,2 +1,8 @@
-// Feature-level domain UI shared by more than one route goes here.
-// See frontend/AGENTS.md for placement rules.
+export {
+  VariantSelectorRow,
+  normalizeCardFinish,
+  type CardFinish,
+  type VariantSelection,
+} from "./VariantSelectorRow";
+export { CardSummaryPopup, type CardSummaryPopupProps } from "./card/CardSummaryPopup";
+export { CardSearchResultsPane, type CardSearchResultsPaneProps } from "./card-search/CardSearchResultsPane";

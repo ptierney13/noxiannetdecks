@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { CardSearchResultsPane } from "../../features";
+import { useDebounce } from "../../lib";
 
 const DOMAIN_ORDER = ["Fury", "Calm", "Mind", "Body", "Chaos", "Order"] as const;
 const CARD_TYPES = ["Unit", "Spell", "Gear", "Rune", "Battlefield", "Legend"] as const;
@@ -177,7 +179,10 @@ export default function QueryBuilderView() {
     navigate({ to: "/cards", search: { q: trimmed || undefined } });
   }
 
+  const debouncedBuiltQuery = useDebounce(builtQuery, 180);
+
   return (
+    <div className="mx-auto grid w-full max-w-[1720px] gap-6 px-4 pb-8 pt-2 lg:grid-cols-[minmax(360px,820px)_minmax(0,1fr)]">
     <div className="qb-panel" aria-labelledby="qb-heading">
       <div className="qb-header">
         <p className="eyebrow">Cards</p>
@@ -407,6 +412,18 @@ export default function QueryBuilderView() {
           {builtQuery ? "Search with this query" : "Search all cards"}
         </button>
       </div>
+    </div>
+    <aside className="min-w-0 lg:sticky lg:top-[calc(var(--site-header-height)+1rem)] lg:self-start">
+      <div className="mb-3 grid gap-1">
+        <p className="m-0 text-xs font-black uppercase tracking-[0.2em] text-accent-warm">
+          Live Preview
+        </p>
+        <p className="m-0 text-sm text-text-tertiary">
+          Results update from the generated query after a short debounce.
+        </p>
+      </div>
+      <CardSearchResultsPane query={debouncedBuiltQuery} />
+    </aside>
     </div>
   );
 }

@@ -23,6 +23,15 @@ export {
   buildDeckExplorerLegendPath,
 } from "./pathBuilders";
 export {
+  CARD_SEARCH_SORT_OPTIONS,
+  sortCardsByKey,
+  groupCardsByRiftboundId,
+  buildCardSearchResultGroups,
+  type CardSearchSortKey,
+  type CardSearchVariantMode,
+  type CardSearchResultGroup,
+} from "./cardSearchResults";
+export {
   usePublishedPriceIndex,
   loadPublishedPriceIndex,
   loadPublishedPriceIndexForPath,

@@ -1,6 +1,6 @@
 # Work Item: Card Summary Popup
 
-> Status: plan
+> Status: in progress
 
 ## Summary
 
@@ -23,6 +23,19 @@ are still bundled together. This work item creates the reusable popup boundary
 the new search-results path needs so that work does not duplicate popup
 logic inside the pane or deepen the new dependency on the legacy
 `cardFormat.tsx` ownership model.
+
+## Implementation Note 2026-05-21
+
+Initial implementation exists in:
+
+- `frontend/src/ui-elements/ModalShell.tsx`
+- `frontend/src/features/card/CardSummaryPopup.tsx`
+- `frontend/src/features/VariantSelectorRow.tsx`
+
+The new popup path is Storybook-covered and is used by the new
+`CardSearchResultsPane`. Legacy `CardQuickLookModal` callers remain in place.
+Do not treat the work item as complete until the remaining frontend validation
+gap is resolved or explicitly accepted.
 
 ## Key Changes
 
