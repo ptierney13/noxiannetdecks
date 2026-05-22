@@ -147,7 +147,6 @@ export function CardSummaryPopup({
                 cards={group}
                 activeKey={`${activeCard.id}-${activeFinish}`}
                 showPrice
-                showCollectorNumber
                 publishedPriceIndex={publishedPriceIndex}
                 onVariantSelect={({ card, finish }) => {
                   setActiveCard(card);
