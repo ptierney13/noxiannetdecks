@@ -85,11 +85,13 @@ function ContentHarness({
   isPending = false,
   isError = false,
   diagnostics = [],
+  rawQuery = "n:jinx",
 }: {
   cards?: CardRecord[];
   isPending?: boolean;
   isError?: boolean;
   diagnostics?: QueryDiagnostic[];
+  rawQuery?: string;
 }) {
   const [sort, setSort] = useState<CardSearchSortKey>("energy-asc");
   const [variantMode, setVariantMode] = useState<CardSearchVariantMode>("unique-cards");
@@ -106,7 +108,7 @@ function ContentHarness({
       groups={groups}
       rawResultCount={cards.length}
       visibleResultCount={variantMode === "unique-cards" ? groups.length : cards.length}
-      normalizedQuery="n:jinx"
+      rawQuery={rawQuery}
       diagnostics={diagnostics}
       isPending={isPending}
       isError={isError}
@@ -147,4 +149,28 @@ export const Diagnostics: Story = {
       diagnostics={[{ message: "Unknown field 'foo'." } as QueryDiagnostic]}
     />
   ),
+};
+
+export const DomainOrQuery: Story = {
+  render: () => <ContentHarness rawQuery="d:fury or d:calm cardtype:unit" />,
+};
+
+export const DomainAndQuery: Story = {
+  render: () => <ContentHarness rawQuery="d:fury d:calm" />,
+};
+
+export const NumericQuery: Story = {
+  render: () => <ContentHarness rawQuery="might>3 energy>=2" />,
+};
+
+export const BareTextQuery: Story = {
+  render: () => <ContentHarness rawQuery="Yi" />,
+};
+
+export const NegatedQuery: Story = {
+  render: () => <ContentHarness rawQuery="-rarity:common cardtype:unit" />,
+};
+
+export const UnknownFields: Story = {
+  render: () => <ContentHarness rawQuery="f:me f:u" />,
 };

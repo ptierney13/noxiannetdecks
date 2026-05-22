@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   queryRequestsAllPrintings,
-  stripUniqueFromNormalized,
   useCardSearchResults,
 } from "../../data";
 import {
@@ -49,7 +48,6 @@ export function CardSearchResultsPane({ query }: CardSearchResultsPaneProps) {
     () => buildCardSearchResultGroups(sortedCards, variantMode),
     [sortedCards, variantMode]
   );
-  const normalizedQuery = stripUniqueFromNormalized(resultsQuery.data?.normalizedQuery ?? "");
   const visibleResultCount = variantMode === "unique-cards" ? groups.length : cards.length;
 
   return (
@@ -58,7 +56,7 @@ export function CardSearchResultsPane({ query }: CardSearchResultsPaneProps) {
         groups={groups}
         rawResultCount={cards.length}
         visibleResultCount={visibleResultCount}
-        normalizedQuery={normalizedQuery}
+        rawQuery={query}
         diagnostics={resultsQuery.data?.diagnostics ?? []}
         isPending={resultsQuery.isPending}
         isError={resultsQuery.isError}

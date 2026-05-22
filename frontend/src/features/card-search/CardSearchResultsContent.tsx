@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronIcon, ResultCard } from "../../ui-elements";
 import { VariantSelectorRow } from "../VariantSelectorRow";
 import {
@@ -11,12 +11,13 @@ import {
   type PublishedPriceIndex,
 } from "../../lib";
 import type { CardRecord, QueryDiagnostic } from "../../types";
+import { parseQueryToBlocks, type ParsedQueryItem } from "./queryBlocks";
 
 export type CardSearchResultsContentProps = {
   groups: CardSearchResultGroup[];
   rawResultCount: number;
   visibleResultCount: number;
-  normalizedQuery: string;
+  rawQuery: string;
   diagnostics: QueryDiagnostic[];
   isPending: boolean;
   isError: boolean;
@@ -198,37 +199,72 @@ function LoadingGrid() {
   );
 }
 
+function QueryBlocksDisplay({ items }: { items: ParsedQueryItem[] }) {
+  if (items.length === 0) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+      {items.map((item, i) => {
+        if (item === "AND" || item === "OR") {
+          return (
+            <span key={i} className="text-[0.7rem] font-black uppercase tracking-widest text-text-tertiary">
+              {item}
+            </span>
+          );
+        }
+        if (item.kind === "unknown") {
+          return (
+            <span
+              key={i}
+              className="inline-flex items-center rounded-lg border border-negative-border bg-negative-soft px-3 py-1 text-sm font-semibold text-negative"
+            >
+              UNKNOWN QUERY &quot;{item.raw}&quot;
+            </span>
+          );
+        }
+        return (
+          <span
+            key={i}
+            className="inline-flex items-center rounded-lg border border-[rgba(215,170,73,0.4)] bg-accent-warm-soft px-3 py-1 text-sm font-semibold text-accent-warm"
+          >
+            {item.label}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 function ResultSummary({
   isPending,
   visibleResultCount,
   rawResultCount,
-  normalizedQuery,
+  rawQuery,
 }: {
   isPending: boolean;
   visibleResultCount: number;
   rawResultCount: number;
-  normalizedQuery: string;
+  rawQuery: string;
 }) {
+  const blocks = useMemo(() => parseQueryToBlocks(rawQuery), [rawQuery]);
+
   if (isPending) {
     return <p className="m-0 text-[1.225rem] font-semibold leading-snug text-text-tertiary">Searching cards…</p>;
   }
 
   const cardWord = visibleResultCount === 1 ? "card" : "cards";
-  const extra =
-    rawResultCount !== visibleResultCount ? ` from ${rawResultCount.toLocaleString()} printings` : "";
+  const printings =
+    rawResultCount !== visibleResultCount
+      ? ` with ${rawResultCount.toLocaleString()} printings`
+      : "";
 
   return (
-    <p className="m-0 text-[1.225rem] font-semibold leading-snug text-text-secondary">
-      <span className="font-black text-text-primary">{visibleResultCount.toLocaleString()}</span>{" "}
-      matching {cardWord}
-      {extra}
-      {normalizedQuery ? (
-        <>
-          {" "}
-          for <code className="rounded-lg bg-surface-inset px-3 py-1 text-[1.225rem] text-accent-warm">{normalizedQuery}</code>
-        </>
-      ) : null}
-    </p>
+    <div className="grid gap-2">
+      <p className="m-0 text-[1.225rem] font-semibold leading-snug text-text-secondary">
+        <span className="font-black text-text-primary">{visibleResultCount.toLocaleString()}</span>
+        {" "}{cardWord}{printings}{blocks.length > 0 ? " matching" : ""}
+      </p>
+      <QueryBlocksDisplay items={blocks} />
+    </div>
   );
 }
 
@@ -236,7 +272,7 @@ export function CardSearchResultsContent({
   groups,
   rawResultCount,
   visibleResultCount,
-  normalizedQuery,
+  rawQuery,
   diagnostics,
   isPending,
   isError,
@@ -304,7 +340,7 @@ export function CardSearchResultsContent({
           isPending={isPending}
           visibleResultCount={visibleResultCount}
           rawResultCount={rawResultCount}
-          normalizedQuery={normalizedQuery}
+          rawQuery={rawQuery}
         />
 
         <Diagnostics diagnostics={diagnostics} />
