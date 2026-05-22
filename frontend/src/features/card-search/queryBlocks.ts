@@ -1,6 +1,5 @@
 export type ConditionBlock = { kind: 'condition'; label: string };
-export type UnknownBlock = { kind: 'unknown'; raw: string };
-export type QueryBlock = ConditionBlock | UnknownBlock;
+export type QueryBlock = ConditionBlock;
 // Flat list interleaved with connectors: block | 'AND' | 'OR'
 export type ParsedQueryItem = QueryBlock | 'AND' | 'OR';
 
@@ -146,7 +145,7 @@ function buildLabel(
     case 'power':
       return `${notPrefix}Power ${conditions.map(c => `${fmtOp(c.op)} ${c.value}`).join(conn)}`;
     case 'price':
-      return `${notPrefix}Price ${conditions.map(c => `${fmtOp(c.op)} ${c.value}`).join(conn)}`;
+      return `${notPrefix}Price ${conditions.map(c => `${fmtOp(c.op)} $${c.value}`).join(conn)}`;
     case 'layout':
       return `${notPrefix}Layout is ${conditions.map(c => c.value).join(conn)}`;
     case 'language':
@@ -301,8 +300,7 @@ function buildGroups(tokens: ParsedToken[]): GroupEntry[] {
       groups.push({ group, followingConnector: segments[j]!.followingConnector });
       i = j + 1;
     } else {
-      // Unknown fields are never merged — each is its own block
-      groups.push({ group, followingConnector: seg.followingConnector });
+      // Unknown fields are silently skipped — best-effort display
       i++;
     }
   }
@@ -337,9 +335,7 @@ export function parseQueryToBlocks(rawQuery: string): ParsedQueryItem[] {
 
   const items: ParsedQueryItem[] = [];
   groups.forEach(({ group, followingConnector }, idx) => {
-    const block: QueryBlock = group.isUnknown
-      ? { kind: 'unknown', raw: group.rawToken }
-      : { kind: 'condition', label: buildLabel(group.canonicalField, group.conditions, group.intraConnector) };
+    const block: QueryBlock = { kind: 'condition', label: buildLabel(group.canonicalField, group.conditions, group.intraConnector) };
     items.push(block);
     if (idx < groups.length - 1) {
       items.push(followingConnector);

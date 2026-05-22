@@ -171,6 +171,10 @@ export const NegatedQuery: Story = {
   render: () => <ContentHarness rawQuery="-rarity:common cardtype:unit" />,
 };
 
+export const UnknownFieldsDropped: Story = {
+  render: () => <ContentHarness rawQuery="f:me cardtype:unit f:u" />,
+};
+
 export const UnknownFields: Story = {
   render: () => <ContentHarness rawQuery="f:me f:u" />,
 };

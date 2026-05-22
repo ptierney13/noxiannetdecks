@@ -206,18 +206,8 @@ function QueryBlocksDisplay({ items }: { items: ParsedQueryItem[] }) {
       {items.map((item, i) => {
         if (item === "AND" || item === "OR") {
           return (
-            <span key={i} className="text-[0.7rem] font-black uppercase tracking-widest text-text-tertiary">
+            <span key={i} className="text-[0.7rem] font-black uppercase tracking-widest text-text-secondary">
               {item}
-            </span>
-          );
-        }
-        if (item.kind === "unknown") {
-          return (
-            <span
-              key={i}
-              className="inline-flex items-center rounded-lg border border-negative-border bg-negative-soft px-3 py-1 text-sm font-semibold text-negative"
-            >
-              UNKNOWN QUERY &quot;{item.raw}&quot;
             </span>
           );
         }
