@@ -1,4 +1,5 @@
-import { ResultCard } from "../../ui-elements";
+import { useEffect, useRef, useState } from "react";
+import { ChevronIcon, ResultCard } from "../../ui-elements";
 import { VariantSelectorRow } from "../VariantSelectorRow";
 import {
   CARD_SEARCH_SORT_OPTIONS,
@@ -44,6 +45,118 @@ const RESULTS_GRID_CLASSES =
 
 // Padding is centralized so pane edge spacing can be tuned without hunting through JSX.
 const PANE_PADDING_CLASSES = "p-3 @[640px]:p-4 @[1024px]:p-5";
+
+const VARIANT_OPTIONS: { value: CardSearchVariantMode; label: string }[] = [
+  { value: "unique-cards", label: "Unique Cards" },
+  { value: "unique-printings", label: "Unique Printings" },
+];
+
+// ---------------------------------------------------------------------------
+// SearchSelect — custom dropdown used by the controls banner.
+// Native <select> option lists are OS-rendered and can't be styled cross-
+// browser, so we build a lightweight alternative that respects our tokens:
+//   • Selected option highlighted with the accent (red) background.
+//   • Hover changes background only (no border/color shift).
+//   • Dropdown bg matches the banner surface so the popup reads as elevated.
+// ---------------------------------------------------------------------------
+type SelectOption<T extends string> = { value: T; label: string };
+
+function SearchSelect<T extends string>({
+  value,
+  options,
+  onChange,
+}: {
+  value: T;
+  options: SelectOption<T>[];
+  onChange: (value: T) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const selectedLabel = options.find((o) => o.value === value)?.label ?? String(value);
+
+  // Close when clicking outside.
+  useEffect(() => {
+    if (!open) return;
+    function onPointerDown(event: PointerEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open]);
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+    if (event.key === "Escape") {
+      setOpen(false);
+      return;
+    }
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      if (!open) {
+        setOpen(true);
+        return;
+      }
+      const idx = options.findIndex((o) => o.value === value);
+      const next =
+        event.key === "ArrowDown"
+          ? Math.min(idx + 1, options.length - 1)
+          : Math.max(idx - 1, 0);
+      if (options[next]) onChange(options[next]!.value);
+    }
+  }
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        ref={buttonRef}
+        type="button"
+        role="combobox"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        className="inline-flex min-h-11 min-w-[9rem] items-center justify-between gap-2 rounded-xl border border-border-default bg-[rgba(255,255,255,0.12)] px-3 text-sm font-bold text-text-primary outline-none focus:border-accent focus:ring-4 focus:ring-focus-ring"
+        onClick={() => setOpen((prev) => !prev)}
+        onKeyDown={handleKeyDown}
+      >
+        <span>{selectedLabel}</span>
+        <ChevronIcon expanded={open} />
+      </button>
+
+      {open ? (
+        <ul
+          role="listbox"
+          className="absolute left-0 top-[calc(100%+4px)] z-50 min-w-full overflow-hidden rounded-xl border border-border-default bg-surface-2 shadow-surface-1"
+        >
+          {options.map((option) => {
+            const isSelected = option.value === value;
+            return (
+              <li key={option.value} role="option" aria-selected={isSelected}>
+                <button
+                  type="button"
+                  className={`block w-full px-3 py-2.5 text-left text-sm font-bold transition-colors ${
+                    isSelected
+                      ? "bg-accent text-white"
+                      : "text-text-primary hover:bg-accent-soft"
+                  }`}
+                  onClick={() => {
+                    onChange(option.value);
+                    setOpen(false);
+                    buttonRef.current?.focus();
+                  }}
+                >
+                  {option.label}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 
 function FieldLabel({ children }: { children: string }) {
   return (
@@ -144,32 +257,23 @@ export function CardSearchResultsContent({
       {/* Full-width controls banner — no rounded sub-box, spans edge to edge */}
       <div className={`bg-surface-2 border-b border-border-subtle ${BANNER_PADDING_CLASSES}`}>
         <div className={CONTROL_LAYOUT_CLASSES}>
-          <label className="grid gap-2">
+          <div className="grid gap-2">
             <FieldLabel>Sort</FieldLabel>
-            <select
-              className="min-h-11 rounded-xl border border-border-default bg-[rgba(255,255,255,0.12)] px-3 text-sm font-bold text-text-primary outline-none focus:border-accent focus:ring-4 focus:ring-focus-ring"
+            <SearchSelect
               value={sort}
-              onChange={(event) => onSortChange(event.target.value as CardSearchSortKey)}
-            >
-              {CARD_SEARCH_SORT_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+              options={CARD_SEARCH_SORT_OPTIONS}
+              onChange={onSortChange}
+            />
+          </div>
 
-          <label className="grid gap-2">
+          <div className="grid gap-2">
             <FieldLabel>Variants</FieldLabel>
-            <select
-              className="min-h-11 rounded-xl border border-border-default bg-[rgba(255,255,255,0.12)] px-3 text-sm font-bold text-text-primary outline-none focus:border-accent focus:ring-4 focus:ring-focus-ring"
+            <SearchSelect
               value={variantMode}
-              onChange={(event) => onVariantModeChange(event.target.value as CardSearchVariantMode)}
-            >
-              <option value="unique-cards">Unique Cards</option>
-              <option value="unique-printings">Unique Printings</option>
-            </select>
-          </label>
+              options={VARIANT_OPTIONS}
+              onChange={onVariantModeChange}
+            />
+          </div>
 
           {/* Checkboxes as plain stacked rows — gap-2 matches label-to-dropdown spacing */}
           <div className="flex flex-col gap-2">
@@ -196,60 +300,60 @@ export function CardSearchResultsContent({
       </div>
 
       <div className={`grid gap-4 ${PANE_PADDING_CLASSES}`}>
-      <ResultSummary
-        isPending={isPending}
-        visibleResultCount={visibleResultCount}
-        rawResultCount={rawResultCount}
-        normalizedQuery={normalizedQuery}
-      />
+        <ResultSummary
+          isPending={isPending}
+          visibleResultCount={visibleResultCount}
+          rawResultCount={rawResultCount}
+          normalizedQuery={normalizedQuery}
+        />
 
-      <Diagnostics diagnostics={diagnostics} />
+        <Diagnostics diagnostics={diagnostics} />
 
-      {isPending ? <LoadingGrid /> : null}
+        {isPending ? <LoadingGrid /> : null}
 
-      {isError ? (
-        <div className="rounded-2xl border border-negative-border bg-negative-soft p-5 text-sm text-text-primary">
-          <strong className="block font-black">Search failed</strong>
-          <span className="mt-1 block text-text-secondary">{errorMessage ?? "Unable to load cards."}</span>
-        </div>
-      ) : null}
+        {isError ? (
+          <div className="rounded-2xl border border-negative-border bg-negative-soft p-5 text-sm text-text-primary">
+            <strong className="block font-black">Search failed</strong>
+            <span className="mt-1 block text-text-secondary">{errorMessage ?? "Unable to load cards."}</span>
+          </div>
+        ) : null}
 
-      {!isPending && !isError && groups.length === 0 ? (
-        <div className="rounded-2xl border border-border-default bg-surface-2 p-8 text-center text-text-secondary">
-          No cards matched this query.
-        </div>
-      ) : null}
+        {!isPending && !isError && groups.length === 0 ? (
+          <div className="rounded-2xl border border-border-default bg-surface-2 p-8 text-center text-text-secondary">
+            No cards matched this query.
+          </div>
+        ) : null}
 
-      {!isPending && !isError && groups.length > 0 ? (
-        <div className={RESULTS_GRID_CLASSES} data-testid="card-search-results-grid">
-          {groups.map((group) => {
-            const representative = group.representative;
-            const primaryFinish = normalizeCardFinish(representative.finishes[0]);
-            const variantCards = showVariants ? group.cards : [];
+        {!isPending && !isError && groups.length > 0 ? (
+          <div className={RESULTS_GRID_CLASSES} data-testid="card-search-results-grid">
+            {groups.map((group) => {
+              const representative = group.representative;
+              const primaryFinish = normalizeCardFinish(representative.finishes[0]);
+              const variantCards = showVariants ? group.cards : [];
 
-            return (
-              <ResultCard
-                key={group.key}
-                name={representative.riot_name}
-                imageUrl={representative.media.image_url}
-                imageAlt={representative.media.accessibility_text ?? representative.riot_name}
-                layout={representative.media.layout}
-                onClick={() => onCardClick(representative, group.cards, primaryFinish)}
-                footer={
-                  variantCards.length > 0 ? (
-                    <VariantSelectorRow
-                      cards={variantCards}
-                      showPrice={showPrice}
-                      publishedPriceIndex={publishedPriceIndex}
-                      onVariantSelect={({ card, finish }) => onCardClick(card, group.cards, finish)}
-                    />
-                  ) : undefined
-                }
-              />
-            );
-          })}
-        </div>
-      ) : null}
+              return (
+                <ResultCard
+                  key={group.key}
+                  name={representative.riot_name}
+                  imageUrl={representative.media.image_url}
+                  imageAlt={representative.media.accessibility_text ?? representative.riot_name}
+                  layout={representative.media.layout}
+                  onClick={() => onCardClick(representative, group.cards, primaryFinish)}
+                  footer={
+                    variantCards.length > 0 ? (
+                      <VariantSelectorRow
+                        cards={variantCards}
+                        showPrice={showPrice}
+                        publishedPriceIndex={publishedPriceIndex}
+                        onVariantSelect={({ card, finish }) => onCardClick(card, group.cards, finish)}
+                      />
+                    ) : undefined
+                  }
+                />
+              );
+            })}
+          </div>
+        ) : null}
       </div>
     </section>
   );
