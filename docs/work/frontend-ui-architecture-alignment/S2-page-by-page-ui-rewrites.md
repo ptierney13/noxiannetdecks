@@ -8,8 +8,8 @@ Stage 7 rewrites each legacy page one at a time. Every page gets a full
 visual overhaul — not a translation of existing styles. The user provides a
 mockup image, the agent reads the current page code and the available `ui-elements/`
 component inventory (built in Stages 5–6), and together they produce a
-concrete plan before any code is written. Each page is executed and approved
-independently before the next begins.
+concrete durable plan document before any implementation code is written. Each
+page is executed and approved independently before the next begins.
 
 TanStack Query is wired in during each rewrite. There is no separate
 data-loading stage.
@@ -84,6 +84,12 @@ record the decisions as a new section here and proceed.
 
 Each page follows this exact sequence. Do not skip steps.
 
+When the user asks to plan a Stage 7 page rewrite, create or update that page's
+subordinate plan file under `docs/work/frontend-ui-architecture-alignment/`.
+Do not treat the chat response alone as the plan. The chat response should
+summarize the durable document and call out any decisions that still need user
+approval.
+
 ### Step 1 — Inventory
 
 Before looking at the mockup, read:
@@ -106,6 +112,12 @@ region. For each region, note:
 
 ### Step 3 — Draft plan
 
+Create or update the page-specific plan document before presenting the draft to
+the user. Use a descriptive filename such as
+`query-builder-tailwind-rewrite-plan.md`; these files are subordinate to this
+Stage 7 plan and do not need top-level `work-status.json` entries unless the
+initiative README says otherwise.
+
 Produce a table:
 
 ```
@@ -123,7 +135,9 @@ Also list:
 - The TanStack Query hook(s) needed (resource name, query key shape)
 - Any `styles.css` selectors this page owns that will be deleted
 
-Present the draft plan to the user. Do not write code.
+Present the durable draft plan to the user. Writing or updating the plan
+document is expected; do not write implementation code until the user approves
+the page plan.
 
 ### Step 4 — Iteration
 

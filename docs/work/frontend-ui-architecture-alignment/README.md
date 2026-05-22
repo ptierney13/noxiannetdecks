@@ -272,9 +272,10 @@ Completed stage plans move to `docs/archive/work/frontend-ui-architecture-alignm
 ## Stage 7 Plan File Naming
 
 The `S#-...` naming convention in this folder is reserved for initiative stages
-themselves. Stage 7 execution plans for individual page rewrites may use
-descriptive filenames instead of `S#` numbering when that makes iteration
-clearer.
+themselves. Stage 7 execution plans for individual page rewrites must use
+durable subordinate plan files with descriptive filenames instead of `S#`
+numbering. When the user asks to plan one of these page rewrites, create or
+update the matching plan file before summarizing the plan in chat.
 
 Examples:
 
@@ -283,7 +284,9 @@ Examples:
 
 These descriptive page-plan files remain subordinate to Stage 7. Do not mirror
 this exception into the top-level `docs/work/README.md`; it is local to this
-initiative's page-rewrite workflow.
+initiative's page-rewrite workflow. These page-plan files do not need top-level
+or folder-local `work-status.json` entries unless a future initiative update
+explicitly adds per-page status tracking.
 
 ## Test Plan
 
