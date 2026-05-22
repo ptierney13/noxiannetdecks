@@ -8,8 +8,9 @@ import {
   normalizeCardText,
   renderTokenizedText,
   usePublishedPriceIndex,
+  type CardFinish,
 } from "../../lib";
-import { VariantSelectorRow, type CardFinish } from "../VariantSelectorRow";
+import { VariantSelectorRow } from "../VariantSelectorRow";
 
 export type CardSummaryPopupProps = {
   group: CardRecord[];
@@ -65,9 +66,6 @@ export function CardSummaryPopup({
 
         <div className="grid content-start gap-5 p-5 pr-16 @[760px]:p-8 @[760px]:pr-20">
           <div className="grid gap-2">
-            <p className="m-0 text-xs font-black uppercase tracking-[0.24em] text-accent-warm">
-              Card Summary Popup
-            </p>
             <h2 className="m-0 text-3xl font-black leading-tight text-text-primary">
               {activeCard.riot_name}
             </h2>

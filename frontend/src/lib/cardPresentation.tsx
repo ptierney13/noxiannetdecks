@@ -28,6 +28,9 @@ export const RIFTBOUND_REGIONS = new Set([
 export type InlineSymbolVariant = "white" | "black";
 export type InlineSymbolSize = "text" | "stat" | "chip";
 
+/** The canonical finish values for a card printing. */
+export type CardFinish = "foil" | "nonfoil";
+
 // --- Symbol rendering ---
 
 /**
@@ -148,6 +151,16 @@ export function normalizeCardText(richText: string): string {
   return applySymbols(stripped).trim();
 }
 
+// --- Card finish normalization ---
+
+/**
+ * Normalizes a raw finish string (from card data) to the canonical CardFinish
+ * union. Any value that is not "foil" is treated as "nonfoil".
+ */
+export function normalizeCardFinish(finish: string | null | undefined): CardFinish {
+  return finish === "foil" ? "foil" : "nonfoil";
+}
+
 // --- Card attribute formatters ---
 
 /** Returns the card's energy attribute value, or null if not present. */
@@ -195,9 +208,13 @@ export function formatTypeline(card: CardRecord): string {
 }
 
 /**
- * Returns the Tailwind class string for a domain chip. Single-domain cards
- * receive a domain-specific color class; multi-domain cards receive the
- * multicolor class.
+ * Returns the CSS class string for a domain chip using the legacy CSS utility
+ * class system (`card-attr-chip--domain-*`). Single-domain cards receive a
+ * domain-specific color class; multi-domain cards receive the multicolor class.
+ *
+ * @deprecated Use a local Tailwind implementation (see `CardMetaChips.tsx`)
+ * for new components. This version is kept for existing callers in
+ * `cardFormat.tsx` and will be removed when that file is retired.
  */
 export function domainChipClass(domains: string[]): string {
   if (domains.length === 1) {

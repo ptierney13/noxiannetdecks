@@ -6,14 +6,15 @@ import {
 } from "../../data";
 import {
   buildCardSearchResultGroups,
+  normalizeCardFinish,
   sortCardsByKey,
   usePublishedPriceIndex,
+  type CardFinish,
   type CardSearchSortKey,
   type CardSearchVariantMode,
 } from "../../lib";
 import type { CardRecord } from "../../types";
 import { CardSummaryPopup } from "../card/CardSummaryPopup";
-import { normalizeCardFinish, type CardFinish } from "../VariantSelectorRow";
 import { CardSearchResultsContent } from "./CardSearchResultsContent";
 
 export type CardSearchResultsPaneProps = {

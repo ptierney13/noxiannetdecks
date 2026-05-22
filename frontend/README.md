@@ -12,10 +12,11 @@ The current site provides:
 
 ## UI Terms
 
-- `Card Summary Popup` is the canonical product term for the compact dialog
-  that opens when a search-result card is clicked.
-- Card Summary Popup shows a lightweight card summary and actions such as
-  `Buy on TCG` and `View full details`.
+- `Card Summary Popup` is the canonical internal name for the compact dialog
+  that opens when a search-result card is clicked. It is a code/doc identifier,
+  not UI copy — the phrase should not appear as visible text inside the component.
+- The popup shows a lightweight card summary and actions such as
+  `Buy on TCGPlayer` and `View full details`.
 - Some older internal code and CSS still use `quick-look` in names like
   `CardQuickLookModal` and `.card-quick-look-*`. Treat those as legacy internal
   identifiers for the same Card Summary Popup surface rather than a different UI.

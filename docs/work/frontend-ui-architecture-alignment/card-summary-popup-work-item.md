@@ -55,8 +55,10 @@ The component should:
 - accept prepared props from a parent rather than owning route state itself
 - own no routing concerns
 
-Use `Card Summary Popup` in user-facing copy and active documentation. Older
-`quick-look` identifiers remain legacy implementation names only.
+Use `Card Summary Popup` as the product name in documentation, code identifiers,
+and agent guidance. It is an internal naming convention, not UI copy — the
+component itself should not render the phrase "Card Summary Popup" as visible
+text. Older `quick-look` identifiers remain legacy implementation names only.
 
 ### 2. Define a clear split between popup shell and domain content
 

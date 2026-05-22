@@ -2,11 +2,15 @@ import type { CardRecord } from "../types";
 import {
   formatUsdPrice,
   getPublishedRowsForCard,
+  normalizeCardFinish,
   resolveNearMintMarketPrice,
+  type CardFinish,
   type PublishedPriceIndex,
 } from "../lib";
 
-export type CardFinish = "foil" | "nonfoil";
+// Re-export so callers that import from features/index still work.
+export type { CardFinish } from "../lib";
+export { normalizeCardFinish } from "../lib";
 
 export type VariantSelection = {
   card: CardRecord;
@@ -22,10 +26,6 @@ export type VariantSelectorRowProps = {
   orientation?: "horizontal" | "vertical";
   onVariantSelect: (selection: VariantSelection) => void;
 };
-
-export function normalizeCardFinish(finish: string | null | undefined): CardFinish {
-  return finish === "foil" ? "foil" : "nonfoil";
-}
 
 function variantButtonLabel(card: CardRecord, finish: CardFinish): string {
   const parts: string[] = [card.set.set_id];

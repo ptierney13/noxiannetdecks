@@ -8,11 +8,13 @@ export {
   applySymbols,
   normalizeCardText,
   cardEnergy,
+  normalizeCardFinish,
   formatCostText,
   formatTypeline,
   domainChipClass,
   type InlineSymbolVariant,
   type InlineSymbolSize,
+  type CardFinish,
 } from "./cardPresentation";
 export {
   buildCardDetailPath,

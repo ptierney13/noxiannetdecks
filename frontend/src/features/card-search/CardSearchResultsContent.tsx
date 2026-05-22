@@ -1,7 +1,9 @@
 import { CardMetaChips, ResultCard } from "../../ui-elements";
-import { VariantSelectorRow, normalizeCardFinish, type CardFinish } from "../VariantSelectorRow";
+import { VariantSelectorRow } from "../VariantSelectorRow";
 import {
   CARD_SEARCH_SORT_OPTIONS,
+  normalizeCardFinish,
+  type CardFinish,
   type CardSearchResultGroup,
   type CardSearchSortKey,
   type CardSearchVariantMode,
