@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { searchCards } from "../../api";
-import { CardQuickLookModal } from "../../cardFormat";
+import { CardSummaryPopup } from "../../features";
+import { normalizeCardFinish } from "../../lib";
 import {
   formatUsdPrice,
   getPublishedRowsForCard,
@@ -780,12 +781,12 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
       </div>
     </div>
     {quickLookCard && (
-      <CardQuickLookModal
-          group={[quickLookCard]}
-          initialCard={quickLookCard}
-          initialFinish={quickLookCard.finishes[0] ?? "nonfoil"}
-          onClose={() => setQuickLookCard(null)}
-        />
+      <CardSummaryPopup
+        group={[quickLookCard]}
+        initialCard={quickLookCard}
+        initialFinish={normalizeCardFinish(quickLookCard.finishes[0])}
+        onClose={() => setQuickLookCard(null)}
+      />
     )}
   </>
   );

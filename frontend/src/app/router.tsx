@@ -2,7 +2,7 @@ import { createRootRoute, createRoute, createRouter, useNavigate } from "@tansta
 import AppShell from "./AppShell";
 import { HomePage } from "../pages/home";
 import { NotFoundView } from "../pages/legacy/NotFoundView";
-import SearchView from "../pages/legacy/SearchView";
+import CardSearchView from "../pages/CardSearchView";
 import LearnToSearchView from "../pages/legacy/LearnToSearchView";
 import QueryBuilderView from "../pages/legacy/QueryBuilderView";
 import CardDetailView from "../pages/legacy/CardDetailView";
@@ -39,7 +39,7 @@ const cardsRoute = createRoute({
   validateSearch: (search: Record<string, unknown>) => ({
     q: typeof search.q === "string" ? search.q : undefined,
   }),
-  component: () => <SearchView />,
+  component: () => <CardSearchView />,
 });
 
 const cardsLearnToSearchRoute = createRoute({
