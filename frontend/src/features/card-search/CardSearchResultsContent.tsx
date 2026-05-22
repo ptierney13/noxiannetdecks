@@ -208,44 +208,47 @@ function ResultSummary({
   visibleResultCount: number;
   executedTokens: ExecutedQueryItem[];
 }) {
-  const blocks = useMemo(() => executedTokensToDisplay(executedTokens, { includeDropped: true }), [executedTokens]);
+  // Two separate passes: executed chips (with their AND/OR connectors) and
+  // dropped chips (collected flat — connectors between dropped tokens are
+  // not meaningful to show since they are already in an error section).
+  const executedBlocks = useMemo(() => executedTokensToDisplay(executedTokens), [executedTokens]);
+  const droppedBlocks = useMemo(
+    () =>
+      executedTokensToDisplay(executedTokens, { includeDropped: true }).filter(
+        (item): item is import("@noxiannet/card-store/query").DisplayBlock =>
+          typeof item !== "string" && item.state === "dropped"
+      ),
+    [executedTokens]
+  );
 
   if (isPending) {
     return <p className="m-0 text-[1.225rem] font-semibold leading-snug text-text-tertiary">Searching cards…</p>;
   }
 
   const cardWord = visibleResultCount === 1 ? "card" : "cards";
+  const hasGood = executedBlocks.length > 0;
+  const hasBad = droppedBlocks.length > 0;
 
   return (
     <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1.5">
+      {/* Count + "matching" — only show "matching" when there are executed chips */}
       <p className="m-0 shrink-0 text-[1.225rem] font-semibold leading-snug text-text-secondary">
         <span className="font-black text-text-primary">{visibleResultCount.toLocaleString()}</span>
-        {" "}{cardWord}{blocks.length > 0 ? " matching" : ""}
+        {" "}{cardWord}{hasGood ? " matching" : ""}
       </p>
-      {blocks.map((item, i) => {
+
+      {/* Valid chips — preserve their AND/OR connectors */}
+      {executedBlocks.map((item, i) => {
         if (item === "AND" || item === "OR") {
           return (
-            <span key={i} className="text-[0.7rem] font-black uppercase tracking-widest text-text-secondary">
+            <span key={`conn-${i}`} className="text-[0.7rem] font-black uppercase tracking-widest text-text-secondary">
               {item}
-            </span>
-          );
-        }
-        if (item.state === "dropped") {
-          return (
-            <span
-              key={i}
-              className="inline-flex items-center gap-1 rounded-lg border border-negative-border bg-negative-soft px-3 py-1 text-sm"
-            >
-              {item.prefix ? (
-                <span className="font-semibold text-red-400">{item.prefix}</span>
-              ) : null}
-              <span className="font-black text-red-300">{item.value}</span>
             </span>
           );
         }
         return (
           <span
-            key={i}
+            key={`exec-${i}`}
             className="inline-flex items-center gap-1 rounded-lg border border-[rgba(215,170,73,0.4)] bg-accent-warm-soft px-3 py-1 text-sm"
           >
             {item.prefix ? (
@@ -258,6 +261,26 @@ function ResultSummary({
           </span>
         );
       })}
+
+      {/* Separator + dropped chips — connectors between dropped tokens are omitted */}
+      {hasBad ? (
+        <>
+          <span className="text-[1.225rem] font-semibold leading-snug text-text-tertiary">
+            {hasGood ? "· Unable to parse" : "Unable to parse"}
+          </span>
+          {droppedBlocks.map((block, i) => (
+            <span
+              key={`drop-${i}`}
+              className="inline-flex items-center gap-1 rounded-lg border border-negative-border bg-negative-soft px-3 py-1 text-sm"
+            >
+              {block.prefix ? (
+                <span className="font-semibold text-red-400">{block.prefix}</span>
+              ) : null}
+              <span className="font-black text-red-300">{block.value}</span>
+            </span>
+          ))}
+        </>
+      ) : null}
     </div>
   );
 }
