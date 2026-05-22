@@ -218,14 +218,14 @@ function ResultSummary({
     rawResultCount !== visibleResultCount ? ` from ${rawResultCount.toLocaleString()} printings` : "";
 
   return (
-    <p className="m-0 text-sm text-text-secondary">
+    <p className="m-0 text-[1.75rem] font-semibold leading-snug text-text-secondary">
       <span className="font-black text-text-primary">{visibleResultCount.toLocaleString()}</span>{" "}
       matching {cardWord}
       {extra}
       {normalizedQuery ? (
         <>
           {" "}
-          for <code className="rounded-md bg-surface-inset px-1.5 py-0.5 text-accent-warm">{normalizedQuery}</code>
+          for <code className="rounded-lg bg-surface-inset px-3 py-1 text-accent-warm">{normalizedQuery}</code>
         </>
       ) : null}
     </p>
@@ -344,7 +344,6 @@ export function CardSearchResultsContent({
                       <VariantSelectorRow
                         cards={variantCards}
                         showPrice={showPrice}
-                        size="lg"
                         publishedPriceIndex={publishedPriceIndex}
                         onVariantSelect={({ card, finish }) => onCardClick(card, group.cards, finish)}
                       />

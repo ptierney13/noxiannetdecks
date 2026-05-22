@@ -110,28 +110,28 @@ export function CardSummaryPopup({
             ) : null}
           </div>
 
-          {/* Typeline chip */}
-          <span className="inline-flex self-start rounded-xl border border-border-default bg-surface-inset px-3 py-1.5 text-sm font-bold text-text-secondary">
+          {/* Typeline chip — 25% bigger than base text-sm/px-3/py-1.5 */}
+          <span className="inline-flex self-start rounded-xl border border-border-default bg-surface-inset px-4 py-2 text-[1.094rem] font-bold text-text-secondary">
             {formatTypeline(activeCard)}
           </span>
 
-          {/* Rules text */}
+          {/* Rules text — 25% bigger */}
           {normalizedText ? (
-            <p className="m-0 whitespace-pre-line rounded-2xl border border-border-subtle bg-surface-inset p-4 text-sm leading-6 text-text-secondary">
+            <p className="m-0 whitespace-pre-line rounded-2xl border border-border-subtle bg-surface-inset p-5 text-[1.094rem] leading-[1.875rem] text-text-secondary">
               {renderTokenizedText(normalizedText)}
             </p>
           ) : null}
 
-          {/* Flavor text */}
+          {/* Flavor text — 25% bigger, matches rules text scale */}
           {activeCard.text.flavour ? (
-            <p className="m-0 whitespace-pre-line rounded-2xl border border-border-subtle bg-surface-inset p-4 text-sm italic leading-6 text-text-tertiary">
+            <p className="m-0 whitespace-pre-line rounded-2xl border border-border-subtle bg-surface-inset p-5 text-[1.094rem] italic leading-[1.875rem] text-text-tertiary">
               {activeCard.text.flavour}
             </p>
           ) : null}
 
-          {/* Illustrator */}
+          {/* Illustrator — 25% bigger: text-xs → text-[0.9375rem] */}
           {activeCard.media.artist ? (
-            <p className="m-0 text-xs text-text-tertiary">
+            <p className="m-0 text-[0.9375rem] text-text-tertiary">
               Illustrated by {activeCard.media.artist}
             </p>
           ) : null}
@@ -139,7 +139,8 @@ export function CardSummaryPopup({
           {/* Variants */}
           {group.length > 0 ? (
             <div className="grid gap-2">
-              <p className="m-0 text-xs font-black uppercase tracking-[0.18em] text-text-tertiary">
+              {/* Section label — 25% bigger: text-xs → text-[0.9375rem] */}
+              <p className="m-0 text-[0.9375rem] font-black uppercase tracking-[0.18em] text-text-tertiary">
                 Variants
               </p>
               <VariantSelectorRow
