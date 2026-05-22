@@ -15,7 +15,8 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
-      "@noxiannet/card-store": ["../card_store/src/index.ts"]
+      "@noxiannet/card-store": ["../card_store/src/index.ts"],
+      "@noxiannet/card-store/query": ["../card_store/src/query/index.ts"]
     },
     "noEmit": true,
     "jsx": "react-jsx"

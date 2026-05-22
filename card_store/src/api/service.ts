@@ -132,10 +132,9 @@ export function createCardApiService({
 
     async search(query = "") {
       const parsed = parseQuery(query);
-      if (parsed.diagnostics.length > 0) {
-        return searchCardsFromParsed(sortedCards, parsed);
-      }
 
+      // No early return for diagnostics — the clean AST is always safe to evaluate.
+      // Diagnostics describe what was dropped; results still return for valid tokens.
       if (!parsedQueryReferencesField(parsed, "price")) {
         return searchCardsFromParsed(sortedCards, parsed);
       }

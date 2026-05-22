@@ -1,6 +1,6 @@
 import { createToken, Lexer, type IToken, type TokenType } from "chevrotain";
 import { normalizeVariantQuery } from "../data/variant.js";
-import type { ParsedQuery, QueryDiagnostic, QueryNode, QueryOperator } from "./ast.js";
+import type { ExecutedCondition, ExecutedQueryItem, ParsedQuery, QueryDiagnostic, QueryNode, QueryOperator } from "./ast.js";
 import { parseDomainQueryValue } from "./domain.js";
 import { resolveField } from "./fields.js";
 import { quoteIfNeeded, unquote } from "./normalize.js";
@@ -387,48 +387,131 @@ function normalizedQueryWithOptions(ast: QueryNode, uniqueMode: SearchUniqueMode
   return parts.filter(Boolean).join(" ");
 }
 
-function validateNode(node: QueryNode, diagnostics: QueryDiagnostic[]): void {
+// Returns the first validation error message for a predicate, or null if valid.
+function validatePredicateMessage(
+  node: Extract<QueryNode, { type: "predicate" }>,
+  field: ReturnType<typeof resolveField>
+): string | null {
+  if (!field) {
+    return `Unknown query field "${node.field}".`;
+  }
+
+  const isNumericOperator = ["lt", "lte", "gt", "gte"].includes(node.operator);
+  const isMissingCheck = node.value.toLowerCase() === "none";
+
+  if (field.canonical === "is" && !normalizeVariantQuery(node.value)) {
+    return `Field "is" requires a known finish or treatment value.`;
+  }
+
+  if (field.kind === "string" && isNumericOperator) {
+    const supportsDomainSetComparison =
+      field.canonical === "domain" && parseDomainQueryValue(node.value) !== null;
+    if (!supportsDomainSetComparison) {
+      return `Field "${field.canonical}" does not support numeric comparisons.`;
+    }
+  }
+
+  const isPowerLetterCode = field.canonical === "power" && /^[mfcbhourgopy]+$/i.test(node.value);
+  const isCostSpec =
+    field.canonical === "cost" &&
+    (/^\d+$/.test(node.value) ||
+      /^\d*[mfcbhourgopy]+$/i.test(node.value) ||
+      /^\d*(\{[a-z](?:\/[a-z])*\})+$/i.test(node.value));
+  if (
+    field.kind === "number" &&
+    !isMissingCheck &&
+    !isPowerLetterCode &&
+    !isCostSpec &&
+    Number.isNaN(Number(node.value))
+  ) {
+    return `Field "${field.canonical}" requires a numeric value or "none".`;
+  }
+
+  return null;
+}
+
+// Walks the AST, validates each predicate, and produces:
+//   • A flat ExecutedQueryItem[] recording every condition with its execution state.
+//   • A clean QueryNode with invalid predicates removed (AND/OR simplified as needed).
+//   • Diagnostics for each dropped predicate.
+//
+// Lex/parse errors are handled upstream and cause an early return before this runs.
+// Only field-level validation errors are handled here (unknown field, wrong type, etc.)
+// — those are recoverable: we drop the offending token and continue with the rest.
+function partitionValidNodes(
+  node: QueryNode,
+  negated: boolean,
+  flatTokens: ExecutedQueryItem[],
+  diagnostics: QueryDiagnostic[]
+): QueryNode | null {
   switch (node.type) {
     case "all":
-    case "term":
-      return;
-    case "not":
-      validateNode(node.child, diagnostics);
-      return;
-    case "and":
-    case "or":
-      node.children.forEach((child) => validateNode(child, diagnostics));
-      return;
+      return { type: "all" };
+
+    case "term": {
+      const condition: ExecutedCondition = {
+        field: null,
+        canonicalField: null,
+        op: ":",
+        value: node.value,
+        negated,
+        state: "executed"
+      };
+      flatTokens.push(condition);
+      return { type: "term", value: node.value };
+    }
+
     case "predicate": {
       const field = resolveField(node.field);
-      if (!field) {
-        diagnostics.push({ message: `Unknown query field "${node.field}".` });
-        return;
+      const errorMsg = validatePredicateMessage(node, field);
+      const condition: ExecutedCondition = {
+        field: node.field,
+        canonicalField: field?.canonical ?? null,
+        op: normalizeOperator(node.operator),
+        value: node.value,
+        negated,
+        state: errorMsg ? "dropped" : "executed",
+        ...(errorMsg !== null ? { errorMessage: errorMsg } : {})
+      };
+      flatTokens.push(condition);
+      if (errorMsg !== null) {
+        diagnostics.push({ message: errorMsg });
+        return null;
       }
+      return { type: "predicate", field: node.field, operator: node.operator, value: node.value };
+    }
 
-      const isNumericOperator = ["lt", "lte", "gt", "gte"].includes(node.operator);
-      const isMissingCheck = node.value.toLowerCase() === "none";
+    case "not": {
+      // Collect child tokens with negation flipped, then merge into parent list.
+      const childTokens: ExecutedQueryItem[] = [];
+      const cleanChild = partitionValidNodes(node.child, !negated, childTokens, diagnostics);
+      flatTokens.push(...childTokens);
+      if (!cleanChild) return null;
+      return { type: "not", child: cleanChild };
+    }
 
-      if (field.canonical === "is" && !normalizeVariantQuery(node.value)) {
-        diagnostics.push({ message: `Field "is" requires a known finish or treatment value.` });
+    case "and": {
+      const cleanChildren: QueryNode[] = [];
+      for (let i = 0; i < node.children.length; i++) {
+        if (i > 0) flatTokens.push("AND");
+        const clean = partitionValidNodes(node.children[i]!, negated, flatTokens, diagnostics);
+        if (clean) cleanChildren.push(clean);
       }
+      if (cleanChildren.length === 0) return null;
+      if (cleanChildren.length === 1) return cleanChildren[0]!;
+      return { type: "and", children: cleanChildren };
+    }
 
-      if (field.kind === "string" && isNumericOperator) {
-        const supportsDomainSetComparison = field.canonical === "domain" && parseDomainQueryValue(node.value) !== null;
-        if (!supportsDomainSetComparison) {
-          diagnostics.push({ message: `Field "${field.canonical}" does not support numeric comparisons.` });
-        }
+    case "or": {
+      const cleanChildren: QueryNode[] = [];
+      for (let i = 0; i < node.children.length; i++) {
+        if (i > 0) flatTokens.push("OR");
+        const clean = partitionValidNodes(node.children[i]!, negated, flatTokens, diagnostics);
+        if (clean) cleanChildren.push(clean);
       }
-
-      const isPowerLetterCode = field.canonical === "power" && /^[mfcbhourgopy]+$/i.test(node.value);
-      const isCostSpec = field.canonical === "cost" && (
-        /^\d+$/.test(node.value) ||
-        /^\d*[mfcbhourgopy]+$/i.test(node.value) ||
-        /^\d*(\{[a-z](?:\/[a-z])*\})+$/i.test(node.value)
-      );
-      if (field.kind === "number" && !isMissingCheck && !isPowerLetterCode && !isCostSpec && Number.isNaN(Number(node.value))) {
-        diagnostics.push({ message: `Field "${field.canonical}" requires a numeric value or "none".` });
-      }
+      if (cleanChildren.length === 0) return null;
+      if (cleanChildren.length === 1) return cleanChildren[0]!;
+      return { type: "or", children: cleanChildren };
     }
   }
 }
@@ -442,12 +525,13 @@ export function parseQuery(source: string): ParsedQuery {
       ast: { type: "all" },
       uniqueMode: defaultSearchUniqueMode,
       uniqueModeSpecified: false,
-      diagnostics: []
+      diagnostics: [],
+      executedTokens: []
     };
   }
 
   const lexResult = lexer.tokenize(trimmedSource);
-  const diagnostics: QueryDiagnostic[] = lexResult.errors.map((error) => ({
+  const structuralDiagnostics: QueryDiagnostic[] = lexResult.errors.map((error) => ({
     message: error.message,
     offset: error.offset,
     length: error.length
@@ -455,29 +539,54 @@ export function parseQuery(source: string): ParsedQuery {
 
   const parser = new QueryParser(lexResult.tokens);
   const parsed = parser.parse();
-  diagnostics.push(...parsed.diagnostics);
+  structuralDiagnostics.push(...parsed.diagnostics);
+
+  // Lex and parse errors are fatal — the token stream is too broken to recover.
+  if (structuralDiagnostics.length > 0) {
+    return {
+      source,
+      normalizedQuery: trimmedSource,
+      ast: { type: "all" },
+      uniqueMode: defaultSearchUniqueMode,
+      uniqueModeSpecified: false,
+      diagnostics: structuralDiagnostics,
+      executedTokens: []
+    };
+  }
 
   let ast = parsed.ast;
-  let uniqueMode = defaultSearchUniqueMode;
-  let uniqueModeSpecified = false;
 
-  if (diagnostics.length === 0) {
-    const extracted = extractQueryOptions(ast, diagnostics);
-    ast = extracted.ast;
-    uniqueMode = extracted.uniqueMode;
-    uniqueModeSpecified = extracted.uniqueModeSpecified;
+  // Extract query options (unique:) — errors here are also fatal (misuse of unique:).
+  const optionDiagnostics: QueryDiagnostic[] = [];
+  const extracted = extractQueryOptions(ast, optionDiagnostics);
+  if (optionDiagnostics.length > 0) {
+    return {
+      source,
+      normalizedQuery: trimmedSource,
+      ast: { type: "all" },
+      uniqueMode: defaultSearchUniqueMode,
+      uniqueModeSpecified: false,
+      diagnostics: optionDiagnostics,
+      executedTokens: []
+    };
   }
+  ast = extracted.ast;
+  const uniqueMode = extracted.uniqueMode;
+  const uniqueModeSpecified = extracted.uniqueModeSpecified;
 
-  if (diagnostics.length === 0) {
-    validateNode(ast, diagnostics);
-  }
+  // Field validation — recoverable. Unknown or invalid field predicates are dropped;
+  // the clean AST runs against only the valid tokens.
+  const flatTokens: ExecutedQueryItem[] = [];
+  const validationDiagnostics: QueryDiagnostic[] = [];
+  const cleanAst = partitionValidNodes(ast, false, flatTokens, validationDiagnostics) ?? { type: "all" };
 
   return {
     source,
-    normalizedQuery: diagnostics.length > 0 ? trimmedSource : normalizedQueryWithOptions(ast, uniqueMode, uniqueModeSpecified),
-    ast: diagnostics.length > 0 ? { type: "all" } : ast,
-    uniqueMode: diagnostics.length > 0 ? defaultSearchUniqueMode : uniqueMode,
-    uniqueModeSpecified: diagnostics.length > 0 ? false : uniqueModeSpecified,
-    diagnostics
+    normalizedQuery: normalizedQueryWithOptions(cleanAst, uniqueMode, uniqueModeSpecified),
+    ast: cleanAst,
+    uniqueMode,
+    uniqueModeSpecified,
+    diagnostics: validationDiagnostics,
+    executedTokens: flatTokens
   };
 }

@@ -10,14 +10,14 @@ import {
   type CardSearchVariantMode,
   type PublishedPriceIndex,
 } from "../../lib";
+import { executedTokensToDisplay, type ExecutedQueryItem } from "@noxiannet/card-store/query";
 import type { CardRecord, QueryDiagnostic } from "../../types";
-import { parseQueryToBlocks } from "./queryBlocks";
 
 export type CardSearchResultsContentProps = {
   groups: CardSearchResultGroup[];
   rawResultCount: number;
   visibleResultCount: number;
-  rawQuery: string;
+  executedTokens: ExecutedQueryItem[];
   diagnostics: QueryDiagnostic[];
   isPending: boolean;
   isError: boolean;
@@ -202,13 +202,13 @@ function LoadingGrid() {
 function ResultSummary({
   isPending,
   visibleResultCount,
-  rawQuery,
+  executedTokens,
 }: {
   isPending: boolean;
   visibleResultCount: number;
-  rawQuery: string;
+  executedTokens: ExecutedQueryItem[];
 }) {
-  const blocks = useMemo(() => parseQueryToBlocks(rawQuery), [rawQuery]);
+  const blocks = useMemo(() => executedTokensToDisplay(executedTokens), [executedTokens]);
 
   if (isPending) {
     return <p className="m-0 text-[1.225rem] font-semibold leading-snug text-text-tertiary">Searching cards…</p>;
@@ -252,7 +252,7 @@ function ResultSummary({
 export function CardSearchResultsContent({
   groups,
   visibleResultCount,
-  rawQuery,
+  executedTokens,
   diagnostics,
   isPending,
   isError,
@@ -319,7 +319,7 @@ export function CardSearchResultsContent({
         <ResultSummary
           isPending={isPending}
           visibleResultCount={visibleResultCount}
-          rawQuery={rawQuery}
+          executedTokens={executedTokens}
         />
 
         {isPending ? <LoadingGrid /> : null}

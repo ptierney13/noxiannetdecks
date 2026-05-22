@@ -56,7 +56,7 @@ export function CardSearchResultsPane({ query }: CardSearchResultsPaneProps) {
         groups={groups}
         rawResultCount={cards.length}
         visibleResultCount={visibleResultCount}
-        rawQuery={query}
+        executedTokens={resultsQuery.data?.executedTokens ?? []}
         diagnostics={resultsQuery.data?.diagnostics ?? []}
         isPending={resultsQuery.isPending}
         isError={resultsQuery.isError}

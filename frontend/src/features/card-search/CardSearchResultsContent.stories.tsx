@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { parseQuery, type ExecutedQueryItem } from "@noxiannet/card-store/query";
 import type { CardRecord, QueryDiagnostic } from "../../types";
 import {
   buildCardSearchResultGroups,
@@ -102,13 +103,17 @@ function ContentHarness({
     () => buildCardSearchResultGroups(sortedCards, variantMode),
     [sortedCards, variantMode]
   );
+  const executedTokens = useMemo<ExecutedQueryItem[]>(
+    () => parseQuery(rawQuery).executedTokens,
+    [rawQuery]
+  );
 
   return (
     <CardSearchResultsContent
       groups={groups}
       rawResultCount={cards.length}
       visibleResultCount={variantMode === "unique-cards" ? groups.length : cards.length}
-      rawQuery={rawQuery}
+      executedTokens={executedTokens}
       diagnostics={diagnostics}
       isPending={isPending}
       isError={isError}

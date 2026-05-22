@@ -48,6 +48,7 @@ const response = {
   normalizedQuery: "n:jinx unique:id",
   uniqueMode: "id",
   diagnostics: [],
+  executedTokens: [],
 } as CardSearchResponse;
 
 const meta = {

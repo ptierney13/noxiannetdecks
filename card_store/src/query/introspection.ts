@@ -17,9 +17,7 @@ function nodeReferencesCanonicalField(node: QueryNode, canonicalField: string): 
 }
 
 export function parsedQueryReferencesField(parsed: ParsedQuery, canonicalField: string): boolean {
-  if (parsed.diagnostics.length > 0) {
-    return false;
-  }
-
+  // parsed.ast is always the clean AST (invalid tokens already removed by the parser),
+  // so checking it unconditionally is correct even when diagnostics are present.
   return nodeReferencesCanonicalField(parsed.ast, canonicalField);
 }

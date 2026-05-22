@@ -18,6 +18,25 @@ export type QueryDiagnostic = {
   length?: number;
 };
 
+export type ExecutedTokenState = "executed" | "dropped";
+
+// One condition from the original query, tagged with whether the backend ran it.
+// field is the raw field name as written (null for bare-text searches).
+// canonicalField is the resolved canonical from fields.ts (null when unknown or bare text).
+// op is the normalised operator string (":", "=", ">", ">=", "<", "<=").
+export type ExecutedCondition = {
+  field: string | null;
+  canonicalField: string | null;
+  op: string;
+  value: string;
+  negated: boolean;
+  state: ExecutedTokenState;
+  errorMessage?: string;
+};
+
+// Flat list of conditions interleaved with logical connectors — mirrors ParsedQueryItem shape.
+export type ExecutedQueryItem = ExecutedCondition | "AND" | "OR";
+
 export type ParsedQuery = {
   source: string;
   normalizedQuery: string;
@@ -25,4 +44,5 @@ export type ParsedQuery = {
   uniqueMode: SearchUniqueMode;
   uniqueModeSpecified: boolean;
   diagnostics: QueryDiagnostic[];
+  executedTokens: ExecutedQueryItem[];
 };

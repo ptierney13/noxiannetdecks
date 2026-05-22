@@ -13,6 +13,7 @@ export type SearchResult = {
   normalizedQuery: string;
   uniqueMode: SearchUniqueMode;
   diagnostics: ParsedQuery["diagnostics"];
+  executedTokens: ParsedQuery["executedTokens"];
   items: CardRecord[];
 };
 
@@ -476,17 +477,30 @@ export function searchCardsFromParsed(
   parsed: ParsedQuery,
   context: SearchEvaluationContext = {}
 ): SearchResult {
-  const matched =
-    parsed.diagnostics.length > 0
-      ? []
-      : sortCards(cards.filter((card) => evaluateQueryNode(card, parsed.ast, context)));
-  const items = parsed.diagnostics.length > 0 ? [] : rollupCards(matched, parsed.uniqueMode);
+  // Determine whether evaluation should run.
+  //   • Empty query: always evaluate (returns all cards — intentional "browse" state).
+  //   • Non-empty query with at least one executed token: evaluate the clean AST.
+  //   • Non-empty query with zero executed tokens: structural/lex error, or every token
+  //     was dropped by field validation — return empty so the user sees that nothing ran.
+  const isEmptyQuery = parsed.source.trim().length === 0;
+  const hasExecuted =
+    isEmptyQuery ||
+    parsed.executedTokens.some(
+      (item): item is import("./ast.js").ExecutedCondition =>
+        typeof item !== "string" && item.state === "executed"
+    );
+
+  const matched = hasExecuted
+    ? sortCards(cards.filter((card) => evaluateQueryNode(card, parsed.ast, context)))
+    : [];
+  const items = hasExecuted ? rollupCards(matched, parsed.uniqueMode) : [];
 
   return {
     total: items.length,
     normalizedQuery: parsed.normalizedQuery,
     uniqueMode: parsed.uniqueMode,
     diagnostics: parsed.diagnostics,
+    executedTokens: parsed.executedTokens,
     items
   };
 }
