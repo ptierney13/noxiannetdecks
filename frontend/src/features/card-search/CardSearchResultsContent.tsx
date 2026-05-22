@@ -134,10 +134,10 @@ function SearchSelect<T extends string>({
               <li key={option.value} role="option" aria-selected={isSelected}>
                 <button
                   type="button"
-                  className={`block w-full px-3 py-2.5 text-left text-sm font-bold transition-colors ${
+                  className={`block w-full border border-transparent px-3 py-2.5 text-left text-sm font-bold transition-[color,background-color,border-color] ${
                     isSelected
-                      ? "bg-accent text-white"
-                      : "text-text-primary hover:bg-accent-soft"
+                      ? "bg-accent border-accent text-white"
+                      : "text-text-primary hover:bg-[var(--color-accent-soft)] hover:border-[var(--color-accent)]"
                   }`}
                   onClick={() => {
                     onChange(option.value);
@@ -344,6 +344,7 @@ export function CardSearchResultsContent({
                       <VariantSelectorRow
                         cards={variantCards}
                         showPrice={showPrice}
+                        size="lg"
                         publishedPriceIndex={publishedPriceIndex}
                         onVariantSelect={({ card, finish }) => onCardClick(card, group.cards, finish)}
                       />
