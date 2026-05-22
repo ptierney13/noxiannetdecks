@@ -11,14 +11,13 @@ import {
   type PublishedPriceIndex,
 } from "../../lib";
 import { executedTokensToDisplay, type ExecutedQueryItem } from "@noxiannet/card-store/query";
-import type { CardRecord, QueryDiagnostic } from "../../types";
+import type { CardRecord } from "../../types";
 
 export type CardSearchResultsContentProps = {
   groups: CardSearchResultGroup[];
   rawResultCount: number;
   visibleResultCount: number;
   executedTokens: ExecutedQueryItem[];
-  diagnostics: QueryDiagnostic[];
   isPending: boolean;
   isError: boolean;
   errorMessage?: string;
@@ -167,25 +166,6 @@ function FieldLabel({ children }: { children: string }) {
   );
 }
 
-function Diagnostics({ diagnostics }: { diagnostics: QueryDiagnostic[] }) {
-  if (diagnostics.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="rounded-2xl border border-negative-border bg-negative-soft p-4 text-sm text-text-primary" role="alert">
-      <strong className="block text-sm font-black">Query needs attention</strong>
-      <ul className="mt-2 grid gap-1 pl-5">
-        {diagnostics.map((diagnostic, index) => (
-          <li key={`${diagnostic.message}-${index}`} className="list-disc">
-            {diagnostic.message}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 function LoadingGrid() {
   return (
     <div className={RESULTS_GRID_CLASSES} aria-label="Loading card results">
@@ -266,7 +246,7 @@ function ResultSummary({
       {hasBad ? (
         <>
           <span className="text-[1.225rem] font-semibold leading-snug text-text-tertiary">
-            {hasGood ? "· Unable to parse" : "Unable to parse"}
+            {hasGood ? "| Unable to parse" : "Unable to parse"}
           </span>
           {droppedBlocks.map((block, i) => (
             <span
@@ -289,7 +269,6 @@ export function CardSearchResultsContent({
   groups,
   visibleResultCount,
   executedTokens,
-  diagnostics,
   isPending,
   isError,
   errorMessage,
@@ -404,7 +383,6 @@ export function CardSearchResultsContent({
           </div>
         ) : null}
 
-        <Diagnostics diagnostics={diagnostics} />
       </div>
     </section>
   );

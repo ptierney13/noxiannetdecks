@@ -57,7 +57,6 @@ export function CardSearchResultsPane({ query }: CardSearchResultsPaneProps) {
         rawResultCount={cards.length}
         visibleResultCount={visibleResultCount}
         executedTokens={resultsQuery.data?.executedTokens ?? []}
-        diagnostics={resultsQuery.data?.diagnostics ?? []}
         isPending={resultsQuery.isPending}
         isError={resultsQuery.isError}
         errorMessage={resultsQuery.error instanceof Error ? resultsQuery.error.message : undefined}

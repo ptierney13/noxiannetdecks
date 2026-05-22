@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { parseQuery, type ExecutedQueryItem } from "@noxiannet/card-store/query";
-import type { CardRecord, QueryDiagnostic } from "../../types";
+import type { CardRecord } from "../../types";
 import {
   buildCardSearchResultGroups,
   sortCardsByKey,
@@ -85,13 +85,11 @@ function ContentHarness({
   cards = sampleCards,
   isPending = false,
   isError = false,
-  diagnostics = [],
   rawQuery = "n:jinx",
 }: {
   cards?: CardRecord[];
   isPending?: boolean;
   isError?: boolean;
-  diagnostics?: QueryDiagnostic[];
   rawQuery?: string;
 }) {
   const [sort, setSort] = useState<CardSearchSortKey>("energy-asc");
@@ -114,7 +112,6 @@ function ContentHarness({
       rawResultCount={cards.length}
       visibleResultCount={variantMode === "unique-cards" ? groups.length : cards.length}
       executedTokens={executedTokens}
-      diagnostics={diagnostics}
       isPending={isPending}
       isError={isError}
       errorMessage={isError ? "Request failed: 500" : undefined}
@@ -146,14 +143,6 @@ export const Empty: Story = {
 
 export const Error: Story = {
   render: () => <ContentHarness isError cards={[]} />,
-};
-
-export const Diagnostics: Story = {
-  render: () => (
-    <ContentHarness
-      diagnostics={[{ message: "Unknown field 'foo'." } as QueryDiagnostic]}
-    />
-  ),
 };
 
 export const DomainOrQuery: Story = {
