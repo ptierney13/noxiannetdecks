@@ -210,7 +210,7 @@ function ResultSummary({
   normalizedQuery: string;
 }) {
   if (isPending) {
-    return <p className="m-0 text-[1.75rem] font-semibold leading-snug text-text-tertiary">Searching cards…</p>;
+    return <p className="m-0 text-[1.225rem] font-semibold leading-snug text-text-tertiary">Searching cards…</p>;
   }
 
   const cardWord = visibleResultCount === 1 ? "card" : "cards";
@@ -218,14 +218,14 @@ function ResultSummary({
     rawResultCount !== visibleResultCount ? ` from ${rawResultCount.toLocaleString()} printings` : "";
 
   return (
-    <p className="m-0 text-[1.75rem] font-semibold leading-snug text-text-secondary">
+    <p className="m-0 text-[1.225rem] font-semibold leading-snug text-text-secondary">
       <span className="font-black text-text-primary">{visibleResultCount.toLocaleString()}</span>{" "}
       matching {cardWord}
       {extra}
       {normalizedQuery ? (
         <>
           {" "}
-          for <code className="rounded-lg bg-surface-inset px-3 py-1 text-accent-warm">{normalizedQuery}</code>
+          for <code className="rounded-lg bg-surface-inset px-3 py-1 text-[1.225rem] text-accent-warm">{normalizedQuery}</code>
         </>
       ) : null}
     </p>
