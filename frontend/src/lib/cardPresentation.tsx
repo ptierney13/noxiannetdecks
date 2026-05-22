@@ -34,6 +34,23 @@ export type CardFinish = "foil" | "nonfoil";
 // --- Symbol rendering ---
 
 /**
+ * Returns the image path for a rarity pip asset, or null if the rarity is
+ * unrecognised. Used by QB rarity chip buttons and any other surface that
+ * needs to render the gem symbol for a given rarity tier.
+ */
+export function raritySymbolSrc(rarity: string): string | null {
+  switch (rarity.toLowerCase()) {
+    case "common":   return "/assets/riftbound/symbols/rarity/rarity-common-pip.png";
+    case "uncommon": return "/assets/riftbound/symbols/rarity/rarity-uncommon-pip.png";
+    case "rare":     return "/assets/riftbound/symbols/rarity/rarity-rare-pip.png";
+    case "epic":     return "/assets/riftbound/symbols/rarity/rarity-epic-pip.png";
+    case "showcase": return "/assets/riftbound/symbols/rarity/rarity-showcase-pip.png";
+    case "promo":    return "/assets/riftbound/symbols/rarity/rarity-promo-pip.png";
+    default:         return null;
+  }
+}
+
+/**
  * Returns the image path for a given inline symbol token, or null if the
  * token is unrecognised. Used by renderTokenizedText and formatCostText.
  */

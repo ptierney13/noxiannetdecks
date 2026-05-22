@@ -6,6 +6,12 @@ This folder contains publicly sourced Riftbound symbol assets organized for UI r
 
 The current site token inventory requires these symbols:
 
+- `rarity/rarity-common-pip.png`
+- `rarity/rarity-uncommon-pip.png`
+- `rarity/rarity-rare-pip.png`
+- `rarity/rarity-epic-pip.png`
+- `rarity/rarity-showcase-pip.png`
+- `rarity/rarity-promo-pip.png`
 - `actions/exhaust-black.png`
 - `actions/exhaust-white.png`
 - `stats/might-black.png`
@@ -47,6 +53,8 @@ The current site token inventory requires these symbols:
   - Numeric energy badges.
 - `power/`
   - Wild Power / rainbow power glyphs.
+- `rarity/`
+  - Rarity pip gems cropped from official card faces. One per rarity tier.
 - `runes/`
   - Domain rune glyphs used inline in rules text.
 - `stats/`
@@ -62,6 +70,9 @@ The current site token inventory requires these symbols:
   - Used for the six domain rune glyphs.
 - Official Riot-hosted card images already referenced in `card_store/data/cards.json`
   - Used for the numeric energy badge extraction files stored in `_sources/energy-*-source.png`.
+  - Also used for the six rarity pip gems. Source cards: Common (OGN), Uncommon (OGN), Rare (OGN),
+    Epic (Shadow — dark background chosen for clean extraction), Showcase (Diana - No Longer Human
+    Alternate Art), Promo (OGN). Gems cropped from the bottom-center divider bar of each card face.
 
 ## Review Note
 

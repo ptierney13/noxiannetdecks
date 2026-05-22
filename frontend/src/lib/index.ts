@@ -3,6 +3,7 @@ export {
   SYMBOL_MAP,
   RIFTBOUND_REGIONS,
   inlineSymbolSrc,
+  raritySymbolSrc,
   renderMultilineText,
   renderTokenizedText,
   applySymbols,
