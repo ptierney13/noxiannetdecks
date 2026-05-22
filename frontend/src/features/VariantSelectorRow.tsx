@@ -22,6 +22,7 @@ export type VariantSelectorRowProps = {
   cards: CardRecord[];
   activeKey?: string;
   showPrice?: boolean;
+  showCollectorNumber?: boolean;
   publishedPriceIndex?: PublishedPriceIndex | null;
   orientation?: "horizontal" | "vertical";
   onVariantSelect: (selection: VariantSelection) => void;
@@ -47,6 +48,7 @@ export function VariantSelectorRow({
   cards,
   activeKey,
   showPrice = false,
+  showCollectorNumber = false,
   publishedPriceIndex = null,
   orientation = "horizontal",
   onVariantSelect,
@@ -81,6 +83,11 @@ export function VariantSelectorRow({
               aria-pressed={active}
             >
               <span>{label}</span>
+              {showCollectorNumber && card.collector_number ? (
+                <span className="mt-0.5 text-[0.65rem] font-bold normal-case tracking-normal">
+                  {card.collector_number}
+                </span>
+              ) : null}
               {price ? (
                 <span className="mt-0.5 text-[0.65rem] font-bold normal-case tracking-normal text-price">
                   {price}

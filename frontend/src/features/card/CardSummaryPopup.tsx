@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { CardMetaChips, ModalShell } from "../../ui-elements";
+import { ModalShell } from "../../ui-elements";
 import type { CardRecord } from "../../types";
 import {
   buildCardDetailPath,
   buildTcgplayerAffiliateSearchLink,
+  formatCostText,
   formatTypeline,
   normalizeCardText,
   renderTokenizedText,
@@ -18,6 +19,33 @@ export type CardSummaryPopupProps = {
   initialFinish: CardFinish;
   onClose: () => void;
 };
+
+/**
+ * Returns inline styles for the cost chip based on the card's domain(s).
+ * Single domain: domain-soft background + domain border/color.
+ * Multi-domain: left-to-right gradient between the two domain soft colors.
+ */
+function costChipStyle(
+  domains: string[]
+): { background?: string; borderColor?: string; color?: string } {
+  if (domains.length === 0) return {};
+
+  if (domains.length === 1) {
+    const d = domains[0]?.toLowerCase() ?? "";
+    return {
+      background: `var(--domain-${d}-soft)`,
+      borderColor: `var(--domain-${d})`,
+      color: `var(--domain-${d})`,
+    };
+  }
+
+  const d0 = domains[0]?.toLowerCase() ?? "";
+  const d1 = domains[1]?.toLowerCase() ?? "";
+  return {
+    background: `linear-gradient(to right, var(--domain-${d0}-soft) 0%, var(--domain-${d0}-soft) 40%, var(--domain-${d1}-soft) 60%, var(--domain-${d1}-soft) 100%)`,
+    borderColor: "var(--color-border-default)",
+  };
+}
 
 export function CardSummaryPopup({
   group,
@@ -46,6 +74,8 @@ export function CardSummaryPopup({
 
   const detailHref = buildCardDetailPath(activeCard.id);
   const normalizedText = activeCard.text.rich ? normalizeCardText(activeCard.text.rich) : "";
+  const costText = formatCostText(activeCard);
+  const domains = activeCard.attributes.domain;
 
   return (
     <ModalShell label={`Card Summary Popup for ${activeCard.riot_name}`} onClose={onClose}>
@@ -64,22 +94,49 @@ export function CardSummaryPopup({
           )}
         </div>
 
-        <div className="grid content-start gap-5 p-5 pr-16 @[760px]:p-8 @[760px]:pr-20">
-          <div className="grid gap-2">
+        <div className="grid content-start gap-4 p-5 pr-16 @[760px]:p-8 @[760px]:pr-20">
+          {/* Name + Cost on the same line */}
+          <div className="flex flex-wrap items-center gap-3">
             <h2 className="m-0 text-3xl font-black leading-tight text-text-primary">
               {activeCard.riot_name}
             </h2>
-            <p className="m-0 text-sm font-bold text-text-tertiary">{formatTypeline(activeCard)}</p>
+            {costText ? (
+              <span
+                className="inline-flex items-center gap-1 rounded-xl border px-3 py-1 text-3xl font-black leading-none"
+                style={costChipStyle(domains)}
+              >
+                {renderTokenizedText(costText, { size: "stat" })}
+              </span>
+            ) : null}
           </div>
 
-          <CardMetaChips card={activeCard} />
+          {/* Typeline chip */}
+          <span className="inline-flex self-start rounded-xl border border-border-default bg-surface-inset px-3 py-1.5 text-sm font-bold text-text-secondary">
+            {formatTypeline(activeCard)}
+          </span>
 
+          {/* Rules text */}
           {normalizedText ? (
             <p className="m-0 whitespace-pre-line rounded-2xl border border-border-subtle bg-surface-inset p-4 text-sm leading-6 text-text-secondary">
               {renderTokenizedText(normalizedText)}
             </p>
           ) : null}
 
+          {/* Flavor text */}
+          {activeCard.text.flavour ? (
+            <p className="m-0 whitespace-pre-line rounded-2xl border border-border-subtle bg-surface-inset p-4 text-sm italic leading-6 text-text-tertiary">
+              {activeCard.text.flavour}
+            </p>
+          ) : null}
+
+          {/* Illustrator */}
+          {activeCard.media.artist ? (
+            <p className="m-0 text-xs text-text-tertiary">
+              Illustrated by {activeCard.media.artist}
+            </p>
+          ) : null}
+
+          {/* Variants */}
           {group.length > 0 ? (
             <div className="grid gap-2">
               <p className="m-0 text-xs font-black uppercase tracking-[0.18em] text-text-tertiary">
@@ -89,6 +146,7 @@ export function CardSummaryPopup({
                 cards={group}
                 activeKey={`${activeCard.id}-${activeFinish}`}
                 showPrice
+                showCollectorNumber
                 publishedPriceIndex={publishedPriceIndex}
                 onVariantSelect={({ card, finish }) => {
                   setActiveCard(card);
@@ -98,6 +156,7 @@ export function CardSummaryPopup({
             </div>
           ) : null}
 
+          {/* Actions */}
           <div className="flex flex-wrap gap-3 pt-1">
             {buyHref ? (
               <a
