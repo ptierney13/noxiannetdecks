@@ -10,6 +10,7 @@ import { parseDomainQueryValue } from "./domain.js";
 
 export type DisplayBlock = {
   kind: "condition";
+  state: "executed" | "dropped"; // whether this token was used or discarded
   prefix: string;   // descriptive label, e.g. "Domain is" or "NOT Might"
   value: string;    // data-driven part, e.g. "Fury OR Calm" or "> 3"
   suffix?: string;  // trailing descriptor — only for bare-text searches
@@ -46,6 +47,7 @@ function parseDomainDisplayNames(value: string): string[] {
 type Condition = { op: string; value: string; negated: boolean };
 
 function buildBlockParts(
+  field: string | null,
   canonicalField: string | null,
   conditions: Condition[],
   intraConnector: "AND" | "OR"
@@ -53,6 +55,15 @@ function buildBlockParts(
   const allNegated = conditions.every((c) => c.negated);
   const not = allNegated ? "NOT " : ""; // trailing space for concat
   const conn = ` ${intraConnector} `;
+
+  // Unknown field predicate (e.g. "f:me") — show raw field name as prefix.
+  // Distinct from bare-text search where field is null because there was no field.
+  if (field !== null && canonicalField === null) {
+    return {
+      prefix: `${not}${field}:`,
+      value: conditions.map((c) => c.value).join(conn)
+    };
+  }
 
   // Bare-text search — value is the quoted text; suffix is the static descriptor
   if (canonicalField === null) {
@@ -220,9 +231,11 @@ function buildBlockParts(
 // ---------------------------------------------------------------------------
 
 type ConditionGroup = {
+  field: string | null;          // raw field name (for unknown-field display)
   canonicalField: string | null;
   conditions: Condition[];
   intraConnector: "AND" | "OR";
+  state: "executed" | "dropped";
 };
 
 type GroupEntry = { group: ConditionGroup; followingConnector: "AND" | "OR" };
@@ -250,15 +263,24 @@ function buildDisplayGroups(items: (ExecutedCondition | "AND" | "OR")[]): GroupE
   while (i < segments.length) {
     const seg = segments[i]!;
     const group: ConditionGroup = {
+      field: seg.cond.field,
       canonicalField: seg.cond.canonicalField,
       conditions: [{ op: seg.cond.op, value: seg.cond.value, negated: seg.cond.negated }],
-      intraConnector: "AND"
+      intraConnector: "AND",
+      state: seg.cond.state
     };
 
     let j = i;
     while (j + 1 < segments.length) {
       const next = segments[j + 1]!;
-      if (next.cond.canonicalField === group.canonicalField) {
+      // Only merge adjacent conditions that share the same canonical field, raw
+      // field name (so "f:x" and "g:x" stay separate), and execution state (so
+      // dropped tokens never merge into executed ones and vice-versa).
+      if (
+        next.cond.canonicalField === group.canonicalField &&
+        next.cond.field === group.field &&
+        next.cond.state === group.state
+      ) {
         group.intraConnector = segments[j]!.followingConnector;
         group.conditions.push({ op: next.cond.op, value: next.cond.value, negated: next.cond.negated });
         j++;
@@ -324,8 +346,8 @@ export function executedTokensToDisplay(
   const result: DisplayItem[] = [];
 
   groups.forEach(({ group, followingConnector }, idx) => {
-    const parts = buildBlockParts(group.canonicalField, group.conditions, group.intraConnector);
-    result.push({ kind: "condition", ...parts });
+    const parts = buildBlockParts(group.field, group.canonicalField, group.conditions, group.intraConnector);
+    result.push({ kind: "condition", state: group.state, ...parts });
     if (idx < groups.length - 1) {
       result.push(followingConnector);
     }

@@ -208,7 +208,7 @@ function ResultSummary({
   visibleResultCount: number;
   executedTokens: ExecutedQueryItem[];
 }) {
-  const blocks = useMemo(() => executedTokensToDisplay(executedTokens), [executedTokens]);
+  const blocks = useMemo(() => executedTokensToDisplay(executedTokens, { includeDropped: true }), [executedTokens]);
 
   if (isPending) {
     return <p className="m-0 text-[1.225rem] font-semibold leading-snug text-text-tertiary">Searching cards…</p>;
@@ -227,6 +227,19 @@ function ResultSummary({
           return (
             <span key={i} className="text-[0.7rem] font-black uppercase tracking-widest text-text-secondary">
               {item}
+            </span>
+          );
+        }
+        if (item.state === "dropped") {
+          return (
+            <span
+              key={i}
+              className="inline-flex items-center gap-1 rounded-lg border border-negative-border bg-negative-soft px-3 py-1 text-sm"
+            >
+              {item.prefix ? (
+                <span className="font-semibold text-red-400">{item.prefix}</span>
+              ) : null}
+              <span className="font-black text-red-300">{item.value}</span>
             </span>
           );
         }
