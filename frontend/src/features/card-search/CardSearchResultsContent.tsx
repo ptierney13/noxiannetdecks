@@ -210,7 +210,7 @@ function ResultSummary({
   normalizedQuery: string;
 }) {
   if (isPending) {
-    return <p className="m-0 text-sm text-text-tertiary">Searching cards...</p>;
+    return <p className="m-0 text-[1.75rem] font-semibold leading-snug text-text-tertiary">Searching cards…</p>;
   }
 
   const cardWord = visibleResultCount === 1 ? "card" : "cards";
