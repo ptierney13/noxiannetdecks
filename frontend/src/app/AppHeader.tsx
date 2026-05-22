@@ -135,9 +135,9 @@ export function AppHeader() {
 
         <div className="flex items-center justify-end shrink-0">
           {/* Hamburger wrapper — collapses at md (768px)+.
-              No overflow-hidden: absolutely-positioned dropdowns inside must not be clipped. */}
+              Clip after collapse so hidden controls cannot widen the page. */}
           <div
-            className="relative max-w-[3rem] opacity-100 pointer-events-auto transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] md:max-w-0 md:opacity-0 md:pointer-events-none"
+            className="relative max-w-[3rem] opacity-100 pointer-events-auto transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] md:max-w-0 md:opacity-0 md:pointer-events-none md:overflow-hidden"
             ref={menuRef}
           >
             <button
@@ -171,10 +171,10 @@ export function AppHeader() {
           </div>
 
           {/* Inline nav wrapper — expands at md (768px)+.
-              No overflow-hidden: absolutely-positioned dropdowns inside must not be clipped. */}
+              Clip while collapsed; allow md+ dropdowns to escape the wrapper. */}
           <div
             data-nav-items=""
-            className="inline-flex items-center gap-[0.4rem] max-w-0 opacity-0 pointer-events-none transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] md:max-w-[34rem] md:opacity-100 md:pointer-events-auto"
+            className="inline-flex items-center gap-[0.4rem] max-w-0 overflow-hidden opacity-0 pointer-events-none transition-[max-width,opacity] duration-[220ms,180ms] ease-[cubic-bezier(0.22,1,0.36,1),ease] md:max-w-[34rem] md:overflow-visible md:opacity-100 md:pointer-events-auto"
           >
             <div className="relative" ref={cardsMenuRef}>
               <MenuItem
