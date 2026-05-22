@@ -11,7 +11,7 @@ import {
   type PublishedPriceIndex,
 } from "../../lib";
 import type { CardRecord, QueryDiagnostic } from "../../types";
-import { parseQueryToBlocks, type ParsedQueryItem } from "./queryBlocks";
+import { parseQueryToBlocks } from "./queryBlocks";
 
 export type CardSearchResultsContentProps = {
   groups: CardSearchResultGroup[];
@@ -199,11 +199,30 @@ function LoadingGrid() {
   );
 }
 
-function QueryBlocksDisplay({ items }: { items: ParsedQueryItem[] }) {
-  if (items.length === 0) return null;
+function ResultSummary({
+  isPending,
+  visibleResultCount,
+  rawQuery,
+}: {
+  isPending: boolean;
+  visibleResultCount: number;
+  rawQuery: string;
+}) {
+  const blocks = useMemo(() => parseQueryToBlocks(rawQuery), [rawQuery]);
+
+  if (isPending) {
+    return <p className="m-0 text-[1.225rem] font-semibold leading-snug text-text-tertiary">Searching cards…</p>;
+  }
+
+  const cardWord = visibleResultCount === 1 ? "card" : "cards";
+
   return (
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-      {items.map((item, i) => {
+    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1.5">
+      <p className="m-0 shrink-0 text-[1.225rem] font-semibold leading-snug text-text-secondary">
+        <span className="font-black text-text-primary">{visibleResultCount.toLocaleString()}</span>
+        {" "}{cardWord}{blocks.length > 0 ? " matching" : ""}
+      </p>
+      {blocks.map((item, i) => {
         if (item === "AND" || item === "OR") {
           return (
             <span key={i} className="text-[0.7rem] font-black uppercase tracking-widest text-text-secondary">
@@ -214,9 +233,15 @@ function QueryBlocksDisplay({ items }: { items: ParsedQueryItem[] }) {
         return (
           <span
             key={i}
-            className="inline-flex items-center rounded-lg border border-[rgba(215,170,73,0.4)] bg-accent-warm-soft px-3 py-1 text-sm font-semibold text-accent-warm"
+            className="inline-flex items-center gap-1 rounded-lg border border-[rgba(215,170,73,0.4)] bg-accent-warm-soft px-3 py-1 text-sm"
           >
-            {item.label}
+            {item.prefix ? (
+              <span className="font-semibold text-accent-warm">{item.prefix}</span>
+            ) : null}
+            <span className="font-black text-text-primary">{item.value}</span>
+            {item.suffix ? (
+              <span className="font-semibold text-accent-warm">{item.suffix}</span>
+            ) : null}
           </span>
         );
       })}
@@ -224,43 +249,8 @@ function QueryBlocksDisplay({ items }: { items: ParsedQueryItem[] }) {
   );
 }
 
-function ResultSummary({
-  isPending,
-  visibleResultCount,
-  rawResultCount,
-  rawQuery,
-}: {
-  isPending: boolean;
-  visibleResultCount: number;
-  rawResultCount: number;
-  rawQuery: string;
-}) {
-  const blocks = useMemo(() => parseQueryToBlocks(rawQuery), [rawQuery]);
-
-  if (isPending) {
-    return <p className="m-0 text-[1.225rem] font-semibold leading-snug text-text-tertiary">Searching cards…</p>;
-  }
-
-  const cardWord = visibleResultCount === 1 ? "card" : "cards";
-  const printings =
-    rawResultCount !== visibleResultCount
-      ? ` with ${rawResultCount.toLocaleString()} printings`
-      : "";
-
-  return (
-    <div className="grid gap-2">
-      <p className="m-0 text-[1.225rem] font-semibold leading-snug text-text-secondary">
-        <span className="font-black text-text-primary">{visibleResultCount.toLocaleString()}</span>
-        {" "}{cardWord}{printings}{blocks.length > 0 ? " matching" : ""}
-      </p>
-      <QueryBlocksDisplay items={blocks} />
-    </div>
-  );
-}
-
 export function CardSearchResultsContent({
   groups,
-  rawResultCount,
   visibleResultCount,
   rawQuery,
   diagnostics,
@@ -329,11 +319,8 @@ export function CardSearchResultsContent({
         <ResultSummary
           isPending={isPending}
           visibleResultCount={visibleResultCount}
-          rawResultCount={rawResultCount}
           rawQuery={rawQuery}
         />
-
-        <Diagnostics diagnostics={diagnostics} />
 
         {isPending ? <LoadingGrid /> : null}
 
@@ -380,6 +367,8 @@ export function CardSearchResultsContent({
             })}
           </div>
         ) : null}
+
+        <Diagnostics diagnostics={diagnostics} />
       </div>
     </section>
   );

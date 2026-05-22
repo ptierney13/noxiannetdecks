@@ -1,4 +1,4 @@
-export type ConditionBlock = { kind: 'condition'; label: string };
+export type ConditionBlock = { kind: 'condition'; prefix: string; value: string; suffix?: string };
 export type QueryBlock = ConditionBlock;
 // Flat list interleaved with connectors: block | 'AND' | 'OR'
 export type ParsedQueryItem = QueryBlock | 'AND' | 'OR';
@@ -75,87 +75,94 @@ function fmtOp(op: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Label builder — converts a group of same-field conditions to a string
+// Block parts builder — converts a group of same-field conditions to display
+// segments: prefix (descriptive label), value (user-supplied data), optional
+// suffix (trailing descriptor). Splitting lets each segment be styled
+// independently so the data-driven value stands out from the label text.
 // ---------------------------------------------------------------------------
 
 type Condition = { op: string; value: string; negated: boolean };
 
-function buildLabel(
+function buildBlockParts(
   canonicalField: string | null,
   conditions: Condition[],
   intraConnector: 'AND' | 'OR',
-): string {
+): { prefix: string; value: string; suffix?: string } {
   const allNegated = conditions.every(c => c.negated);
-  const notPrefix = allNegated ? 'NOT ' : '';
+  const not = allNegated ? 'NOT ' : '';  // trailing space ready for string concat
   const conn = ` ${intraConnector} `;
 
-  // Bare text search
+  // Bare text search — value is the quoted text; "anywhere on the card" is a static suffix
   if (canonicalField === null) {
-    const joined = conditions.map(c => `"${c.value}"`).join(conn);
-    return `${notPrefix}${joined} anywhere on the card`;
+    return {
+      prefix: allNegated ? 'NOT' : '',
+      value: conditions.map(c => `"${c.value}"`).join(conn),
+      suffix: 'anywhere on the card',
+    };
   }
 
   switch (canonicalField) {
     case 'name': {
       const opStr = conditions[0]!.op === '=' ? 'is' : 'contains';
-      return `${notPrefix}Name ${opStr} ${conditions.map(c => `"${c.value}"`).join(conn)}`;
+      return { prefix: `${not}Name ${opStr}`, value: conditions.map(c => `"${c.value}"`).join(conn) };
     }
     case 'text':
-      return `${notPrefix}Rules text contains ${conditions.map(c => `"${c.value}"`).join(conn)}`;
+      return { prefix: `${not}Rules text contains`, value: conditions.map(c => `"${c.value}"`).join(conn) };
     case 'typeline':
-      return `${notPrefix}Type line includes ${conditions.map(c => capitalize(c.value)).join(conn)}`;
+      return { prefix: `${not}Type line includes`, value: conditions.map(c => capitalize(c.value)).join(conn) };
     case 'cardtype':
-      return `${notPrefix}Card type is ${conditions.map(c => capitalize(c.value)).join(conn)}`;
+      return { prefix: `${not}Card type is`, value: conditions.map(c => capitalize(c.value)).join(conn) };
     case 'supertype':
-      return `${notPrefix}Supertype is ${conditions.map(c => capitalize(c.value)).join(conn)}`;
+      return { prefix: `${not}Supertype is`, value: conditions.map(c => capitalize(c.value)).join(conn) };
     case 'domain': {
       const op0 = conditions[0]!.op;
       const isSetCompare = op0 === '>' || op0 === '>=' || op0 === '<' || op0 === '<=';
       if (isSetCompare) {
-        const parts = conditions
-          .map(c => `${fmtOp(c.op)} ${parseDomainValue(c.value).join(' AND ')}`)
-          .join(conn);
-        return `${notPrefix}Domain ${parts}`;
+        return {
+          prefix: `${not}Domain`,
+          value: conditions
+            .map(c => `${fmtOp(c.op)} ${parseDomainValue(c.value).join(' AND ')}`)
+            .join(conn),
+        };
       }
-      const names = conditions.flatMap(c => parseDomainValue(c.value)).join(conn);
-      return `${notPrefix}Domain is ${names}`;
+      return { prefix: `${not}Domain is`, value: conditions.flatMap(c => parseDomainValue(c.value)).join(conn) };
     }
     case 'tag':
-      return `${notPrefix}Tags contain ${conditions.map(c => c.value).join(conn)}`;
+      return { prefix: `${not}Tags contain`, value: conditions.map(c => c.value).join(conn) };
     case 'keyword':
-      return `${notPrefix}Keyword is ${conditions.map(c => capitalize(c.value)).join(conn)}`;
+      return { prefix: `${not}Keyword is`, value: conditions.map(c => capitalize(c.value)).join(conn) };
     case 'rarity':
-      return `${notPrefix}Rarity is ${conditions.map(c => capitalize(c.value)).join(conn)}`;
+      return { prefix: `${not}Rarity is`, value: conditions.map(c => capitalize(c.value)).join(conn) };
     case 'set':
-      return `${notPrefix}Set is ${conditions.map(c => `"${c.value}"`).join(conn)}`;
+      return { prefix: `${not}Set is`, value: conditions.map(c => `"${c.value}"`).join(conn) };
     case 'artist':
-      return `${notPrefix}Artist is ${conditions.map(c => `"${c.value}"`).join(conn)}`;
+      return { prefix: `${not}Artist is`, value: conditions.map(c => `"${c.value}"`).join(conn) };
     case 'number':
-      return `${notPrefix}Collector # ${conditions.map(c => `${fmtOp(c.op)} ${c.value}`).join(conn)}`;
+      return { prefix: `${not}Collector #`, value: conditions.map(c => `${fmtOp(c.op)} ${c.value}`).join(conn) };
     case 'is':
-      return `${notPrefix}Card is ${conditions.map(c => c.value).join(conn)}`;
+      return { prefix: `${not}Card is`, value: conditions.map(c => c.value).join(conn) };
     case 'finish':
-      return `${notPrefix}Finish is ${conditions.map(c => c.value).join(conn)}`;
+      return { prefix: `${not}Finish is`, value: conditions.map(c => c.value).join(conn) };
     case 'cost':
-      return `${notPrefix}Cost ${conditions.map(c => `${fmtOp(c.op)} ${c.value}`).join(conn)}`;
+      return { prefix: `${not}Cost`, value: conditions.map(c => `${fmtOp(c.op)} ${c.value}`).join(conn) };
     case 'energy':
-      return `${notPrefix}Energy ${conditions.map(c => `${fmtOp(c.op)} ${c.value}`).join(conn)}`;
+      return { prefix: `${not}Energy`, value: conditions.map(c => `${fmtOp(c.op)} ${c.value}`).join(conn) };
     case 'might':
-      return `${notPrefix}Might ${conditions.map(c => `${fmtOp(c.op)} ${c.value}`).join(conn)}`;
+      return { prefix: `${not}Might`, value: conditions.map(c => `${fmtOp(c.op)} ${c.value}`).join(conn) };
     case 'power':
-      return `${notPrefix}Power ${conditions.map(c => `${fmtOp(c.op)} ${c.value}`).join(conn)}`;
+      return { prefix: `${not}Power`, value: conditions.map(c => `${fmtOp(c.op)} ${c.value}`).join(conn) };
     case 'price':
-      return `${notPrefix}Price ${conditions.map(c => `${fmtOp(c.op)} $${c.value}`).join(conn)}`;
+      return { prefix: `${not}Price`, value: conditions.map(c => `${fmtOp(c.op)} $${c.value}`).join(conn) };
     case 'layout':
-      return `${notPrefix}Layout is ${conditions.map(c => c.value).join(conn)}`;
+      return { prefix: `${not}Layout is`, value: conditions.map(c => c.value).join(conn) };
     case 'language':
-      return `${notPrefix}Language is ${conditions.map(c => c.value).join(conn)}`;
+      return { prefix: `${not}Language is`, value: conditions.map(c => c.value).join(conn) };
     case 'flavour':
-      return `${notPrefix}Flavor text contains ${conditions.map(c => `"${c.value}"`).join(conn)}`;
+      return { prefix: `${not}Flavor text contains`, value: conditions.map(c => `"${c.value}"`).join(conn) };
     case 'id':
-      return `${notPrefix}Card ID is ${conditions.map(c => c.value).join(conn)}`;
+      return { prefix: `${not}Card ID is`, value: conditions.map(c => c.value).join(conn) };
     default:
-      return `${notPrefix}${canonicalField}: ${conditions.map(c => c.value).join(conn)}`;
+      return { prefix: `${not}${canonicalField}:`, value: conditions.map(c => c.value).join(conn) };
   }
 }
 
@@ -335,7 +342,7 @@ export function parseQueryToBlocks(rawQuery: string): ParsedQueryItem[] {
 
   const items: ParsedQueryItem[] = [];
   groups.forEach(({ group, followingConnector }, idx) => {
-    const block: QueryBlock = { kind: 'condition', label: buildLabel(group.canonicalField, group.conditions, group.intraConnector) };
+    const block: QueryBlock = { kind: 'condition', ...buildBlockParts(group.canonicalField, group.conditions, group.intraConnector) };
     items.push(block);
     if (idx < groups.length - 1) {
       items.push(followingConnector);
