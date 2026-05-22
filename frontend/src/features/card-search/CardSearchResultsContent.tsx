@@ -1,4 +1,4 @@
-import { CardMetaChips, ResultCard } from "../../ui-elements";
+import { ResultCard } from "../../ui-elements";
 import { VariantSelectorRow } from "../VariantSelectorRow";
 import {
   CARD_SEARCH_SORT_OPTIONS,
@@ -32,9 +32,9 @@ export type CardSearchResultsContentProps = {
   onCardClick: (card: CardRecord, group: CardRecord[], finish: CardFinish) => void;
 };
 
-// The controls combine into one row once the pane itself has enough width.
-const CONTROL_LAYOUT_CLASSES =
-  "grid gap-3 @[1024px]:grid-cols-[minmax(150px,210px)_minmax(180px,250px)_minmax(0,1fr)] @[1024px]:items-end";
+// All four controls share one flex row; they wrap at narrow widths and
+// compact to a single line once the pane is wide enough to fit all four.
+const CONTROL_LAYOUT_CLASSES = "flex flex-wrap items-end gap-3";
 
 // The grid intentionally uses fixed columns, not auto-fill, to match search-plan review rules.
 const RESULTS_GRID_CLASSES =
@@ -117,13 +117,6 @@ function ResultSummary({
   );
 }
 
-function buildPriceRepresentative(card: CardRecord): CardRecord {
-  return {
-    ...card,
-    finishes: [normalizeCardFinish(card.finishes[0])],
-  };
-}
-
 export function CardSearchResultsContent({
   groups,
   rawResultCount,
@@ -175,27 +168,25 @@ export function CardSearchResultsContent({
             </select>
           </label>
 
-          <div className="flex flex-wrap gap-3 @[1024px]:justify-end">
+          <label className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border-default bg-surface-inset px-3 text-sm font-bold text-text-secondary">
+            <input
+              type="checkbox"
+              checked={showPrice}
+              onChange={(event) => onShowPriceChange(event.target.checked)}
+            />
+            Show prices
+          </label>
+
+          {variantMode === "unique-cards" ? (
             <label className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border-default bg-surface-inset px-3 text-sm font-bold text-text-secondary">
               <input
                 type="checkbox"
-                checked={showPrice}
-                onChange={(event) => onShowPriceChange(event.target.checked)}
+                checked={showVariants}
+                onChange={(event) => onShowVariantsChange(event.target.checked)}
               />
-              Show prices
+              Show variants
             </label>
-
-            {variantMode === "unique-cards" ? (
-              <label className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border-default bg-surface-inset px-3 text-sm font-bold text-text-secondary">
-                <input
-                  type="checkbox"
-                  checked={showVariants}
-                  onChange={(event) => onShowVariantsChange(event.target.checked)}
-                />
-                Show variants
-              </label>
-            ) : null}
-          </div>
+          ) : null}
         </div>
       </div>
 
@@ -228,11 +219,7 @@ export function CardSearchResultsContent({
           {groups.map((group) => {
             const representative = group.representative;
             const primaryFinish = normalizeCardFinish(representative.finishes[0]);
-            const variantCards = showVariants
-              ? group.cards
-              : showPrice
-              ? [buildPriceRepresentative(representative)]
-              : [];
+            const variantCards = showVariants ? group.cards : [];
 
             return (
               <ResultCard
@@ -243,17 +230,14 @@ export function CardSearchResultsContent({
                 layout={representative.media.layout}
                 onClick={() => onCardClick(representative, group.cards, primaryFinish)}
                 footer={
-                  <div className="grid gap-2">
-                    <CardMetaChips card={representative} />
-                    {variantCards.length > 0 ? (
-                      <VariantSelectorRow
-                        cards={variantCards}
-                        showPrice={showPrice}
-                        publishedPriceIndex={publishedPriceIndex}
-                        onVariantSelect={({ card, finish }) => onCardClick(card, group.cards, finish)}
-                      />
-                    ) : null}
-                  </div>
+                  variantCards.length > 0 ? (
+                    <VariantSelectorRow
+                      cards={variantCards}
+                      showPrice={showPrice}
+                      publishedPriceIndex={publishedPriceIndex}
+                      onVariantSelect={({ card, finish }) => onCardClick(card, group.cards, finish)}
+                    />
+                  ) : undefined
                 }
               />
             );

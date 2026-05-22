@@ -41,9 +41,6 @@ export function ResultCard({
             </span>
           )}
         </span>
-        <span className="block border-t border-border-subtle px-3 py-2 text-sm font-black text-text-primary">
-          {name}
-        </span>
       </button>
       {footer ? <div className="border-t border-border-subtle p-2">{footer}</div> : null}
     </article>

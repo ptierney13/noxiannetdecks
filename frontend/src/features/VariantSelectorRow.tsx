@@ -54,7 +54,7 @@ export function VariantSelectorRow({
   const rowClass =
     orientation === "vertical"
       ? "grid gap-2"
-      : "flex flex-wrap gap-2";
+      : "flex flex-nowrap gap-2 overflow-x-auto";
 
   return (
     <div className={rowClass} onClick={(event) => event.stopPropagation()}>
@@ -72,16 +72,20 @@ export function VariantSelectorRow({
             <button
               key={key}
               type="button"
-              className={`inline-flex min-h-9 items-center justify-between gap-2 rounded-xl border px-3 py-2 text-left text-xs font-black uppercase tracking-[0.08em] transition ${
+              className={`inline-flex flex-shrink-0 flex-col min-h-9 rounded-xl border px-3 py-1.5 text-left text-xs font-black uppercase tracking-[0.08em] transition ${
                 active
-                  ? "border-accent-warm bg-accent-warm-soft text-accent-warm"
-                  : "border-border-default bg-surface-inset text-text-secondary hover:border-border-strong hover:text-text-primary"
+                  ? "border-accent bg-[rgba(197,50,71,0.45)] text-white"
+                  : "border-border-default bg-surface-inset text-text-secondary hover:bg-accent-soft hover:border-accent hover:text-text-primary hover:shadow-[0_0_0_1px_rgba(197,50,71,0.25),0_0_16px_rgba(197,50,71,0.18)]"
               }`}
               onClick={() => onVariantSelect({ card, finish, key })}
               aria-pressed={active}
             >
               <span>{label}</span>
-              {price ? <span className="text-text-primary">{price}</span> : null}
+              {price ? (
+                <span className="mt-0.5 text-[0.65rem] font-bold normal-case tracking-normal text-price">
+                  {price}
+                </span>
+              ) : null}
             </button>
           );
         })

@@ -50,7 +50,7 @@ export function CardSummaryPopup({
   return (
     <ModalShell label={`Card Summary Popup for ${activeCard.riot_name}`} onClose={onClose}>
       <div className="grid gap-0 overflow-hidden rounded-[28px] @[760px]:grid-cols-[minmax(240px,0.86fr)_minmax(0,1.14fr)]">
-        <div className="grid place-items-center bg-surface-inset p-5 @[760px]:p-7">
+        <div className="grid place-items-center bg-surface-3 p-5 @[760px]:p-7">
           {activeCard.media.image_url ? (
             <img
               src={activeCard.media.image_url}
@@ -110,7 +110,7 @@ export function CardSummaryPopup({
               </a>
             ) : null}
             <a
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border-default bg-surface-inset px-4 text-sm font-black text-text-primary transition hover:border-border-strong"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[image:var(--gradient-accent-button)] px-4 text-sm font-black text-[#1A0D05] shadow-[0_8px_22px_rgba(0,0,0,0.28)] transition hover:brightness-110"
               href={detailHref}
               onClick={onClose}
             >

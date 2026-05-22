@@ -70,8 +70,14 @@ export function CardSearchResultsPane({ query }: CardSearchResultsPaneProps) {
         publishedPriceIndex={publishedPriceIndex}
         onSortChange={setSort}
         onVariantModeChange={setVariantMode}
-        onShowPriceChange={setShowPrice}
-        onShowVariantsChange={setShowVariants}
+        onShowPriceChange={(value) => {
+          setShowPrice(value);
+          if (value) setShowVariants(true);
+        }}
+        onShowVariantsChange={(value) => {
+          setShowVariants(value);
+          if (!value) setShowPrice(false);
+        }}
         onCardClick={(card, group, finish) => {
           setSelectedPreview({ group, card, finish: normalizeCardFinish(finish) });
         }}
