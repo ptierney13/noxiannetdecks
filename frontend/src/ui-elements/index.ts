@@ -2,7 +2,6 @@ export { QueryChip } from "./QueryChip";
 export { SearchIcon, CardsIcon, MenuIcon, ChevronIcon, TradeIcon, SealedIcon } from "./Icon";
 export { LogoBadge } from "./LogoBadge";
 export { CardSearchInput } from "./CardSearchInput";
-export { CardMetaChips } from "./CardMetaChips";
 export { ModalShell } from "./ModalShell";
 export { ResultCard } from "./ResultCard";
 export { TileBase, TileFeature, TilePromo } from "./tiles";

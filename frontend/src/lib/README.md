@@ -95,6 +95,7 @@ formatting. Provides the building blocks for displaying card data in
 **Types:**
 - `InlineSymbolVariant` — `"white" | "black"` — controls which color variant of a symbol image is used
 - `InlineSymbolSize` — `"text" | "stat" | "chip"` — controls the CSS size class applied to symbol images
+- `CardFinish` — `"foil" | "nonfoil"` — canonical finish values for a card printing
 
 **Symbol rendering:**
 - `inlineSymbolSrc(token: string, variant?: InlineSymbolVariant): string | null` — returns the asset path for a symbol token, or null if unrecognised
@@ -105,11 +106,14 @@ formatting. Provides the building blocks for displaying card data in
 - `applySymbols(text: string): string` — converts `:shortcode:` and `:rb_energy_N:` notation to `{token}` syntax
 - `normalizeCardText(richText: string): string` — strips HTML tags, normalises entities, and applies symbol substitution; use before `renderTokenizedText`
 
+**Card finish normalisation:**
+- `normalizeCardFinish(finish: string | null | undefined): CardFinish` — normalises a raw finish string to `"foil"` or `"nonfoil"`
+
 **Card attribute formatters:**
 - `cardEnergy(card: CardRecord): number | null` — returns the card's energy attribute
 - `formatCostText(card: CardRecord): string | null` — formats the cost attribute as a token string for `renderTokenizedText`; falls back to the energy attribute
 - `formatTypeline(card: CardRecord): string` — formats the full display typeline (supertype + cardtype + sorted tags)
-- `domainChipClass(domains: string[]): string` — returns the Tailwind class string for a domain chip
+- `domainChipClass(domains: string[]): string` — ⚠️ **deprecated** — returns a legacy `card-attr-chip--domain-*` CSS class string; use a local `DOMAIN_CHIP_CLASSES` Tailwind lookup instead for new components
 
 ## Update Triggers
 

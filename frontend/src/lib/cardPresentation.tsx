@@ -212,8 +212,9 @@ export function formatTypeline(card: CardRecord): string {
  * class system (`card-attr-chip--domain-*`). Single-domain cards receive a
  * domain-specific color class; multi-domain cards receive the multicolor class.
  *
- * @deprecated Use a local Tailwind implementation (see `CardMetaChips.tsx`)
- * for new components. This version is kept for existing callers in
+ * @deprecated Use a local `DOMAIN_CHIP_CLASSES` lookup with Tailwind utility
+ * classes for new components (see `QueryBuilderView` or `CardSearchResultsPane`
+ * for the pattern). This version is kept for existing callers in
  * `cardFormat.tsx` and will be removed when that file is retired.
  */
 export function domainChipClass(domains: string[]): string {
