@@ -11,8 +11,8 @@ export type CardSearchResultGroup = {
 };
 
 export const CARD_SEARCH_SORT_OPTIONS: { value: CardSearchSortKey; label: string }[] = [
-  { value: "energy-asc", label: "Energy up" },
-  { value: "energy-desc", label: "Energy down" },
+  { value: "energy-asc", label: "Energy Asc" },
+  { value: "energy-desc", label: "Energy Desc" },
   { value: "name-asc", label: "Name A-Z" },
   { value: "name-desc", label: "Name Z-A" },
   { value: "set", label: "Set order" },
