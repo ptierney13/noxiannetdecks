@@ -32,9 +32,11 @@ export type CardSearchResultsContentProps = {
   onCardClick: (card: CardRecord, group: CardRecord[], finish: CardFinish) => void;
 };
 
-// All four controls share one flex row; they wrap at narrow widths and
-// compact to a single line once the pane is wide enough to fit all four.
-const CONTROL_LAYOUT_CLASSES = "flex flex-wrap items-end gap-3";
+// Controls flex row — dropdowns + checkbox stack wrap at narrow widths.
+const CONTROL_LAYOUT_CLASSES = "flex flex-wrap items-end gap-4";
+
+// Banner padding mirrors the content padding so controls align with card grid.
+const BANNER_PADDING_CLASSES = "px-3 py-4 @[640px]:px-4 @[1024px]:px-5";
 
 // The grid intentionally uses fixed columns, not auto-fill, to match search-plan review rules.
 const RESULTS_GRID_CLASSES =
@@ -45,7 +47,7 @@ const PANE_PADDING_CLASSES = "p-3 @[640px]:p-4 @[1024px]:p-5";
 
 function FieldLabel({ children }: { children: string }) {
   return (
-    <span className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-text-tertiary">
+    <span className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-white">
       {children}
     </span>
   );
@@ -138,13 +140,14 @@ export function CardSearchResultsContent({
   onCardClick,
 }: CardSearchResultsContentProps) {
   return (
-    <section className={`grid gap-4 ${PANE_PADDING_CLASSES}`} aria-label="Card search results">
-      <div className="rounded-[22px] border border-border-default bg-surface-2 p-4">
+    <section aria-label="Card search results">
+      {/* Full-width controls banner — no rounded sub-box, spans edge to edge */}
+      <div className={`bg-surface-2 border-b border-border-subtle ${BANNER_PADDING_CLASSES}`}>
         <div className={CONTROL_LAYOUT_CLASSES}>
           <label className="grid gap-2">
             <FieldLabel>Sort</FieldLabel>
             <select
-              className="min-h-11 rounded-xl border border-border-default bg-surface-inset px-3 text-sm font-bold text-text-primary outline-none focus:border-accent focus:ring-4 focus:ring-focus-ring"
+              className="min-h-11 rounded-xl border border-border-default bg-[rgba(255,255,255,0.12)] px-3 text-sm font-bold text-text-primary outline-none focus:border-accent focus:ring-4 focus:ring-focus-ring"
               value={sort}
               onChange={(event) => onSortChange(event.target.value as CardSearchSortKey)}
             >
@@ -159,7 +162,7 @@ export function CardSearchResultsContent({
           <label className="grid gap-2">
             <FieldLabel>Variants</FieldLabel>
             <select
-              className="min-h-11 rounded-xl border border-border-default bg-surface-inset px-3 text-sm font-bold text-text-primary outline-none focus:border-accent focus:ring-4 focus:ring-focus-ring"
+              className="min-h-11 rounded-xl border border-border-default bg-[rgba(255,255,255,0.12)] px-3 text-sm font-bold text-text-primary outline-none focus:border-accent focus:ring-4 focus:ring-focus-ring"
               value={variantMode}
               onChange={(event) => onVariantModeChange(event.target.value as CardSearchVariantMode)}
             >
@@ -168,28 +171,31 @@ export function CardSearchResultsContent({
             </select>
           </label>
 
-          <label className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border-default bg-surface-inset px-3 text-sm font-bold text-text-secondary">
-            <input
-              type="checkbox"
-              checked={showPrice}
-              onChange={(event) => onShowPriceChange(event.target.checked)}
-            />
-            Show prices
-          </label>
-
-          {variantMode === "unique-cards" ? (
-            <label className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border-default bg-surface-inset px-3 text-sm font-bold text-text-secondary">
+          {/* Checkboxes as plain stacked rows — gap-2 matches label-to-dropdown spacing */}
+          <div className="flex flex-col gap-2">
+            <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-bold text-text-secondary">
               <input
                 type="checkbox"
-                checked={showVariants}
-                onChange={(event) => onShowVariantsChange(event.target.checked)}
+                checked={showPrice}
+                onChange={(event) => onShowPriceChange(event.target.checked)}
               />
-              Show variants
+              Show prices
             </label>
-          ) : null}
+            {variantMode === "unique-cards" ? (
+              <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-bold text-text-secondary">
+                <input
+                  type="checkbox"
+                  checked={showVariants}
+                  onChange={(event) => onShowVariantsChange(event.target.checked)}
+                />
+                Show variants
+              </label>
+            ) : null}
+          </div>
         </div>
       </div>
 
+      <div className={`grid gap-4 ${PANE_PADDING_CLASSES}`}>
       <ResultSummary
         isPending={isPending}
         visibleResultCount={visibleResultCount}
@@ -244,6 +250,7 @@ export function CardSearchResultsContent({
           })}
         </div>
       ) : null}
+      </div>
     </section>
   );
 }

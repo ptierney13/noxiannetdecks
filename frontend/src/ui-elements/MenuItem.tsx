@@ -36,11 +36,11 @@ export function MenuItem({
   const hoverColorClass = selected ? "hover:text-accent-warm" : "hover:text-text-primary";
 
   const className =
-    `rounded-[12px] bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.07)] cursor-pointer ` +
+    `rounded-[12px] bg-[rgba(255,255,255,0.04)] border border-black cursor-pointer ` +
     `${colorClass} ${weightClass} ${decorationClass} ` +
-    `${hoverColorClass} hover:bg-[var(--color-accent-soft)] hover:border-[var(--color-accent)] ` +
-    `hover:shadow-[0_0_0_1px_rgba(197,50,71,0.25),0_0_16px_rgba(197,50,71,0.18)] ` +
-    `transition-[color,background-color,border-color,box-shadow] duration-[120ms] ${variants[variant]}`;
+    `${hoverColorClass} hover:bg-[var(--color-accent-soft)] ` +
+    `hover:shadow-[0_0_0_2px_rgba(197,50,71,0.55),0_0_16px_rgba(197,50,71,0.18)] ` +
+    `transition-[color,background-color,box-shadow] duration-[120ms] ${variants[variant]}`;
 
   if (href !== undefined) {
     return (

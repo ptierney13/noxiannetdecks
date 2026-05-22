@@ -53,7 +53,7 @@ export function CardSearchResultsPane({ query }: CardSearchResultsPaneProps) {
   const visibleResultCount = variantMode === "unique-cards" ? groups.length : cards.length;
 
   return (
-    <div className="@container min-h-[28rem] overflow-hidden rounded-[28px] border border-border-default bg-surface-glass shadow-surface-1">
+    <div className="@container min-h-[28rem]">
       <CardSearchResultsContent
         groups={groups}
         rawResultCount={cards.length}
