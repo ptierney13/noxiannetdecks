@@ -3,8 +3,8 @@ import AppShell from "./AppShell";
 import { HomePage } from "../pages/home";
 import { NotFoundView } from "../pages/NotFoundView";
 import CardSearchView from "../pages/CardSearchView";
-import LearnToSearchView from "../pages/legacy/LearnToSearchView";
-import QueryBuilderView from "../pages/legacy/QueryBuilderView";
+import LearnToSearchView from "../pages/LearnToSearchView";
+import QueryBuilderView from "../pages/QueryBuilderView";
 import CardDetailView from "../pages/legacy/CardDetailView";
 import DeckExplorerView from "../pages/DeckExplorerView";
 import TierListView from "../pages/legacy/TierListView";
@@ -42,9 +42,17 @@ const cardsRoute = createRoute({
   component: () => <CardSearchView />,
 });
 
+const LEARN_TABS = ["visual-guide", "text-guide", "syntax-guide"] as const;
+type LearnTab = (typeof LEARN_TABS)[number];
+
 const cardsLearnToSearchRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "cards/learn-to-search",
+  validateSearch: (search: Record<string, unknown>) => ({
+    mode: LEARN_TABS.includes(search.mode as LearnTab)
+      ? (search.mode as LearnTab)
+      : ("visual-guide" as LearnTab),
+  }),
   component: () => <LearnToSearchView />,
 });
 

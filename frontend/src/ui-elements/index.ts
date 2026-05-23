@@ -1,5 +1,7 @@
 export { QueryChip } from "./QueryChip";
 export { NoxianLogoIcon, SearchIcon, CardsIcon, MenuIcon, ChevronIcon, TradeIcon, SealedIcon } from "./Icon";
+export { SyntaxQueryChip } from "./SyntaxQueryChip";
+export type { SyntaxQueryChipProps } from "./SyntaxQueryChip";
 export { LogoBadge } from "./LogoBadge";
 export { CardSearchInput } from "./CardSearchInput";
 export { ModalShell } from "./ModalShell";

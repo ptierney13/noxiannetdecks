@@ -6,6 +6,7 @@
 // code to this layer.
 
 export { queryClient } from "./queryClient";
+export { queryFeaturesKeys, queryFeaturesQueryOptions } from "./queryFeatures";
 export {
   cardSearchKeys,
   cardSearchQueryOptions,
