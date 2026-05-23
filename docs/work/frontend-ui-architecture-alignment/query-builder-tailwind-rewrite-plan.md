@@ -36,8 +36,8 @@ the implementation mechanism (CSS → Tailwind).
 ### What needs to change
 
 - Every `className="qb-*"` attribute in the builder panel JSX
-- The domain chip `--domain-color` / `--domain-bg` / `--domain-bg-hover` injection
-- The rarity chip `--rarity-color` / `--rarity-bg` injection
+- The domain chip `--domain-color` / `--domain-bg` / `--domain-bg-hover` CSS injection → replaced by rune symbol images via `renderTokenizedText`
+- The rarity chip `--rarity-color` / `--rarity-bg` CSS injection → replaced by gem pip images via `raritySymbolSrc`
 - ~362 lines of CSS to delete from `styles.css`
 - ~75 lines of attribute selectors to delete from `ui-foundation.css`
 
@@ -46,40 +46,84 @@ the implementation mechanism (CSS → Tailwind).
 ### Domain chips
 
 The current approach injects `--domain-color` etc. via `data-domain` attribute
-selectors in `ui-foundation.css`. The migrated approach follows
-`CardMetaChips.tsx` exactly:
+selectors in `ui-foundation.css`. The migrated approach replaces the colored
+dot pip with an inline rune symbol image, reusing the existing
+`renderTokenizedText` infrastructure from `lib/cardPresentation.tsx`.
 
-1. Define a top-of-file `DOMAIN_CHIP_CLASSES` lookup keyed by domain name:
-   ```ts
-   const DOMAIN_CHIP_CLASSES: Record<string, { chip: string; pip: string }> = {
-     Fury:  { chip: "border-[color:var(--domain-fury)] bg-[var(--domain-fury-soft)] hover:bg-[var(--domain-fury-soft-hover)]", pip: "var(--domain-fury)" },
-     Calm:  { chip: "border-[color:var(--domain-calm)] bg-[var(--domain-calm-soft)] hover:bg-[var(--domain-calm-soft-hover)]", pip: "var(--domain-calm)" },
-     Mind:  { chip: "border-[color:var(--domain-mind)] bg-[var(--domain-mind-soft)] hover:bg-[var(--domain-mind-soft-hover)]", pip: "var(--domain-mind)" },
-     Body:  { chip: "border-[color:var(--domain-body)] bg-[var(--domain-body-soft)] hover:bg-[var(--domain-body-soft-hover)]", pip: "var(--domain-body)" },
-     Chaos: { chip: "border-[color:var(--domain-chaos)] bg-[var(--domain-chaos-soft)] hover:bg-[var(--domain-chaos-soft-hover)]", pip: "var(--domain-chaos)" },
-     Order: { chip: "border-[color:var(--domain-order)] bg-[var(--domain-order-soft)] hover:bg-[var(--domain-order-soft-hover)]", pip: "var(--domain-order)" },
-   };
-   ```
-2. The pip `<span>` uses `style={{ background: colors.pip }}` — a
-   per-instance computed value, which is acceptable per `AGENTS.md`.
-3. Delete the `data-domain` attribute selector block from `ui-foundation.css`.
-
-### Rarity chips
-
-Same approach as domain chips:
+Domain → rune token mapping (file-local constant):
 
 ```ts
-const RARITY_CHIP_CLASSES: Record<string, { chip: string; pip: string }> = {
-  Common:    { chip: "border-[color:var(--rarity-common)] bg-[var(--rarity-common-soft)]",    pip: "var(--rarity-common)" },
-  Uncommon:  { chip: "border-[color:var(--rarity-uncommon)] bg-[var(--rarity-uncommon-soft)]", pip: "var(--rarity-uncommon)" },
-  Rare:      { chip: "border-[color:var(--rarity-rare)] bg-[var(--rarity-rare-soft)]",         pip: "var(--rarity-rare)" },
-  Epic:      { chip: "border-[color:var(--rarity-epic)] bg-[var(--rarity-epic-soft)]",         pip: "var(--rarity-epic)" },
-  Showcase:  { chip: "border-[color:var(--rarity-showcase)] bg-[var(--rarity-showcase-soft)]", pip: "var(--rarity-showcase)" },
-  Promo:     { chip: "border-[color:var(--rarity-promo)] bg-[var(--rarity-promo-soft)]",       pip: "var(--rarity-promo)" },
+const DOMAIN_RUNE_TOKEN: Record<string, string> = {
+  Fury:  "{F}",
+  Calm:  "{C}",
+  Mind:  "{M}",
+  Body:  "{B}",
+  Chaos: "{H}",
+  Order: "{O}",
 };
 ```
 
-Delete the `data-rarity` attribute selector block from `ui-foundation.css`.
+Each domain chip renders its pip via:
+
+```tsx
+<span className="w-4 h-4 inline-flex items-center justify-center shrink-0">
+  {renderTokenizedText(DOMAIN_RUNE_TOKEN[domain] ?? "", { size: "chip" })}
+</span>
+```
+
+- No CSS color injection. No `style={{ background: … }}`.
+- The rune image is the existing symbol from `inlineSymbolSrc()` — the same
+  images already used in card body text and `formatCostText`.
+- Delete the `data-domain` attribute selector block from `ui-foundation.css`.
+
+### Rarity chips
+
+Rarity chips use actual extracted gem pip images via `raritySymbolSrc()` from
+`lib/cardPresentation.tsx`. These are real card assets (40–52px PNGs) placed in
+`public/assets/riftbound/symbols/rarity/`.
+
+Each rarity chip renders its pip via:
+
+```tsx
+const pipSrc = raritySymbolSrc(rarity);
+// inside the chip button:
+{pipSrc && (
+  <img
+    src={pipSrc}
+    alt=""
+    aria-hidden="true"
+    className="w-4 h-4 object-contain shrink-0"
+  />
+)}
+```
+
+- No CSS color injection. No `RARITY_CHIP_CLASSES` with `--rarity-*` vars.
+- `raritySymbolSrc` is already exported from `lib/index.ts`.
+- Available rarities: `common`, `uncommon`, `rare`, `epic`, `showcase`, `promo`.
+- Delete the `data-rarity` attribute selector block from `ui-foundation.css`.
+
+### Selected ("on") state for all filter chips
+
+All filter chips — domain, rarity, card type, set, finish, supertype, operator,
+and generic — use the same generic accent highlight when selected. No chip type
+gets domain-specific or rarity-specific highlight colors.
+
+```tsx
+const isOn = selectedValues.includes(value);
+<button
+  className={[
+    "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-sm transition-colors",
+    isOn
+      ? "bg-accent-soft border-accent text-text-primary"
+      : "bg-surface-2 border-border-subtle text-text-secondary hover:bg-surface-3 hover:border-border-default",
+  ].join(" ")}
+>
+```
+
+The accent tokens (`bg-accent-soft`, `border-accent`) come from
+`ui-foundation.css` and are the same ones used by other selected-state patterns
+in the app. Domain and rarity pips appear on both selected and unselected chips
+(they identify the option, not the selection state).
 
 ### Focus rings on inputs / selects
 
@@ -107,8 +151,9 @@ breakpoint modifier) to match the same threshold without adding to `styles.css`.
 Write the new file as a direct Tailwind replacement of the legacy version:
 
 - All `qb-*` class references → Tailwind utility classes
-- `DOMAIN_CHIP_CLASSES` and `RARITY_CHIP_CLASSES` lookups at top of file
-- Pip spans use `style={{ background: … }}` for the per-domain/rarity color
+- `DOMAIN_RUNE_TOKEN` lookup at top of file; domain pips rendered via `renderTokenizedText`
+- Rarity pips rendered via `raritySymbolSrc(rarity)` → `<img>`
+- All chips use generic accent highlight for selected state (no domain/rarity-specific colors)
 - `StatRow` and `TextField` helper components stay file-local (private, not exported)
 - `SearchIcon` stays file-local (private inline SVG, not exported)
 - No logic changes — identical behavior to legacy version
@@ -186,8 +231,8 @@ Story notes:
 | Section title (`qb-section-title`) | Flex row, uppercase, tiny font, `text-text-tertiary` | Direct translation |
 | Hint badge (`qb-hint`) | `px-2 py-0.5 rounded bg-accent-warm-soft border border-accent-warm/25 text-accent-warm text-[0.72rem]` | Matches current visual |
 | Generic chips | Tailwind pill button with toggled state classes | Base chip → conditional `qb-chip--on` classes |
-| Domain chips | `DOMAIN_CHIP_CLASSES` lookup + pip `style` | Follows `CardMetaChips` pattern |
-| Rarity chips | `RARITY_CHIP_CLASSES` lookup + pip `style` | Follows `CardMetaChips` pattern |
+| Domain chips | `DOMAIN_RUNE_TOKEN` lookup + `renderTokenizedText` pip | Reuses existing rune symbol images; no CSS color injection |
+| Rarity chips | `raritySymbolSrc(rarity)` → `<img>` pip | Extracted gem assets; no CSS color injection |
 | Set code badge | `font-mono text-[0.68rem] font-bold px-1.5 bg-surface-1 rounded text-text-tertiary` | Direct translation |
 | Stats grid | `grid grid-cols-2 max-[700px]:grid-cols-1 gap-2.5` | Keeps 700px threshold |
 | Stat row | Flex row inside a surface card | Direct translation |
@@ -197,7 +242,18 @@ Story notes:
 
 ## New Shared Components
 
-None. All internal helpers (`StatRow`, `TextField`, `SearchIcon`) are too
+### `SyntaxQueryChip` (from `ui-elements/`)
+
+The built query display box should use `SyntaxQueryChip` from `ui-elements/`
+to render the live query string with syntax highlighting (fields, operators,
+values, negation). This component is also used by the LTS Syntax Guide.
+
+`SyntaxQueryChip` is built as part of whichever page (QB or LTS) is
+implemented first and then imported by the other. If QB is implemented first,
+build `SyntaxQueryChip` as a pre-step (Unit 0) before Unit 1. See the LTS plan
+for the full component spec.
+
+All other internal helpers (`StatRow`, `TextField`, `SearchIcon`) are too
 QB-specific to extract. They remain file-local unexported functions.
 
 ## styles.css Drawdown
@@ -212,8 +268,9 @@ After Unit 3:
 2. `npm run build-storybook -w @noxiannet/frontend` — must pass
 3. `npm run test -w @noxiannet/frontend` — pre-existing failures are acceptable; no new failures
 4. Browser smoke test: navigate to `/query-builder`, confirm all chips toggle
-   correctly, domain/rarity pip colors render, built-query box updates live,
-   live preview pane shows results, "Search with this query" navigates to `/cards`
+   correctly, domain rune symbols and rarity gem pips render, chips show generic
+   accent highlight when selected, built-query box updates live, live preview
+   pane shows results, "Search with this query" navigates to `/cards`
 
 ## Completion Criteria
 
