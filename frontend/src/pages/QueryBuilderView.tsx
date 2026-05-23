@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { CardSearchResultsPane } from "../features";
 import { SyntaxQueryChip } from "../ui-elements";
@@ -99,32 +99,67 @@ function SearchIcon() {
   );
 }
 
+const QB_TOKENS = {
+  layout: "mx-auto grid w-full max-w-[1720px] gap-7 px-4 pb-10 pt-3 lg:grid-cols-[minmax(360px,820px)_minmax(0,1fr)]",
+  builderShell: "flex min-w-0 flex-col gap-4 rounded-2xl border border-border-subtle bg-[linear-gradient(180deg,rgba(16,20,30,0.72),rgba(7,9,14,0.46))] p-3 shadow-[0_18px_48px_rgba(0,0,0,0.24)] sm:p-4",
+  queryCard: "rounded-xl border border-border-default bg-[linear-gradient(180deg,rgba(25,30,42,0.94),rgba(12,15,23,0.96))] px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_28px_rgba(0,0,0,0.24)]",
+  sectionBase: "flex flex-col gap-4 rounded-xl border p-4 transition-[background,border-color,box-shadow] duration-150",
+  sectionPrimary: "border-border-default bg-[linear-gradient(180deg,rgba(25,30,42,0.92),rgba(12,15,23,0.94))] shadow-[inset_0_1px_0_rgba(255,255,255,0.045),0_14px_34px_rgba(0,0,0,0.22)]",
+  sectionSecondary: "border-border-subtle bg-[linear-gradient(180deg,rgba(17,21,31,0.86),rgba(10,12,18,0.9))] shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]",
+  sectionHeader: "flex items-center gap-3 border-b border-border-subtle/70 pb-3",
+  sectionTitlePrimary: "text-[0.78rem] font-black uppercase tracking-[0.14em] text-text-primary leading-none",
+  sectionTitleSecondary: "text-[0.74rem] font-extrabold uppercase tracking-[0.14em] text-text-secondary leading-none",
+  sectionHint: "rounded-md border border-border-subtle bg-surface-inset px-1.5 py-0.5 font-mono text-[0.66rem] text-accent-warm leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]",
+  subgroupLabel: "mb-2 text-[0.7rem] font-bold uppercase tracking-[0.13em] text-text-tertiary",
+  helperText: "text-xs leading-relaxed text-text-tertiary/78",
+  chipBase: "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-[6px] text-sm font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-[background,border-color,box-shadow,transform,color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
+  chipOff: "border-border-subtle bg-[linear-gradient(180deg,rgba(25,30,42,0.94),rgba(13,16,24,0.96))] text-text-secondary hover:-translate-y-px hover:border-border-strong hover:bg-[linear-gradient(180deg,rgba(35,41,56,0.96),rgba(17,21,31,0.98))] hover:text-text-primary hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.055),0_8px_20px_rgba(0,0,0,0.24)]",
+  chipOn: "border-border-accent bg-[linear-gradient(180deg,rgba(82,28,39,0.76),rgba(33,12,19,0.94))] text-text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_0_1px_rgba(197,50,71,0.22),0_10px_24px_rgba(0,0,0,0.28)] hover:-translate-y-px hover:border-accent hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_0_0_1px_rgba(197,50,71,0.28),0_12px_28px_rgba(0,0,0,0.32)]",
+  fieldInput: "h-9 w-full rounded-lg border border-border-default bg-[linear-gradient(180deg,rgba(11,14,21,0.94),rgba(8,10,16,0.96))] px-3 text-sm text-text-primary shadow-[inset_0_1px_2px_rgba(0,0,0,0.32)] placeholder:text-text-tertiary/50 transition-[background,border-color,box-shadow] duration-150 hover:border-border-strong focus:outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-focus-ring)]",
+  compactField: "h-8 rounded-md border border-border-default bg-[linear-gradient(180deg,rgba(11,14,21,0.94),rgba(8,10,16,0.96))] font-mono text-sm text-text-primary shadow-[inset_0_1px_2px_rgba(0,0,0,0.32)] transition-[border-color,box-shadow] duration-150 focus:outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-focus-ring)]",
+  statRow: "flex items-center gap-2 rounded-lg border border-border-subtle bg-[linear-gradient(180deg,rgba(20,25,36,0.9),rgba(10,13,20,0.94))] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-[background,border-color,box-shadow] duration-150 hover:border-border-default hover:bg-[linear-gradient(180deg,rgba(27,33,45,0.95),rgba(12,15,23,0.96))] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.055),0_8px_20px_rgba(0,0,0,0.18)]",
+  actionButton: "inline-flex items-center gap-2 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,var(--color-accent-hover),var(--color-accent))] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(197,50,71,0.22),inset_0_1px_0_rgba(255,255,255,0.12)] transition-[box-shadow,transform,filter] duration-150 hover:-translate-y-px hover:shadow-[0_14px_30px_rgba(197,50,71,0.28),inset_0_1px_0_rgba(255,255,255,0.14)] hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
+  previewFrame: "overflow-hidden rounded-2xl border border-border-default bg-[linear-gradient(180deg,rgba(18,22,32,0.96),rgba(7,9,14,0.98))] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_22px_52px_rgba(0,0,0,0.34)]",
+} as const;
+
 type SectionProps = {
   title: string;
   hint?: string;
-  children: React.ReactNode;
+  emphasis?: "primary" | "secondary";
+  children: ReactNode;
 };
 
-function Section({ title, hint, children }: SectionProps) {
+function Section({ title, hint, emphasis = "secondary", children }: SectionProps) {
+  const isPrimary = emphasis === "primary";
+
   return (
-    <div className="flex flex-col gap-3 pt-5 border-t border-border-subtle">
-      <div className="flex items-center gap-2.5">
-        <h2 className="text-xs font-bold uppercase tracking-[0.13em] text-text-tertiary leading-none">
+    <section className={[QB_TOKENS.sectionBase, isPrimary ? QB_TOKENS.sectionPrimary : QB_TOKENS.sectionSecondary].join(" ")}>
+      <div className={QB_TOKENS.sectionHeader}>
+        <span
+          className={[
+            "h-7 w-1 rounded-full",
+            isPrimary ? "bg-accent shadow-[0_0_16px_rgba(197,50,71,0.18)]" : "bg-border-accent/70",
+          ].join(" ")}
+          aria-hidden="true"
+        />
+        <h2 className={isPrimary ? QB_TOKENS.sectionTitlePrimary : QB_TOKENS.sectionTitleSecondary}>
           {title}
         </h2>
         {hint && (
-          <code className="rounded px-1.5 py-0.5 bg-surface-1 border border-border-subtle font-mono text-[0.66rem] text-accent-warm leading-none">
+          <code className={QB_TOKENS.sectionHint}>
             {hint}
           </code>
         )}
       </div>
-      {children}
-    </div>
+      <div className={isPrimary ? "flex flex-col gap-4" : "flex flex-col gap-3.5"}>
+        {children}
+      </div>
+    </section>
   );
 }
 
 type ChipProps = {
-  label: React.ReactNode;
+  label: ReactNode;
   isOn: boolean;
   onToggle: () => void;
 };
@@ -134,10 +169,8 @@ function Chip({ label, isOn, onToggle }: ChipProps) {
     <button
       type="button"
       className={[
-        "inline-flex items-center gap-1.5 px-2.5 py-[5px] rounded-full border text-sm font-medium transition-[background-color,border-color,color] duration-[120ms]",
-        isOn
-          ? "bg-accent-soft border-accent text-text-primary shadow-[0_0_0_1px_rgba(197,50,71,0.3)]"
-          : "bg-surface-2 border-border-subtle text-text-secondary hover:bg-accent-soft/40 hover:border-border-default hover:text-text-primary",
+        QB_TOKENS.chipBase,
+        isOn ? QB_TOKENS.chipOn : QB_TOKENS.chipOff,
       ].join(" ")}
       onClick={onToggle}
       aria-pressed={isOn}
@@ -158,16 +191,16 @@ type StatRowProps = {
 
 function StatRow({ label, hint, op, onOpChange, val, onValChange }: StatRowProps) {
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-border-subtle bg-surface-2 px-3 py-2.5">
+    <div className={QB_TOKENS.statRow}>
       <div className="flex-1 min-w-0">
-        <span className="text-sm font-medium text-text-primary">{label}</span>
+        <span className="text-sm font-semibold text-text-primary">{label}</span>
         <code className="ml-2 text-[0.64rem] font-mono text-text-tertiary">{hint}</code>
       </div>
       <div className="flex items-center gap-1.5 shrink-0">
         <select
           value={op}
           onChange={(e) => onOpChange(e.target.value)}
-          className="h-8 rounded-md border border-border-default bg-surface-1 px-1.5 font-mono text-sm text-text-secondary focus:outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-focus-ring)]"
+          className={`${QB_TOKENS.compactField} px-1.5 text-text-secondary`}
           aria-label={`${label} operator`}
         >
           {OPERATORS.map((o) => (
@@ -176,7 +209,7 @@ function StatRow({ label, hint, op, onOpChange, val, onValChange }: StatRowProps
         </select>
         <input
           type="text"
-          className="h-8 w-20 rounded-md border border-border-default bg-surface-1 px-2 font-mono text-sm text-text-primary placeholder:text-text-tertiary/50 focus:outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-focus-ring)]"
+          className={`${QB_TOKENS.compactField} w-20 px-2 placeholder:text-text-tertiary/50`}
           value={val}
           onChange={(e) => onValChange(e.target.value)}
           placeholder="—"
@@ -205,7 +238,7 @@ function TextField({ label, hint, placeholder, value, onChange }: TextFieldProps
       <input
         id={id}
         type="text"
-        className="h-9 w-full rounded-md border border-border-default bg-surface-2 px-3 text-sm text-text-primary placeholder:text-text-tertiary/50 focus:outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-focus-ring)]"
+        className={QB_TOKENS.fieldInput}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
@@ -290,14 +323,14 @@ export default function QueryBuilderView() {
   const debouncedBuiltQuery = useDebounce(builtQuery, 180);
 
   return (
-    <div className="mx-auto grid w-full max-w-[1720px] gap-6 px-4 pb-8 pt-2 lg:grid-cols-[minmax(360px,820px)_minmax(0,1fr)]">
+    <div className={QB_TOKENS.layout}>
 
       {/* ── Builder panel ── */}
-      <div className="flex flex-col gap-6 min-w-0" aria-labelledby="qb-heading">
+      <div className={QB_TOKENS.builderShell} aria-labelledby="qb-heading">
 
         {/* Live query display */}
-        <div className="rounded-xl border border-border-default bg-surface-2 px-4 py-3.5 shadow-surface-1">
-          <h1 id="qb-heading" className="mb-2 text-[0.72rem] font-black uppercase tracking-[0.16em] text-text-primary">
+        <div className={QB_TOKENS.queryCard}>
+          <h1 id="qb-heading" className="mb-2.5 text-[0.74rem] font-black uppercase tracking-[0.16em] text-text-primary">
             Your Query
           </h1>
           <output
@@ -313,12 +346,12 @@ export default function QueryBuilderView() {
         </div>
 
         {/* ── Card Type & Tags ── */}
-        <Section title="Card Type & Tags" hint="ct:Unit · u:Champion · tag:Dragon">
+        <Section title="Card Type & Tags" hint="ct:Unit · u:Champion · tag:Dragon" emphasis="primary">
           <div className="flex flex-col gap-2.5">
             <TextField label="Typeline" hint="t:Champion" placeholder="e.g. Champion Unit, Dragon" value={typelineText} onChange={setTypelineText} />
           </div>
           <div>
-            <p className="mb-1.5 text-[0.7rem] font-semibold uppercase tracking-wider text-text-tertiary">Card Type</p>
+            <p className={QB_TOKENS.subgroupLabel}>Card Type</p>
             <div className="flex flex-wrap gap-2">
               {CARD_TYPES.map((type) => (
                 <Chip key={type} isOn={selectedTypes.has(type)} onToggle={() => setSelectedTypes(toggle(selectedTypes, type))} label={type} />
@@ -326,7 +359,7 @@ export default function QueryBuilderView() {
             </div>
           </div>
           <div>
-            <p className="mb-1.5 text-[0.7rem] font-semibold uppercase tracking-wider text-text-tertiary">Supertype</p>
+            <p className={QB_TOKENS.subgroupLabel}>Supertype</p>
             <div className="flex flex-wrap gap-2">
               {SUPERTYPES.map((st) => (
                 <Chip key={st} isOn={selectedSupertypes.has(st)} onToggle={() => setSelectedSupertypes(toggle(selectedSupertypes, st))} label={st} />
@@ -336,13 +369,13 @@ export default function QueryBuilderView() {
           <div className="flex flex-col gap-2">
             <TextField label="Tag" hint="tag:Dragon" placeholder="e.g. Dragon, Follower, Celestial" value={tagText} onChange={setTagText} />
           </div>
-          <p className="text-xs text-text-tertiary/70">
+          <p className={QB_TOKENS.helperText}>
             Tags are subtypes like Dragon or Follower. Supertypes are Champion, Signature, etc.
           </p>
         </Section>
 
         {/* ── Domain ── */}
-        <Section title="Domain" hint="d:Fury">
+        <Section title="Domain" hint="d:Fury" emphasis="primary">
           <div className="flex flex-wrap gap-2">
             {DOMAIN_ORDER.map((domain) => {
               const rune = DOMAIN_RUNE[domain] ?? "";
@@ -412,7 +445,7 @@ export default function QueryBuilderView() {
                 onToggle={() => setSelectedSets(toggle(selectedSets, id))}
                 label={
                   <>
-                    <span className="font-mono text-[0.68rem] font-bold px-1.5 py-px bg-surface-1 rounded text-text-tertiary leading-none">
+                    <span className="rounded-md border border-border-subtle bg-surface-inset px-1.5 py-px font-mono text-[0.68rem] font-bold leading-none text-text-tertiary">
                       {id}
                     </span>
                     {label}
@@ -424,7 +457,7 @@ export default function QueryBuilderView() {
         </Section>
 
         {/* ── Stats ── */}
-        <Section title="Stats">
+        <Section title="Stats" emphasis="primary">
           <div className="grid grid-cols-2 max-[700px]:grid-cols-1 gap-2.5">
             <StatRow label="Energy" hint="e>=3"       op={energyOp} onOpChange={setEnergyOp} val={energyVal} onValChange={setEnergyVal} />
             <StatRow label="Might"  hint="m>=2"       op={mightOp}  onOpChange={setMightOp}  val={mightVal}  onValChange={setMightVal}  />
@@ -441,7 +474,7 @@ export default function QueryBuilderView() {
             <TextField label="Keyword"    hint="kw:Action"           placeholder="e.g. Action, Resolve"         value={keywordText} onChange={setKeywordText} />
             <TextField label="Artist"     hint='a:"Six More Vodka"'  placeholder="e.g. Six More Vodka"          value={artistText}  onChange={setArtistText}  />
           </div>
-          <p className="text-xs text-text-tertiary/70">
+          <p className={QB_TOKENS.helperText}>
             Keywords are mechanics like Action, Resolve, or Allegiance. Use quotes around multi-word values.
           </p>
         </Section>
@@ -459,7 +492,7 @@ export default function QueryBuilderView() {
         <div className="pt-1">
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-[background-color,box-shadow] duration-[120ms] hover:bg-accent-hover hover:shadow-[0_0_16px_rgba(197,50,71,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
+            className={QB_TOKENS.actionButton}
             onClick={handleSearch}
           >
             <SearchIcon />
@@ -470,7 +503,9 @@ export default function QueryBuilderView() {
 
       {/* ── Live preview aside ── */}
       <aside className="min-w-0 lg:sticky lg:top-[calc(var(--site-header-height)+1rem)] lg:self-start">
-        <CardSearchResultsPane query={debouncedBuiltQuery} />
+        <div className={QB_TOKENS.previewFrame}>
+          <CardSearchResultsPane query={debouncedBuiltQuery} />
+        </div>
       </aside>
     </div>
   );
