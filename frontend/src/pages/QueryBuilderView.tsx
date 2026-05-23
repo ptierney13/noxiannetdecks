@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { CardSearchResultsPane } from "../features";
 import { SyntaxQueryChip } from "../ui-elements";
@@ -34,6 +34,42 @@ const DOMAIN_RUNE: Record<string, string> = {
   Chaos: "{H}",
   Order: "{O}",
 };
+
+type RarityPipGeometry = {
+  width: number;
+  height: number;
+  contentWidth: number;
+  contentHeight: number;
+  minX: number;
+  minY: number;
+};
+
+const RARITY_PIP_GEOMETRY: Record<(typeof RARITIES)[number], RarityPipGeometry> = {
+  Common:   { width: 40, height: 40, contentWidth: 22, contentHeight: 22, minX: 9,  minY: 9  },
+  Uncommon: { width: 36, height: 40, contentWidth: 22, contentHeight: 18, minX: 7,  minY: 9  },
+  Rare:     { width: 36, height: 36, contentWidth: 22, contentHeight: 21, minX: 7,  minY: 3  },
+  Epic:     { width: 52, height: 52, contentWidth: 22, contentHeight: 20, minX: 15, minY: 15 },
+  Showcase: { width: 22, height: 24, contentWidth: 22, contentHeight: 24, minX: 0,  minY: 0  },
+  Promo:    { width: 86, height: 72, contentWidth: 82, contentHeight: 55, minX: 2,  minY: 3  },
+};
+
+function rarityPipImageStyle(rarity: (typeof RARITIES)[number]): CSSProperties {
+  const geometry = RARITY_PIP_GEOMETRY[rarity];
+  const wrapperWidth = rarity === "Promo" ? 20 : 16;
+  const wrapperHeight = 16;
+  const scale = rarity === "Promo"
+    ? 12 / geometry.contentHeight
+    : 12 / Math.max(geometry.contentWidth, geometry.contentHeight);
+  const contentWidth = geometry.contentWidth * scale;
+  const contentHeight = geometry.contentHeight * scale;
+
+  return {
+    width: `${geometry.width * scale}px`,
+    height: `${geometry.height * scale}px`,
+    left: `${(wrapperWidth - contentWidth) / 2 - geometry.minX * scale}px`,
+    top: `${(wrapperHeight - contentHeight) / 2 - geometry.minY * scale}px`,
+  };
+}
 
 // ── Query assembly helpers ────────────────────────────────────────────────────
 
@@ -259,30 +295,19 @@ export default function QueryBuilderView() {
       {/* ── Builder panel ── */}
       <div className="flex flex-col gap-6 min-w-0" aria-labelledby="qb-heading">
 
-        {/* Header */}
-        <div>
-          <p className="eyebrow">Cards</p>
-          <h1 id="qb-heading" className="mt-0.5 text-[1.75rem] font-bold tracking-tight text-text-primary leading-tight">
-            Query Builder
-          </h1>
-          <p className="mt-1.5 text-sm text-text-secondary leading-relaxed max-w-prose">
-            Click options to build a search query. Multiple selections within a group combine with OR — combine groups to narrow with AND.
-          </p>
-        </div>
-
         {/* Live query display */}
-        <div className="rounded-xl border border-border-default bg-surface-2 px-4 py-3.5">
-          <p className="mb-2 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-text-tertiary">
-            Built Query
-          </p>
+        <div className="rounded-xl border border-border-default bg-surface-2 px-4 py-3.5 shadow-surface-1">
+          <h1 id="qb-heading" className="mb-2 text-[0.72rem] font-black uppercase tracking-[0.16em] text-text-primary">
+            Your Query
+          </h1>
           <output
             className="block min-h-[1.5rem]"
             aria-live="polite"
-            aria-label="Built query"
+            aria-label="Your query"
           >
             {builtQuery
               ? <SyntaxQueryChip query={builtQuery} />
-              : <span className="text-sm italic text-text-tertiary/50">Make a selection below to build your query</span>
+              : <span className="text-sm italic text-text-secondary">Make a selection below to build your query</span>
             }
           </output>
         </div>
@@ -353,7 +378,20 @@ export default function QueryBuilderView() {
                   label={
                     <>
                       {pipSrc && (
-                        <img src={pipSrc} alt="" aria-hidden="true" className="w-4 h-4 object-contain shrink-0" />
+                        <span
+                          className={[
+                            "relative h-4 shrink-0 overflow-visible",
+                            rarity === "Promo" ? "w-5" : "w-4",
+                          ].join(" ")}
+                          aria-hidden="true"
+                        >
+                          <img
+                            src={pipSrc}
+                            alt=""
+                            className="absolute max-w-none object-contain"
+                            style={rarityPipImageStyle(rarity)}
+                          />
+                        </span>
                       )}
                       {rarity}
                     </>
@@ -432,10 +470,6 @@ export default function QueryBuilderView() {
 
       {/* ── Live preview aside ── */}
       <aside className="min-w-0 lg:sticky lg:top-[calc(var(--site-header-height)+1rem)] lg:self-start">
-        <div className="mb-3 flex flex-col gap-0.5">
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-accent-warm">Live Preview</p>
-          <p className="text-sm text-text-tertiary">Results update from the generated query after a short debounce.</p>
-        </div>
         <CardSearchResultsPane query={debouncedBuiltQuery} />
       </aside>
     </div>
