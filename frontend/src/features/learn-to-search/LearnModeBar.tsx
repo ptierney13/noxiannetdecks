@@ -48,12 +48,12 @@ export function LearnModeBar({ active, onChange }: LearnModeBarProps) {
             aria-selected={isActive}
             tabIndex={isActive ? 0 : -1}
             className={[
-              "min-h-[44px] px-[0.95rem] inline-flex items-center rounded-[12px] border border-black text-sm cursor-pointer",
-              "transition-[color,background-color,box-shadow] duration-[120ms]",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
+              "min-h-[44px] px-[0.95rem] inline-flex items-center rounded-xl border text-sm font-bold cursor-pointer",
+              "transition-[color,background-color,border-color] duration-[120ms]",
+              "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--color-focus-ring)]",
               isActive
-                ? "bg-[rgba(255,255,255,0.04)] text-accent-warm font-bold underline underline-offset-[3px] hover:text-accent-warm hover:bg-accent-soft hover:shadow-[0_0_0_2px_rgba(197,50,71,0.55),0_0_16px_rgba(197,50,71,0.18)]"
-                : "bg-[rgba(255,255,255,0.04)] text-text-secondary font-semibold no-underline hover:text-text-primary hover:bg-accent-soft hover:shadow-[0_0_0_2px_rgba(197,50,71,0.55),0_0_16px_rgba(197,50,71,0.18)]",
+                ? "bg-accent border-accent text-white"
+                : "border-border-default bg-[rgba(255,255,255,0.12)] text-text-primary hover:bg-[var(--color-accent-soft)] hover:border-[var(--color-accent)]",
             ].join(" ")}
             onClick={() => onChange(value)}
             onKeyDown={(e) => handleKeyDown(e, i)}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ModalShell } from "../../ui-elements";
 import { GuideDetailCard, type LtsDetailItem } from "./GuideDetailCard";
 import { GuideDetailStream } from "./GuideDetailStream";
@@ -7,7 +7,7 @@ import { GuideDetailStream } from "./GuideDetailStream";
 const LARGE_BREAKPOINT_PX = 1024;
 
 type ResponsiveGuideDetailsProps = {
-  children: (onSelect: (item: LtsDetailItem) => void) => React.ReactNode;
+  children: (onSelect: (item: LtsDetailItem) => void, selectedQueries: ReadonlySet<string>) => React.ReactNode;
   onAppend: (text: string) => void;
 };
 
@@ -44,24 +44,35 @@ export function ResponsiveGuideDetails({ children, onAppend }: ResponsiveGuideDe
   }, []);
 
   const handleSelect = useCallback((item: LtsDetailItem) => {
+    const key = item.query ?? item.label;
     if (isLarge) {
       setActiveLarge((prev) => {
-        const filtered = prev.filter((x) => x.label !== item.label || x.category !== item.category);
-        return [item, ...filtered];
+        const alreadyActive = prev.some((x) => (x.query ?? x.label) === key);
+        if (alreadyActive) return prev.filter((x) => (x.query ?? x.label) !== key);
+        return [item, ...prev];
       });
     } else {
-      setActiveSmall(item);
-      // promote to single-item large list for when viewport grows back
-      setActiveLarge([item]);
-      madeSmallSelection.current = true;
+      const alreadyActive = (activeSmall?.query ?? activeSmall?.label) === key;
+      if (alreadyActive) {
+        setActiveSmall(null);
+        madeSmallSelection.current = false;
+      } else {
+        setActiveSmall(item);
+        setActiveLarge([item]);
+        madeSmallSelection.current = true;
+      }
     }
-  }, [isLarge]);
+  }, [isLarge, activeSmall]);
 
   const handleRemove = useCallback((item: LtsDetailItem) => {
-    setActiveLarge((prev) =>
-      prev.filter((x) => x.label !== item.label || x.category !== item.category)
-    );
+    const key = item.query ?? item.label;
+    setActiveLarge((prev) => prev.filter((x) => (x.query ?? x.label) !== key));
   }, []);
+
+  const selectedQueries = useMemo(
+    () => new Set(activeLarge.map((x) => x.query ?? x.label)),
+    [activeLarge]
+  );
 
   const closeSmall = useCallback(() => {
     setActiveSmall(null);
@@ -71,7 +82,7 @@ export function ResponsiveGuideDetails({ children, onAppend }: ResponsiveGuideDe
   if (isLarge) {
     return (
       <div className="grid grid-cols-2 gap-6 items-start">
-        <div>{children(handleSelect)}</div>
+        <div>{children(handleSelect, selectedQueries)}</div>
         <div className="sticky top-[calc(var(--site-header-height)+1rem)] self-start">
           <GuideDetailStream
             items={activeLarge}
@@ -83,12 +94,22 @@ export function ResponsiveGuideDetails({ children, onAppend }: ResponsiveGuideDe
     );
   }
 
+  // In small layout only one item can be selected at a time; build a single-item set.
+  const smallSelected = new Set(
+    activeSmall ? [activeSmall.query ?? activeSmall.label] : []
+  );
+
   return (
     <div>
-      {children(handleSelect)}
+      {children(handleSelect, smallSelected)}
       {activeSmall && (
-        <ModalShell label={activeSmall.label} onClose={closeSmall}>
-          <div className="p-6">
+        <ModalShell
+          label={activeSmall.label}
+          onClose={closeSmall}
+          panelClassName="border-0 bg-transparent shadow-none"
+          showCloseButton={false}
+        >
+          <div className="p-0">
             <GuideDetailCard item={activeSmall} onAppend={onAppend} onRemove={closeSmall} />
           </div>
         </ModalShell>

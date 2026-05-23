@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { LtsDetailItem } from "./GuideDetailCard";
 
 type ZoneId =
@@ -37,10 +36,13 @@ const CARD_MIGHT  = 5;
 
 type VisualCardGuideProps = {
   onSelect: (item: LtsDetailItem) => void;
+  selectedQueries: ReadonlySet<string>;
 };
 
-export function VisualCardGuide({ onSelect }: VisualCardGuideProps) {
-  const [active, setActive] = useState<ZoneId | null>(null);
+export function VisualCardGuide({ onSelect, selectedQueries }: VisualCardGuideProps) {
+  function isActive(id: ZoneId) {
+    return selectedQueries.has(ZONES[id].query ?? ZONES[id].label);
+  }
 
   function zoneClass(id: ZoneId, extra: string) {
     const base = [
@@ -48,7 +50,7 @@ export function VisualCardGuide({ onSelect }: VisualCardGuideProps) {
       "relative cursor-pointer rounded transition-[background-color,box-shadow,color] duration-[120ms]",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
     ];
-    if (active === id) {
+    if (isActive(id)) {
       base.push("bg-accent-soft/80 shadow-[0_0_0_2px_rgba(197,50,71,0.6)] text-text-primary");
     } else {
       base.push("hover:bg-accent-soft/40 hover:shadow-[0_0_0_1px_rgba(197,50,71,0.35)] hover:text-text-primary");
@@ -60,39 +62,37 @@ export function VisualCardGuide({ onSelect }: VisualCardGuideProps) {
     return {
       onClick(e: React.MouseEvent) {
         e.stopPropagation();
-        const wasActive = active === id;
-        setActive(wasActive ? null : id);
-        if (!wasActive) onSelect(ZONES[id]);
+        onSelect(ZONES[id]);
       },
     };
   }
 
   return (
-    <div className="flex flex-col gap-3" onClick={() => setActive(null)}>
+    <div className="flex flex-col gap-3">
       <p className="text-sm text-text-secondary">Tap any element to learn how to search for it.</p>
 
       <div
-        className="w-full max-w-[360px] mx-auto rounded-2xl border border-border-strong bg-surface-2 overflow-hidden shadow-lg select-none"
+        className="w-full rounded-2xl border border-border-strong bg-surface-2 overflow-hidden shadow-lg select-none"
         role="group"
         aria-label="Interactive card diagram — tap any element for its query"
       >
         {/* ── Header: Cost · Energy · Power / Might ── */}
         <div className="grid grid-cols-[1fr_auto] gap-0 border-b border-border-subtle">
           <div className="flex items-stretch divide-x divide-border-subtle">
-            <button className={zoneClass("cost",   "flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 text-xs")} {...zoneHandlers("cost")}   aria-pressed={active === "cost"}>
+            <button className={zoneClass("cost",   "flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 text-xs")} {...zoneHandlers("cost")}   aria-pressed={isActive("cost")}>
               <span className="font-bold uppercase tracking-wide text-text-tertiary text-[0.6rem]">Cost</span>
               <span className="font-mono font-semibold text-text-primary">{CARD_COST}</span>
             </button>
-            <button className={zoneClass("energy", "flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 text-xs")} {...zoneHandlers("energy")} aria-pressed={active === "energy"}>
+            <button className={zoneClass("energy", "flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 text-xs")} {...zoneHandlers("energy")} aria-pressed={isActive("energy")}>
               <span className="font-bold uppercase tracking-wide text-text-tertiary text-[0.6rem]">Energy</span>
               <span className="font-semibold text-text-primary text-base">{CARD_ENERGY}</span>
             </button>
-            <button className={zoneClass("power",  "flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 text-xs")} {...zoneHandlers("power")}  aria-pressed={active === "power"}>
+            <button className={zoneClass("power",  "flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 text-xs")} {...zoneHandlers("power")}  aria-pressed={isActive("power")}>
               <span className="font-bold uppercase tracking-wide text-text-tertiary text-[0.6rem]">Power</span>
               <span className="font-semibold text-text-primary text-base">{CARD_POWER}</span>
             </button>
           </div>
-          <button className={zoneClass("might", "flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 text-xs border-l border-border-subtle")} {...zoneHandlers("might")} aria-pressed={active === "might"}>
+          <button className={zoneClass("might", "flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 text-xs border-l border-border-subtle")} {...zoneHandlers("might")} aria-pressed={isActive("might")}>
             <span className="font-bold uppercase tracking-wide text-text-tertiary text-[0.6rem]">Might</span>
             <span className="font-semibold text-text-primary text-base">{CARD_MIGHT}</span>
           </button>
@@ -112,7 +112,7 @@ export function VisualCardGuide({ onSelect }: VisualCardGuideProps) {
         <button
           className={zoneClass("name", "block w-full px-4 py-2.5 text-left text-base font-bold text-text-primary border-t border-border-subtle")}
           {...zoneHandlers("name")}
-          aria-pressed={active === "name"}
+          aria-pressed={isActive("name")}
         >
           Blitzcrank – Impassive
         </button>
@@ -122,7 +122,7 @@ export function VisualCardGuide({ onSelect }: VisualCardGuideProps) {
           <button
             className={zoneClass("typeline", "block w-full px-4 py-1.5 text-left text-[0.68rem] font-bold uppercase tracking-widest text-text-tertiary")}
             {...zoneHandlers("typeline")}
-            aria-pressed={active === "typeline"}
+            aria-pressed={isActive("typeline")}
           >
             Type line
           </button>
@@ -133,7 +133,7 @@ export function VisualCardGuide({ onSelect }: VisualCardGuideProps) {
                 <button
                   className={zoneClass(id, "px-2 py-0.5 rounded text-sm font-medium text-text-secondary")}
                   {...zoneHandlers(id)}
-                  aria-pressed={active === id}
+                  aria-pressed={isActive(id)}
                 >
                   {id === "supertype" ? "Champion" : id === "cardtype" ? "Unit" : id === "tag-blitzcrank" ? "Blitzcrank" : id === "tag-zaun" ? "Zaun" : "Mech"}
                 </button>
@@ -147,7 +147,7 @@ export function VisualCardGuide({ onSelect }: VisualCardGuideProps) {
           <button
             className={zoneClass("text", "block w-full px-4 py-1.5 text-left text-[0.68rem] font-bold uppercase tracking-widest text-text-tertiary")}
             {...zoneHandlers("text")}
-            aria-pressed={active === "text"}
+            aria-pressed={isActive("text")}
           >
             Rules text
           </button>
@@ -155,7 +155,7 @@ export function VisualCardGuide({ onSelect }: VisualCardGuideProps) {
             <button
               className={zoneClass("keyword", "inline px-1 font-semibold text-text-primary rounded")}
               {...zoneHandlers("keyword")}
-              aria-pressed={active === "keyword"}
+              aria-pressed={isActive("keyword")}
             >
               [Tank]
             </button>
@@ -166,11 +166,11 @@ export function VisualCardGuide({ onSelect }: VisualCardGuideProps) {
         {/* ── Footer ── */}
         <div className="border-t border-border-subtle px-4 py-2 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <button className={zoneClass("set",    "px-2 py-0.5 font-mono text-xs font-bold")} {...zoneHandlers("set")}    aria-pressed={active === "set"}>OGN</button>
-            <button className={zoneClass("number", "px-2 py-0.5 font-mono text-xs")}           {...zoneHandlers("number")} aria-pressed={active === "number"}>067/298</button>
+            <button className={zoneClass("set",    "px-2 py-0.5 font-mono text-xs font-bold")} {...zoneHandlers("set")}    aria-pressed={isActive("set")}>OGN</button>
+            <button className={zoneClass("number", "px-2 py-0.5 font-mono text-xs")}           {...zoneHandlers("number")} aria-pressed={isActive("number")}>067/298</button>
           </div>
-          <button className={zoneClass("rarity", "px-2 py-0.5 text-xs font-medium text-text-secondary")} {...zoneHandlers("rarity")} aria-pressed={active === "rarity"}>◆ Rare</button>
-          <button className={zoneClass("artist", "flex items-center gap-1 px-2 py-0.5 text-xs text-text-secondary")} {...zoneHandlers("artist")} aria-pressed={active === "artist"}>
+          <button className={zoneClass("rarity", "px-2 py-0.5 text-xs font-medium text-text-secondary")} {...zoneHandlers("rarity")} aria-pressed={isActive("rarity")}>◆ Rare</button>
+          <button className={zoneClass("artist", "flex items-center gap-1 px-2 py-0.5 text-xs text-text-secondary")} {...zoneHandlers("artist")} aria-pressed={isActive("artist")}>
             <svg aria-hidden="true" viewBox="0 0 16 16" width="10" height="10" fill="currentColor" className="shrink-0">
               <path d="M11.5 1a3.5 3.5 0 0 1 2.538 5.908L5.414 15.536A2 2 0 0 1 4 16H2a2 2 0 0 1-2-2v-2a2 2 0 0 1 .464-1.278L9.09 1.962A3.5 3.5 0 0 1 11.5 1Zm0 2a1.5 1.5 0 0 0-1.09.474L9.81 4.1l2.09 2.09.626-.59A1.5 1.5 0 0 0 11.5 3ZM8.4 5.5 2.27 12.31A.5.5 0 0 0 2 12.7V14h1.3a.5.5 0 0 0 .39-.192L10.49 7.59 8.4 5.5Z"/>
             </svg>

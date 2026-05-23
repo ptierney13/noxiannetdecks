@@ -38,17 +38,20 @@ export default function LearnToSearchView() {
 
       {mode === "visual-guide" && (
         <ResponsiveGuideDetails onAppend={appendQuery}>
-          {(onSelect) => <VisualCardGuide onSelect={onSelect} />}
+          {(onSelect, selectedQueries) => (
+            <VisualCardGuide onSelect={onSelect} selectedQueries={selectedQueries} />
+          )}
         </ResponsiveGuideDetails>
       )}
 
       {mode === "text-guide" && (
         <ResponsiveGuideDetails onAppend={appendQuery}>
-          {(onSelect) => (
+          {(onSelect, selectedQueries) => (
             <TextFieldGuide
               fields={fields}
               onSelect={onSelect}
               onAppend={appendQuery}
+              selectedQueries={selectedQueries}
             />
           )}
         </ResponsiveGuideDetails>
