@@ -34,6 +34,10 @@ const CARD_ENERGY = 5;
 const CARD_POWER  = 1;
 const CARD_MIGHT  = 5;
 
+const STAT_CELL_CLASSES = "flex min-w-0 flex-col items-center justify-center gap-1 px-2.5 py-3 text-center";
+const STAT_LABEL_CLASSES = "text-[0.625rem] font-semibold uppercase leading-none tracking-[0.12em] text-text-tertiary/75";
+const STAT_VALUE_CLASSES = "text-[1.25rem] font-black leading-none text-text-primary";
+
 type VisualCardGuideProps = {
   onSelect: (item: LtsDetailItem) => void;
   selectedQueries: ReadonlySet<string>;
@@ -69,7 +73,9 @@ export function VisualCardGuide({ onSelect, selectedQueries }: VisualCardGuidePr
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm text-text-secondary">Tap any element to learn how to search for it.</p>
+      <p className="mx-auto max-w-[12ch] text-balance text-center text-[2.1875rem] font-black leading-[0.95] text-text-primary lg:hidden">
+        Tap any element to learn how to search for it.
+      </p>
 
       <div
         className="w-full rounded-2xl border border-border-strong bg-surface-2 overflow-hidden shadow-lg select-none"
@@ -77,24 +83,22 @@ export function VisualCardGuide({ onSelect, selectedQueries }: VisualCardGuidePr
         aria-label="Interactive card diagram — tap any element for its query"
       >
         {/* ── Header: Cost · Energy · Power / Might ── */}
-        <div className="grid grid-cols-[1fr_auto] gap-0 border-b border-border-subtle">
-          <div className="flex items-stretch divide-x divide-border-subtle">
-            <button className={zoneClass("cost",   "flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 text-xs")} {...zoneHandlers("cost")}   aria-pressed={isActive("cost")}>
-              <span className="font-bold uppercase tracking-wide text-text-tertiary text-[0.6rem]">Cost</span>
-              <span className="font-mono font-semibold text-text-primary">{CARD_COST}</span>
-            </button>
-            <button className={zoneClass("energy", "flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 text-xs")} {...zoneHandlers("energy")} aria-pressed={isActive("energy")}>
-              <span className="font-bold uppercase tracking-wide text-text-tertiary text-[0.6rem]">Energy</span>
-              <span className="font-semibold text-text-primary text-base">{CARD_ENERGY}</span>
-            </button>
-            <button className={zoneClass("power",  "flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 text-xs")} {...zoneHandlers("power")}  aria-pressed={isActive("power")}>
-              <span className="font-bold uppercase tracking-wide text-text-tertiary text-[0.6rem]">Power</span>
-              <span className="font-semibold text-text-primary text-base">{CARD_POWER}</span>
-            </button>
-          </div>
-          <button className={zoneClass("might", "flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 text-xs border-l border-border-subtle")} {...zoneHandlers("might")} aria-pressed={isActive("might")}>
-            <span className="font-bold uppercase tracking-wide text-text-tertiary text-[0.6rem]">Might</span>
-            <span className="font-semibold text-text-primary text-base">{CARD_MIGHT}</span>
+        <div className="grid grid-cols-4 divide-x divide-border-subtle border-b border-border-subtle">
+          <button className={zoneClass("cost", STAT_CELL_CLASSES)} {...zoneHandlers("cost")} aria-pressed={isActive("cost")}>
+            <span className={STAT_LABEL_CLASSES}>Cost</span>
+            <span className={`${STAT_VALUE_CLASSES} font-mono`}>{CARD_COST}</span>
+          </button>
+          <button className={zoneClass("energy", STAT_CELL_CLASSES)} {...zoneHandlers("energy")} aria-pressed={isActive("energy")}>
+            <span className={STAT_LABEL_CLASSES}>Energy</span>
+            <span className={STAT_VALUE_CLASSES}>{CARD_ENERGY}</span>
+          </button>
+          <button className={zoneClass("power", STAT_CELL_CLASSES)} {...zoneHandlers("power")} aria-pressed={isActive("power")}>
+            <span className={STAT_LABEL_CLASSES}>Power</span>
+            <span className={STAT_VALUE_CLASSES}>{CARD_POWER}</span>
+          </button>
+          <button className={zoneClass("might", STAT_CELL_CLASSES)} {...zoneHandlers("might")} aria-pressed={isActive("might")}>
+            <span className={STAT_LABEL_CLASSES}>Might</span>
+            <span className={STAT_VALUE_CLASSES}>{CARD_MIGHT}</span>
           </button>
         </div>
 

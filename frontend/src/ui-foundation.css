@@ -94,6 +94,11 @@
   to   { clip-path: inset(0 0%);  opacity: 1; }
 }
 
+@keyframes lts-detail-enter {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ============================================================
    ROOT — compositions only
    Rule: only tokens that reference other tokens via var().
