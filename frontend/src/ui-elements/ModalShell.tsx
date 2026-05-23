@@ -6,6 +6,7 @@ export type ModalShellProps = {
   onClose: () => void;
   className?: string;
   panelClassName?: string;
+  showCloseButton?: boolean;
 };
 
 // Elements that can receive keyboard focus. Used to determine the focus cycle
@@ -25,6 +26,7 @@ export function ModalShell({
   onClose,
   className,
   panelClassName,
+  showCloseButton = true,
 }: ModalShellProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -96,14 +98,16 @@ export function ModalShell({
         aria-label={label}
         aria-modal="true"
       >
-        <button
-          type="button"
-          className="absolute right-4 top-4 z-10 grid min-h-11 min-w-11 place-items-center rounded-full border border-border-default bg-surface-glass text-text-secondary transition hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-focus-ring"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          X
-        </button>
+        {showCloseButton ? (
+          <button
+            type="button"
+            className="absolute right-4 top-4 z-10 grid min-h-11 min-w-11 place-items-center rounded-full border border-border-default bg-surface-glass text-text-secondary transition hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-focus-ring"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            X
+          </button>
+        ) : null}
         {children}
       </div>
     </div>
