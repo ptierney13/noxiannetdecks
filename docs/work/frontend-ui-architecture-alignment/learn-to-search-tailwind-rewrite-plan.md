@@ -653,17 +653,17 @@ Candidate components for the eventual rewrite:
 | `SyntaxComparisonCard` | `features/` | Clickable comparison examples |
 | `SyntaxSection` | page-local or `features/` | Section layout for syntax learning groups |
 | `ScryfallComparisonCard` | page-local | Lightweight experienced-user sidebar |
-| `SyntaxQueryChip` | `ui-elements/` or extend `QueryChip` | Clickable syntax-highlighted query examples |
+| `SyntaxQueryChip` | `ui-elements/` | Syntax-highlighted query display with optional click behavior |
 
 Planning cautions:
 
-- Reuse the existing `QueryChip` where it fits, but the Syntax Guide may need a
-  richer chip/card variant that can show highlighted operators and hover
-  semantics.
+- Reuse the existing `QueryChip` for simple appendable chips; use
+  `SyntaxQueryChip` for highlighted query examples and display-only query
+  output.
 - The shared detail content should be one component rendered in two shells:
   popup/sheet on small layouts and inline card in the large detail stream.
-- The final plan should decide whether the guide data remains local static data
-  or moves through `data/queryFeatures.ts` with TanStack Query.
+- Query feature guide data moves through `data/queryFeatures.ts` with TanStack
+  Query.
 - If a component is only used by this route, keep it page-local unless a later
   route has a clear reuse need.
 
@@ -724,16 +724,8 @@ Manual review should include:
 
 ## Open Questions
 
-- Should clicking an already-selected item in large guide layouts remove it or
-  promote it to most recent? This spec recommends promote, with an explicit
-  remove control on each detail block.
-- Should Syntax Guide example clicks replace the sandbox query or append to it?
-  This spec assumes replace for comparison examples and append only where a
-  control is explicitly framed as additive.
-- Should the Syntax Guide sandbox use the same parser/diagnostics path as
-  actual search diagnostics, or a lighter explainer tuned to teaching copy?
-- Should the top mode selection be reflected in the URL search params so direct
-  links can open Visual/Text/Syntax Guide?
+None remaining for the current plan. Earlier planning questions are captured
+in the resolved decision table below.
 
 ## Risks
 
@@ -798,15 +790,16 @@ Currently loaded via `useEffect` in `LearnToSearchView`. Must be migrated to `da
 |---|---|
 | Click already-selected item in large guide: promote or remove? | Promote to most-recent; each block has an explicit remove control. |
 | Sandbox click: replace or append? | Replace for comparison examples. Additive chips (Controlling Results) may append where explicitly framed as additive. |
-| Sandbox parser: production path or lighter explainer? | Lighter page-specific explainer. Predefined map for all shown examples; best-effort tokenizer for user edits. Must not lie — if a token is unrecognized, say so calmly. |
-| Mode in URL params? | Yes. Add `?mode=visual\|text\|syntax` search param via TanStack Router. Omitted param defaults to `visual-guide`. This enables deep-linking and browser back/forward without the complexity of separate routes. |
+| Sandbox parser path? | Use the production parser path. Call `parseQuery()` from `@noxiannet/card-store/query` in the browser and render its `executedTokens` / `diagnostics`; do not maintain a parallel predefined map or custom tokenizer. |
+| Mode in URL params? | Yes. Add `?mode=visual-guide\|text-guide\|syntax-guide` search param via TanStack Router. Omitted param defaults to `visual-guide`. This enables deep-linking and browser back/forward without the complexity of separate routes. |
 
 ---
 
 ## Query Builder Parallel Work Coordination
 
-The QB rewrite (`query-builder-tailwind-rewrite-plan.md`) is a pure CSS migration
-with no new shared components. Points of coordination:
+The QB rewrite (`query-builder-tailwind-rewrite-plan.md`) is primarily a
+Tailwind/component-system migration that may also improve visuals. Points of
+coordination:
 
 **`SyntaxQueryChip` (new shared component):** Must be built and
 barrel-exported from `ui-elements/` before either LTS or QB uses it. Whichever
@@ -814,14 +807,16 @@ page is implemented first must create it; the second page then imports from
 `ui-elements/`. The QB plan should be updated to use `SyntaxQueryChip` for its
 built query display box (see QB plan Unit 1 note).
 
-**`QueryChip` (already shared):** Both pages use it. `SyntaxQueryChip` is a
-separate component — do not modify the existing `QueryChip`.
+**`QueryChip` (already shared):** LTS keeps using it for simple appendable
+field/example chips. `SyntaxQueryChip` is a separate component for
+syntax-highlighted query display; do not modify `QueryChip` to cover that role.
 
-**Domain color lookups:** QB introduces a file-local `DOMAIN_CHIP_CLASSES`
-constant. LTS Syntax Guide domain chips are display-only comparison elements —
-different structure from QB's interactive toggle buttons. Both reference the
-same `--domain-*` CSS variables with separate file-local constants. No shared
-extraction needed.
+**Domain and rarity pips:** QB renders domain pips through a file-local
+`DOMAIN_RUNE_TOKEN` map plus `renderTokenizedText`, and rarity pips through
+`raritySymbolSrc()`. LTS Syntax Guide domain visuals are display-only
+comparison elements with a different structure from QB's interactive toggle
+buttons. No shared extraction is needed unless a second concrete use case
+emerges during implementation.
 
 **`domainChipClass` in `lib/cardPresentation.tsx`:** Already marked `@deprecated`.
 Neither page should call it. Both use their own Tailwind lookups.
@@ -891,15 +886,19 @@ renders buttons, not anchor/router links.
 
 ### `SyntaxQueryChip`
 
-A new component in `ui-elements/` (shared by LTS and QB). Wraps a clickable
-button like `QueryChip` but renders syntax-highlighted content: field tokens
-(e.g., `name`, `d`) in one color, operators (`=`, `:`, `>=`) in another,
-values in a third, negation/logical keywords (`-`, `or`, `not`) in a fourth.
+A new component in `ui-elements/` (shared by LTS and QB). It renders
+syntax-highlighted content: field tokens (e.g., `name`, `d`) in one color,
+operators (`=`, `:`, `>=`) in another, values in a third, and negation/logical
+keywords (`-`, `or`, `not`) in a fourth. It behaves like a clickable chip only
+when `onClick` is provided.
 
-Implementation: call `parseQuery(text)` from `@noxiannet/card-store/query` to
-get the AST, then walk it to assign color roles to each original text segment.
-Unknown tokens render unstyled. The output is a `<button>` that renders
-`<span>` elements with the appropriate color classes rather than plain text.
+Implementation: call `parseQuery(text)` from `@noxiannet/card-store/query` and
+derive display segments from the parsed `executedTokens` / diagnostics path
+used elsewhere in the frontend. Do not walk the AST for original source spans
+and do not implement a second parser/tokenizer. Unknown or dropped tokens render
+with a subdued/error state from parser diagnostics. When `onClick` is provided,
+the output is a `<button>`; when it is omitted, the output is a non-interactive
+`<span>` / `<code>` with the same visual syntax treatment.
 
 Must be barrel-exported from `ui-elements/index.ts`.
 
@@ -1039,15 +1038,17 @@ Create `features/learn-to-search/TextFieldGuide.tsx`.
 
 Create `ui-elements/SyntaxQueryChip.tsx`. Barrel-export from `ui-elements/index.ts`.
 
-- Props: `query: string`, `onClick: (query: string) => void`
-- Calls `parseQuery(query)` from `@noxiannet/card-store/query` to get the AST
-- Walks the AST to assign color roles to each original text segment:
-  field tokens, operators, values, negation/logical keywords
+- Props: `query: string`, optional `onClick?: (query: string) => void`
+- Calls `parseQuery(query)` from `@noxiannet/card-store/query`
+- Derives syntax-colored display from `executedTokens` / diagnostics:
+  field tokens, operators, values, negation/logical keywords, dropped tokens
 - Renders each segment in a `<span>` with the appropriate color class
-- Button wrapper matches `QueryChip` shape and sizing
-- Unknown tokens render unstyled
-- Storybook: several example queries from this spec; also a non-query-chip
-  display-only variant if QB needs it for the built query box
+- Clickable wrapper matches `QueryChip` shape and sizing when `onClick` exists
+- Display-only wrapper is used when `onClick` is omitted, including QB's built
+  query display box
+- Unknown or dropped tokens render with parser-derived subdued/error treatment
+- Storybook: several example queries from this spec, plus a display-only
+  variant for QB's built query box
 
 ### Unit 8 — `SyntaxComparisonCard`
 

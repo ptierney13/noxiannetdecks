@@ -6,11 +6,12 @@
 ## Summary
 
 Migrate `QueryBuilderView` out of `pages/legacy/` by rewriting all
-`qb-*` CSS class usage to Tailwind utility classes. The component's
-logic, layout, and `CardSearchResultsPane` integration are already
-correct — this is a pure styling migration. No mockup is needed because
-the visual target is identical to the current output; the only change is
-the implementation mechanism (CSS → Tailwind).
+`qb-*` CSS class usage to Tailwind utility classes. The component's query
+construction logic and `CardSearchResultsPane` integration are already
+architecturally correct. The rewrite may improve the visual design while it is
+being moved into the current component system; no mockup is required for this
+pass. Prioritize a sound, maintainable implementation now, and expect final
+visual tuning after the search/backend behavior has settled.
 
 ## Current State
 
@@ -24,10 +25,11 @@ the implementation mechanism (CSS → Tailwind).
 | TanStack Router | Already uses `useNavigate` |
 | TanStack Query | N/A — no page-level queries |
 
-### What exists and is correct (keep as-is)
+### What exists and is correct architecturally
 
-- The two-column outer grid wrapper (`lg:grid-cols-[…]`) — already Tailwind
-- The `<aside>` sticky positioning — already Tailwind
+- The two-column builder + live-preview page shape
+- The right-side live-preview affordance; sticky positioning may be tuned as
+  part of the visual rewrite
 - The `CardSearchResultsPane` integration with `debouncedBuiltQuery`
 - All `useMemo` query-building logic
 - `useDebounce`, `toggle`, `quoteValue`, `orGroup` — logic is fine
@@ -148,7 +150,7 @@ breakpoint modifier) to match the same threshold without adding to `styles.css`.
 
 ### Unit 1 — Create `pages/QueryBuilderView.tsx`
 
-Write the new file as a direct Tailwind replacement of the legacy version:
+Write the new file as a Tailwind page rewrite of the legacy version:
 
 - All `qb-*` class references → Tailwind utility classes
 - `DOMAIN_RUNE_TOKEN` lookup at top of file; domain pips rendered via `renderTokenizedText`
@@ -156,7 +158,8 @@ Write the new file as a direct Tailwind replacement of the legacy version:
 - All chips use generic accent highlight for selected state (no domain/rarity-specific colors)
 - `StatRow` and `TextField` helper components stay file-local (private, not exported)
 - `SearchIcon` stays file-local (private inline SVG, not exported)
-- No logic changes — identical behavior to legacy version
+- Preserve query-building behavior, navigation behavior, and live-preview data
+  flow; visual layout and spacing may improve during the rewrite
 
 CSS token mapping reference:
 
@@ -223,22 +226,22 @@ Story notes:
 
 | Visual region | Approach | Rationale |
 |---|---|---|
-| Outer two-column grid wrapper | Keep existing Tailwind — no change | Already migrated |
-| Builder panel container (`qb-panel`) | `flex flex-col gap-8 pb-14 max-w-[820px]` | Direct translation |
+| Outer two-column grid wrapper | Keep the builder + live-preview split, but tune columns if the new visual pass needs it | Current shape is architecturally right |
+| Builder panel container (`qb-panel`) | Tailwind surface/layout classes owned by `pages/QueryBuilderView.tsx` | Page-local composition |
 | Page header (eyebrow, h1, description) | Keep `.eyebrow` class; h1/description use Tailwind | eyebrow is a shared component class |
 | Built query box | Tailwind surface + border tokens | Static layout, straightforward |
-| Section dividers (`qb-section`) | `flex flex-col gap-2.5 pt-1 border-t border-border-subtle` | Direct translation |
-| Section title (`qb-section-title`) | Flex row, uppercase, tiny font, `text-text-tertiary` | Direct translation |
-| Hint badge (`qb-hint`) | `px-2 py-0.5 rounded bg-accent-warm-soft border border-accent-warm/25 text-accent-warm text-[0.72rem]` | Matches current visual |
+| Section dividers (`qb-section`) | Tailwind stack/separator treatment | May visually improve from the legacy layout |
+| Section title (`qb-section-title`) | Compact Tailwind heading treatment | Keep scannable control groups |
+| Hint badge (`qb-hint`) | Tailwind token-backed hint treatment | May visually improve from the legacy layout |
 | Generic chips | Tailwind pill button with toggled state classes | Base chip → conditional `qb-chip--on` classes |
 | Domain chips | `DOMAIN_RUNE_TOKEN` lookup + `renderTokenizedText` pip | Reuses existing rune symbol images; no CSS color injection |
 | Rarity chips | `raritySymbolSrc(rarity)` → `<img>` pip | Extracted gem assets; no CSS color injection |
 | Set code badge | `font-mono text-[0.68rem] font-bold px-1.5 bg-surface-1 rounded text-text-tertiary` | Direct translation |
 | Stats grid | `grid grid-cols-2 max-[700px]:grid-cols-1 gap-2.5` | Keeps 700px threshold |
-| Stat row | Flex row inside a surface card | Direct translation |
+| Stat row | Flex row inside a surface card | Page-local helper |
 | Text filter rows | `grid grid-cols-[110px_1fr_auto] max-[700px]:grid-cols-1` | Keeps 700px threshold |
-| Search button | `bg-accent hover:bg-accent-hover` with `text-white` | Direct translation |
-| Live preview aside | No change — already Tailwind | Already migrated |
+| Search button | Token-backed primary action treatment | Preserve action behavior |
+| Live preview aside | Keep `CardSearchResultsPane`; page framing may be tuned | Shared feature owns results behavior |
 
 ## New Shared Components
 
@@ -267,7 +270,7 @@ After Unit 3:
 1. `npm run build -w @noxiannet/frontend` — must pass
 2. `npm run build-storybook -w @noxiannet/frontend` — must pass
 3. `npm run test -w @noxiannet/frontend` — pre-existing failures are acceptable; no new failures
-4. Browser smoke test: navigate to `/query-builder`, confirm all chips toggle
+4. Browser smoke test: navigate to `/cards/query-builder`, confirm all chips toggle
    correctly, domain rune symbols and rarity gem pips render, chips show generic
    accent highlight when selected, built-query box updates live, live preview
    pane shows results, "Search with this query" navigates to `/cards`

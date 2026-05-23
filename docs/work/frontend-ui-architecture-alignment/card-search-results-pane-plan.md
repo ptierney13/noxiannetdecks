@@ -4,31 +4,27 @@
 
 ## Summary
 
-Build a new shared `CardSearchResultsPane` path from scratch while leaving the
-existing legacy card search view in place for side-by-side comparison during
-development. The first live integration point is the right side of Query
-Builder, where the new pane will render against the builder's generated query.
+Build and evolve a shared `CardSearchResultsPane` path for surfaced card-search
+results. The pane is the canonical owner of result fetching, result-local
+controls, responsive grid composition, and card summary popup selection. Parents
+own only the query source of truth.
 
-The immediate goal is not to replace `/cards` yet. The immediate goal is to
-establish the correct code organization, data ownership, responsive layout
-rules, and reusable component boundaries for the search-results experience
-before the legacy surface is retired.
-
-This plan treats the new results pane as the canonical future implementation
-for surfaced card search results. It should be designed so the `/cards` route
-can adopt it later without reworking its internal boundaries.
+The first live host was Query Builder, where the pane renders against the
+builder's generated query. The `/cards` route now adopts the same pane directly
+through `CardSearchView`, so future work should keep both hosts on the same
+feature path instead of reintroducing a second search-results implementation.
 
 ## Implementation Note 2026-05-21
 
-The first Query Builder integration pass exists. The legacy `/cards` route is
-still untouched.
+The first Query Builder integration pass exists. The `/cards` route now adopts
+the same `CardSearchResultsPane` through `frontend/src/pages/CardSearchView.tsx`.
 
 Implemented surfaces:
 
 - `frontend/src/data/cards.ts`
 - `frontend/src/lib/cardSearchResults.ts`
 - `frontend/src/ui-elements/ResultCard.tsx`
-- `frontend/src/ui-elements/CardMetaChips.tsx`
+- `frontend/src/pages/CardSearchView.tsx`
 - `frontend/src/features/card-search/CardSearchResultsPane.tsx`
 - `frontend/src/features/card-search/CardSearchResultsContent.tsx`
 - `frontend/src/features/VariantSelectorRow.tsx`
@@ -64,7 +60,7 @@ Create `CardSearchResultsPane` as a `features/` component with this ownership:
 
 The parent owns only the query source of truth:
 
-- `/cards` will eventually pass the route search param
+- `/cards` passes the route search param through `CardSearchView`
 - Query Builder will pass the generated query string
 
 The pane should not require pre-fetched result data from parents. That would
@@ -125,9 +121,6 @@ The new search-results implementation should use these layers:
 - `ui-elements/ResultCard.tsx`
   - one clickable repeated result card rendered in the grid
   - barrel-exported from `ui-elements/index.ts`
-- `ui-elements/CardMetaChips.tsx`
-  - reusable chip row for cost / might / domain display
-  - barrel-exported from `ui-elements/index.ts`
 
 **Lib helpers**
 
@@ -151,23 +144,21 @@ policy line here. Its boundary is already defined by placement:
 - it should not own route state
 - it should receive prepared values and callbacks from its parent
 
-### 4. Keep the existing search page in place during the first integration pass
+### 4. Keep both live hosts on the same pane
 
-Do not remove the legacy `/cards` implementation in this step.
+The first pass used Query Builder as the low-risk host for inspecting the new
+pane while the search-results boundaries settled. `/cards` has since adopted
+the same `CardSearchResultsPane` directly through `CardSearchView`.
 
-Instead:
+Future work should preserve this single feature path:
 
-- leave `frontend/src/pages/legacy/SearchView.tsx` intact
-- add the new pane to the right side of Query Builder
-- use that side-by-side surface to compare behavior, text, grid response, and
-  summary-popup behavior while iterating
+- Query Builder passes its debounced generated query string
+- `/cards` passes its route search param
+- `CardSearchResultsPane` owns the fetching, controls, grouping, selection, and
+  popup behavior for both contexts
 
-After the first Query Builder integration is working, the `/cards` route should
-adopt the same `CardSearchResultsPane` directly and let it fill the page space
-without introducing a second behavior variant. The `/cards` route should reuse
-the same pane behavior exactly; only the allotted size changes.
-
-This keeps risk low while the new pane boundaries settle.
+If the full-page `/cards` route needs extra framing later, add a thin page-level
+wrapper above the pane rather than forking pane behavior.
 
 ### 5. Use explicit container-query values when mirroring viewport terminology
 
@@ -318,7 +309,6 @@ needed and whether it should be migrated or a different approach taken.
 Create:
 
 - `ResultCard`
-- `CardMetaChips`
 
 These should be reusable within the new search-results path and future card
 summary surfaces.
@@ -362,14 +352,14 @@ despite not being barrel-exported.
 
 ### Unit 6: Query Builder integration
 
-Update Query Builder to render the new pane on its right side while preserving
-the existing builder behavior.
+Update Query Builder to render the shared pane on its right side while
+preserving the existing builder behavior.
 
 This integration should:
 
 - pass a debounced form of `builtQuery` into `CardSearchResultsPane`
 - preserve current builder controls
-- make the new pane easy to inspect without replacing `/cards` yet
+- keep Query Builder on the same results-pane feature path as `/cards`
 - reuse the existing shared debounce utility in
   `frontend/src/lib/useDebounce.ts`
 - use the current frontend typing-delay pattern rather than inventing a new
@@ -379,9 +369,6 @@ This integration should:
 
 - Should the pane own its selected preview state internally for all contexts,
   or should later full-page adoption allow that state to be optionally lifted?
-- Should the future `/cards` route re-use the same controls composition exactly,
-  or will the full-page route need one additional page-level wrapper above the
-  pane?
 
 ## Risks
 
@@ -405,7 +392,7 @@ Before implementation is considered complete for this plan's first execution:
 - run `npm run test:storybook -w @noxiannet/frontend`
 - run `npm run build-storybook -w @noxiannet/frontend`
 - manually inspect Query Builder with the pane rendered on the right side
-- compare the new pane behavior against the existing legacy `/cards` experience
+- manually inspect `/cards` and confirm it uses the same pane behavior
 - include a detailed completion note describing exactly how container sizing
   values were sourced, centralized, and applied in the implementation
 
@@ -419,11 +406,10 @@ Storybook review should explicitly verify:
 
 ## Assumptions
 
-- `CardSearchResultsPane` is the canonical future owner of surfaced card-search
-  results behavior, even though the legacy `/cards` page remains temporarily in
-  place during this first pass.
-- Query Builder is the safest first host because it allows direct comparison and
-  incremental tuning without immediately replacing the route-level search page.
+- `CardSearchResultsPane` is the canonical owner of surfaced card-search
+  results behavior for both `/cards` and Query Builder.
+- Query Builder remains a useful host for inspecting generated-query behavior
+  beside live results, while `/cards` is the full-page host.
 - The current viewport values documented in Storybook remain the source of
   truth for user-facing breakpoint language during this work.
 - `renderTokenizedText` remains the durable text-rendering mechanism for card
