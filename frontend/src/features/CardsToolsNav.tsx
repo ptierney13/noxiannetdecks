@@ -52,7 +52,7 @@ export function CardsToolsNav({ description }: CardsToolsNavProps) {
             </Link>
           )}
           {!isOnLTS && (
-            <Link to="/cards/learn-to-search" className={NAV_LINK}>
+            <Link to="/cards/learn-to-search" search={{ mode: "visual-guide" }} className={NAV_LINK}>
               <BookIcon />
               Learn to Search
             </Link>
