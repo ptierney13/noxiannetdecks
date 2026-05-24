@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { CardsToolsNav } from "../features";
 import { useAppError } from "../app/ErrorContext";
 import { useHeaderSearch } from "../app/HeaderSearchContext";
 import { queryFeaturesQueryOptions } from "../data";
@@ -34,7 +33,7 @@ export default function LearnToSearchView() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pb-16 pt-4 flex flex-col gap-6">
+    <div className="mx-auto w-full max-w-5xl px-4 pb-4 pt-4 flex flex-col gap-6">
       <LearnModeBar active={mode} onChange={handleTabChange} />
 
       {mode === "visual-guide" && (
@@ -59,7 +58,6 @@ export default function LearnToSearchView() {
       )}
 
       {mode === "syntax-guide" && <SyntaxGuide />}
-      <CardsToolsNav description="Learn how to build search queries using the query language syntax." />
     </div>
   );
 }

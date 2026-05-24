@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ChevronIcon, ResultCard } from "../../ui-elements";
 import { NoxianLogoIcon } from "../../ui-elements/Icon";
 import { VariantSelectorRow } from "../VariantSelectorRow";
@@ -32,6 +32,7 @@ export type CardSearchResultsContentProps = {
   onShowPriceChange: (showPrice: boolean) => void;
   onShowVariantsChange: (showVariants: boolean) => void;
   onCardClick: (card: CardRecord, group: CardRecord[], finish: CardFinish) => void;
+  navSlot?: ReactNode;
 };
 
 // Controls flex row — dropdowns + checkbox stack wrap at narrow widths.
@@ -283,9 +284,10 @@ export function CardSearchResultsContent({
   onShowPriceChange,
   onShowVariantsChange,
   onCardClick,
+  navSlot,
 }: CardSearchResultsContentProps) {
   return (
-    <section aria-label="Card search results">
+    <section aria-label="Card search results" className="flex flex-col flex-1 min-h-0">
       {/* Full-width controls banner — no rounded sub-box, spans edge to edge */}
       <div className={`bg-surface-2 border-b border-border-subtle ${BANNER_PADDING_CLASSES}`}>
         <div className={CONTROL_LAYOUT_CLASSES}>
@@ -328,10 +330,16 @@ export function CardSearchResultsContent({
               </label>
             ) : null}
           </div>
+
+          {navSlot ? (
+            <div className="ml-auto hidden xl:flex items-center">
+              {navSlot}
+            </div>
+          ) : null}
         </div>
       </div>
 
-      <div className={`grid gap-4 ${PANE_PADDING_CLASSES}`}>
+      <div className={`flex flex-col flex-1 min-h-0 gap-4 ${PANE_PADDING_CLASSES}`}>
         <ResultSummary
           isPending={isPending}
           visibleResultCount={visibleResultCount}
@@ -348,8 +356,8 @@ export function CardSearchResultsContent({
         ) : null}
 
         {!isPending && !isError && groups.length === 0 ? (
-          <div className="rounded-2xl border border-border-default bg-surface-2 p-8 flex flex-col items-center gap-5 text-center">
-            <NoxianLogoIcon className="w-14 h-14 opacity-[0.15]" />
+          <div className="hidden lg:flex flex-1 min-h-0 flex-col items-center justify-center rounded-2xl border border-border-default bg-surface-2 gap-5 text-center p-8">
+            <NoxianLogoIcon className="w-28 h-28 opacity-[0.15]" />
             <div className="flex flex-col gap-1.5">
               <p className="font-semibold text-text-secondary">No cards match this query.</p>
               <p className="text-sm text-text-tertiary">Adjust your filters or remove some constraints<br className="hidden @[400px]:block" /> to see results here.</p>

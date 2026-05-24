@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   queryRequestsAllPrintings,
   useCardSearchResults,
@@ -18,6 +18,7 @@ import { CardSearchResultsContent } from "./CardSearchResultsContent";
 
 export type CardSearchResultsPaneProps = {
   query: string;
+  navSlot?: ReactNode;
 };
 
 type SelectedPreview = {
@@ -26,7 +27,7 @@ type SelectedPreview = {
   finish: CardFinish;
 };
 
-export function CardSearchResultsPane({ query }: CardSearchResultsPaneProps) {
+export function CardSearchResultsPane({ query, navSlot }: CardSearchResultsPaneProps) {
   const resultsQuery = useCardSearchResults(query);
   const { index: publishedPriceIndex } = usePublishedPriceIndex();
   const [sort, setSort] = useState<CardSearchSortKey>("energy-asc");
@@ -51,7 +52,7 @@ export function CardSearchResultsPane({ query }: CardSearchResultsPaneProps) {
   const visibleResultCount = variantMode === "unique-cards" ? groups.length : cards.length;
 
   return (
-    <div className="@container min-h-[28rem]">
+    <div className="@container min-h-[28rem] flex flex-col">
       <CardSearchResultsContent
         groups={groups}
         rawResultCount={cards.length}
@@ -78,6 +79,7 @@ export function CardSearchResultsPane({ query }: CardSearchResultsPaneProps) {
         onCardClick={(card, group, finish) => {
           setSelectedPreview({ group, card, finish: normalizeCardFinish(finish) });
         }}
+        navSlot={navSlot}
       />
 
       {selectedPreview ? (

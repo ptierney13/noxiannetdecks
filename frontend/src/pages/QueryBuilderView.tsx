@@ -1,7 +1,6 @@
 import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { CardSearchResultsPane, CardsToolsNav } from "../features";
-import { SyntaxQueryChip } from "../ui-elements";
+import { useNavigate, Link } from "@tanstack/react-router";
+import { CardSearchResultsPane } from "../features";
 import { useDebounce } from "../lib";
 import { renderTokenizedText, raritySymbolSrc } from "../lib";
 
@@ -88,6 +87,15 @@ function orGroup(items: string[]): string {
 
 // ── Private sub-components ───────────────────────────────────────────────────
 
+function BookIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </svg>
+  );
+}
+
 function SearchIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -98,7 +106,7 @@ function SearchIcon() {
 }
 
 const QB_TOKENS = {
-  layout: "mx-auto grid w-full max-w-[1720px] gap-7 px-4 pb-16 pt-3 lg:grid-cols-[minmax(360px,820px)_minmax(0,1fr)]",
+  layout: "mx-auto grid w-full max-w-[1720px] gap-7 px-4 pb-10 pt-3 lg:grid-cols-[minmax(360px,820px)_minmax(0,1fr)]",
   builderShell: "flex min-w-0 flex-col gap-5 rounded-2xl border border-border-subtle bg-[linear-gradient(180deg,rgba(16,20,30,0.72),rgba(7,9,14,0.46))] p-3 shadow-[0_18px_48px_rgba(0,0,0,0.24)] sm:p-4",
   queryCard: "rounded-xl border border-border-default bg-[linear-gradient(180deg,rgba(25,30,42,0.94),rgba(12,15,23,0.96))] px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_28px_rgba(0,0,0,0.24)]",
   section: "overflow-hidden rounded-xl bg-[linear-gradient(180deg,rgba(197,50,71,0.055)_0%,rgba(15,19,29,0.94)_28%,rgba(8,10,16,0.96)_100%)] shadow-[0_0_16px_rgba(197,50,71,0.16),0_8px_20px_rgba(0,0,0,0.18)] transition-[background,box-shadow] duration-150",
@@ -108,7 +116,7 @@ const QB_TOKENS = {
   sectionHint: "rounded-md border border-border-default bg-[rgba(8,11,18,0.82)] px-1.5 py-0.5 font-mono text-[0.66rem] text-accent-warm leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
   subsection: "rounded-lg border border-border-subtle bg-[linear-gradient(180deg,rgba(20,25,36,0.72),rgba(10,13,20,0.78))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
   subsectionRaised: "border-border-default bg-[linear-gradient(180deg,rgba(25,31,43,0.82),rgba(12,15,23,0.88))]",
-  subsectionLabel: "mb-2.5 text-[0.7rem] font-black uppercase tracking-[0.14em] text-text-secondary",
+  subsectionLabel: "mb-2.5 text-[0.7rem] font-black uppercase tracking-[0.14em] text-accent-warm",
   helperText: "text-xs leading-relaxed text-text-tertiary/78",
   chipBase: "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-[6px] text-sm font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.075),0_4px_10px_rgba(0,0,0,0.2)] transition-[background,border-color,box-shadow,transform,color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
   chipOff: "border-[rgba(255,255,255,0.18)] bg-[linear-gradient(180deg,rgba(38,45,61,0.96),rgba(18,22,32,0.98))] text-text-secondary hover:-translate-y-px hover:border-border-strong hover:bg-[linear-gradient(180deg,rgba(47,55,72,0.98),rgba(23,28,40,0.98))] hover:text-text-primary hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_8px_20px_rgba(0,0,0,0.28)]",
@@ -336,7 +344,7 @@ export default function QueryBuilderView() {
             aria-label="Your query"
           >
             {builtQuery
-              ? <SyntaxQueryChip query={builtQuery} />
+              ? <code className="text-sm font-mono text-text-primary break-all">{builtQuery}</code>
               : <span className="text-sm italic text-text-secondary">Make a selection below to build your query</span>
             }
           </output>
@@ -511,11 +519,22 @@ export default function QueryBuilderView() {
       {/* ── Live preview aside ── */}
       <aside className="min-w-0 lg:sticky lg:top-[calc(var(--site-header-height)+1rem)] lg:self-start">
         <div className={QB_TOKENS.previewFrame}>
-          <CardSearchResultsPane query={debouncedBuiltQuery} />
+          <CardSearchResultsPane
+          query={debouncedBuiltQuery}
+          navSlot={
+            <Link
+              to="/cards/learn-to-search"
+              search={{ mode: "visual-guide" }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border-default bg-[rgba(255,255,255,0.04)] px-3 py-1.5 text-xs font-bold text-text-secondary transition-[background,border-color,color] duration-150 hover:border-border-strong hover:bg-[rgba(255,255,255,0.07)] hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
+            >
+              <BookIcon />
+              Learn to Search
+            </Link>
+          }
+        />
         </div>
       </aside>
 
-      <CardsToolsNav description="Use the filters to narrow your search. Combining more filters will return more specific results." />
     </div>
   );
 }
