@@ -57,9 +57,7 @@ function rarityPipImageStyle(rarity: (typeof RARITIES)[number]): CSSProperties {
   const geometry = RARITY_PIP_GEOMETRY[rarity];
   const wrapperWidth = rarity === "Promo" ? 20 : 16;
   const wrapperHeight = 16;
-  const scale = rarity === "Promo"
-    ? 12 / geometry.contentHeight
-    : 12 / Math.max(geometry.contentWidth, geometry.contentHeight);
+  const scale = 12 / geometry.contentHeight;
   const contentWidth = geometry.contentWidth * scale;
   const contentHeight = geometry.contentHeight * scale;
 
