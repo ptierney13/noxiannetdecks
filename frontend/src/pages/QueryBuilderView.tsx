@@ -1,9 +1,10 @@
 import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { useNavigate, Link } from "@tanstack/react-router";
+import { ChevronIcon } from "../ui-elements";
 import { CardSearchResultsPane, QuerySummaryChips } from "../features";
 import { useDebounce } from "../lib";
 import { renderTokenizedText, raritySymbolSrc } from "../lib";
-import { parseQuery, executedTokensToDisplay, type DisplayItem } from "@noxiannet/card-store/query";
+import { parseQuery, executedTokensToDisplay, resolveField, type DisplayItem } from "@noxiannet/card-store/query";
 
 // ── Data constants ────────────────────────────────────────────────────────────
 
@@ -33,6 +34,36 @@ const DOMAIN_RUNE: Record<string, string> = {
   Body:  "{B}",
   Chaos: "{H}",
   Order: "{O}",
+};
+
+// Colors for each canonical field — used by the syntax-highlighted query display.
+const FIELD_COLOR: Record<string, string> = {
+  cardtype:     "#7dd3fc", // sky-300
+  supertype:    "#c4b5fd", // violet-300
+  t:            "#5eead4", // teal-300
+  tag:          "#86efac", // green-300
+  domain:       "#fcd34d", // amber-300
+  rarity:       "#e879f9", // fuchsia-400
+  set:          "#60a5fa", // blue-400
+  name:         "#fb923c", // orange-400
+  clean_name:   "#fb923c",
+  text:         "#fdba74", // orange-300
+  keyword:      "#bef264", // lime-300
+  artist:       "#d1d5db", // gray-300
+  flavour:      "#d1d5db",
+  energy:       "#f9a8d4", // pink-300
+  might:        "#fda4af", // rose-300
+  power:        "#a5b4fc", // indigo-300
+  cost:         "#67e8f9", // cyan-300
+  is:           "#d4d4d8", // zinc-300
+  finish:       "#d4d4d8",
+  price:        "#34d399", // emerald-400
+  number:       "#94a3b8", // slate-400
+  language:     "#94a3b8",
+  layout:       "#94a3b8",
+  id:           "#94a3b8",
+  riftbound_id: "#94a3b8",
+  tcgplayer_id: "#94a3b8",
 };
 
 type RarityPipGeometry = {
@@ -86,6 +117,120 @@ function orGroup(items: string[]): string {
   return items.length === 1 ? items[0] : `(${items.join(" or ")})`;
 }
 
+// ── Syntax-highlighted query ──────────────────────────────────────────────────
+
+type QuerySpan = {
+  text: string;
+  kind: "space" | "structural" | "connector" | "predicate" | "error";
+  color?: string;
+};
+
+function tokenizeQueryString(source: string): QuerySpan[] {
+  const spans: QuerySpan[] = [];
+  let i = 0;
+
+  while (i < source.length) {
+    const rest = source.slice(i);
+
+    // Whitespace
+    const ws = rest.match(/^\s+/);
+    if (ws) {
+      spans.push({ text: ws[0], kind: "space" });
+      i += ws[0].length;
+      continue;
+    }
+
+    // Structural: ( )
+    if (rest[0] === "(" || rest[0] === ")") {
+      spans.push({ text: rest[0], kind: "structural" });
+      i++;
+      continue;
+    }
+
+    // Connectors: or / and / not — must be followed by space, paren, or end
+    const conn = rest.match(/^(or|and|not)(?=[\s()]|$)/i);
+    if (conn) {
+      spans.push({ text: conn[0], kind: "connector" });
+      i += conn[0].length;
+      continue;
+    }
+
+    // Predicate: optional -, field, op, value (quoted or bare)
+    const pred = rest.match(
+      /^(-?)([A-Za-z_][A-Za-z0-9_]*)(:|=|>=?|<=?)("(?:[^"\\]|\\.)*"|[^\s()]+)/
+    );
+    if (pred) {
+      const [fullText, , rawField] = pred;
+      const defn = resolveField(rawField);
+      const color = defn ? (FIELD_COLOR[defn.canonical] ?? "#94a3b8") : undefined;
+      spans.push({ text: fullText, kind: defn ? "predicate" : "error", color });
+      i += fullText.length;
+      continue;
+    }
+
+    // Bare unrecognized word
+    const bare = rest.match(/^[^\s()]+/);
+    if (bare) {
+      spans.push({ text: bare[0], kind: "error" });
+      i += bare[0].length;
+      continue;
+    }
+
+    // Fallback: advance one character
+    spans.push({ text: rest[0], kind: "structural" });
+    i++;
+  }
+
+  return spans;
+}
+
+function SyntaxHighlightedQuery({ query }: { query: string }) {
+  const spans = useMemo(() => tokenizeQueryString(query), [query]);
+
+  if (!query.trim()) {
+    return (
+      <span className="text-sm font-mono text-text-tertiary">
+        Select one or more filters to build a query.
+      </span>
+    );
+  }
+
+  return (
+    <code className="text-sm font-mono break-all leading-relaxed">
+      {spans.map((span, idx) => {
+        switch (span.kind) {
+          case "space":
+            return <span key={idx}>{span.text}</span>;
+          case "structural":
+            return (
+              <span key={idx} style={{ color: "rgba(255,255,255,0.3)" }}>
+                {span.text}
+              </span>
+            );
+          case "connector":
+            return (
+              <span key={idx} style={{ color: "rgba(255,255,255,0.42)", fontStyle: "italic" }}>
+                {span.text}
+              </span>
+            );
+          case "error":
+            return (
+              <span key={idx} style={{ color: "#f87171" }}>
+                {span.text}
+              </span>
+            );
+          case "predicate":
+            return (
+              <span key={idx} style={{ color: span.color ?? "#94a3b8" }}>
+                {span.text}
+              </span>
+            );
+        }
+      })}
+    </code>
+  );
+}
+
 // ── Private sub-components ───────────────────────────────────────────────────
 
 function BookIcon() {
@@ -93,15 +238,6 @@ function BookIcon() {
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-    </svg>
-  );
-}
-
-function EyeIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }
@@ -135,7 +271,7 @@ function SearchIcon() {
 
 const QB_TOKENS = {
   builderShell: "flex min-w-0 flex-col gap-5 rounded-2xl border border-border-subtle bg-[linear-gradient(180deg,rgba(16,20,30,0.72),rgba(7,9,14,0.46))] p-3 shadow-[0_18px_48px_rgba(0,0,0,0.24)] sm:p-4",
-  section: "overflow-hidden rounded-xl bg-[rgba(14,18,28,0.92)]",
+  section: "overflow-hidden rounded-xl bg-[rgba(14,18,28,0.92)] shadow-[0_0_0_1px_rgba(197,50,71,0.14),0_0_28px_rgba(197,50,71,0.08),0_4px_14px_rgba(0,0,0,0.28)]",
   sectionHeader: "flex items-center gap-2.5 px-4 pt-3.5 pb-2",
   sectionBody: "flex flex-col gap-3.5 px-4 pb-4",
   sectionTitle: "text-[0.77rem] font-black uppercase tracking-[0.14em] text-accent-warm leading-none",
@@ -157,18 +293,42 @@ type SectionProps = {
   title: string;
   hint?: string;
   children: ReactNode;
+  collapsible?: boolean;
+  defaultOpen?: boolean;
 };
 
-function Section({ title, hint, children }: SectionProps) {
+function Section({ title, hint, children, collapsible = false, defaultOpen = true }: SectionProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  const headerContent = (
+    <>
+      <h2 className={QB_TOKENS.sectionTitle}>{title}</h2>
+      {hint ? <code className={QB_TOKENS.sectionHint}>{hint}</code> : null}
+      {collapsible ? (
+        <span className="ml-auto text-text-tertiary opacity-60">
+          <ChevronIcon expanded={isOpen} />
+        </span>
+      ) : null}
+    </>
+  );
+
   return (
     <section className={QB_TOKENS.section}>
-      <div className={QB_TOKENS.sectionHeader}>
-        <h2 className={QB_TOKENS.sectionTitle}>{title}</h2>
-        {hint && <code className={QB_TOKENS.sectionHint}>{hint}</code>}
-      </div>
-      <div className={QB_TOKENS.sectionBody}>
-        {children}
-      </div>
+      {collapsible ? (
+        <button
+          type="button"
+          className={`w-full flex ${QB_TOKENS.sectionHeader} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)] focus-visible:ring-inset`}
+          onClick={() => setIsOpen((v) => !v)}
+          aria-expanded={isOpen}
+        >
+          {headerContent}
+        </button>
+      ) : (
+        <div className={QB_TOKENS.sectionHeader}>{headerContent}</div>
+      )}
+      {isOpen ? (
+        <div className={QB_TOKENS.sectionBody}>{children}</div>
+      ) : null}
     </section>
   );
 }
@@ -382,53 +542,45 @@ export default function QueryBuilderView() {
     return executedTokensToDisplay(parseQuery(debouncedBuiltQuery).executedTokens);
   }, [debouncedBuiltQuery]);
 
-  const NAV_BTN = "inline-flex items-center gap-1.5 rounded-lg border border-border-default px-2.5 py-1.5 text-xs font-bold text-text-secondary transition-[background,border-color,color] duration-150 hover:border-border-strong hover:text-text-primary disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]";
+  const NAV_BTN = "inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-border-default px-3 py-1.5 text-xs font-bold text-text-secondary transition-[background,border-color,color] duration-150 hover:border-border-strong hover:text-text-primary disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]";
 
   return (
     <div>
-      {/* ── Sticky Query bar ── */}
-      <div className="sticky top-[var(--site-header-height)] z-20 border-b border-border-subtle bg-[rgba(7,9,14,0.96)] backdrop-blur-sm">
-        <div className="mx-auto max-w-[1720px] px-4">
-          <div className="flex items-start gap-3 py-3">
+      {/* ── Sticky Query bar — floating card, not a full-width banner ── */}
+      <div className="sticky top-[var(--site-header-height)] z-20 px-4 py-2.5">
+        <div className="mx-auto max-w-[1720px]">
+          <div className="rounded-xl border border-[rgba(197,50,71,0.28)] bg-[rgba(10,13,20,0.98)] shadow-[0_0_0_1px_rgba(197,50,71,0.12),0_0_40px_rgba(197,50,71,0.12),0_12px_32px_rgba(0,0,0,0.56)] backdrop-blur-md flex items-start gap-4 px-4 py-3">
 
-            {/* Left label — md+ */}
-            <div className="hidden md:flex shrink-0 items-center gap-1.5 self-center border-r border-border-subtle pr-3">
-              <EyeIcon />
-              <span className="text-[0.74rem] font-black uppercase tracking-[0.16em] text-text-secondary">Query</span>
-            </div>
-
-            {/* Center: raw query + human-readable chips */}
+            {/* Color-coded query + human-readable chips */}
             <div className="flex-1 min-w-0 flex flex-col gap-1.5">
               <output aria-live="polite" aria-label="Your query" className="block">
-                {builtQuery
-                  ? <code className="text-sm font-mono text-text-primary break-all">{builtQuery}</code>
-                  : <span className="text-sm text-text-tertiary">Select one or more filters to build a query.</span>
-                }
+                <SyntaxHighlightedQuery query={builtQuery} />
               </output>
-              {queryDisplayBlocks.length > 0 && (
+              {queryDisplayBlocks.length > 0 ? (
                 <div className="hidden md:flex flex-wrap items-center gap-x-2 gap-y-1">
                   <QuerySummaryChips items={queryDisplayBlocks} />
                 </div>
-              )}
+              ) : null}
             </div>
 
-            {/* Right: action buttons */}
-            <div className="shrink-0 flex items-center gap-1.5">
+            {/* Action buttons — stacked vertically */}
+            <div className="shrink-0 flex flex-col gap-1 min-w-[7.5rem]">
               <button type="button" onClick={handleCopy} disabled={!builtQuery} className={NAV_BTN}>
                 <CopyIcon />
-                <span className="hidden lg:inline">{copied ? "Copied!" : "Copy"}</span>
+                {copied ? "Copied!" : "Copy"}
               </button>
               <button type="button" onClick={handleReset} className={NAV_BTN}>
                 <XIcon />
-                <span className="hidden lg:inline">Reset Filters</span>
+                Reset Filters
               </button>
+              {/* Search — only visible below lg where the results panel isn't alongside */}
               <button
                 type="button"
                 onClick={handleSearch}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,var(--color-accent-hover),var(--color-accent))] px-2.5 py-1.5 text-xs font-bold text-white shadow-[0_4px_12px_rgba(197,50,71,0.22)] transition-[box-shadow,filter] duration-150 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
+                className="lg:hidden inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,var(--color-accent-hover),var(--color-accent))] px-3 py-1.5 text-xs font-bold text-white shadow-[0_4px_12px_rgba(197,50,71,0.22)] transition-[box-shadow,filter] duration-150 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
               >
                 <SearchIcon />
-                <span className="hidden lg:inline">Search</span>
+                Search
               </button>
             </div>
           </div>
@@ -442,7 +594,7 @@ export default function QueryBuilderView() {
       <div className={QB_TOKENS.builderShell} aria-label="Query builder filters">
 
         {/* ── Card Type & Tags ── */}
-        <Section title="Card Type & Tags" hint="ct:Unit · u:Champion · tag:Dragon">
+        <Section title="Card Type & Tags" hint="ct:Unit · u:Champion · tag:Dragon" collapsible>
           <Subsection raised>
             <TextField label="TYPELINE" hint="t:Champion" placeholder="e.g. Champion Unit, Dragon" value={typelineText} onChange={setTypelineText} />
           </Subsection>
@@ -469,7 +621,7 @@ export default function QueryBuilderView() {
         </Section>
 
         {/* ── Domain ── */}
-        <Section title="Domain" hint="d:Fury">
+        <Section title="Domain" hint="d:Fury" collapsible>
           <Subsection raised>
             <div className="flex flex-wrap gap-2">
             {DOMAIN_ORDER.map((domain) => {
@@ -495,7 +647,7 @@ export default function QueryBuilderView() {
         </Section>
 
         {/* ── Rarity ── */}
-        <Section title="Rarity" hint="rarity:Rare">
+        <Section title="Rarity" hint="rarity:Rare" collapsible>
           <Subsection>
             <div className="flex flex-wrap gap-2">
             {RARITIES.map((rarity) => {
@@ -534,7 +686,7 @@ export default function QueryBuilderView() {
         </Section>
 
         {/* ── Set ── */}
-        <Section title="Set" hint="s:OGN">
+        <Section title="Set" hint="s:OGN" collapsible>
           <Subsection>
             <div className="flex flex-wrap gap-2">
             {QB_SETS.map(({ id, label }) => (
@@ -557,7 +709,7 @@ export default function QueryBuilderView() {
         </Section>
 
         {/* ── Stats ── */}
-        <Section title="Stats">
+        <Section title="Stats" collapsible>
           <Subsection raised>
             <div className="grid grid-cols-2 max-[700px]:grid-cols-1 gap-2.5">
               <StatRow label="Energy" hint="e>=3"       op={energyOp} onOpChange={setEnergyOp} val={energyVal} onValChange={setEnergyVal} />
@@ -569,7 +721,7 @@ export default function QueryBuilderView() {
         </Section>
 
         {/* ── Text Filters ── */}
-        <Section title="Text Filters">
+        <Section title="Text Filters" collapsible>
           <Subsection>
             <div className="flex flex-col gap-2.5">
               <TextField label="Name"       hint="n:jinx"              placeholder="e.g. Jinx"                    value={nameText}    onChange={setNameText}    />
@@ -584,7 +736,7 @@ export default function QueryBuilderView() {
         </Section>
 
         {/* ── Finish ── */}
-        <Section title="Finish" hint="is:foil">
+        <Section title="Finish" hint="is:foil" collapsible>
           <Subsection>
             <div className="flex flex-wrap gap-2">
               {FINISHES.map(({ value, label }) => (
