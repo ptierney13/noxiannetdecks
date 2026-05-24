@@ -101,7 +101,7 @@ const QB_TOKENS = {
   layout: "mx-auto grid w-full max-w-[1720px] gap-7 px-4 pb-16 pt-3 lg:grid-cols-[minmax(360px,820px)_minmax(0,1fr)]",
   builderShell: "flex min-w-0 flex-col gap-5 rounded-2xl border border-border-subtle bg-[linear-gradient(180deg,rgba(16,20,30,0.72),rgba(7,9,14,0.46))] p-3 shadow-[0_18px_48px_rgba(0,0,0,0.24)] sm:p-4",
   queryCard: "rounded-xl border border-border-default bg-[linear-gradient(180deg,rgba(25,30,42,0.94),rgba(12,15,23,0.96))] px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_28px_rgba(0,0,0,0.24)]",
-  section: "overflow-hidden rounded-xl border border-[rgba(197,50,71,0.5)] bg-[linear-gradient(180deg,rgba(197,50,71,0.055)_0%,rgba(15,19,29,0.94)_28%,rgba(8,10,16,0.96)_100%)] shadow-[0_0_16px_rgba(197,50,71,0.16),0_8px_20px_rgba(0,0,0,0.18)] transition-[background,border-color,box-shadow] duration-150",
+  section: "overflow-hidden rounded-xl bg-[linear-gradient(180deg,rgba(197,50,71,0.055)_0%,rgba(15,19,29,0.94)_28%,rgba(8,10,16,0.96)_100%)] shadow-[0_0_16px_rgba(197,50,71,0.16),0_8px_20px_rgba(0,0,0,0.18)] transition-[background,box-shadow] duration-150",
   sectionHeader: "flex items-center gap-2.5 border-b border-border-subtle bg-[linear-gradient(180deg,rgba(25,30,42,0.9),rgba(15,19,29,0.94))] px-4 py-3.5 shadow-[inset_0_1px_0_rgba(197,50,71,0.22)]",
   sectionBody: "flex flex-col gap-3.5 bg-[linear-gradient(180deg,rgba(10,13,20,0.72),rgba(8,10,16,0.88))] px-4 py-4",
   sectionTitle: "text-[0.77rem] font-black uppercase tracking-[0.14em] text-accent-warm leading-none",
