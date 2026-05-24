@@ -1,8 +1,9 @@
 import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { useNavigate, Link } from "@tanstack/react-router";
-import { CardSearchResultsPane } from "../features";
+import { CardSearchResultsPane, QuerySummaryChips } from "../features";
 import { useDebounce } from "../lib";
 import { renderTokenizedText, raritySymbolSrc } from "../lib";
+import { parseQuery, executedTokensToDisplay, type DisplayItem } from "@noxiannet/card-store/query";
 
 // ── Data constants ────────────────────────────────────────────────────────────
 
@@ -96,6 +97,33 @@ function BookIcon() {
   );
 }
 
+function EyeIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function CopyIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+
+function XIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
 function SearchIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -106,12 +134,10 @@ function SearchIcon() {
 }
 
 const QB_TOKENS = {
-  layout: "mx-auto grid w-full max-w-[1720px] gap-7 px-4 pb-10 pt-3 lg:grid-cols-[minmax(360px,820px)_minmax(0,1fr)]",
   builderShell: "flex min-w-0 flex-col gap-5 rounded-2xl border border-border-subtle bg-[linear-gradient(180deg,rgba(16,20,30,0.72),rgba(7,9,14,0.46))] p-3 shadow-[0_18px_48px_rgba(0,0,0,0.24)] sm:p-4",
-  queryCard: "rounded-xl border border-border-default bg-[linear-gradient(180deg,rgba(25,30,42,0.94),rgba(12,15,23,0.96))] px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_28px_rgba(0,0,0,0.24)]",
-  section: "overflow-hidden rounded-xl bg-[linear-gradient(180deg,rgba(197,50,71,0.055)_0%,rgba(15,19,29,0.94)_28%,rgba(8,10,16,0.96)_100%)] shadow-[0_0_16px_rgba(197,50,71,0.16),0_8px_20px_rgba(0,0,0,0.18)] transition-[background,box-shadow] duration-150",
-  sectionHeader: "flex items-center gap-2.5 border-b border-border-subtle bg-[linear-gradient(180deg,rgba(25,30,42,0.9),rgba(15,19,29,0.94))] px-4 py-3.5 shadow-[inset_0_1px_0_rgba(197,50,71,0.22)]",
-  sectionBody: "flex flex-col gap-3.5 bg-[linear-gradient(180deg,rgba(10,13,20,0.72),rgba(8,10,16,0.88))] px-4 py-4",
+  section: "overflow-hidden rounded-xl bg-[rgba(14,18,28,0.92)]",
+  sectionHeader: "flex items-center gap-2.5 px-4 pt-3.5 pb-2",
+  sectionBody: "flex flex-col gap-3.5 px-4 pb-4",
   sectionTitle: "text-[0.77rem] font-black uppercase tracking-[0.14em] text-accent-warm leading-none",
   sectionHint: "rounded-md border border-border-default bg-[rgba(8,11,18,0.82)] px-1.5 py-0.5 font-mono text-[0.66rem] text-accent-warm leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
   subsection: "rounded-lg border border-border-subtle bg-[linear-gradient(180deg,rgba(20,25,36,0.72),rgba(10,13,20,0.78))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
@@ -124,8 +150,7 @@ const QB_TOKENS = {
   fieldInput: "h-9 w-full rounded-lg border border-[rgba(255,255,255,0.2)] bg-[linear-gradient(180deg,rgba(18,22,32,0.96),rgba(10,13,20,0.98))] px-3 text-sm text-text-primary shadow-[inset_0_1px_2px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,255,255,0.045)] placeholder:text-text-tertiary/55 transition-[background,border-color,box-shadow] duration-150 hover:border-border-strong focus:outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-focus-ring)]",
   compactField: "h-8 rounded-md border border-[rgba(255,255,255,0.2)] bg-[linear-gradient(180deg,rgba(18,22,32,0.96),rgba(10,13,20,0.98))] font-mono text-sm text-text-primary shadow-[inset_0_1px_2px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,255,255,0.045)] transition-[border-color,box-shadow] duration-150 focus:outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-focus-ring)]",
   statRow: "flex items-center gap-2 rounded-lg border border-border-default bg-[linear-gradient(180deg,rgba(27,33,45,0.88),rgba(13,16,24,0.94))] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.055),0_5px_14px_rgba(0,0,0,0.18)] transition-[background,border-color,box-shadow] duration-150 hover:border-border-strong hover:bg-[linear-gradient(180deg,rgba(35,42,56,0.94),rgba(16,20,30,0.98))] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.075),0_9px_20px_rgba(0,0,0,0.24)]",
-  actionButton: "inline-flex items-center gap-2 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,var(--color-accent-hover),var(--color-accent))] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(197,50,71,0.22),inset_0_1px_0_rgba(255,255,255,0.12)] transition-[box-shadow,transform,filter] duration-150 hover:-translate-y-px hover:shadow-[0_14px_30px_rgba(197,50,71,0.28),inset_0_1px_0_rgba(255,255,255,0.14)] hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
-  previewFrame: "overflow-hidden rounded-2xl border border-border-default bg-[linear-gradient(180deg,rgba(18,22,32,0.96),rgba(7,9,14,0.98))] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_22px_52px_rgba(0,0,0,0.34)]",
+  previewFrame: "flex flex-col flex-1 overflow-hidden rounded-2xl border border-border-default bg-[linear-gradient(180deg,rgba(18,22,32,0.96),rgba(7,9,14,0.98))] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_22px_52px_rgba(0,0,0,0.34)]",
 } as const;
 
 type SectionProps = {
@@ -321,39 +346,105 @@ export default function QueryBuilderView() {
     energyOp, energyVal, mightOp, mightVal, powerOp, powerVal, costOp, costVal,
   ]);
 
+  const [copied, setCopied] = useState(false);
+
   function handleSearch() {
     void navigate({ to: "/cards", search: { q: builtQuery.trim() || undefined } });
   }
 
+  function handleReset() {
+    setSelectedTypes(new Set());
+    setSelectedSupertypes(new Set());
+    setSelectedDomains(new Set());
+    setSelectedRarities(new Set());
+    setSelectedSets(new Set());
+    setSelectedFinishes(new Set());
+    setTypelineText(""); setTagText(""); setNameText("");
+    setRulesText(""); setKeywordText(""); setArtistText("");
+    setEnergyOp(">="); setEnergyVal("");
+    setMightOp(">=");  setMightVal("");
+    setPowerOp(">=");  setPowerVal("");
+    setCostOp(">=");   setCostVal("");
+  }
+
+  function handleCopy() {
+    if (!builtQuery) return;
+    void navigator.clipboard.writeText(builtQuery).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  }
+
   const debouncedBuiltQuery = useDebounce(builtQuery, 180);
 
+  const queryDisplayBlocks = useMemo((): DisplayItem[] => {
+    if (!debouncedBuiltQuery.trim()) return [];
+    return executedTokensToDisplay(parseQuery(debouncedBuiltQuery).executedTokens);
+  }, [debouncedBuiltQuery]);
+
+  const NAV_BTN = "inline-flex items-center gap-1.5 rounded-lg border border-border-default px-2.5 py-1.5 text-xs font-bold text-text-secondary transition-[background,border-color,color] duration-150 hover:border-border-strong hover:text-text-primary disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]";
+
   return (
-    <div className={QB_TOKENS.layout}>
+    <div>
+      {/* ── Sticky Query bar ── */}
+      <div className="sticky top-[var(--site-header-height)] z-20 border-b border-border-subtle bg-[rgba(7,9,14,0.96)] backdrop-blur-sm">
+        <div className="mx-auto max-w-[1720px] px-4">
+          <div className="flex items-start gap-3 py-3">
+
+            {/* Left label — md+ */}
+            <div className="hidden md:flex shrink-0 items-center gap-1.5 self-center border-r border-border-subtle pr-3">
+              <EyeIcon />
+              <span className="text-[0.74rem] font-black uppercase tracking-[0.16em] text-text-secondary">Query</span>
+            </div>
+
+            {/* Center: raw query + human-readable chips */}
+            <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+              <output aria-live="polite" aria-label="Your query" className="block">
+                {builtQuery
+                  ? <code className="text-sm font-mono text-text-primary break-all">{builtQuery}</code>
+                  : <span className="text-sm text-text-tertiary">Select one or more filters to build a query.</span>
+                }
+              </output>
+              {queryDisplayBlocks.length > 0 && (
+                <div className="hidden md:flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <QuerySummaryChips items={queryDisplayBlocks} />
+                </div>
+              )}
+            </div>
+
+            {/* Right: action buttons */}
+            <div className="shrink-0 flex items-center gap-1.5">
+              <button type="button" onClick={handleCopy} disabled={!builtQuery} className={NAV_BTN}>
+                <CopyIcon />
+                <span className="hidden lg:inline">{copied ? "Copied!" : "Copy"}</span>
+              </button>
+              <button type="button" onClick={handleReset} className={NAV_BTN}>
+                <XIcon />
+                <span className="hidden lg:inline">Reset Filters</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleSearch}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,var(--color-accent-hover),var(--color-accent))] px-2.5 py-1.5 text-xs font-bold text-white shadow-[0_4px_12px_rgba(197,50,71,0.22)] transition-[box-shadow,filter] duration-150 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
+              >
+                <SearchIcon />
+                <span className="hidden lg:inline">Search</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Two-column grid ── */}
+      <div className="mx-auto grid w-full max-w-[1720px] gap-7 px-4 pb-10 pt-4 lg:grid-cols-[minmax(360px,820px)_minmax(0,1fr)]">
 
       {/* ── Builder panel ── */}
-      <div className={QB_TOKENS.builderShell} aria-labelledby="qb-heading">
-
-        {/* Live query display */}
-        <div className={QB_TOKENS.queryCard}>
-          <h1 id="qb-heading" className="mb-2.5 text-[0.74rem] font-black uppercase tracking-[0.16em] text-text-primary">
-            Your Query
-          </h1>
-          <output
-            className="block min-h-[1.5rem]"
-            aria-live="polite"
-            aria-label="Your query"
-          >
-            {builtQuery
-              ? <code className="text-sm font-mono text-text-primary break-all">{builtQuery}</code>
-              : <span className="text-sm italic text-text-secondary">Make a selection below to build your query</span>
-            }
-          </output>
-        </div>
+      <div className={QB_TOKENS.builderShell} aria-label="Query builder filters">
 
         {/* ── Card Type & Tags ── */}
         <Section title="Card Type & Tags" hint="ct:Unit · u:Champion · tag:Dragon">
           <Subsection raised>
-            <TextField label="Typeline" hint="t:Champion" placeholder="e.g. Champion Unit, Dragon" value={typelineText} onChange={setTypelineText} />
+            <TextField label="TYPELINE" hint="t:Champion" placeholder="e.g. Champion Unit, Dragon" value={typelineText} onChange={setTypelineText} />
           </Subsection>
           <Subsection label="Card Type" raised>
             <div className="flex flex-wrap gap-2">
@@ -503,38 +594,29 @@ export default function QueryBuilderView() {
           </Subsection>
         </Section>
 
-        {/* ── Search action ── */}
-        <div className="pt-1">
-          <button
-            type="button"
-            className={QB_TOKENS.actionButton}
-            onClick={handleSearch}
-          >
-            <SearchIcon />
-            {builtQuery ? "Search with this query" : "Search all cards"}
-          </button>
-        </div>
       </div>
 
       {/* ── Live preview aside ── */}
-      <aside className="min-w-0 lg:sticky lg:top-[calc(var(--site-header-height)+1rem)] lg:self-start">
+      <aside className="min-w-0 flex flex-col">
         <div className={QB_TOKENS.previewFrame}>
           <CardSearchResultsPane
-          query={debouncedBuiltQuery}
-          navSlot={
-            <Link
-              to="/cards/learn-to-search"
-              search={{ mode: "visual-guide" }}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border-default bg-[rgba(255,255,255,0.04)] px-3 py-1.5 text-xs font-bold text-text-secondary transition-[background,border-color,color] duration-150 hover:border-border-strong hover:bg-[rgba(255,255,255,0.07)] hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
-            >
-              <BookIcon />
-              Learn to Search
-            </Link>
-          }
-        />
+            query={debouncedBuiltQuery}
+            hideSummary
+            navSlot={
+              <Link
+                to="/cards/learn-to-search"
+                search={{ mode: "visual-guide" }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border-default bg-[rgba(255,255,255,0.04)] px-3 py-1.5 text-xs font-bold text-text-secondary transition-[background,border-color,color] duration-150 hover:border-border-strong hover:bg-[rgba(255,255,255,0.07)] hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
+              >
+                <BookIcon />
+                Learn to Search
+              </Link>
+            }
+          />
         </div>
       </aside>
 
+      </div>
     </div>
   );
 }

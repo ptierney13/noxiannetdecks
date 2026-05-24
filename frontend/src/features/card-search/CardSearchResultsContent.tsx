@@ -12,6 +12,7 @@ import {
   type PublishedPriceIndex,
 } from "../../lib";
 import { executedTokensToDisplay, type ExecutedQueryItem } from "@noxiannet/card-store/query";
+import { QuerySummaryChips } from "./QuerySummaryChips";
 import type { CardRecord } from "../../types";
 
 export type CardSearchResultsContentProps = {
@@ -33,6 +34,7 @@ export type CardSearchResultsContentProps = {
   onShowVariantsChange: (showVariants: boolean) => void;
   onCardClick: (card: CardRecord, group: CardRecord[], finish: CardFinish) => void;
   navSlot?: ReactNode;
+  hideSummary?: boolean;
 };
 
 // Controls flex row — dropdowns + checkbox stack wrap at narrow widths.
@@ -220,29 +222,7 @@ function ResultSummary({
       </p>
 
       {/* Valid chips — preserve their AND/OR connectors */}
-      {executedBlocks.map((item, i) => {
-        if (item === "AND" || item === "OR") {
-          return (
-            <span key={`conn-${i}`} className="text-[0.7rem] font-black uppercase tracking-widest text-text-secondary">
-              {item}
-            </span>
-          );
-        }
-        return (
-          <span
-            key={`exec-${i}`}
-            className="inline-flex items-center gap-1 rounded-lg border border-[rgba(215,170,73,0.4)] bg-accent-warm-soft px-3 py-1 text-sm"
-          >
-            {item.prefix ? (
-              <span className="font-semibold text-accent-warm">{item.prefix}</span>
-            ) : null}
-            <span className="font-black text-text-primary">{item.value}</span>
-            {item.suffix ? (
-              <span className="font-semibold text-accent-warm">{item.suffix}</span>
-            ) : null}
-          </span>
-        );
-      })}
+      <QuerySummaryChips items={executedBlocks} />
 
       {/* Separator + dropped chips — connectors between dropped tokens are omitted */}
       {hasBad ? (
@@ -285,6 +265,7 @@ export function CardSearchResultsContent({
   onShowVariantsChange,
   onCardClick,
   navSlot,
+  hideSummary,
 }: CardSearchResultsContentProps) {
   return (
     <section aria-label="Card search results" className="flex flex-col flex-1 min-h-0">
@@ -340,11 +321,13 @@ export function CardSearchResultsContent({
       </div>
 
       <div className={`flex flex-col flex-1 min-h-0 gap-4 ${PANE_PADDING_CLASSES}`}>
-        <ResultSummary
-          isPending={isPending}
-          visibleResultCount={visibleResultCount}
-          executedTokens={executedTokens}
-        />
+        {!hideSummary && (
+          <ResultSummary
+            isPending={isPending}
+            visibleResultCount={visibleResultCount}
+            executedTokens={executedTokens}
+          />
+        )}
 
         {isPending ? <LoadingGrid /> : null}
 
@@ -366,6 +349,7 @@ export function CardSearchResultsContent({
         ) : null}
 
         {!isPending && !isError && groups.length > 0 ? (
+          <div className="rounded-2xl border border-border-subtle overflow-hidden p-3 @[640px]:p-4">
           <div className={RESULTS_GRID_CLASSES} data-testid="card-search-results-grid">
             {groups.map((group) => {
               const representative = group.representative;
@@ -393,6 +377,7 @@ export function CardSearchResultsContent({
                 />
               );
             })}
+          </div>
           </div>
         ) : null}
 

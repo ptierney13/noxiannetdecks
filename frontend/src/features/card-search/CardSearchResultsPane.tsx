@@ -19,6 +19,7 @@ import { CardSearchResultsContent } from "./CardSearchResultsContent";
 export type CardSearchResultsPaneProps = {
   query: string;
   navSlot?: ReactNode;
+  hideSummary?: boolean;
 };
 
 type SelectedPreview = {
@@ -27,7 +28,7 @@ type SelectedPreview = {
   finish: CardFinish;
 };
 
-export function CardSearchResultsPane({ query, navSlot }: CardSearchResultsPaneProps) {
+export function CardSearchResultsPane({ query, navSlot, hideSummary }: CardSearchResultsPaneProps) {
   const resultsQuery = useCardSearchResults(query);
   const { index: publishedPriceIndex } = usePublishedPriceIndex();
   const [sort, setSort] = useState<CardSearchSortKey>("energy-asc");
@@ -52,7 +53,7 @@ export function CardSearchResultsPane({ query, navSlot }: CardSearchResultsPaneP
   const visibleResultCount = variantMode === "unique-cards" ? groups.length : cards.length;
 
   return (
-    <div className="@container min-h-[28rem] flex flex-col">
+    <div className="@container flex-1 flex flex-col min-h-[28rem]">
       <CardSearchResultsContent
         groups={groups}
         rawResultCount={cards.length}
@@ -80,6 +81,7 @@ export function CardSearchResultsPane({ query, navSlot }: CardSearchResultsPaneP
           setSelectedPreview({ group, card, finish: normalizeCardFinish(finish) });
         }}
         navSlot={navSlot}
+        hideSummary={hideSummary}
       />
 
       {selectedPreview ? (
