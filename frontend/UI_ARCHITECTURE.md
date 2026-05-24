@@ -87,6 +87,15 @@ Additional boundary rules:
 
 ## Shared Design System
 
+The durable source of truth for visual design decisions is
+`docs/reference/ui/`. Read those docs before UI polish, component extraction,
+or new page composition work:
+
+- `docs/reference/ui/DESIGN-SYSTEM.md`
+- `docs/reference/ui/TOKENS.md`
+- `docs/reference/ui/COMPONENTS.md`
+- `docs/reference/ui/ANTI-PATTERNS.md`
+
 Semantic tokens are defined as CSS custom properties in `ui-foundation.css`.
 They represent shared visual decisions and should be referenced in Tailwind
 classes via `var(--token-name)` where needed.

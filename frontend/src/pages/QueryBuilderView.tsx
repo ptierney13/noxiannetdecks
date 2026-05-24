@@ -1,6 +1,6 @@
 import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { CardSearchResultsPane } from "../features";
+import { CardSearchResultsPane, CardsToolsNav } from "../features";
 import { SyntaxQueryChip } from "../ui-elements";
 import { useDebounce } from "../lib";
 import { renderTokenizedText, raritySymbolSrc } from "../lib";
@@ -98,19 +98,13 @@ function SearchIcon() {
 }
 
 const QB_TOKENS = {
-  layout: "mx-auto grid w-full max-w-[1720px] gap-7 px-4 pb-10 pt-3 lg:grid-cols-[minmax(360px,820px)_minmax(0,1fr)]",
+  layout: "mx-auto grid w-full max-w-[1720px] gap-7 px-4 pb-16 pt-3 lg:grid-cols-[minmax(360px,820px)_minmax(0,1fr)]",
   builderShell: "flex min-w-0 flex-col gap-5 rounded-2xl border border-border-subtle bg-[linear-gradient(180deg,rgba(16,20,30,0.72),rgba(7,9,14,0.46))] p-3 shadow-[0_18px_48px_rgba(0,0,0,0.24)] sm:p-4",
   queryCard: "rounded-xl border border-border-default bg-[linear-gradient(180deg,rgba(25,30,42,0.94),rgba(12,15,23,0.96))] px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_28px_rgba(0,0,0,0.24)]",
-  sectionBase: "overflow-hidden rounded-xl border transition-[background,border-color,box-shadow] duration-150",
-  sectionPrimary: "border-border-default bg-[linear-gradient(180deg,rgba(20,25,36,0.96),rgba(10,13,20,0.98))] shadow-[0_16px_36px_rgba(0,0,0,0.24)]",
-  sectionSecondary: "border-border-subtle bg-[linear-gradient(180deg,rgba(15,19,29,0.94),rgba(8,10,16,0.96))] shadow-[0_10px_24px_rgba(0,0,0,0.16)]",
-  sectionHeaderBase: "flex items-center gap-3 border-b px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.055)]",
-  sectionHeaderPrimary: "border-border-default bg-[linear-gradient(180deg,rgba(35,41,56,0.98),rgba(20,25,36,0.96))]",
-  sectionHeaderSecondary: "border-border-subtle bg-[linear-gradient(180deg,rgba(25,30,42,0.9),rgba(15,19,29,0.94))]",
-  sectionBodyPrimary: "flex flex-col gap-4 bg-[linear-gradient(180deg,rgba(13,16,24,0.82),rgba(10,12,18,0.92))] px-4 py-4",
-  sectionBodySecondary: "flex flex-col gap-3.5 bg-[linear-gradient(180deg,rgba(10,13,20,0.72),rgba(8,10,16,0.88))] px-4 py-4",
-  sectionTitlePrimary: "text-[0.8rem] font-black uppercase tracking-[0.14em] text-text-primary leading-none",
-  sectionTitleSecondary: "text-[0.76rem] font-black uppercase tracking-[0.14em] text-text-secondary leading-none",
+  section: "overflow-hidden rounded-xl border border-border-subtle [border-top-color:rgba(197,50,71,0.5)] bg-[linear-gradient(180deg,rgba(197,50,71,0.055)_0%,rgba(15,19,29,0.94)_28%,rgba(8,10,16,0.96)_100%)] shadow-[0_-2px_16px_rgba(197,50,71,0.16),0_8px_20px_rgba(0,0,0,0.18)] transition-[background,border-color,box-shadow] duration-150",
+  sectionHeader: "flex items-center gap-2.5 border-b border-border-subtle bg-[linear-gradient(180deg,rgba(25,30,42,0.9),rgba(15,19,29,0.94))] px-4 py-3.5 shadow-[inset_0_1px_0_rgba(197,50,71,0.22)]",
+  sectionBody: "flex flex-col gap-3.5 bg-[linear-gradient(180deg,rgba(10,13,20,0.72),rgba(8,10,16,0.88))] px-4 py-4",
+  sectionTitle: "text-[0.77rem] font-black uppercase tracking-[0.14em] text-accent-warm leading-none",
   sectionHint: "rounded-md border border-border-default bg-[rgba(8,11,18,0.82)] px-1.5 py-0.5 font-mono text-[0.66rem] text-accent-warm leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
   subsection: "rounded-lg border border-border-subtle bg-[linear-gradient(180deg,rgba(20,25,36,0.72),rgba(10,13,20,0.78))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
   subsectionRaised: "border-border-default bg-[linear-gradient(180deg,rgba(25,31,43,0.82),rgba(12,15,23,0.88))]",
@@ -129,38 +123,17 @@ const QB_TOKENS = {
 type SectionProps = {
   title: string;
   hint?: string;
-  emphasis?: "primary" | "secondary";
   children: ReactNode;
 };
 
-function Section({ title, hint, emphasis = "secondary", children }: SectionProps) {
-  const isPrimary = emphasis === "primary";
-
+function Section({ title, hint, children }: SectionProps) {
   return (
-    <section className={[QB_TOKENS.sectionBase, isPrimary ? QB_TOKENS.sectionPrimary : QB_TOKENS.sectionSecondary].join(" ")}>
-      <div className={[
-        QB_TOKENS.sectionHeaderBase,
-        isPrimary ? QB_TOKENS.sectionHeaderPrimary : QB_TOKENS.sectionHeaderSecondary,
-      ].join(" ")}>
-        <span
-          className={[
-            "h-8 w-1.5 rounded-full",
-            isPrimary ? "bg-accent shadow-[0_0_16px_rgba(197,50,71,0.2)]" : "bg-border-accent/80",
-          ].join(" ")}
-          aria-hidden="true"
-        />
-        <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-2">
-          <h2 className={isPrimary ? QB_TOKENS.sectionTitlePrimary : QB_TOKENS.sectionTitleSecondary}>
-            {title}
-          </h2>
-          {hint && (
-            <code className={QB_TOKENS.sectionHint}>
-              {hint}
-            </code>
-          )}
-        </div>
+    <section className={QB_TOKENS.section}>
+      <div className={QB_TOKENS.sectionHeader}>
+        <h2 className={QB_TOKENS.sectionTitle}>{title}</h2>
+        {hint && <code className={QB_TOKENS.sectionHint}>{hint}</code>}
       </div>
-      <div className={isPrimary ? QB_TOKENS.sectionBodyPrimary : QB_TOKENS.sectionBodySecondary}>
+      <div className={QB_TOKENS.sectionBody}>
         {children}
       </div>
     </section>
@@ -370,7 +343,7 @@ export default function QueryBuilderView() {
         </div>
 
         {/* ── Card Type & Tags ── */}
-        <Section title="Card Type & Tags" hint="ct:Unit · u:Champion · tag:Dragon" emphasis="primary">
+        <Section title="Card Type & Tags" hint="ct:Unit · u:Champion · tag:Dragon">
           <Subsection raised>
             <TextField label="Typeline" hint="t:Champion" placeholder="e.g. Champion Unit, Dragon" value={typelineText} onChange={setTypelineText} />
           </Subsection>
@@ -397,7 +370,7 @@ export default function QueryBuilderView() {
         </Section>
 
         {/* ── Domain ── */}
-        <Section title="Domain" hint="d:Fury" emphasis="primary">
+        <Section title="Domain" hint="d:Fury">
           <Subsection raised>
             <div className="flex flex-wrap gap-2">
             {DOMAIN_ORDER.map((domain) => {
@@ -485,7 +458,7 @@ export default function QueryBuilderView() {
         </Section>
 
         {/* ── Stats ── */}
-        <Section title="Stats" emphasis="primary">
+        <Section title="Stats">
           <Subsection raised>
             <div className="grid grid-cols-2 max-[700px]:grid-cols-1 gap-2.5">
               <StatRow label="Energy" hint="e>=3"       op={energyOp} onOpChange={setEnergyOp} val={energyVal} onValChange={setEnergyVal} />
@@ -541,6 +514,8 @@ export default function QueryBuilderView() {
           <CardSearchResultsPane query={debouncedBuiltQuery} />
         </div>
       </aside>
+
+      <CardsToolsNav description="Use the filters to narrow your search. Combining more filters will return more specific results." />
     </div>
   );
 }

@@ -10,9 +10,16 @@ These notes apply when editing files under `frontend/`.
 Before significant UI work, also read:
 
 - `frontend/UI_ARCHITECTURE.md`
+- `docs/reference/ui/README.md`
+- `docs/reference/ui/DESIGN-SYSTEM.md`
+- `docs/reference/ui/TOKENS.md`
+- `docs/reference/ui/COMPONENTS.md`
+- `docs/reference/ui/ANTI-PATTERNS.md`
 
-Treat that file as the detailed design and responsive-architecture companion to
-this one.
+Treat `frontend/UI_ARCHITECTURE.md` as the detailed frontend architecture and
+responsive-architecture companion to this one. Treat `docs/reference/ui/` as
+the source of truth for visual design decisions, token usage, component
+patterns, and UI anti-patterns.
 
 ## Execution Defaults
 
@@ -29,6 +36,7 @@ Use the repo-local preview skill at
 
 | If you are doing...                             | Read this first                                        |
 | ----------------------------------------------- | ------------------------------------------------------ |
+| Any frontend UI design, visual polish, or styling decision | `docs/reference/ui/README.md`, then the in-scope UI reference subdoc |
 | Any new component or shared UI work             | `frontend/AGENTS.md` (here), then `src/ui-elements/index.ts` |
 | Feature-level UI used by multiple routes        | `src/features/` barrel + Storybook coverage rule below |
 | Routing or navigation changes                   | `src/routes/` — TanStack Router owns all navigation    |

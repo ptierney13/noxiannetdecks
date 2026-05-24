@@ -18,6 +18,8 @@ Work in progress:
 
 - [AGENTS.md](./AGENTS.md): authoritative agent workflow and repo rules
 - [docs/README.md](./docs/README.md): documentation topology
+- [docs/reference/ui/README.md](./docs/reference/ui/README.md): UI design
+  system, tokens, component patterns, and anti-patterns
 - [card_store/README.md](./card_store/README.md): backend card/search semantics
 - [frontend/README.md](./frontend/README.md): frontend app semantics
 - [price_store/README.md](./price_store/README.md): price pipeline semantics

@@ -57,7 +57,7 @@ This table is mandatory, not a suggestion.
 | If you are doing... | Read this first |
 | --- | --- |
 | Query engine or API work | `card_store/AGENTS.md`, `card_store/README.md` |
-| Frontend UI work | `frontend/AGENTS.md`, `frontend/UI_ARCHITECTURE.md`, `frontend/README.md` |
+| Frontend UI work | `frontend/AGENTS.md`, `frontend/UI_ARCHITECTURE.md`, `frontend/README.md`, `docs/reference/ui/README.md` |
 | Price scraping or pipeline work | `price_store/AGENTS.md`, `price_store/README.md` |
 | Deck archive or ingestion work | `deck_store/AGENTS.md`, `deck_store/README.md` |
 | Cloudflare deployment architecture | `docs/reference/cloudflare-deployment/README.md` |

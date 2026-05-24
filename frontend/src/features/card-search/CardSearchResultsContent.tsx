@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronIcon, ResultCard } from "../../ui-elements";
+import { NoxianLogoIcon } from "../../ui-elements/Icon";
 import { VariantSelectorRow } from "../VariantSelectorRow";
 import {
   CARD_SEARCH_SORT_OPTIONS,
@@ -347,8 +348,12 @@ export function CardSearchResultsContent({
         ) : null}
 
         {!isPending && !isError && groups.length === 0 ? (
-          <div className="rounded-2xl border border-border-default bg-surface-2 p-8 text-center text-text-secondary">
-            No cards matched this query.
+          <div className="rounded-2xl border border-border-default bg-surface-2 p-8 flex flex-col items-center gap-5 text-center">
+            <NoxianLogoIcon className="w-14 h-14 opacity-[0.15]" />
+            <div className="flex flex-col gap-1.5">
+              <p className="font-semibold text-text-secondary">No cards match this query.</p>
+              <p className="text-sm text-text-tertiary">Adjust your filters or remove some constraints<br className="hidden @[400px]:block" /> to see results here.</p>
+            </div>
           </div>
         ) : null}
 

@@ -6,6 +6,8 @@ READMEs.
 ## Layout
 
 - `reference/`: evergreen behavior, architecture, and policy docs
+  - `reference/ui/`: UI design system, tokens, component patterns, and
+    anti-patterns for frontend implementation
 - `runbooks/`: repeatable operational procedures
 - `work/`: active initiative planning and execution docs
 - `archive/`: completed or superseded historical docs

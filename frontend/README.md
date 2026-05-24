@@ -25,7 +25,11 @@ The current site provides:
 
 - Shared semantic UI tokens and small cross-route primitives live in
   `frontend/src/ui-foundation.css`.
-- Route and feature styling lives in `frontend/src/styles.css`.
+- Current route and feature styling uses Tailwind utilities on components,
+  shared primitives from `frontend/src/ui-elements/`, and reusable domain UI
+  from `frontend/src/features/`.
+- `frontend/src/styles.css` is legacy and shrinking; do not add new rules.
+- Durable UI decision guidance lives in `docs/reference/ui/`.
 - Frontend contributor guidance for agents and humans lives in
   `frontend/AGENTS.md`.
 

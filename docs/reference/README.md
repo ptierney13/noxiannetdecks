@@ -18,6 +18,9 @@ One level down, the current reference surface is:
 
 - [initiative-doc-authoring.md](./initiative-doc-authoring.md):
   compact reference for structuring active initiative docs in `docs/work/`
+- [ui/README.md](./ui/README.md):
+  UI design system, token inventory, component patterns, and anti-patterns for
+  frontend implementation
 - [cloudflare-deployment/README.md](./cloudflare-deployment/README.md):
   Cloudflare-hosted production architecture, with subdocs for the deployed app,
   API, card data, price pipeline, and published price contract
