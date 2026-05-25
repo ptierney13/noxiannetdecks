@@ -631,10 +631,11 @@ export default function QueryBuilderView() {
       {/* px-4 lives on the inner max-w div so the pill borders line up with the two-column grid */}
       <div className="sticky top-[var(--site-header-height)] z-20 py-2.5">
         <div className="mx-auto max-w-[1720px] px-4">
-          {/* Pill: items-center, symbol at explicit h-[132px] (3× original 44px) */}
-          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-center gap-3 px-3 py-2.5">
+          {/* Pill: py-1 so the image edge sits close to the pill border;
+               items-stretch so text+buttons fill the full height cleanly */}
+          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-stretch gap-2 px-2 py-1">
 
-            {/* h-[132px] is explicit so w-auto resolves cleanly (no circular sizing) */}
+            {/* h-[132px] explicit — w-auto derives width from aspect ratio cleanly */}
             <img
               src="/design-assets/solar_symbol.png"
               alt=""
@@ -657,8 +658,8 @@ export default function QueryBuilderView() {
               ) : null}
             </div>
 
-            {/* Action buttons — icon-only, horizontal row */}
-            <div className="shrink-0 flex flex-row items-center gap-1.5">
+            {/* Action buttons — icon-only, horizontal row, centered in stretched height */}
+            <div className="shrink-0 flex flex-row items-center gap-1.5 px-1">
               <button type="button" onClick={handleCopy} disabled={!builtQuery} title={copied ? "Copied!" : "Copy query"} aria-label={copied ? "Copied!" : "Copy query"} className={ICON_BTN}>
                 <CopyIcon />
               </button>
