@@ -256,15 +256,15 @@ const QB_TOKENS = {
   section: "overflow-hidden rounded-xl bg-[rgba(14,18,28,0.92)] shadow-[0_0_0_1px_rgba(197,50,71,0.14),0_0_28px_rgba(197,50,71,0.08),0_4px_14px_rgba(0,0,0,0.28)]",
   sectionHeader: "flex items-center gap-2.5 px-4 pt-3.5 pb-2",
   sectionBody: "flex flex-col gap-3.5 px-4 pb-4",
-  sectionTitle: "text-[0.77rem] font-black uppercase tracking-[0.14em] text-accent-warm leading-none",
+  sectionTitle: "text-[0.77rem] font-bold tracking-[0.04em] text-accent-warm/75 leading-none",
   sectionHint: "rounded-md border border-border-default bg-[rgba(8,11,18,0.82)] px-1.5 py-0.5 font-mono text-[0.66rem] text-accent-warm leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
   subsection: "rounded-lg border border-border-subtle bg-[linear-gradient(180deg,rgba(20,25,36,0.72),rgba(10,13,20,0.78))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
   subsectionRaised: "border-border-default bg-[linear-gradient(180deg,rgba(25,31,43,0.82),rgba(12,15,23,0.88))]",
-  subsectionLabel: "mb-2.5 text-[0.7rem] font-black uppercase tracking-[0.14em] text-accent-warm",
+  subsectionLabel: "mb-2.5 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-accent-warm/65",
   helperText: "text-xs leading-relaxed text-text-tertiary/78",
-  chipBase: "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-[6px] text-sm font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.075),0_4px_10px_rgba(0,0,0,0.2)] transition-[background,border-color,box-shadow,transform,color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
+  chipBase: "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-[6px] text-sm font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.075),0_4px_10px_rgba(0,0,0,0.2)] transition-[background,border-color,box-shadow,transform,color] duration-[180ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
   chipOff: "border-[rgba(255,255,255,0.18)] bg-[linear-gradient(180deg,rgba(38,45,61,0.96),rgba(18,22,32,0.98))] text-text-secondary hover:-translate-y-px hover:border-border-strong hover:bg-[linear-gradient(180deg,rgba(47,55,72,0.98),rgba(23,28,40,0.98))] hover:text-text-primary hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_8px_20px_rgba(0,0,0,0.28)]",
-  chipOn: "border-accent bg-[linear-gradient(180deg,rgba(112,38,51,0.88),rgba(53,17,27,0.96))] text-text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_0_0_1px_rgba(197,50,71,0.32),0_0_18px_rgba(197,50,71,0.15),0_10px_24px_rgba(0,0,0,0.3)] hover:-translate-y-px hover:border-accent-hover hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_0_0_1px_rgba(215,66,85,0.38),0_0_20px_rgba(197,50,71,0.2),0_12px_28px_rgba(0,0,0,0.34)]",
+  chipOn: "border-accent bg-[linear-gradient(180deg,rgba(112,38,51,0.88),rgba(53,17,27,0.96))] text-text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_0_0_1px_rgba(197,50,71,0.32),0_0_24px_rgba(197,50,71,0.22),0_10px_24px_rgba(0,0,0,0.3)] hover:-translate-y-px hover:border-accent-hover hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_0_0_1px_rgba(215,66,85,0.38),0_0_28px_rgba(197,50,71,0.28),0_12px_28px_rgba(0,0,0,0.34)]",
   fieldInput: "h-9 w-full rounded-lg border border-[rgba(255,255,255,0.2)] bg-[linear-gradient(180deg,rgba(18,22,32,0.96),rgba(10,13,20,0.98))] px-3 text-sm text-text-primary shadow-[inset_0_1px_2px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,255,255,0.045)] placeholder:text-text-tertiary/55 transition-[background,border-color,box-shadow] duration-150 hover:border-border-strong focus:outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-focus-ring)]",
   compactField: "h-8 rounded-md border border-[rgba(255,255,255,0.2)] bg-[linear-gradient(180deg,rgba(18,22,32,0.96),rgba(10,13,20,0.98))] font-mono text-sm text-text-primary shadow-[inset_0_1px_2px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,255,255,0.045)] transition-[border-color,box-shadow] duration-150 focus:outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-focus-ring)]",
   statRow: "flex items-center gap-2 rounded-lg border border-border-default bg-[linear-gradient(180deg,rgba(27,33,45,0.88),rgba(13,16,24,0.94))] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.055),0_5px_14px_rgba(0,0,0,0.18)] transition-[background,border-color,box-shadow] duration-150 hover:border-border-strong hover:bg-[linear-gradient(180deg,rgba(35,42,56,0.94),rgba(16,20,30,0.98))] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.075),0_9px_20px_rgba(0,0,0,0.24)]",
@@ -327,7 +327,7 @@ function Subsection({ label, hint, raised = false, children }: SubsectionProps) 
     <div className={[QB_TOKENS.subsection, raised ? QB_TOKENS.subsectionRaised : ""].join(" ")}>
       {(label || hint) ? (
         <div className="flex items-center gap-2 mb-2.5">
-          {label ? <span className="text-[0.7rem] font-black uppercase tracking-[0.14em] text-accent-warm leading-none">{label}</span> : null}
+          {label ? <span className="text-[0.7rem] font-bold uppercase tracking-[0.1em] text-accent-warm/65 leading-none">{label}</span> : null}
           {hint ? <code className={QB_TOKENS.sectionHint}>{hint}</code> : null}
         </div>
       ) : null}
@@ -629,18 +629,18 @@ export default function QueryBuilderView() {
     <div>
       {/* ── Sticky Query bar — pill-shaped, gold accent ── */}
       {/* px-4 lives on the inner max-w div so the pill borders line up with the two-column grid */}
-      <div className="sticky top-[var(--site-header-height)] z-20 py-2.5">
+      <div className="sticky top-[var(--site-header-height)] z-20 py-1.5">
         <div className="mx-auto max-w-[1720px] px-4">
           {/* Pill: py-1 so the image edge sits close to the pill border;
                items-stretch so text+buttons fill the full height cleanly */}
-          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-center gap-3 px-3 py-2">
+          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-center gap-3 px-3 py-1">
 
             {/* h-[72px] explicit — ~1.6x the original 44px; w-auto derives width from aspect ratio */}
             <img
               src="/design-assets/solar_symbol.png"
               alt=""
               aria-hidden="true"
-              className="shrink-0 h-[72px] w-auto object-contain opacity-90 drop-shadow-[0_0_10px_rgba(212,170,73,0.5)]"
+              className="shrink-0 h-[56px] w-auto object-contain opacity-90 drop-shadow-[0_0_10px_rgba(212,170,73,0.5)]"
             />
 
             {/* Syntax query (top, text-base) + human-readable chips (bottom, sm) */}

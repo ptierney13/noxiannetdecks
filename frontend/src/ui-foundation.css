@@ -7,10 +7,10 @@
    every entry as a CSS custom property on :root automatically.
    ============================================================ */
 @theme {
-  --color-app-bg: #05060a;
+  --color-app-bg: #030408;
   --color-surface-header: #3a0c15;
   --color-surface-1: rgba(13, 16, 24, 0.9);
-  --color-surface-2: rgba(16, 20, 30, 0.94);
+  --color-surface-2: rgba(20, 25, 37, 0.96);
   --color-surface-3: rgba(25, 30, 42, 0.96);
   --color-surface-inset: rgba(8, 11, 18, 0.82);
   --color-surface-glass: rgba(10, 13, 20, 0.76);

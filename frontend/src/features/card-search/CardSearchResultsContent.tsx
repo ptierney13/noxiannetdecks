@@ -119,7 +119,11 @@ function SearchSelect<T extends string>({
         role="combobox"
         aria-expanded={open}
         aria-haspopup="listbox"
-        className="inline-flex min-h-11 min-w-[9rem] items-center justify-between gap-2 rounded-xl border border-border-default bg-[rgba(255,255,255,0.12)] px-3 text-sm font-bold text-text-primary outline-none transition-[background,border-color] duration-150 hover:border-border-strong hover:bg-[rgba(255,255,255,0.16)] focus:border-accent focus:ring-4 focus:ring-focus-ring"
+        className={`inline-flex min-h-11 min-w-[9rem] items-center justify-between gap-2 rounded-xl border px-3 text-sm font-bold text-text-primary outline-none transition-[background,border-color,box-shadow] duration-[180ms] hover:border-border-strong hover:bg-[rgba(255,255,255,0.16)] focus:ring-4 focus:ring-focus-ring ${
+          open
+            ? "border-accent bg-[rgba(255,255,255,0.14)] shadow-[0_0_0_1px_rgba(197,50,71,0.18),0_0_14px_rgba(197,50,71,0.1)]"
+            : "border-border-default bg-[rgba(255,255,255,0.12)] focus:border-accent"
+        }`}
         onClick={() => setOpen((prev) => !prev)}
         onKeyDown={handleKeyDown}
       >
@@ -176,9 +180,9 @@ function ToggleButton({
       type="button"
       aria-pressed={checked}
       onClick={() => onChange(!checked)}
-      className={`inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border px-3 text-sm font-bold transition-[background,border-color,color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)] ${
+      className={`inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border px-3 text-sm font-bold transition-[background,border-color,color,box-shadow] duration-[180ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)] ${
         checked
-          ? "border-accent bg-accent-soft text-text-primary"
+          ? "border-accent bg-accent-soft text-text-primary shadow-[0_0_0_1px_rgba(197,50,71,0.32),0_0_12px_rgba(197,50,71,0.12)]"
           : "border-border-default bg-[rgba(255,255,255,0.12)] text-text-secondary hover:border-border-strong hover:bg-[rgba(255,255,255,0.16)] hover:text-text-primary"
       }`}
     >
@@ -294,36 +298,42 @@ export function CardSearchResultsContent({
 }: CardSearchResultsContentProps) {
   return (
     <section aria-label="Card search results" className="flex flex-col flex-1 min-h-0">
-      {/* Full-width controls banner — no rounded sub-box, spans edge to edge */}
+      {/* Controls banner */}
       <div className={`bg-surface-2 border-b border-border-subtle ${BANNER_PADDING_CLASSES}`}>
         <div className={CONTROL_LAYOUT_CLASSES}>
-          <div className="grid gap-2">
-            <FieldLabel>Sort</FieldLabel>
-            <SearchSelect
-              value={sort}
-              options={CARD_SEARCH_SORT_OPTIONS}
-              onChange={onSortChange}
-            />
-          </div>
+          {/* Unified inset surface groups Sort / Variants / Toggles */}
+          <div className="flex flex-wrap items-end gap-4 rounded-xl border border-border-subtle bg-surface-inset px-3 py-2.5">
+            <div className="grid gap-2">
+              <FieldLabel>Sort</FieldLabel>
+              <SearchSelect
+                value={sort}
+                options={CARD_SEARCH_SORT_OPTIONS}
+                onChange={onSortChange}
+              />
+            </div>
 
-          <div className="grid gap-2">
-            <FieldLabel>Variants</FieldLabel>
-            <SearchSelect
-              value={variantMode}
-              options={VARIANT_OPTIONS}
-              onChange={onVariantModeChange}
-            />
-          </div>
+            <div className="grid gap-2">
+              <FieldLabel>Variants</FieldLabel>
+              <SearchSelect
+                value={variantMode}
+                options={VARIANT_OPTIONS}
+                onChange={onVariantModeChange}
+              />
+            </div>
 
-          <div className="flex flex-wrap items-end gap-2">
-            <ToggleButton checked={showPrice} onChange={onShowPriceChange}>
-              Show prices
-            </ToggleButton>
-            {variantMode === "unique-cards" ? (
-              <ToggleButton checked={showVariants} onChange={onShowVariantsChange}>
-                Show variants
-              </ToggleButton>
-            ) : null}
+            <div className="grid gap-2">
+              <FieldLabel>Toggles</FieldLabel>
+              <div className="flex flex-wrap gap-2">
+                <ToggleButton checked={showPrice} onChange={onShowPriceChange}>
+                  Show prices
+                </ToggleButton>
+                {variantMode === "unique-cards" ? (
+                  <ToggleButton checked={showVariants} onChange={onShowVariantsChange}>
+                    Show variants
+                  </ToggleButton>
+                ) : null}
+              </div>
+            </div>
           </div>
 
           {navSlot ? (
