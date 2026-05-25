@@ -142,10 +142,10 @@ function SearchSelect<T extends string>({
               <li key={option.value} role="option" aria-selected={isSelected}>
                 <button
                   type="button"
-                  className={`block w-full border border-transparent px-3 py-2.5 text-left text-sm font-bold transition-[color,background-color,border-color] ${
+                  className={`block w-full px-3 py-2.5 text-left text-sm font-bold transition-[color,background-color] duration-[180ms] ${
                     isSelected
-                      ? "bg-accent border-accent text-white"
-                      : "text-text-primary hover:bg-[var(--color-accent-soft)] hover:border-[var(--color-accent)]"
+                      ? "bg-accent text-white"
+                      : "text-text-primary hover:bg-[var(--color-accent-soft)] hover:text-accent-warm"
                   }`}
                   onClick={() => {
                     onChange(option.value);
