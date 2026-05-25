@@ -682,7 +682,7 @@ export default function QueryBuilderView() {
       </div>
 
       {/* ── Two-column grid ── */}
-      <div className="mx-auto grid w-full max-w-[1720px] gap-7 px-4 pb-10 pt-4 lg:grid-cols-[minmax(360px,820px)_minmax(0,1fr)]">
+      <div className="mx-auto grid w-full max-w-[1720px] gap-7 px-4 pb-10 pt-4 lg:grid-cols-2">
 
       {/* ── Builder panel ── */}
       <div className={QB_TOKENS.builderShell} aria-label="Query builder filters">
