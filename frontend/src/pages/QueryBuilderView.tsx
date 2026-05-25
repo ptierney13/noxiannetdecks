@@ -268,7 +268,7 @@ const QB_TOKENS = {
   fieldInput: "h-9 w-full rounded-lg border border-[rgba(255,255,255,0.2)] bg-[linear-gradient(180deg,rgba(18,22,32,0.96),rgba(10,13,20,0.98))] px-3 text-sm text-text-primary shadow-[inset_0_1px_2px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,255,255,0.045)] placeholder:text-text-tertiary/55 transition-[background,border-color,box-shadow] duration-150 hover:border-border-strong focus:outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-focus-ring)]",
   compactField: "h-8 rounded-md border border-[rgba(255,255,255,0.2)] bg-[linear-gradient(180deg,rgba(18,22,32,0.96),rgba(10,13,20,0.98))] font-mono text-sm text-text-primary shadow-[inset_0_1px_2px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,255,255,0.045)] transition-[border-color,box-shadow] duration-150 focus:outline-none focus:border-accent focus:ring-2 focus:ring-[var(--color-focus-ring)]",
   statRow: "flex items-center gap-2 rounded-lg border border-border-default bg-[linear-gradient(180deg,rgba(27,33,45,0.88),rgba(13,16,24,0.94))] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.055),0_5px_14px_rgba(0,0,0,0.18)] transition-[background,border-color,box-shadow] duration-150 hover:border-border-strong hover:bg-[linear-gradient(180deg,rgba(35,42,56,0.94),rgba(16,20,30,0.98))] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.075),0_9px_20px_rgba(0,0,0,0.24)]",
-  previewFrame: "flex flex-col flex-1 overflow-y-auto rounded-2xl border border-border-default bg-[linear-gradient(180deg,rgba(18,22,32,0.96),rgba(7,9,14,0.98))] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_22px_52px_rgba(0,0,0,0.34)]",
+  previewFrame: "flex flex-col flex-1 overflow-hidden rounded-2xl border border-border-default bg-[linear-gradient(180deg,rgba(18,22,32,0.96),rgba(7,9,14,0.98))] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_22px_52px_rgba(0,0,0,0.34)]",
 } as const;
 
 type SectionProps = {
@@ -685,7 +685,7 @@ export default function QueryBuilderView() {
       <div className="mx-auto grid w-full max-w-[1720px] gap-7 px-4 pb-10 pt-4 lg:grid-cols-2">
 
       {/* ── Builder panel ── */}
-      <div className={`${QB_TOKENS.builderShell} self-start max-h-[calc(100vh-var(--site-header-height)-9.5rem)] overflow-y-auto`} aria-label="Query builder filters">
+      <div className={`${QB_TOKENS.builderShell} self-start`} aria-label="Query builder filters">
 
         {/* ── Card Type & Tags ── */}
         <Section title="Card Type & Tags" collapsible>
@@ -846,7 +846,7 @@ export default function QueryBuilderView() {
       </div>
 
       {/* ── Live preview aside — hidden below lg where the two-column grid collapses ── */}
-      <aside className="hidden lg:flex flex-col min-w-0 self-start max-h-[calc(100vh-var(--site-header-height)-9.5rem)]">
+      <aside className="hidden lg:flex flex-col min-w-0 self-start">
         <div className={QB_TOKENS.previewFrame}>
           <CardSearchResultsPane
             query={debouncedBuiltQuery}
