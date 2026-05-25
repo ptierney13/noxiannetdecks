@@ -139,13 +139,13 @@ function SearchSelect<T extends string>({
           {options.map((option) => {
             const isSelected = option.value === value;
             return (
-              <li key={option.value} role="option" aria-selected={isSelected}>
+              <li key={option.value} role="option" aria-selected={isSelected} className="first:rounded-t-xl last:rounded-b-xl overflow-hidden">
                 <button
                   type="button"
-                  className={`block w-full px-3 py-2.5 text-left text-sm font-bold transition-[color,background-color] duration-[180ms] ${
+                  className={`block w-full border border-transparent px-3 py-2.5 text-left text-sm font-bold transition-[color,background-color,border-color] duration-[180ms] ${
                     isSelected
-                      ? "bg-accent text-white"
-                      : "text-text-primary hover:bg-[var(--color-accent-soft)] hover:text-accent-warm"
+                      ? "bg-accent border-accent text-white"
+                      : "text-text-primary hover:bg-[var(--color-accent-soft)] hover:border-[var(--color-accent)]"
                   }`}
                   onClick={() => {
                     onChange(option.value);
