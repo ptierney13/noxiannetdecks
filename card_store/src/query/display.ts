@@ -11,6 +11,7 @@ import { parseDomainQueryValue } from "./domain.js";
 export type DisplayBlock = {
   kind: "condition";
   state: "executed" | "dropped"; // whether this token was used or discarded
+  canonicalField: string | null; // resolved canonical field name, for color lookup
   prefix: string;   // descriptive label, e.g. "Domain is" or "NOT Might"
   value: string;    // data-driven part, e.g. "Fury OR Calm" or "> 3"
   suffix?: string;  // trailing descriptor — only for bare-text searches
@@ -347,7 +348,7 @@ export function executedTokensToDisplay(
 
   groups.forEach(({ group, followingConnector }, idx) => {
     const parts = buildBlockParts(group.field, group.canonicalField, group.conditions, group.intraConnector);
-    result.push({ kind: "condition", state: group.state, ...parts });
+    result.push({ kind: "condition", state: group.state, canonicalField: group.canonicalField, ...parts });
     if (idx < groups.length - 1) {
       result.push(followingConnector);
     }

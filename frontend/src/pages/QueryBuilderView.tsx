@@ -5,6 +5,7 @@ import { CardSearchResultsPane, QuerySummaryChips } from "../features";
 import { useDebounce } from "../lib";
 import { renderTokenizedText, raritySymbolSrc } from "../lib";
 import { parseQuery, executedTokensToDisplay, resolveField, type DisplayItem } from "@noxiannet/card-store/query";
+import { FIELD_COLOR } from "../lib";
 
 // ── Data constants ────────────────────────────────────────────────────────────
 
@@ -34,36 +35,6 @@ const DOMAIN_RUNE: Record<string, string> = {
   Body:  "{B}",
   Chaos: "{H}",
   Order: "{O}",
-};
-
-// Colors for each canonical field — used by the syntax-highlighted query display.
-const FIELD_COLOR: Record<string, string> = {
-  cardtype:     "#7dd3fc", // sky-300
-  supertype:    "#c4b5fd", // violet-300
-  t:            "#5eead4", // teal-300
-  tag:          "#86efac", // green-300
-  domain:       "#fcd34d", // amber-300
-  rarity:       "#e879f9", // fuchsia-400
-  set:          "#60a5fa", // blue-400
-  name:         "#fb923c", // orange-400
-  clean_name:   "#fb923c",
-  text:         "#fdba74", // orange-300
-  keyword:      "#bef264", // lime-300
-  artist:       "#d1d5db", // gray-300
-  flavour:      "#d1d5db",
-  energy:       "#f9a8d4", // pink-300
-  might:        "#fda4af", // rose-300
-  power:        "#a5b4fc", // indigo-300
-  cost:         "#67e8f9", // cyan-300
-  is:           "#d4d4d8", // zinc-300
-  finish:       "#d4d4d8",
-  price:        "#34d399", // emerald-400
-  number:       "#94a3b8", // slate-400
-  language:     "#94a3b8",
-  layout:       "#94a3b8",
-  id:           "#94a3b8",
-  riftbound_id: "#94a3b8",
-  tcgplayer_id: "#94a3b8",
 };
 
 type RarityPipGeometry = {
