@@ -631,19 +631,16 @@ export default function QueryBuilderView() {
       {/* px-4 lives on the inner max-w div so the pill borders line up with the two-column grid */}
       <div className="sticky top-[var(--site-header-height)] z-20 py-2.5">
         <div className="mx-auto max-w-[1720px] px-4">
-          {/* Pill: items-stretch so the wrapper div can fill the content height */}
-          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-stretch gap-3 px-3 py-2.5">
+          {/* Pill: items-center, symbol at explicit h-[132px] (3× original 44px) */}
+          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-center gap-3 px-3 py-2.5">
 
-            {/* Wrapper div has no intrinsic size — text content anchors the container
-                height, wrapper stretches to match, img fills the wrapper via h-full. */}
-            <div className="self-stretch flex items-center shrink-0">
-              <img
-                src="/design-assets/solar_symbol.png"
-                alt=""
-                aria-hidden="true"
-                className="h-full w-auto object-contain opacity-90 drop-shadow-[0_0_10px_rgba(212,170,73,0.5)]"
-              />
-            </div>
+            {/* h-[132px] is explicit so w-auto resolves cleanly (no circular sizing) */}
+            <img
+              src="/design-assets/solar_symbol.png"
+              alt=""
+              aria-hidden="true"
+              className="shrink-0 h-[132px] w-auto object-contain opacity-90 drop-shadow-[0_0_10px_rgba(212,170,73,0.5)]"
+            />
 
             {/* Syntax query (top, text-base) + human-readable chips (bottom, sm) */}
             <div className="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
