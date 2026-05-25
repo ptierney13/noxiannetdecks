@@ -23,9 +23,9 @@ export const queryFieldGuides: QueryFieldGuide[] = [
   {
     property: "Rules text",
     query: "text:<text>",
-    shorthand: "r:<text> or o:<text>",
+    shorthand: "o:<text>",
     searches: "text.plain and text.rich",
-    example: 'r:"draw a card"'
+    example: 'o:"draw a card"'
   },
   {
     property: "Flavor text",
@@ -86,9 +86,9 @@ export const queryFieldGuides: QueryFieldGuide[] = [
   {
     property: "Rarity",
     query: "rarity:<text>",
-    shorthand: null,
+    shorthand: "r:<text>",
     searches: "rarity",
-    example: "rarity:Rare"
+    example: "r:Rare"
   },
   {
     property: "Artist",

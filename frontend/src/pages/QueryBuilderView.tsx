@@ -306,14 +306,20 @@ function Section({ title, hint, children, collapsible = false, defaultOpen = tru
 
 type SubsectionProps = {
   label?: string;
+  hint?: string;  // syntax example shown right of the subsection label
   raised?: boolean;
   children: ReactNode;
 };
 
-function Subsection({ label, raised = false, children }: SubsectionProps) {
+function Subsection({ label, hint, raised = false, children }: SubsectionProps) {
   return (
     <div className={[QB_TOKENS.subsection, raised ? QB_TOKENS.subsectionRaised : ""].join(" ")}>
-      {label && <p className={QB_TOKENS.subsectionLabel}>{label}</p>}
+      {(label || hint) ? (
+        <div className="flex items-center gap-2 mb-2.5">
+          {label ? <span className="text-[0.7rem] font-black uppercase tracking-[0.14em] text-accent-warm leading-none">{label}</span> : null}
+          {hint ? <code className={QB_TOKENS.sectionHint}>{hint}</code> : null}
+        </div>
+      ) : null}
       {children}
     </div>
   );
@@ -353,46 +359,61 @@ type StatRowProps = {
 function StatRow({ label, hint, op, onOpChange, val, onValChange }: StatRowProps) {
   return (
     <div className={QB_TOKENS.statRow}>
-      <div className="flex-1 min-w-0">
-        <span className="text-sm font-semibold text-text-primary">{label}</span>
-        <code className="ml-2 text-[0.64rem] font-mono text-text-tertiary">{hint}</code>
-      </div>
-      <div className="flex items-center gap-1.5 shrink-0">
-        <select
-          value={op}
-          onChange={(e) => onOpChange(e.target.value)}
-          className={`${QB_TOKENS.compactField} px-1.5 text-text-secondary`}
-          aria-label={`${label} operator`}
-        >
-          {OPERATORS.map((o) => (
-            <option key={o} value={o}>{o}</option>
-          ))}
-        </select>
-        <input
-          type="text"
-          className={`${QB_TOKENS.compactField} w-20 px-2 placeholder:text-text-tertiary/50`}
-          value={val}
-          onChange={(e) => onValChange(e.target.value)}
-          placeholder="—"
-          aria-label={`${label} value`}
-        />
-      </div>
+      <span className="shrink-0 text-sm font-semibold text-text-primary">{label}</span>
+      <select
+        value={op}
+        onChange={(e) => onOpChange(e.target.value)}
+        className={`${QB_TOKENS.compactField} shrink-0 px-1.5 text-text-secondary`}
+        aria-label={`${label} operator`}
+      >
+        {OPERATORS.map((o) => (
+          <option key={o} value={o}>{o}</option>
+        ))}
+      </select>
+      <input
+        type="text"
+        className={`${QB_TOKENS.compactField} shrink-0 w-10 px-2 placeholder:text-text-tertiary/50`}
+        value={val}
+        onChange={(e) => onValChange(e.target.value)}
+        placeholder="—"
+        aria-label={`${label} value`}
+      />
+      <code className="ml-auto shrink-0 text-[0.64rem] font-mono text-text-tertiary leading-none">{hint}</code>
     </div>
   );
 }
 
 type TextFieldProps = {
   label: string;
-  hint: string;
+  hint?: string;
   placeholder: string;
   value: string;
   onChange: (v: string) => void;
+  /** When true, the label is sr-only and no hint column is shown (subsection owns the label). */
+  hideLabel?: boolean;
 };
 
-function TextField({ label, hint, placeholder, value, onChange }: TextFieldProps) {
+function TextField({ label, hint, placeholder, value, onChange, hideLabel = false }: TextFieldProps) {
   const id = `qb-field-${label.toLowerCase().replace(/\s+/g, "-")}`;
+  if (hideLabel) {
+    return (
+      <div>
+        <label htmlFor={id} className="sr-only">{label}</label>
+        <input
+          id={id}
+          type="text"
+          className={QB_TOKENS.fieldInput}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          autoComplete="off"
+          spellCheck={false}
+        />
+      </div>
+    );
+  }
   return (
-    <div className="grid grid-cols-[100px_1fr_auto] max-[700px]:grid-cols-1 items-center gap-x-2.5 gap-y-1">
+    <div className={`grid items-center gap-x-2.5 gap-y-1 ${hint ? "grid-cols-[100px_1fr_auto]" : "grid-cols-[100px_1fr]"} max-[700px]:grid-cols-1`}>
       <label htmlFor={id} className="text-sm font-medium text-text-secondary truncate">
         {label}
       </label>
@@ -406,8 +427,58 @@ function TextField({ label, hint, placeholder, value, onChange }: TextFieldProps
         autoComplete="off"
         spellCheck={false}
       />
-      <code className="text-[0.66rem] font-mono text-text-tertiary leading-none whitespace-nowrap max-[700px]:hidden">
-        {hint}
+      {hint ? (
+        <code className="text-[0.66rem] font-mono text-text-tertiary leading-none whitespace-nowrap max-[700px]:hidden">
+          {hint}
+        </code>
+      ) : null}
+    </div>
+  );
+}
+
+// Domain query syntax examples with per-domain coloring.
+// Colors match CSS variables: --domain-fury, --domain-body, etc.
+const DOMAIN_HEX: Record<string, string> = {
+  Fury:  "#e53935",
+  Calm:  "#43a047",
+  Mind:  "#1e88e5",
+  Body:  "#fb8c00",
+  Chaos: "#8e24aa",
+  Order: "#e6c100",
+};
+const FIELD_DIM = "rgba(255,255,255,0.28)";      // structural chars: ( ) or
+const FIELD_CONN = "rgba(255,255,255,0.42)";     // "or" connector italic
+
+function DomainExamples() {
+  const field = FIELD_COLOR["domain"] ?? "#fcd34d";
+  const fury  = DOMAIN_HEX.Fury!;
+  const body  = DOMAIN_HEX.Body!;
+
+  const codeClass = "inline-flex items-center rounded-md border border-border-subtle bg-[rgba(8,11,18,0.82)] px-2 py-1 font-mono text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {/* Named domain or-group */}
+      <code className={codeClass}>
+        <span style={{ color: FIELD_DIM }}>(</span>
+        <span style={{ color: field }}>d:</span>
+        <span style={{ color: fury }}>Fury</span>
+        <span style={{ color: FIELD_CONN, fontStyle: "italic" }}>{" or "}</span>
+        <span style={{ color: field }}>d:</span>
+        <span style={{ color: body }}>Body</span>
+        <span style={{ color: FIELD_DIM }}>)</span>
+      </code>
+      {/* Primary letter codes (f=Fury, b=Body) */}
+      <code className={codeClass}>
+        <span style={{ color: field }}>d:</span>
+        <span style={{ color: fury }}>f</span>
+        <span style={{ color: body }}>b</span>
+      </code>
+      {/* Color letter codes (r=red=Fury, o=orange=Body) */}
+      <code className={codeClass}>
+        <span style={{ color: field }}>d:</span>
+        <span style={{ color: fury }}>r</span>
+        <span style={{ color: body }}>o</span>
       </code>
     </div>
   );
@@ -460,7 +531,7 @@ export default function QueryBuilderView() {
     if (nameText.trim())
       parts.push(`n:${quoteValue(nameText.trim())}`);
     if (rulesText.trim())
-      parts.push(`r:${quoteValue(rulesText.trim())}`);
+      parts.push(`o:${quoteValue(rulesText.trim())}`);
     if (keywordText.trim())
       parts.push(`kw:${quoteValue(keywordText.trim())}`);
     if (artistText.trim())
@@ -565,26 +636,26 @@ export default function QueryBuilderView() {
       <div className={QB_TOKENS.builderShell} aria-label="Query builder filters">
 
         {/* ── Card Type & Tags ── */}
-        <Section title="Card Type & Tags" hint="ct:Unit · u:Champion · tag:Dragon" collapsible>
-          <Subsection raised>
-            <TextField label="TYPELINE" hint="t:Champion" placeholder="e.g. Champion Unit, Dragon" value={typelineText} onChange={setTypelineText} />
+        <Section title="Card Type & Tags" collapsible>
+          <Subsection label="Typeline" hint="t:Champion" raised>
+            <TextField label="TYPELINE" placeholder="e.g. Champion Unit, Dragon" value={typelineText} onChange={setTypelineText} hideLabel />
           </Subsection>
-          <Subsection label="Card Type" raised>
+          <Subsection label="Card Type" hint="ct:Unit" raised>
             <div className="flex flex-wrap gap-2">
               {CARD_TYPES.map((type) => (
                 <Chip key={type} isOn={selectedTypes.has(type)} onToggle={() => setSelectedTypes(toggle(selectedTypes, type))} label={type} />
               ))}
             </div>
           </Subsection>
-          <Subsection label="Supertype" raised>
+          <Subsection label="Supertype" hint="u:Champion" raised>
             <div className="flex flex-wrap gap-2">
               {SUPERTYPES.map((st) => (
                 <Chip key={st} isOn={selectedSupertypes.has(st)} onToggle={() => setSelectedSupertypes(toggle(selectedSupertypes, st))} label={st} />
               ))}
             </div>
           </Subsection>
-          <Subsection raised>
-            <TextField label="Tag" hint="tag:Dragon" placeholder="e.g. Dragon, Follower, Celestial" value={tagText} onChange={setTagText} />
+          <Subsection label="Tag" hint="tag:Dragon" raised>
+            <TextField label="Tag" placeholder="e.g. Dragon, Follower, Celestial" value={tagText} onChange={setTagText} hideLabel />
           </Subsection>
           <p className={QB_TOKENS.helperText}>
             Tags are subtypes like Dragon or Follower. Supertypes are Champion, Signature, etc.
@@ -592,7 +663,10 @@ export default function QueryBuilderView() {
         </Section>
 
         {/* ── Domain ── */}
-        <Section title="Domain" hint="d:Fury" collapsible>
+        <Section title="Domain" collapsible>
+          <Subsection>
+            <DomainExamples />
+          </Subsection>
           <Subsection raised>
             <div className="flex flex-wrap gap-2">
             {DOMAIN_ORDER.map((domain) => {
@@ -618,7 +692,7 @@ export default function QueryBuilderView() {
         </Section>
 
         {/* ── Rarity ── */}
-        <Section title="Rarity" hint="rarity:Rare" collapsible>
+        <Section title="Rarity" hint="r:Rare" collapsible>
           <Subsection>
             <div className="flex flex-wrap gap-2">
             {RARITIES.map((rarity) => {
@@ -696,7 +770,7 @@ export default function QueryBuilderView() {
           <Subsection>
             <div className="flex flex-col gap-2.5">
               <TextField label="Name"       hint="n:jinx"              placeholder="e.g. Jinx"                    value={nameText}    onChange={setNameText}    />
-              <TextField label="Rules Text" hint='r: or o:"draw a card"' placeholder="e.g. draw a card"            value={rulesText}   onChange={setRulesText}   />
+              <TextField label="Rules Text" hint='o:"draw a card"'       placeholder="e.g. draw a card"            value={rulesText}   onChange={setRulesText}   />
               <TextField label="Keyword"    hint="kw:Action"           placeholder="e.g. Action, Resolve"         value={keywordText} onChange={setKeywordText} />
               <TextField label="Artist"     hint='a:"Six More Vodka"'  placeholder="e.g. Six More Vodka"          value={artistText}  onChange={setArtistText}  />
             </div>
@@ -719,8 +793,8 @@ export default function QueryBuilderView() {
 
       </div>
 
-      {/* ── Live preview aside ── */}
-      <aside className="min-w-0 flex flex-col">
+      {/* ── Live preview aside — hidden below lg where the two-column grid collapses ── */}
+      <aside className="hidden lg:flex flex-col min-w-0">
         <div className={QB_TOKENS.previewFrame}>
           <CardSearchResultsPane
             query={debouncedBuiltQuery}

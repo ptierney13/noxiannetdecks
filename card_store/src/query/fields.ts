@@ -10,7 +10,7 @@ export type FieldDefinition = {
 export const fieldDefinitions: FieldDefinition[] = [
   { canonical: "name", aliases: ["n"], kind: "string", description: "Card name." },
   { canonical: "clean_name", aliases: [], kind: "string", description: "Normalized card name." },
-  { canonical: "text", aliases: ["o", "r"], kind: "string", description: "Rules text." },
+  { canonical: "text", aliases: ["o"], kind: "string", description: "Rules text." },
   { canonical: "t", aliases: ["type", "typeline"], kind: "string", description: "Type line (word-by-word match, any order)." },
   { canonical: "cardtype", aliases: ["ct"], kind: "string", description: "Card type." },
   { canonical: "supertype", aliases: ["u"], kind: "string", description: "Card supertype." },
@@ -18,7 +18,7 @@ export const fieldDefinitions: FieldDefinition[] = [
   { canonical: "keyword", aliases: ["k", "kw"], kind: "string", description: "Rules keyword." },
   { canonical: "domain", aliases: ["d"], kind: "string", description: "Riftbound domain." },
   { canonical: "set", aliases: ["s"], kind: "string", description: "Set code or set name." },
-  { canonical: "rarity", aliases: [], kind: "string", description: "Card rarity." },
+  { canonical: "rarity", aliases: ["r"], kind: "string", description: "Card rarity." },
   { canonical: "artist", aliases: ["a"], kind: "string", description: "Illustrator." },
   { canonical: "number", aliases: ["cn"], kind: "string", description: "Collector number." },
   { canonical: "is", aliases: [], kind: "string", description: "Finish or treatment flag." },
