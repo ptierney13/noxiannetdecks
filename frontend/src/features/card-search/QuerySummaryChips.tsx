@@ -1,13 +1,16 @@
 import type { DisplayItem } from "@noxiannet/card-store/query";
 import { FIELD_COLOR, hexToRgba } from "../../lib";
 
-export function QuerySummaryChips({ items }: { items: DisplayItem[] }) {
+export function QuerySummaryChips({ items, size = "sm" }: { items: DisplayItem[]; size?: "sm" | "lg" }) {
+  const textSz  = size === "lg" ? "text-base" : "text-sm";
+  const connSz  = size === "lg" ? "text-xs"   : "text-[0.7rem]";
+  const chipPy  = size === "lg" ? "py-1.5"    : "py-1";
   return (
     <>
       {items.map((item, i) => {
         if (item === "AND" || item === "OR") {
           return (
-            <span key={`conn-${i}`} className="text-[0.7rem] font-black uppercase tracking-widest text-text-secondary">
+            <span key={`conn-${i}`} className={`${connSz} font-black uppercase tracking-widest text-text-secondary`}>
               {item}
             </span>
           );
@@ -17,7 +20,7 @@ export function QuerySummaryChips({ items }: { items: DisplayItem[] }) {
           return (
             <span
               key={`drop-${i}`}
-              className="inline-flex items-center gap-1 rounded-lg border border-negative-border bg-negative-soft px-3 py-1 text-sm"
+              className={`inline-flex items-center gap-1 rounded-lg border border-negative-border bg-negative-soft px-3 ${chipPy} ${textSz}`}
             >
               {item.prefix ? (
                 <span className="font-semibold text-red-400">{item.prefix}</span>
@@ -46,7 +49,7 @@ export function QuerySummaryChips({ items }: { items: DisplayItem[] }) {
         return (
           <span
             key={`exec-${i}`}
-            className="inline-flex items-center gap-1 rounded-lg border px-3 py-1 text-sm"
+            className={`inline-flex items-center gap-1 rounded-lg border px-3 ${chipPy} ${textSz}`}
             style={chipStyle}
           >
             {item.prefix ? (

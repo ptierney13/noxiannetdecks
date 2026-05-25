@@ -160,14 +160,14 @@ function SyntaxHighlightedQuery({ query }: { query: string }) {
 
   if (!query.trim()) {
     return (
-      <span className="text-base font-mono text-text-tertiary/60 italic">
+      <span className="text-xs font-mono text-text-tertiary/55 italic">
         Select filters below to build a query…
       </span>
     );
   }
 
   return (
-    <code className="text-xl font-mono break-all leading-snug">
+    <code className="text-sm font-mono break-all leading-snug">
       {spans.map((span, idx) => {
         switch (span.kind) {
           case "space":
@@ -595,57 +595,59 @@ export default function QueryBuilderView() {
     return executedTokensToDisplay(parseQuery(debouncedBuiltQuery).executedTokens);
   }, [debouncedBuiltQuery]);
 
-  const NAV_BTN = "inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-border-default px-3 py-1.5 text-xs font-bold text-text-secondary transition-[background,border-color,color] duration-150 hover:border-border-strong hover:text-text-primary disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]";
+  // Icon-only square button tokens
+  const ICON_BTN = "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-default text-text-secondary transition-[background,border-color,color] duration-150 hover:border-border-strong hover:text-text-primary disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]";
+  const ICON_BTN_ACCENT = "lg:hidden inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,var(--color-accent-hover),var(--color-accent))] text-white shadow-[0_4px_12px_rgba(197,50,71,0.22)] transition-[box-shadow,filter] duration-150 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]";
 
   return (
     <div>
       {/* ── Sticky Query bar — pill-shaped, gold accent ── */}
-      <div className="sticky top-[var(--site-header-height)] z-20 px-4 py-2.5">
-        <div className="mx-auto max-w-[1720px]">
-          {/* Pill: very rounded, gold border + outer glow */}
-          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-center gap-3 px-3 py-2.5">
+      {/* px-4 lives on the inner max-w div so the pill borders line up with the two-column grid */}
+      <div className="sticky top-[var(--site-header-height)] z-20 py-2.5">
+        <div className="mx-auto max-w-[1720px] px-4">
+          {/* Pill: very rounded, gold border + outer glow; items-stretch so symbol fills height */}
+          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-stretch gap-3 px-3 py-2.5">
 
-            {/* Solar symbol */}
+            {/* Solar symbol — stretches to match pill height */}
             <img
               src="/design-assets/solar_symbol.png"
               alt=""
               aria-hidden="true"
-              className="shrink-0 w-11 h-11 object-contain opacity-92 drop-shadow-[0_0_8px_rgba(212,170,73,0.5)]"
+              className="shrink-0 self-stretch w-auto object-contain opacity-90 drop-shadow-[0_0_10px_rgba(212,170,73,0.55)]"
             />
 
-            {/* Color-coded query + human-readable chips */}
-            <div className="flex-1 min-w-0 flex flex-col gap-1">
-              <output aria-live="polite" aria-label="Your query" className="block">
-                <SyntaxHighlightedQuery query={builtQuery} />
-              </output>
+            {/* Human-readable chips (large) + syntax query (small) */}
+            <div className="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
               {queryDisplayBlocks.length > 0 ? (
                 <div className="hidden md:flex flex-wrap items-center gap-x-1.5 gap-y-1">
                   <span className="shrink-0 text-[rgba(212,170,73,0.55)]">
                     <OpenBookIcon />
                   </span>
-                  <QuerySummaryChips items={queryDisplayBlocks} />
+                  <QuerySummaryChips items={queryDisplayBlocks} size="lg" />
                 </div>
               ) : null}
+              <output aria-live="polite" aria-label="Your query" className="block">
+                <SyntaxHighlightedQuery query={builtQuery} />
+              </output>
             </div>
 
-            {/* Action buttons — stacked vertically */}
-            <div className="shrink-0 flex flex-col gap-1 min-w-[7.5rem]">
-              <button type="button" onClick={handleCopy} disabled={!builtQuery} className={NAV_BTN}>
+            {/* Action buttons — icon-only, horizontal row */}
+            <div className="shrink-0 flex flex-row items-center gap-1.5">
+              <button type="button" onClick={handleCopy} disabled={!builtQuery} title={copied ? "Copied!" : "Copy query"} aria-label={copied ? "Copied!" : "Copy query"} className={ICON_BTN}>
                 <CopyIcon />
-                {copied ? "Copied!" : "Copy"}
               </button>
-              <button type="button" onClick={handleReset} className={NAV_BTN}>
+              <button type="button" onClick={handleReset} title="Reset all filters" aria-label="Reset all filters" className={ICON_BTN}>
                 <XIcon />
-                Reset Filters
               </button>
               {/* Search — only visible below lg where the results panel isn't alongside */}
               <button
                 type="button"
                 onClick={handleSearch}
-                className="lg:hidden inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,var(--color-accent-hover),var(--color-accent))] px-3 py-1.5 text-xs font-bold text-white shadow-[0_4px_12px_rgba(197,50,71,0.22)] transition-[box-shadow,filter] duration-150 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
+                title="Search"
+                aria-label="Search"
+                className={ICON_BTN_ACCENT}
               >
                 <SearchIcon />
-                Search
               </button>
             </div>
           </div>
