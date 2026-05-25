@@ -26,7 +26,7 @@ export default function CardSearchView() {
   const { q = "" } = useSearch({ from: "/cards" });
 
   return (
-    <div className="mx-auto w-full max-w-[1720px] px-4 pb-8 pt-4">
+    <div className="mx-auto flex w-full max-w-[1720px] flex-col min-h-[calc(100vh-var(--site-header-height))] px-4 pb-8 pt-4">
       <CardSearchResultsPane
         query={q}
         navSlot={

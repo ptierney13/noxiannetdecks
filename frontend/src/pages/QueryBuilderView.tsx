@@ -685,7 +685,7 @@ export default function QueryBuilderView() {
       <div className="mx-auto grid w-full max-w-[1720px] gap-7 px-4 pb-10 pt-4 lg:grid-cols-2">
 
       {/* ── Builder panel ── */}
-      <div className={QB_TOKENS.builderShell} aria-label="Query builder filters">
+      <div className={`${QB_TOKENS.builderShell} self-start`} aria-label="Query builder filters">
 
         {/* ── Card Type & Tags ── */}
         <Section title="Card Type & Tags" collapsible>

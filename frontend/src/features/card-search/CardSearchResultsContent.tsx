@@ -119,7 +119,7 @@ function SearchSelect<T extends string>({
         role="combobox"
         aria-expanded={open}
         aria-haspopup="listbox"
-        className="inline-flex min-h-11 min-w-[9rem] items-center justify-between gap-2 rounded-xl border border-border-default bg-[rgba(255,255,255,0.12)] px-3 text-sm font-bold text-text-primary outline-none focus:border-accent focus:ring-4 focus:ring-focus-ring"
+        className="inline-flex min-h-11 min-w-[9rem] items-center justify-between gap-2 rounded-xl border border-border-default bg-[rgba(255,255,255,0.12)] px-3 text-sm font-bold text-text-primary outline-none transition-[background,border-color] duration-150 hover:border-border-strong hover:bg-[rgba(255,255,255,0.16)] focus:border-accent focus:ring-4 focus:ring-focus-ring"
         onClick={() => setOpen((prev) => !prev)}
         onKeyDown={handleKeyDown}
       >
@@ -161,6 +161,31 @@ function SearchSelect<T extends string>({
 }
 
 // ---------------------------------------------------------------------------
+
+function ToggleButton({
+  checked,
+  onChange,
+  children,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={checked}
+      onClick={() => onChange(!checked)}
+      className={`inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border px-3 text-sm font-bold transition-[background,border-color,color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)] ${
+        checked
+          ? "border-accent bg-accent-soft text-text-primary"
+          : "border-border-default bg-[rgba(255,255,255,0.12)] text-text-secondary hover:border-border-strong hover:bg-[rgba(255,255,255,0.16)] hover:text-text-primary"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
 
 function FieldLabel({ children }: { children: string }) {
   return (
@@ -290,30 +315,19 @@ export function CardSearchResultsContent({
             />
           </div>
 
-          {/* Checkboxes as plain stacked rows — gap-2 matches label-to-dropdown spacing */}
-          <div className="flex flex-col gap-2">
-            <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-bold text-text-secondary">
-              <input
-                type="checkbox"
-                checked={showPrice}
-                onChange={(event) => onShowPriceChange(event.target.checked)}
-              />
+          <div className="flex flex-wrap items-end gap-2">
+            <ToggleButton checked={showPrice} onChange={onShowPriceChange}>
               Show prices
-            </label>
+            </ToggleButton>
             {variantMode === "unique-cards" ? (
-              <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-bold text-text-secondary">
-                <input
-                  type="checkbox"
-                  checked={showVariants}
-                  onChange={(event) => onShowVariantsChange(event.target.checked)}
-                />
+              <ToggleButton checked={showVariants} onChange={onShowVariantsChange}>
                 Show variants
-              </label>
+              </ToggleButton>
             ) : null}
           </div>
 
           {navSlot ? (
-            <div className="ml-auto hidden xl:flex items-center">
+            <div className="ml-auto hidden @[768px]:flex items-center">
               {navSlot}
             </div>
           ) : null}
@@ -339,7 +353,7 @@ export function CardSearchResultsContent({
         ) : null}
 
         {!isPending && !isError && groups.length === 0 ? (
-          <div className="hidden lg:flex flex-1 min-h-0 flex-col items-center justify-center rounded-2xl border border-border-default bg-surface-2 gap-5 text-center p-8">
+          <div className="flex flex-1 min-h-0 flex-col items-center justify-center rounded-2xl border border-border-default bg-surface-2 gap-5 text-center p-8">
             <NoxianLogoIcon className="w-28 h-28 opacity-[0.15]" />
             <div className="flex flex-col gap-1.5">
               <p className="font-semibold text-text-secondary">No cards match this query.</p>
