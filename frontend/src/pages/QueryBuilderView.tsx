@@ -160,14 +160,14 @@ function SyntaxHighlightedQuery({ query }: { query: string }) {
 
   if (!query.trim()) {
     return (
-      <span className="text-sm font-mono text-text-tertiary">
-        Select one or more filters to build a query.
+      <span className="text-base font-mono text-text-tertiary/60 italic">
+        Select filters below to build a query…
       </span>
     );
   }
 
   return (
-    <code className="text-sm font-mono break-all leading-relaxed">
+    <code className="text-xl font-mono break-all leading-snug">
       {spans.map((span, idx) => {
         switch (span.kind) {
           case "space":
@@ -204,11 +204,22 @@ function SyntaxHighlightedQuery({ query }: { query: string }) {
 
 // ── Private sub-components ───────────────────────────────────────────────────
 
+// Closed book — used for nav links
 function BookIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </svg>
+  );
+}
+
+// Open book — used before the human-readable query translation
+function OpenBookIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
     </svg>
   );
 }
@@ -588,18 +599,30 @@ export default function QueryBuilderView() {
 
   return (
     <div>
-      {/* ── Sticky Query bar — floating card, not a full-width banner ── */}
+      {/* ── Sticky Query bar — pill-shaped, gold accent ── */}
       <div className="sticky top-[var(--site-header-height)] z-20 px-4 py-2.5">
         <div className="mx-auto max-w-[1720px]">
-          <div className="rounded-xl border border-[rgba(197,50,71,0.28)] bg-[rgba(10,13,20,0.98)] shadow-[0_0_0_1px_rgba(197,50,71,0.12),0_0_40px_rgba(197,50,71,0.12),0_12px_32px_rgba(0,0,0,0.56)] backdrop-blur-md flex items-start gap-4 px-4 py-3">
+          {/* Pill: very rounded, gold border + outer glow */}
+          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-center gap-3 px-3 py-2.5">
+
+            {/* Solar symbol */}
+            <img
+              src="/design-assets/solar_symbol.png"
+              alt=""
+              aria-hidden="true"
+              className="shrink-0 w-11 h-11 object-contain opacity-92 drop-shadow-[0_0_8px_rgba(212,170,73,0.5)]"
+            />
 
             {/* Color-coded query + human-readable chips */}
-            <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+            <div className="flex-1 min-w-0 flex flex-col gap-1">
               <output aria-live="polite" aria-label="Your query" className="block">
                 <SyntaxHighlightedQuery query={builtQuery} />
               </output>
               {queryDisplayBlocks.length > 0 ? (
-                <div className="hidden md:flex flex-wrap items-center gap-x-2 gap-y-1">
+                <div className="hidden md:flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                  <span className="shrink-0 text-[rgba(212,170,73,0.55)]">
+                    <OpenBookIcon />
+                  </span>
                   <QuerySummaryChips items={queryDisplayBlocks} />
                 </div>
               ) : null}
