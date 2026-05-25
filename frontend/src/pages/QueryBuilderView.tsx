@@ -167,7 +167,7 @@ function SyntaxHighlightedQuery({ query }: { query: string }) {
   }
 
   return (
-    <code className="text-sm font-mono break-all leading-snug">
+    <code className="text-base font-mono break-all leading-snug">
       {spans.map((span, idx) => {
         switch (span.kind) {
           case "space":
@@ -226,7 +226,7 @@ function OpenBookIcon() {
 
 function CopyIcon() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
     </svg>
@@ -235,7 +235,7 @@ function CopyIcon() {
 
 function XIcon() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <line x1="18" y1="6" x2="6" y2="18" />
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
@@ -244,7 +244,7 @@ function XIcon() {
 
 function SearchIcon() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="11" cy="11" r="8" />
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
@@ -621,9 +621,9 @@ export default function QueryBuilderView() {
     return executedTokensToDisplay(parseQuery(debouncedBuiltQuery).executedTokens);
   }, [debouncedBuiltQuery]);
 
-  // Icon-only square button tokens
-  const ICON_BTN = "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-default text-text-secondary transition-[background,border-color,color] duration-150 hover:border-border-strong hover:text-text-primary disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]";
-  const ICON_BTN_ACCENT = "lg:hidden inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,var(--color-accent-hover),var(--color-accent))] text-white shadow-[0_4px_12px_rgba(197,50,71,0.22)] transition-[box-shadow,filter] duration-150 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]";
+  // Icon-only square button tokens — h/w 52px (~30% larger than 40px)
+  const ICON_BTN = "inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl border border-border-default text-text-secondary transition-[background,border-color,color] duration-150 hover:border-border-strong hover:text-text-primary disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]";
+  const ICON_BTN_ACCENT = "lg:hidden inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,var(--color-accent-hover),var(--color-accent))] text-white shadow-[0_4px_12px_rgba(197,50,71,0.22)] transition-[box-shadow,filter] duration-150 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]";
 
   return (
     <div>
@@ -634,27 +634,27 @@ export default function QueryBuilderView() {
           {/* Pill: very rounded, gold border + outer glow */}
           <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-center gap-3 px-3 py-2.5">
 
-            {/* Solar symbol */}
+            {/* Solar symbol — 3× the original 44px */}
             <img
               src="/design-assets/solar_symbol.png"
               alt=""
               aria-hidden="true"
-              className="shrink-0 w-11 h-11 object-contain opacity-90 drop-shadow-[0_0_10px_rgba(212,170,73,0.55)]"
+              className="shrink-0 w-[132px] h-[132px] object-contain opacity-90 drop-shadow-[0_0_14px_rgba(212,170,73,0.55)]"
             />
 
-            {/* Human-readable chips (large) + syntax query (small) */}
+            {/* Syntax query (top, text-base) + human-readable chips (bottom, sm) */}
             <div className="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
+              <output aria-live="polite" aria-label="Your query" className="block">
+                <SyntaxHighlightedQuery query={builtQuery} />
+              </output>
               {queryDisplayBlocks.length > 0 ? (
                 <div className="hidden md:flex flex-wrap items-center gap-x-1.5 gap-y-1">
                   <span className="shrink-0 text-[rgba(212,170,73,0.55)]">
                     <OpenBookIcon />
                   </span>
-                  <QuerySummaryChips items={queryDisplayBlocks} size="lg" />
+                  <QuerySummaryChips items={queryDisplayBlocks} size="sm" />
                 </div>
               ) : null}
-              <output aria-live="polite" aria-label="Your query" className="block">
-                <SyntaxHighlightedQuery query={builtQuery} />
-              </output>
             </div>
 
             {/* Action buttons — icon-only, horizontal row */}
