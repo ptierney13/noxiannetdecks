@@ -846,7 +846,7 @@ export default function QueryBuilderView() {
       </div>
 
       {/* ── Live preview aside — hidden below lg where the two-column grid collapses ── */}
-      <aside className="hidden lg:flex flex-col min-w-0 self-start sticky top-[calc(var(--site-header-height)+76px)] z-10">
+      <aside className="hidden lg:flex flex-col min-w-0 self-start">
         <div className={QB_TOKENS.previewFrame}>
           <CardSearchResultsPane
             query={debouncedBuiltQuery}
