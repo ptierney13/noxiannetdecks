@@ -500,7 +500,7 @@ function DomainExamples() {
         <span style={{ color: FIELD_DIM }}>(</span>
         <span style={{ color: field }}>d:</span>
         <span style={{ color: fury }}>Fury</span>
-        <span style={{ color: FIELD_CONN, fontStyle: "italic" }}>{" or "}</span>
+        <span style={{ color: FIELD_CONN, fontStyle: "italic", whiteSpace: "pre" }}>{" or "}</span>
         <span style={{ color: field }}>d:</span>
         <span style={{ color: body }}>Body</span>
         <span style={{ color: FIELD_DIM }}>)</span>
@@ -633,14 +633,14 @@ export default function QueryBuilderView() {
         <div className="mx-auto max-w-[1720px] px-4">
           {/* Pill: py-1 so the image edge sits close to the pill border;
                items-stretch so text+buttons fill the full height cleanly */}
-          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-stretch gap-2 px-2 py-1">
+          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-center gap-3 px-3 py-2">
 
-            {/* h-[132px] explicit — w-auto derives width from aspect ratio cleanly */}
+            {/* h-[72px] explicit — ~1.6x the original 44px; w-auto derives width from aspect ratio */}
             <img
               src="/design-assets/solar_symbol.png"
               alt=""
               aria-hidden="true"
-              className="shrink-0 h-[132px] w-auto object-contain opacity-90 drop-shadow-[0_0_10px_rgba(212,170,73,0.5)]"
+              className="shrink-0 h-[72px] w-auto object-contain opacity-90 drop-shadow-[0_0_10px_rgba(212,170,73,0.5)]"
             />
 
             {/* Syntax query (top, text-base) + human-readable chips (bottom, sm) */}

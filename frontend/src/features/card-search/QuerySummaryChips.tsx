@@ -10,8 +10,8 @@ export function QuerySummaryChips({ items, size = "sm" }: { items: DisplayItem[]
       {items.map((item, i) => {
         if (item === "AND" || item === "OR") {
           return (
-            <span key={`conn-${i}`} className={`${connSz} font-black uppercase tracking-widest text-text-secondary`}>
-              {" "}{item.toLowerCase()}{" "}
+            <span key={`conn-${i}`} className={`${connSz} font-black uppercase tracking-widest text-text-secondary px-1.5`}>
+              {item.toLowerCase()}
             </span>
           );
         }
