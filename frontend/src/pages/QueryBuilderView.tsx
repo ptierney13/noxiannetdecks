@@ -360,6 +360,8 @@ function Chip({ label, isOn, onToggle }: ChipProps) {
 
 type StatRowProps = {
   label: string;
+  /** Optional JSX override for the visible label (e.g. with highlighted shorthand letters). */
+  labelDisplay?: ReactNode;
   hint: string;
   op: string;
   onOpChange: (v: string) => void;
@@ -367,10 +369,10 @@ type StatRowProps = {
   onValChange: (v: string) => void;
 };
 
-function StatRow({ label, hint, op, onOpChange, val, onValChange }: StatRowProps) {
+function StatRow({ label, labelDisplay, hint, op, onOpChange, val, onValChange }: StatRowProps) {
   return (
     <div className={QB_TOKENS.statRow}>
-      <span className="shrink-0 text-sm font-semibold text-text-primary">{label}</span>
+      <span className="shrink-0 text-sm font-semibold text-text-primary">{labelDisplay ?? label}</span>
       <select
         value={op}
         onChange={(e) => onOpChange(e.target.value)}
@@ -396,6 +398,8 @@ function StatRow({ label, hint, op, onOpChange, val, onValChange }: StatRowProps
 
 type TextFieldProps = {
   label: string;
+  /** Optional JSX override for the visible label (e.g. with highlighted shorthand letters). */
+  labelDisplay?: ReactNode;
   hint?: string;
   placeholder: string;
   value: string;
@@ -404,7 +408,7 @@ type TextFieldProps = {
   hideLabel?: boolean;
 };
 
-function TextField({ label, hint, placeholder, value, onChange, hideLabel = false }: TextFieldProps) {
+function TextField({ label, labelDisplay, hint, placeholder, value, onChange, hideLabel = false }: TextFieldProps) {
   const id = `qb-field-${label.toLowerCase().replace(/\s+/g, "-")}`;
   if (hideLabel) {
     return (
@@ -426,7 +430,7 @@ function TextField({ label, hint, placeholder, value, onChange, hideLabel = fals
   return (
     <div className={`grid items-center gap-x-2.5 gap-y-1 ${hint ? "grid-cols-[100px_1fr_auto]" : "grid-cols-[100px_1fr]"} max-[700px]:grid-cols-1`}>
       <label htmlFor={id} className="text-sm font-medium text-text-secondary truncate">
-        {label}
+        {labelDisplay ?? label}
       </label>
       <input
         id={id}
@@ -444,6 +448,28 @@ function TextField({ label, hint, placeholder, value, onChange, hideLabel = fals
         </code>
       ) : null}
     </div>
+  );
+}
+
+// ── Shorthand-letter label helper ─────────────────────────────────────────────
+// Highlights the letters that form the query shorthand in orange (e.g. "e" in
+// "Energy", "kw" in "Keyword"). Used in Stat Rows and Text Filter labels.
+function kbLabel(text: string, shorthand: string): ReactNode {
+  const lo = text.toLowerCase();
+  const hi = new Set<number>();
+  let from = 0;
+  for (const ch of shorthand.toLowerCase()) {
+    const idx = lo.indexOf(ch, from);
+    if (idx !== -1) { hi.add(idx); from = idx + 1; }
+  }
+  return (
+    <>
+      {[...text].map((ch, i) =>
+        hi.has(i) ? (
+          <span key={i} className="text-accent-warm font-black">{ch.toUpperCase()}</span>
+        ) : ch
+      )}
+    </>
   );
 }
 
@@ -605,15 +631,15 @@ export default function QueryBuilderView() {
       {/* px-4 lives on the inner max-w div so the pill borders line up with the two-column grid */}
       <div className="sticky top-[var(--site-header-height)] z-20 py-2.5">
         <div className="mx-auto max-w-[1720px] px-4">
-          {/* Pill: very rounded, gold border + outer glow; items-stretch so symbol fills height */}
-          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-stretch gap-3 px-3 py-2.5">
+          {/* Pill: very rounded, gold border + outer glow */}
+          <div className="rounded-[1.75rem] border border-[rgba(212,170,73,0.38)] bg-[rgba(9,12,19,0.97)] shadow-[0_0_0_1px_rgba(212,170,73,0.10),0_0_36px_rgba(212,170,73,0.12),0_12px_36px_rgba(0,0,0,0.60)] backdrop-blur-md flex items-center gap-3 px-3 py-2.5">
 
-            {/* Solar symbol — stretches to match pill height */}
+            {/* Solar symbol */}
             <img
               src="/design-assets/solar_symbol.png"
               alt=""
               aria-hidden="true"
-              className="shrink-0 self-stretch w-auto object-contain opacity-90 drop-shadow-[0_0_10px_rgba(212,170,73,0.55)]"
+              className="shrink-0 w-11 h-11 object-contain opacity-90 drop-shadow-[0_0_10px_rgba(212,170,73,0.55)]"
             />
 
             {/* Human-readable chips (large) + syntax query (small) */}
@@ -782,10 +808,10 @@ export default function QueryBuilderView() {
         <Section title="Stats" collapsible>
           <Subsection raised>
             <div className="grid grid-cols-2 max-[700px]:grid-cols-1 gap-2.5">
-              <StatRow label="Energy" hint="e>=3"       op={energyOp} onOpChange={setEnergyOp} val={energyVal} onValChange={setEnergyVal} />
-              <StatRow label="Might"  hint="m>=2"       op={mightOp}  onOpChange={setMightOp}  val={mightVal}  onValChange={setMightVal}  />
-              <StatRow label="Power"  hint="p>=1"       op={powerOp}  onOpChange={setPowerOp}  val={powerVal}  onValChange={setPowerVal}  />
-              <StatRow label="Cost"   hint="c>=3"       op={costOp}   onOpChange={setCostOp}   val={costVal}   onValChange={setCostVal}   />
+              <StatRow label="Energy" labelDisplay={kbLabel("Energy", "e")} hint="e>=3" op={energyOp} onOpChange={setEnergyOp} val={energyVal} onValChange={setEnergyVal} />
+              <StatRow label="Might"  labelDisplay={kbLabel("Might",  "m")} hint="m>=2" op={mightOp}  onOpChange={setMightOp}  val={mightVal}  onValChange={setMightVal}  />
+              <StatRow label="Power"  labelDisplay={kbLabel("Power",  "p")} hint="p>=1" op={powerOp}  onOpChange={setPowerOp}  val={powerVal}  onValChange={setPowerVal}  />
+              <StatRow label="Cost"   labelDisplay={kbLabel("Cost",   "c")} hint="c>=3" op={costOp}   onOpChange={setCostOp}   val={costVal}   onValChange={setCostVal}   />
             </div>
           </Subsection>
         </Section>
@@ -794,10 +820,10 @@ export default function QueryBuilderView() {
         <Section title="Text Filters" collapsible>
           <Subsection>
             <div className="flex flex-col gap-2.5">
-              <TextField label="Name"       hint="n:jinx"              placeholder="e.g. Jinx"                    value={nameText}    onChange={setNameText}    />
-              <TextField label="Rules Text" hint='o:"draw a card"'       placeholder="e.g. draw a card"            value={rulesText}   onChange={setRulesText}   />
-              <TextField label="Keyword"    hint="kw:Action"           placeholder="e.g. Action, Resolve"         value={keywordText} onChange={setKeywordText} />
-              <TextField label="Artist"     hint='a:"Six More Vodka"'  placeholder="e.g. Six More Vodka"          value={artistText}  onChange={setArtistText}  />
+              <TextField label="Name"               labelDisplay={kbLabel("Name",                "n")}  hint="n:jinx"              placeholder="e.g. Jinx"                    value={nameText}    onChange={setNameText}    />
+              <TextField label="Official Rules Text" labelDisplay={kbLabel("Official Rules Text", "o")}  hint='o:"draw a card"'   placeholder="e.g. draw a card"            value={rulesText}   onChange={setRulesText}   />
+              <TextField label="Keyword"            labelDisplay={kbLabel("Keyword",             "kw")} hint="kw:Action"           placeholder="e.g. Action, Resolve"         value={keywordText} onChange={setKeywordText} />
+              <TextField label="Artist"             labelDisplay={kbLabel("Artist",              "a")}  hint='a:"Six More Vodka"'  placeholder="e.g. Six More Vodka"          value={artistText}  onChange={setArtistText}  />
             </div>
           </Subsection>
           <p className={QB_TOKENS.helperText}>

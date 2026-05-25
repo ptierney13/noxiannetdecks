@@ -11,7 +11,7 @@ export function QuerySummaryChips({ items, size = "sm" }: { items: DisplayItem[]
         if (item === "AND" || item === "OR") {
           return (
             <span key={`conn-${i}`} className={`${connSz} font-black uppercase tracking-widest text-text-secondary`}>
-              {item}
+              {" "}{item.toLowerCase()}{" "}
             </span>
           );
         }
