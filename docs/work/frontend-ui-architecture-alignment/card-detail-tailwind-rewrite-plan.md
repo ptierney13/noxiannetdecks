@@ -65,7 +65,7 @@ active entry. Keep the set ID, label, and price columns as-is.
 ### Attributes section
 
 The current `card-attr-block` + `card-attr-label` + `card-attr-value` pattern maps
-directly to a label/value pair. Use `dl`/`dt`/`dd` or a flex-row grid. Symbols and
+directly to a label/value pair. Use `dl`/`dt`/`dd`. Symbols and
 cost rendering (`renderTokenizedText`) stay unchanged.
 
 ### Facts table
@@ -133,15 +133,44 @@ export const cardPrintingsQueryOptions = (query: string) => queryOptions({
 The new page uses `useQuery(cardDetailQueryOptions(cardId))`. Handle `isPending`
 with a loading state and `isError` with `useAppError` (existing pattern).
 
-The printings query is derived from the loaded card: once `cardDetailQueryOptions`
-resolves, derive the printings query string and pass to `cardPrintingsQueryOptions`.
-Use `useQuery` with `enabled: Boolean(printingsQuery)`.
+**Loading state principle:** all structural regions of the page render at their
+final dimensions immediately — no layout jump when data arrives. Use placeholder
+content (muted `rounded` blocks at the expected size) or conditionally-visible
+`opacity-0` stand-ins for text and image regions. Do not collapse regions to zero
+height during load. Piecemeal reveal is acceptable (e.g. the pricing panel
+appearing after `usePublishedPriceIndex` resolves) as long as surrounding layout
+does not reflow.
+
+The printings query **cannot** be derived from the `cardId` route param alone — it
+requires either `riftbound_id` or `clean_name` from the card response body. The
+sequential fetch is therefore unavoidable with the current API shape. Derive the
+query string as follows (matching the existing legacy logic):
+
+```ts
+const printingsQuery = card.riftbound_id
+  ? `riftbound_id="${card.riftbound_id}" unique:prints`
+  : card.clean_name
+  ? `n="${card.clean_name}" unique:prints`
+  : null;
+```
+
+Use `useQuery(cardPrintingsQueryOptions(printingsQuery ?? ""))` with
+`enabled: Boolean(printingsQuery)`.
+
+// NOTE: if page-load performance becomes a concern, the right fix is a combined
+// backend endpoint that returns card + printings in a single response. Do not
+// attempt to parallelize on the frontend without that — the query string cannot
+// be derived without the card body.
 
 ### `usePublishedPriceIndex` stays as lib hook
 
 `usePublishedPriceIndex` uses an internal `useEffect` for static JSON loading. It
 is shared across multiple pages and is **not** being migrated to TanStack Query in
-this pass. Its usage in `CardDetailView` remains unchanged.
+this pass. It returns `{ index: PublishedPriceIndex | null, status: "loading" | "ready" | "error" }`.
+Usage in `CardDetailView`: call the hook unconditionally; show the pricing panel
+only when `status === "ready"` and `index` is non-null. When `status === "loading"`,
+the pricing panel area should reserve its space (no layout jump). When
+`status === "error"`, omit the pricing panel silently (it is non-critical data).
 
 ## Implementation Units
 
@@ -203,6 +232,11 @@ classes with Tailwind utility classes. Keep runtime series colors (`entry.color`
 `PRICE_SERIES_COLORS`) as inline styles — they are computed at runtime and must
 stay as `style` attributes.
 
+Use the **CSS token mapping table in Unit 2** for all `var(--*)` → Tailwind token
+translations. For SVG elements where Tailwind `fill-*`/`stroke-*` utilities cannot
+express a static color, use `var(--color-*)` token references directly via inline
+`style` (not hardcoded hex values).
+
 ### Unit 4 — Update router
 
 In `frontend/src/app/router.tsx`: change the `CardDetailView` import path from
@@ -228,7 +262,8 @@ Required `CardDetailView` stories:
 
 | Story | What it shows |
 |---|---|
-| `Loading` | Loading state before card resolves |
+| `Loading` | Placeholder layout before card resolves — all structural regions visible at full dimensions |
+| `Error` | Error state after card fetch fails — uses `useAppError` pattern |
 | `Default` | Loaded card with no price data |
 | `WithPriceData` | Card with pricing panel visible and toggleable rows |
 | `WithPrintings` | Card with multiple printings in the sidebar list |
@@ -254,13 +289,13 @@ no longer references these selectors.
 | Page container | Tailwind page shell | `PageShell` already wraps via router; inner spacing uses Tailwind |
 | Breadcrumb nav | Tailwind flex row | Simple `← Card Search` text button |
 | Two-column layout | `grid grid-cols-1 lg:grid-cols-[...]` | Responsive single→two column at `1024px` |
-| Card image | Tailwind img classes; `missing-image` fallback inlined | |
+| Card image | Tailwind img classes; on load error render a card-sized `div` with centered "Image Not Found" text in `text-text-tertiary` | |
 | Printings list | Border-divided stack; active item uses accent highlight | |
 | Name + price headline | Flex row with wrapping | |
 | Typeline | `text-text-secondary text-sm` | |
 | Attribute block (Cost/Might/Domain) | Flex label/value pairs | `renderTokenizedText` symbols unchanged |
 | Rich text / flavour text | Tailwind prose treatment | `renderTokenizedText` unchanged |
-| Facts table | `dl`/`dt`/`dd` or flex grid with dividers | |
+| Facts table | `dl`/`dt`/`dd` with dividers | |
 | Links section | Flex row of `text-button`-style links | |
 | Pricing panel heading | Compact `h2` with Tailwind | |
 | Price toggle buttons | Generic accent chip pattern (same as QB chips) | |

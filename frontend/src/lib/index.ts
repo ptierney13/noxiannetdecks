@@ -36,6 +36,7 @@ export {
   type CardSearchResultGroup,
 } from "./cardSearchResults";
 export {
+  PRICE_SERIES_COLORS,
   usePublishedPriceIndex,
   loadPublishedPriceIndex,
   loadPublishedPriceIndexForPath,
@@ -48,6 +49,12 @@ export {
   buildTcgplayerAffiliateLink,
   buildTcgplayerAffiliateSearchLink,
   resolveActivePricePathPrefix,
+  formatHeadlinePrice,
+  formatPriceOnly,
+  formatSeriesToggleLabel,
+  formatSeriesLegendLabel,
+  groupRowsByPrinting,
+  type PricePrintingGroup,
   type PublishedPriceHistoryPoint,
   type PublishedPriceRow,
   type PublishedPriceManifest,

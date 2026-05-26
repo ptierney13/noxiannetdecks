@@ -267,6 +267,68 @@ export function buildTcgplayerAffiliateSearchLink(options: TcgplayerAffiliateSea
   return `${TCGPLAYER_AFFILIATE_BASE_URL}?u=${encodeURIComponent(landingUrl)}`;
 }
 
+export const PRICE_SERIES_COLORS = [
+  "var(--chart-series-1)",
+  "var(--chart-series-2)",
+  "var(--chart-series-3)",
+  "var(--chart-series-4)",
+  "var(--chart-series-5)",
+  "var(--chart-series-6)",
+] as const;
+
+export type PricePrintingGroup = {
+  key: string;
+  label: string;
+  rows: PublishedPriceRow[];
+};
+
+export function formatHeadlinePrice(row: PublishedPriceRow | null): string | null {
+  const price = formatUsdPrice(row?.currentPrice.amount);
+  if (!price || !row?.condition) {
+    return null;
+  }
+  return `${row.condition} ${price}`;
+}
+
+export function formatPriceOnly(row: PublishedPriceRow | null): string | null {
+  return formatUsdPrice(row?.currentPrice.amount);
+}
+
+export function formatSeriesToggleLabel(row: PublishedPriceRow): string {
+  const condition = row.condition ?? "Unknown";
+  const price = formatUsdPrice(row.currentPrice.amount);
+  return price ? `${condition} ${price}` : condition;
+}
+
+export function formatSeriesLegendLabel(row: PublishedPriceRow): string {
+  const printing = formatPrintingLabel(row.printing);
+  const condition = row.condition ?? "Unknown";
+  return `${printing} • ${condition}`;
+}
+
+export function groupRowsByPrinting(rows: PublishedPriceRow[]): PricePrintingGroup[] {
+  const groups = new Map<string, PublishedPriceRow[]>();
+
+  for (const row of rows) {
+    const key = normalizePrinting(row.printing) || "other";
+    groups.set(key, [...(groups.get(key) ?? []), row]);
+  }
+
+  const orderedKeys = [
+    "foil",
+    "normal",
+    ...[...groups.keys()].filter((key) => key !== "foil" && key !== "normal").sort(),
+  ];
+
+  return orderedKeys
+    .filter((key) => groups.has(key))
+    .map((key) => ({
+      key,
+      label: formatPrintingLabel(key),
+      rows: groups.get(key) ?? [],
+    }));
+}
+
 export function sortPriceRows(rows: PublishedPriceRow[]): PublishedPriceRow[] {
   return [...rows].sort((left, right) => {
     const printingDelta = resolvePrintingOrder(left.printing) - resolvePrintingOrder(right.printing);
