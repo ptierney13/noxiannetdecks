@@ -11,12 +11,16 @@ function currentBranch() {
   return execFileSync("git", ["branch", "--show-current"], { encoding: "utf8" }).trim();
 }
 
+const MAX_ALIAS_LENGTH = 28;
+
 function sanitizeBranchAlias(branch) {
   return branch
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "-")
     .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
+    .replace(/^-|-$/g, "")
+    .slice(0, MAX_ALIAS_LENGTH)
+    .replace(/-+$/g, "");
 }
 
 const config = readConfig();
