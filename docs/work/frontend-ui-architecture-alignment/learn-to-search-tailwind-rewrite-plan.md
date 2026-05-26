@@ -1,6 +1,6 @@
 ﻿# Behavioral Spec: Learn to Search Rewrite
 
-> Status: plan
+> Status: complete
 > Initiative: Stage 7 - Page-by-Page UI Rewrites
 
 ## Summary

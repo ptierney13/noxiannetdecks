@@ -7,6 +7,6 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "./vitest.setup.ts",
     globals: true,
-    include: ["src/storybook/design-system.stories.test.tsx"]
+    include: ["src/**/*.stories.test.{ts,tsx}"]
   }
 });

@@ -1,6 +1,27 @@
 # Stage 7: Page-by-Page UI Rewrites
 
-> Status: plan
+> Status: in progress
+
+## Implementation Note 2026-05-26
+
+Five of eight pages are complete. Remaining: Card Detail, Tier List,
+Sealed Simulator, Trade Balancer.
+
+| Page | Status | Notes |
+|---|---|---|
+| Card Search (`CardSearchView.tsx`) | ✅ Complete | `CardSearchResultsPane` + `CardSearchView` |
+| Card Detail (`CardDetailView.tsx`) | ❌ In progress (planning) | `pages/legacy/CardDetailView.tsx` — plan doc: `card-detail-tailwind-rewrite-plan.md` |
+| Learn to Search (`LearnToSearchView.tsx`) | ✅ Complete | All legacy files deleted; all `lts-*`/`csg-*` CSS removed |
+| Query Builder (`QueryBuilderView.tsx`) | ✅ Complete | Out of legacy; no `qb-*` CSS; `/* ── QUERY BUILDER ── */` removed from `styles.css` |
+| Deck Explorer (`DeckExplorerView.tsx`) | ✅ Complete | Out of legacy; full Tailwind. CSS cleanup: `/* ── DECK EXPLORER ── */` section (~line 1415) orphaned — safe to remove |
+| Tier List (`TierListView.tsx`) | ❌ Planned | `pages/legacy/TierListView.tsx` — plan doc: `tier-list-tailwind-rewrite-plan.md` |
+| Sealed Simulator (`SealedSimulator.tsx`) | ❌ Not started | `pages/legacy/SealedSimulator.tsx` (1179 lines, largest) |
+| Trade Balancer (`TradeBalancerView.tsx`) | ❌ Not started | `pages/legacy/TradeBalancerView.tsx` |
+
+Pre-Step (data/ structure): `data/cards.ts` and `data/queryFeatures.ts` exist. Plain
+array key convention is in use (`["cards", cardId]`, `["query-features"]`). Route
+loaders are not required for now; `useQuery` in the component is sufficient per page.
+This pre-step is effectively complete.
 
 ## Summary
 

@@ -263,8 +263,8 @@ implementation begins.
 | 3 | ✅ Complete | TanStack Router adoption; zero `window.history` calls remain |
 | 4 | ✅ Complete | Documentation refresh, TanStack Query install, `data/` skeleton |
 | 5 | ✅ Complete | Home Tailwind rewrite + component extraction; AppShell Tailwind rewrite |
-| 6 | 📋 Planned | `cardFormat.tsx` analysis and placement into correct layers |
-| 7 | 📋 Planned | Page-by-page UI rewrites with mockup-driven iteration |
+| 6 | 🔄 In Progress | `cardFormat.tsx` analysis and placement into correct layers |
+| 7 | 🔄 In Progress | Page-by-page UI rewrites (5 of 8 pages complete) |
 
 Active stage plans live in `docs/work/frontend-ui-architecture-alignment/`.
 Completed stage plans move to `docs/archive/work/frontend-ui-architecture-alignment/`.

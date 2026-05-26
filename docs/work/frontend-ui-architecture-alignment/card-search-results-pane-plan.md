@@ -1,6 +1,6 @@
 # Plan: Card Search Results Pane
 
-> Status: in progress
+> Status: complete
 
 ## Summary
 

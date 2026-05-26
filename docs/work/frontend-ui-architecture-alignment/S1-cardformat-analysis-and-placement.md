@@ -1,6 +1,6 @@
 # Stage 6: cardFormat.tsx Analysis and Placement
 
-> Status: plan
+> Status: in progress
 
 ## Summary
 
@@ -21,6 +21,43 @@ Three of the heaviest legacy pages (`SearchView`, `CardDetailView`,
 while `cardFormat.tsx` is still a top-level file, each rewrite subagent will
 make different assumptions about where that code should land — creating
 conflicts. Resolving ownership once here prevents that drift.
+
+## Implementation Note 2026-05-26
+
+Most of `cardFormat.tsx` has already been dissolved:
+
+- Card presentation functions (`renderTokenizedText`, `normalizeCardText`,
+  `formatCostText`, `formatTypeline`, `domainChipClass`, `cardEnergy`, and
+  helpers) moved to `src/lib/cardPresentation.tsx`.
+- `CardQuickLookModal` was superseded by `features/card/CardSummaryPopup.tsx`.
+  Legacy callers still exist; they are being retired as each page is rewritten
+  in Stage 7.
+
+What remains in `src/cardFormat.tsx` as of this note:
+
+| Export | Type | Proposed destination | Reason |
+|---|---|---|---|
+| `PRICE_SERIES_COLORS` | const | `lib/priceData.ts` | Price palette constant; same module as other price data utilities |
+| `PricePrintingGroup` | type | `lib/priceData.ts` | Natural sibling of `PublishedPriceRow` |
+| `formatHeadlinePrice` | pure fn | `lib/priceData.ts` | Price formatting; same family as `formatUsdPrice` |
+| `formatPriceOnly` | pure fn | `lib/priceData.ts` | Price formatting pure helper |
+| `formatSeriesToggleLabel` | pure fn | `lib/priceData.ts` | Price series label helper |
+| `formatSeriesLegendLabel` | pure fn | `lib/priceData.ts` | Price series label helper |
+| `groupRowsByPrinting` | pure fn | `lib/priceData.ts` | Groups `PublishedPriceRow` arrays; sibling of `sortPriceRows` |
+| `PriceHistoryChart` | React component | `features/card/PriceHistoryChart.tsx` | Price domain visualization; only used by `CardDetailView`; has internal `useState` |
+
+Completion steps:
+
+1. Add pure functions and types to `lib/priceData.ts`; export from `lib/index.ts`.
+2. Create `features/card/PriceHistoryChart.tsx`; keep legacy CSS class references
+   (`price-chart-*`) in place for now — these are removed when Card Detail is
+   rewritten in Stage 7.
+3. Update `CardDetailView` imports to use the new paths.
+4. Delete `src/cardFormat.tsx`.
+
+This cleanup should happen before or alongside the Card Detail Stage 7 rewrite.
+`PriceHistoryChart` does not need a Storybook story at this stage; it gets one
+as part of the Card Detail rewrite.
 
 ## What `cardFormat.tsx` currently contains (as of Stage 3)
 

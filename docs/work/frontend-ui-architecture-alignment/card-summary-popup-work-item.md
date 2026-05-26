@@ -34,8 +34,15 @@ Initial implementation exists in:
 
 The new popup path is Storybook-covered and is used by the new
 `CardSearchResultsPane`. Legacy `CardQuickLookModal` callers remain in place.
-Do not treat the work item as complete until the remaining frontend validation
-gap is resolved or explicitly accepted.
+
+## Remaining Work
+
+Visual alignment with the card detail page. Once `CardDetailView` is rewritten
+in Stage 7, review `CardSummaryPopup` visuals against the new card detail layout
+and update the popup to match — shared typography, attribute presentation,
+facts layout, and any token or spacing decisions made during the detail rewrite.
+No structural changes to the popup API or ownership model are expected; this is
+a visual polish pass only.
 
 ## Key Changes
 
