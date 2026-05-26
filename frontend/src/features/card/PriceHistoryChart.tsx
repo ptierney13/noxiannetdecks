@@ -1,78 +1,10 @@
 import { useState } from "react";
 import {
-  formatPrintingLabel,
+  PRICE_SERIES_COLORS,
+  formatSeriesLegendLabel,
   formatUsdPrice,
-  normalizePrinting,
   type PublishedPriceRow,
-} from "./lib";
-
-// --- Price chart display utilities ---
-// These functions support PriceHistoryChart and CardDetailView's price UI.
-// Pure string/data helpers that depend on PublishedPriceRow from priceData.
-
-export const PRICE_SERIES_COLORS = [
-  "var(--chart-series-1)",
-  "var(--chart-series-2)",
-  "var(--chart-series-3)",
-  "var(--chart-series-4)",
-  "var(--chart-series-5)",
-  "var(--chart-series-6)",
-] as const;
-
-export type PricePrintingGroup = {
-  key: string;
-  label: string;
-  rows: PublishedPriceRow[];
-};
-
-export function formatHeadlinePrice(row: PublishedPriceRow | null): string | null {
-  const price = formatUsdPrice(row?.currentPrice.amount);
-  if (!price || !row?.condition) {
-    return null;
-  }
-  return `${row.condition} ${price}`;
-}
-
-export function formatPriceOnly(row: PublishedPriceRow | null): string | null {
-  return formatUsdPrice(row?.currentPrice.amount);
-}
-
-export function formatSeriesToggleLabel(row: PublishedPriceRow): string {
-  const condition = row.condition ?? "Unknown";
-  const price = formatUsdPrice(row.currentPrice.amount);
-  return price ? `${condition} ${price}` : condition;
-}
-
-export function formatSeriesLegendLabel(row: PublishedPriceRow): string {
-  const printing = formatPrintingLabel(row.printing);
-  const condition = row.condition ?? "Unknown";
-  return `${printing} • ${condition}`;
-}
-
-export function groupRowsByPrinting(rows: PublishedPriceRow[]): PricePrintingGroup[] {
-  const groups = new Map<string, PublishedPriceRow[]>();
-
-  for (const row of rows) {
-    const key = normalizePrinting(row.printing) || "other";
-    groups.set(key, [...(groups.get(key) ?? []), row]);
-  }
-
-  const orderedKeys = [
-    "foil",
-    "normal",
-    ...[...groups.keys()].filter((key) => key !== "foil" && key !== "normal").sort(),
-  ];
-
-  return orderedKeys
-    .filter((key) => groups.has(key))
-    .map((key) => ({
-      key,
-      label: formatPrintingLabel(key),
-      rows: groups.get(key) ?? [],
-    }));
-}
-
-// --- Price history chart component ---
+} from "../../lib";
 
 type ChartTooltip = { cx: number; cy: number; amount: number; date: string };
 
@@ -96,7 +28,7 @@ export function PriceHistoryChart({
 
   if (series.length === 0) {
     return (
-      <div className="price-chart-empty">
+      <div className="rounded-[10px] border border-dashed border-border-default bg-[rgba(255,255,255,0.02)] px-4 py-3.5 text-[0.84rem] text-text-tertiary">
         Selected price rows do not have enough 7-day history to plot yet.
       </div>
     );
@@ -154,12 +86,16 @@ export function PriceHistoryChart({
   });
 
   return (
-    <div className="price-chart" data-testid="price-history-chart">
-      <div className="price-chart-legend">
+    <div
+      className="flex flex-col gap-3 rounded-[10px] border border-border-subtle bg-surface-2 p-4"
+      data-testid="price-history-chart"
+    >
+      {/* Legend */}
+      <div className="flex flex-wrap gap-3">
         {series.map((entry) => (
-          <div key={entry.row.rowId} className="price-chart-legend-item">
+          <div key={entry.row.rowId} className="inline-flex items-center gap-2 text-[0.82rem] text-text-secondary">
             <span
-              className="price-chart-legend-swatch"
+              className="h-3 w-3 shrink-0 rounded-full"
               style={{ backgroundColor: entry.color }}
             />
             <span>{formatSeriesLegendLabel(entry.row)}</span>
@@ -167,8 +103,10 @@ export function PriceHistoryChart({
         ))}
       </div>
 
+      {/* SVG chart — series colors stay as inline style (runtime values) */}
       <svg
         viewBox={`0 0 ${width} ${height}`}
+        className="w-full h-auto overflow-visible"
         role="img"
         aria-label="Seven day market price history chart"
       >
@@ -177,7 +115,8 @@ export function PriceHistoryChart({
           y={margin.top}
           width={chartWidth}
           height={chartHeight}
-          className="price-chart-frame"
+          fill="rgba(255,255,255,0.02)"
+          stroke="rgba(255,255,255,0.08)"
         />
 
         {axisLabels.map((label) => (
@@ -187,13 +126,14 @@ export function PriceHistoryChart({
               y1={label.y}
               x2={margin.left + chartWidth}
               y2={label.y}
-              className="price-chart-gridline"
+              stroke="rgba(255,255,255,0.08)"
+              strokeDasharray="4 6"
             />
             <text
               x={margin.left - 10}
               y={label.y + 4}
               textAnchor="end"
-              className="price-chart-axis-label"
+              style={{ fill: "var(--color-text-tertiary)", fontSize: 11 }}
             >
               {label.label}
             </text>
@@ -206,7 +146,7 @@ export function PriceHistoryChart({
             x={label.x}
             y={height - 10}
             textAnchor="middle"
-            className="price-chart-axis-label"
+            style={{ fill: "var(--color-text-tertiary)", fontSize: 11 }}
           >
             {label.label}
           </text>
@@ -278,13 +218,21 @@ export function PriceHistoryChart({
                   width={tooltipWidth}
                   height={tooltipHeight}
                   rx="4"
-                  className="price-chart-tooltip-bg"
+                  style={{
+                    fill: "var(--color-surface-2)",
+                    stroke: "var(--color-border-default)",
+                    strokeWidth: 1,
+                  }}
                 />
                 <text
                   x={tx + tooltipWidth / 2}
                   y={ty + 15.5}
                   textAnchor="middle"
-                  className="price-chart-tooltip-text"
+                  style={{
+                    fill: "var(--color-text-secondary)",
+                    fontSize: 11,
+                    fontWeight: 600,
+                  }}
                 >
                   {text}
                 </text>
@@ -295,4 +243,3 @@ export function PriceHistoryChart({
     </div>
   );
 }
-
