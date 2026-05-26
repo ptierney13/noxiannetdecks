@@ -5,6 +5,7 @@ const meta: Meta<typeof SyntaxGuide> = {
   title: "features/learn-to-search/SyntaxGuide",
   component: SyntaxGuide,
   parameters: { layout: "padded" },
+  args: { onAppend: (query: string) => console.log("append:", query) },
 };
 export default meta;
 

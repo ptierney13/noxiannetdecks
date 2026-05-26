@@ -97,8 +97,9 @@ Purpose: group major page modules, especially dense tools.
 
 Reference:
 
-- `frontend/src/pages/QueryBuilderView.tsx` (`Section`, `Subsection`,
-  `QB_TOKENS`)
+- `frontend/src/ui-elements/ToolSection.tsx`
+- `frontend/src/pages/QueryBuilderView.tsx` (`ToolSection` usage plus
+  page-local `QB_TOKENS`)
 - `frontend/src/features/card-search/CardSearchResultsContent.tsx`
 - `frontend/src/ui-foundation.css` `.site-page-shell` transitional class
 
@@ -203,6 +204,7 @@ Purpose: compact selectable filters, query syntax tokens, print variants.
 References:
 
 - `frontend/src/ui-elements/QueryChip.tsx`
+- `frontend/src/ui-elements/QuerySyntaxText.tsx`
 - `frontend/src/ui-elements/SyntaxQueryChip.tsx`
 - `frontend/src/features/VariantSelectorRow.tsx`
 - `frontend/src/pages/QueryBuilderView.tsx`
@@ -224,6 +226,9 @@ Rules:
 - Selected chips should feel active or lit without heavy glow.
 - Use `aria-pressed` for toggle chips.
 - Use monospace only for syntax tokens or compact codes.
+- Render query examples from their raw query string with `QuerySyntaxText`.
+  Do not rebuild query display from parsed tokens when the visible text must
+  preserve spaces, parentheses, or original grouping.
 
 Bad -> better:
 

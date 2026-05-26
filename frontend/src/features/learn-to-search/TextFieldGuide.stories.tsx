@@ -19,6 +19,7 @@ const sampleFields: QueryFieldGuide[] = [
   { property: "Name",      query: "name:<text>",   shorthand: "n:<text>",  searches: "Matches cards whose name contains this text.", example: "n:jinx"       },
   { property: "Cost",      query: "cost:<n>",       shorthand: null,        searches: "Matches by exact play cost.",                   example: "cost:5"       },
   { property: "Energy",    query: "energy:<n>",     shorthand: "e:<n>",     searches: "Matches by energy value.",                      example: "e:5"          },
+  { property: "Might",     query: "might:<n>",      shorthand: "m:<n>",     searches: "Matches by might value.",                       example: "m:5"          },
   { property: "Power",     query: "power:<n>",      shorthand: "p:<n>",     searches: "Matches by power value.",                       example: "p:1"          },
   { property: "Type line", query: "t:<text>",       shorthand: null,        searches: "Matches any word in the full type line.",        example: "t:champion"   },
   { property: "Card type", query: "cardtype:<text>",shorthand: "ct:<text>", searches: "Matches the card type.",                        example: "ct:unit"      },

@@ -18,7 +18,7 @@ function Side({ side, onClick }: { side: ComparisonSide; onClick: (q: string) =>
   return (
     <button
       type="button"
-      className="group flex flex-col gap-2 p-4 rounded-xl border border-border-default bg-surface-2 text-left transition-[background-color,border-color,box-shadow] duration-[120ms] hover:bg-accent-soft/30 hover:border-accent/40 hover:shadow-[0_0_0_1px_rgba(197,50,71,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)] w-full"
+      className="group flex w-full flex-col gap-2 rounded-xl border border-border-default bg-[linear-gradient(180deg,rgba(25,31,43,0.86),rgba(12,15,23,0.92))] p-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.045)] transition-[background,border-color,box-shadow,transform] duration-[140ms] hover:-translate-y-px hover:border-accent/40 hover:bg-[linear-gradient(180deg,rgba(34,39,52,0.92),rgba(16,20,30,0.96))] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.065),0_0_0_1px_rgba(197,50,71,0.22),0_10px_22px_rgba(0,0,0,0.24)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
       onClick={() => onClick(side.query)}
       title={`Try: ${side.query}`}
     >

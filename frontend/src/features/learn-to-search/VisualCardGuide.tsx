@@ -1,4 +1,6 @@
+import type { MouseEvent } from "react";
 import type { LtsDetailItem } from "./GuideDetailCard";
+import { guideDetailFor } from "./guideDetails";
 
 type ZoneId =
   | "name" | "cost" | "energy" | "power" | "might"
@@ -6,26 +8,26 @@ type ZoneId =
   | "keyword" | "text"
   | "set" | "rarity" | "number" | "artist";
 
-type ZoneInfo = LtsDetailItem & { label: string };
+type ZoneInfo = { label: string; detail: LtsDetailItem };
 
 const ZONES: Record<ZoneId, ZoneInfo> = {
-  name:             { label: "Name",        category: "NAME",        description: "Matches cards whose name contains this text.", query: "name:blitzcrank", shorthand: "n:blitzcrank",             examples: ['name:jinx', 'n:"loose cannon"', "name:blitz*"] },
-  cost:             { label: "Cost",        category: "COST",        description: "Matches by exact play cost. Use >=, <=, >, < for ranges.", query: "cost:5",                                       examples: ["cost:5", "cost>=3", "cost<=2"] },
-  energy:           { label: "Energy",      category: "ENERGY",      description: "Matches by energy value. Supports numeric comparisons.", query: "energy:5",          shorthand: "e:5",            examples: ["e:5", "e>=3", "e<=2"] },
-  power:            { label: "Power",       category: "POWER",       description: "Matches by power value. Supports numeric comparisons.", query: "power:1",            shorthand: "p:1",            examples: ["p:1", "p>=3", "p=0"] },
-  might:            { label: "Might",       category: "MIGHT",       description: "Matches by might value. Supports numeric comparisons.", query: "might:5",            shorthand: "m:5",            examples: ["m:5", "m>=4", "m:none"] },
-  typeline:         { label: "Type line",   category: "TYPE LINE",   description: "Matches any word in the full type line in any order.", query: "t:champion",                                      examples: ["t:champion", 't:"champion unit"', "t:mech"] },
-  cardtype:         { label: "Card type",   category: "CARD TYPE",   description: "Matches the card type (Unit, Event, Landmark, etc.).", query: "cardtype:unit",     shorthand: "ct:unit",         examples: ["ct:unit", "ct:event", "ct:landmark"] },
-  supertype:        { label: "Supertype",   category: "SUPERTYPE",   description: "Matches the supertype segment (Champion, Landmark, etc.).", query: "supertype:champion", shorthand: "u:champion",  examples: ["u:champion", "u:landmark"] },
-  "tag-blitzcrank": { label: "Tag",         category: "TAG",         description: "Matches a specific type tag — champions, tribes, and origins.", query: "tag:blitzcrank",                         examples: ["tag:blitzcrank", "tag:zaun", "tag:dragon"] },
-  "tag-zaun":       { label: "Tag",         category: "TAG",         description: "Matches a specific type tag — champions, tribes, and origins.", query: "tag:zaun",                               examples: ["tag:zaun", "tag:mech", "tag:piltover"] },
-  "tag-mech":       { label: "Tag",         category: "TAG",         description: "Matches a specific type tag — champions, tribes, and origins.", query: "tag:mech",                               examples: ["tag:mech", "tag:dragon", "tag:zaun"] },
-  keyword:          { label: "Keyword",     category: "KEYWORD",     description: "Matches cards that have this rules keyword.", query: "keyword:tank",      shorthand: "k:tank",                  examples: ["k:tank", "k:action", "k:overwhelm"] },
-  text:             { label: "Rules text",  category: "RULES TEXT",  description: "Searches within the card's rules text.", query: "text:move",          shorthand: "o:move",                     examples: ['o:move', 'o:"draw a card"', "o:battlefield"] },
-  set:              { label: "Set",         category: "SET",         description: "Matches by set code or set name.", query: "set:OGN",              shorthand: "s:origins",                       examples: ["s:OGN", "s:unleashed", "s:UNL"] },
-  rarity:           { label: "Rarity",      category: "RARITY",      description: "Filters by rarity: Common, Uncommon, Rare, Epic, Showcase.", query: "rarity:rare",                            examples: ["rarity:rare", "rarity:epic", "rarity:common"] },
-  number:           { label: "Collector #", category: "COLLECTOR #", description: "Matches by collector number.", query: "number:67",            shorthand: "c:67",                              examples: ["c:67", "number:001", "c:298"] },
-  artist:           { label: "Artist",      category: "ARTIST",      description: "Searches by illustrator name.", query: 'artist:"league splash team"', shorthand: 'a:"league splash"',          examples: ['a:"league splash"', "a:sixmorevodka"] },
+  name:             { label: "Name",        detail: guideDetailFor("name") },
+  cost:             { label: "Cost",        detail: guideDetailFor("cost") },
+  energy:           { label: "Energy",      detail: guideDetailFor("energy") },
+  power:            { label: "Power",       detail: guideDetailFor("power") },
+  might:            { label: "Might",       detail: guideDetailFor("might") },
+  typeline:         { label: "Type line",   detail: guideDetailFor("typeline") },
+  cardtype:         { label: "Card type",   detail: guideDetailFor("cardtype") },
+  supertype:        { label: "Supertype",   detail: guideDetailFor("supertype") },
+  "tag-blitzcrank": { label: "Tag",         detail: guideDetailFor("tag", { query: "tag:blitzcrank", examples: ["tag:blitzcrank", "tag:zaun", "tag:dragon"] }) },
+  "tag-zaun":       { label: "Tag",         detail: guideDetailFor("tag", { query: "tag:zaun", examples: ["tag:zaun", "tag:mech", "tag:piltover"] }) },
+  "tag-mech":       { label: "Tag",         detail: guideDetailFor("tag", { query: "tag:mech", examples: ["tag:mech", "tag:dragon", "tag:zaun"] }) },
+  keyword:          { label: "Keyword",     detail: guideDetailFor("keyword") },
+  text:             { label: "Rules text",  detail: guideDetailFor("text") },
+  set:              { label: "Set",         detail: guideDetailFor("set") },
+  rarity:           { label: "Rarity",      detail: guideDetailFor("rarity") },
+  number:           { label: "Collector #", detail: guideDetailFor("number") },
+  artist:           { label: "Artist",      detail: guideDetailFor("artist") },
 };
 
 const CARD_IMAGE = "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/654dcc4aef0a0b5a0c6e928d7aae397a52c3ab17-744x1039.png?accountingTag=RB";
@@ -45,45 +47,45 @@ type VisualCardGuideProps = {
 
 export function VisualCardGuide({ onSelect, selectedQueries }: VisualCardGuideProps) {
   function isActive(id: ZoneId) {
-    return selectedQueries.has(ZONES[id].query ?? ZONES[id].label);
+    return selectedQueries.has(ZONES[id].detail.query ?? ZONES[id].detail.label);
   }
 
   function zoneClass(id: ZoneId, extra: string) {
     const base = [
       extra,
-      "relative cursor-pointer rounded transition-[background-color,box-shadow,color] duration-[120ms]",
+      "relative cursor-pointer rounded transition-[background,box-shadow,color,transform] duration-[120ms]",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
     ];
     if (isActive(id)) {
-      base.push("bg-accent-soft/80 shadow-[0_0_0_2px_rgba(197,50,71,0.6)] text-text-primary");
+      base.push("bg-accent-soft-strong shadow-[0_0_0_2px_rgba(197,50,71,0.58),inset_0_1px_0_rgba(255,255,255,0.08)] text-text-primary");
     } else {
-      base.push("hover:bg-accent-soft/40 hover:shadow-[0_0_0_1px_rgba(197,50,71,0.35)] hover:text-text-primary");
+      base.push("hover:-translate-y-px hover:bg-accent-soft/45 hover:shadow-[0_0_0_1px_rgba(197,50,71,0.34),0_6px_14px_rgba(0,0,0,0.22)] hover:text-text-primary");
     }
     return base.join(" ");
   }
 
   function zoneHandlers(id: ZoneId) {
     return {
-      onClick(e: React.MouseEvent) {
+      onClick(e: MouseEvent) {
         e.stopPropagation();
-        onSelect(ZONES[id]);
+        onSelect(ZONES[id].detail);
       },
     };
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="mx-auto max-w-[12ch] text-balance text-center text-[2.1875rem] font-black leading-[0.95] text-text-primary lg:hidden">
+      <p className="rounded-xl border border-border-subtle bg-surface-inset/75 px-4 py-3 text-center text-sm font-semibold leading-relaxed text-text-secondary shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] lg:hidden">
         Tap any element to learn how to search for it.
       </p>
 
       <div
-        className="w-full rounded-2xl border border-border-strong bg-surface-2 overflow-hidden shadow-lg select-none"
+        className="w-full select-none overflow-hidden rounded-2xl border border-border-default bg-[linear-gradient(180deg,rgba(23,28,40,0.96),rgba(8,11,18,0.98))] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_18px_46px_rgba(0,0,0,0.34)]"
         role="group"
-        aria-label="Interactive card diagram — tap any element for its query"
+        aria-label="Interactive card diagram"
       >
         {/* ── Header: Cost · Energy · Power / Might ── */}
-        <div className="grid grid-cols-4 divide-x divide-border-subtle border-b border-border-subtle">
+        <div className="grid grid-cols-4 divide-x divide-border-subtle border-b border-border-subtle bg-surface-inset/65">
           <button className={zoneClass("cost", STAT_CELL_CLASSES)} {...zoneHandlers("cost")} aria-pressed={isActive("cost")}>
             <span className={STAT_LABEL_CLASSES}>Cost</span>
             <span className={`${STAT_VALUE_CLASSES} font-mono`}>{CARD_COST}</span>
@@ -103,11 +105,11 @@ export function VisualCardGuide({ onSelect, selectedQueries }: VisualCardGuidePr
         </div>
 
         {/* ── Card art ── */}
-        <div className="relative w-full aspect-[744/500] overflow-hidden bg-surface-1">
+        <div className="relative aspect-[744/500] w-full overflow-hidden bg-surface-inset">
           <img
             src={CARD_IMAGE}
-            alt="Blitzcrank – Impassive: chrome champion from Zaun"
-            className="w-full h-full object-cover object-top"
+            alt="Blitzcrank - Impassive, chrome champion from Zaun"
+            className="h-full w-full object-cover object-[center_38%]"
             loading="lazy"
           />
         </div>
@@ -118,7 +120,7 @@ export function VisualCardGuide({ onSelect, selectedQueries }: VisualCardGuidePr
           {...zoneHandlers("name")}
           aria-pressed={isActive("name")}
         >
-          Blitzcrank – Impassive
+          Blitzcrank - Impassive
         </button>
 
         {/* ── Type line ── */}

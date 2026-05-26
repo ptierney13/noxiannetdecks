@@ -30,8 +30,8 @@ export const NegationAndContains: Story = {
   args: { query: 'name:jinx rarity:Rare -tag:dragon' },
 };
 
-export const DroppedToken: Story = {
-  name: "Dropped / unknown token",
+export const UnknownField: Story = {
+  name: "Unknown field",
   args: { query: "unknownfield:foo name:jinx" },
 };
 

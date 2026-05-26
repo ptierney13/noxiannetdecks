@@ -1,67 +1,23 @@
-import { useMemo } from "react";
-import { parseQuery } from "@noxiannet/card-store/query";
-import type { ExecutedCondition, ExecutedQueryItem } from "@noxiannet/card-store/query";
+import { QuerySyntaxText } from "./QuerySyntaxText";
 
 export type SyntaxQueryChipProps = {
   query: string;
   onClick?: (query: string) => void;
 };
 
-function ConditionSpans({ cond }: { cond: ExecutedCondition }) {
-  const dropped = cond.state === "dropped";
-  const cls = (color: string) =>
-    dropped ? "font-mono text-text-tertiary/40 line-through" : `font-mono ${color}`;
-
-  return (
-    <>
-      {cond.negated && <span className={cls("text-accent")}>-</span>}
-      {cond.field !== null && (
-        <>
-          <span className={cls("text-accent-warm")}>{cond.field}</span>
-          <span className={cls("text-text-tertiary")}>{cond.op}</span>
-        </>
-      )}
-      <span className={cls("text-text-primary")}>{cond.value}</span>
-    </>
-  );
-}
-
-function TokenList({ items }: { items: ExecutedQueryItem[] }) {
-  return (
-    <>
-      {items.map((item, i) => {
-        if (item === "AND") {
-          return <span key={i} className="font-mono"> </span>;
-        }
-        if (item === "OR") {
-          return (
-            <span key={i} className="font-mono text-accent-warm"> or </span>
-          );
-        }
-        return <ConditionSpans key={i} cond={item} />;
-      })}
-    </>
-  );
-}
-
 /**
- * Renders a query string with per-token syntax highlighting.
+ * Renders the original query string with per-token syntax highlighting.
  * When `onClick` is provided, renders as an interactive button matching QueryChip sizing.
  * When `onClick` is omitted, renders as a non-interactive <code> element (e.g. QB built query display).
  */
 export function SyntaxQueryChip({ query, onClick }: SyntaxQueryChipProps) {
-  const tokens = useMemo(
-    () => (query.trim() ? parseQuery(query).executedTokens : []),
-    [query]
-  );
-
-  const content = <TokenList items={tokens} />;
+  const content = <QuerySyntaxText query={query} className="text-sm leading-relaxed" />;
 
   if (onClick) {
     return (
       <button
         type="button"
-        className="inline-flex items-center px-2.5 py-1 bg-surface-2 border border-border-default rounded-lg text-sm transition-[background-color,border-color] duration-[120ms] hover:bg-accent-soft hover:border-[rgba(197,50,71,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
+        className="inline-flex min-h-9 items-center rounded-lg border border-border-default bg-[linear-gradient(180deg,rgba(31,37,52,0.96),rgba(15,18,28,0.98))] px-2.5 py-1 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_10px_rgba(0,0,0,0.18)] transition-[background,border-color,box-shadow,transform] duration-[140ms] hover:-translate-y-px hover:border-border-strong hover:bg-[linear-gradient(180deg,rgba(41,49,66,0.98),rgba(20,24,35,0.98))] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_8px_18px_rgba(0,0,0,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
         onClick={() => onClick(query)}
         title={`Use query: ${query}`}
       >
@@ -71,8 +27,6 @@ export function SyntaxQueryChip({ query, onClick }: SyntaxQueryChipProps) {
   }
 
   return (
-    <code className="inline-flex flex-wrap items-baseline gap-0 text-sm leading-relaxed">
-      {content}
-    </code>
+    <span className="inline-flex flex-wrap items-baseline gap-0">{content}</span>
   );
 }

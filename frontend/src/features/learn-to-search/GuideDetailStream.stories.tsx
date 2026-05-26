@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { GuideDetailStream } from "./GuideDetailStream";
 import type { LtsDetailItem } from "./GuideDetailCard";
+import { guideDetailFor } from "./guideDetails";
 
 const meta: Meta<typeof GuideDetailStream> = {
   title: "features/learn-to-search/GuideDetailStream",
@@ -16,21 +17,8 @@ export default meta;
 type Story = StoryObj<typeof GuideDetailStream>;
 
 const items: LtsDetailItem[] = [
-  {
-    label: "Name",
-    category: "NAME",
-    description: "Matches cards whose name contains this text.",
-    query: "name:<text>",
-    shorthand: "n:<text>",
-    examples: ["n:jinx", "name:blitz*"],
-  },
-  {
-    label: "Domain",
-    category: "DOMAIN",
-    description: "Matches cards that include this domain.",
-    query: "d:Fury",
-    examples: ["d:fury", "d:calm"],
-  },
+  guideDetailFor("name"),
+  guideDetailFor("domain"),
 ];
 
 export const Empty: Story = { args: { items: [] } };

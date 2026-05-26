@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { GuideDetailCard, type LtsDetailItem } from "./GuideDetailCard";
+import { guideDetailFor } from "./guideDetails";
 
 const meta: Meta<typeof GuideDetailCard> = {
   title: "features/learn-to-search/GuideDetailCard",
@@ -11,14 +12,7 @@ export default meta;
 
 type Story = StoryObj<typeof GuideDetailCard>;
 
-const fullItem: LtsDetailItem = {
-  label: "Name",
-  category: "NAME",
-  description: "Matches cards whose name contains this text. Use quotes for an exact match.",
-  query: "name:<text>",
-  shorthand: "n:<text>",
-  examples: ["n:jinx", 'n:"loose cannon"', "name:blitz*"],
-};
+const fullItem: LtsDetailItem = guideDetailFor("name");
 
 export const Full: Story = {
   args: { item: fullItem },
@@ -32,7 +26,6 @@ export const Minimal: Story = {
   args: {
     item: {
       label: "Rules text",
-      category: "RULES TEXT",
       description: "Searches within the card's rules text.",
     },
   },

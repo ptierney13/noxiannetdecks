@@ -1,10 +1,11 @@
 import { QueryChip } from "../../ui-elements";
 import type { QueryFieldGuide } from "../../types";
 import type { LtsDetailItem } from "./GuideDetailCard";
+import { guideDetailForQueryField } from "./guideDetails";
 
 // Parent fields that have named children displayed below them.
 const SECTION_CHILDREN: Record<string, string[]> = {
-  "Cost":      ["Energy", "Power"],
+  "Cost":      ["Energy", "Might", "Power"],
   "Type line": ["Card type", "Supertype", "Tag"],
 };
 
@@ -15,40 +16,34 @@ type TextFieldGuideProps = {
   selectedQueries: ReadonlySet<string>;
 };
 
-function fieldToDetail(field: QueryFieldGuide): LtsDetailItem {
-  return {
-    label: field.property,
-    category: field.property.toUpperCase(),
-    description: field.searches,
-    query: field.query,
-    shorthand: field.shorthand ?? undefined,
-    examples: [field.example],
-  };
-}
-
 type FieldRowProps = {
   field: QueryFieldGuide;
   child?: boolean;
+  detail: LtsDetailItem;
   isSelected: boolean;
   onSelect: (item: LtsDetailItem) => void;
   onAppend: (text: string) => void;
 };
 
-function FieldRow({ field, child = false, isSelected, onSelect, onAppend }: FieldRowProps) {
+function FieldRow({ field, child = false, detail, isSelected, onSelect, onAppend }: FieldRowProps) {
+  const query = detail.query ?? field.query;
+
   return (
     <div
       className={[
-        "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-[100ms]",
+        "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-[background,border-color,box-shadow] duration-[120ms]",
         child ? "ml-5 border-l-2 pl-4" : "",
         child && isSelected ? "border-accent/50" : child ? "border-border-subtle" : "",
-        isSelected ? "bg-accent-soft/40" : "",
+        isSelected
+          ? "bg-accent-soft/45 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+          : "hover:bg-[rgba(255,255,255,0.035)]",
       ].join(" ")}
     >
       <button
         type="button"
-        className="flex flex-1 items-center gap-1.5 min-w-0 text-left group hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)] rounded"
-        onClick={() => onSelect(fieldToDetail(field))}
-        aria-label={`${field.property} — details`}
+        className="group flex min-w-0 flex-1 items-center gap-1.5 rounded text-left hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]"
+        onClick={() => onSelect(detail)}
+        aria-label={`${field.property} details`}
         aria-pressed={isSelected}
       >
         <span className={[
@@ -67,7 +62,7 @@ function FieldRow({ field, child = false, isSelected, onSelect, onAppend }: Fiel
           <path d="M6 3l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
-      <QueryChip text={field.query} onAppend={onAppend} />
+      <QueryChip text={query} onAppend={onAppend} />
     </div>
   );
 }
@@ -77,19 +72,38 @@ export function TextFieldGuide({ fields, onSelect, onAppend, selectedQueries }: 
   const fieldByName = new Map(fields.map((f) => [f.property, f]));
 
   return (
-    <ul className="flex flex-col gap-0.5" aria-label="Searchable fields">
+    <ul className="flex flex-col gap-1 rounded-xl border border-border-subtle bg-surface-inset/80 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]" aria-label="Searchable fields">
       {fields.flatMap((field) => {
         if (childSet.has(field.property)) return [];
         const children = SECTION_CHILDREN[field.property];
+        const detail = guideDetailForQueryField(field);
         return [
           <li key={field.property}>
-            <FieldRow field={field} isSelected={selectedQueries.has(field.query)} onSelect={onSelect} onAppend={onAppend} />
+            <FieldRow
+              field={field}
+              detail={detail}
+              isSelected={selectedQueries.has(detail.query ?? detail.label)}
+              onSelect={onSelect}
+              onAppend={onAppend}
+            />
             {children && (
               <ul className="flex flex-col gap-0.5 mt-0.5">
                 {children.flatMap((childName) => {
                   const child = fieldByName.get(childName);
+                  const childDetail = child ? guideDetailForQueryField(child) : null;
                   return child
-                    ? [<li key={childName}><FieldRow field={child} child isSelected={selectedQueries.has(child.query)} onSelect={onSelect} onAppend={onAppend} /></li>]
+                    ? [
+                        <li key={childName}>
+                          <FieldRow
+                            field={child}
+                            child
+                            detail={childDetail!}
+                            isSelected={selectedQueries.has(childDetail!.query ?? childDetail!.label)}
+                            onSelect={onSelect}
+                            onAppend={onAppend}
+                          />
+                        </li>,
+                      ]
                     : [];
                 })}
               </ul>

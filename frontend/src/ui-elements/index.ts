@@ -1,7 +1,10 @@
 export { QueryChip } from "./QueryChip";
-export { NoxianLogoIcon, SearchIcon, CardsIcon, MenuIcon, ChevronIcon, TradeIcon, SealedIcon } from "./Icon";
+export { QuerySyntaxText } from "./QuerySyntaxText";
+export type { QuerySyntaxTextProps } from "./QuerySyntaxText";
 export { SyntaxQueryChip } from "./SyntaxQueryChip";
 export type { SyntaxQueryChipProps } from "./SyntaxQueryChip";
+export { ToolSection, ToolSubsection, TOOL_SECTION_TOKENS } from "./ToolSection";
+export { NoxianLogoIcon, SearchIcon, CardsIcon, MenuIcon, ChevronIcon, TradeIcon, SealedIcon } from "./Icon";
 export { LogoBadge } from "./LogoBadge";
 export { CardSearchInput } from "./CardSearchInput";
 export { ModalShell } from "./ModalShell";

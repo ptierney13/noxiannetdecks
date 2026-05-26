@@ -36,7 +36,11 @@ export function LearnModeBar({ active, onChange }: LearnModeBarProps) {
   }
 
   return (
-    <div role="tablist" aria-label="Learn to Search mode" className="flex gap-1.5">
+    <div
+      role="tablist"
+      aria-label="Learn to Search mode"
+      className="flex w-full flex-wrap gap-1.5 rounded-2xl border border-border-default bg-surface-inset/80 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:w-auto"
+    >
       {TABS.map(({ value, label }, i) => {
         const isActive = active === value;
         return (
@@ -48,12 +52,12 @@ export function LearnModeBar({ active, onChange }: LearnModeBarProps) {
             aria-selected={isActive}
             tabIndex={isActive ? 0 : -1}
             className={[
-              "min-h-[44px] px-[0.95rem] inline-flex items-center rounded-xl border text-sm font-bold cursor-pointer",
-              "transition-[color,background-color,border-color] duration-[120ms]",
-              "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--color-focus-ring)]",
+              "inline-flex min-h-[44px] flex-1 items-center justify-center rounded-xl border px-[0.95rem] text-sm font-bold sm:flex-none",
+              "transition-[background,border-color,box-shadow,transform,color] duration-[140ms]",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
               isActive
-                ? "bg-accent border-accent text-white"
-                : "border-border-default bg-[rgba(255,255,255,0.12)] text-text-primary hover:bg-[var(--color-accent-soft)] hover:border-[var(--color-accent)]",
+                ? "border-accent bg-[linear-gradient(180deg,rgba(112,38,51,0.92),rgba(53,17,27,0.96))] text-text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_0_0_1px_rgba(197,50,71,0.28),0_8px_18px_rgba(0,0,0,0.24)]"
+                : "border-[rgba(255,255,255,0.16)] bg-[linear-gradient(180deg,rgba(36,43,58,0.88),rgba(17,21,31,0.94))] text-text-secondary shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] hover:-translate-y-px hover:border-border-strong hover:text-text-primary",
             ].join(" ")}
             onClick={() => onChange(value)}
             onKeyDown={(e) => handleKeyDown(e, i)}

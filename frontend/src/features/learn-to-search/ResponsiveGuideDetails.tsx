@@ -81,8 +81,8 @@ export function ResponsiveGuideDetails({ children, onAppend }: ResponsiveGuideDe
 
   if (isLarge) {
     return (
-      <div className="grid grid-cols-2 gap-6 items-start">
-        <div>{children(handleSelect, selectedQueries)}</div>
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
+        <div className="min-w-0">{children(handleSelect, selectedQueries)}</div>
         <div className="sticky top-[calc(var(--site-header-height)+1rem)] self-start">
           <GuideDetailStream
             items={activeLarge}

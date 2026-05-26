@@ -17,16 +17,16 @@ type GuideDetailCardProps = {
 
 export function GuideDetailCard({ item, onAppend, onRemove }: GuideDetailCardProps) {
   return (
-    <div className="rounded-xl border border-border-default bg-surface-2 p-4 flex flex-col gap-3">
+    <div className="flex flex-col gap-3 rounded-xl border border-border-default bg-[linear-gradient(180deg,rgba(24,30,42,0.96),rgba(12,15,23,0.98))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.055),0_12px_28px_rgba(0,0,0,0.24)]">
       {/* Header row */}
       <div className="flex items-start justify-between gap-3 min-w-0">
         <div className="flex flex-col gap-0.5 min-w-0">
-          {item.category && (
+          {item.category && item.category.toLowerCase() !== item.label.toLowerCase() && (
             <span className="text-[0.62rem] font-bold uppercase tracking-[0.14em] text-text-tertiary leading-none">
               {item.category}
             </span>
           )}
-          <span className="text-base font-semibold text-text-primary leading-snug">{item.label}</span>
+          <span className="text-lg font-black leading-snug text-text-primary">{item.label}</span>
         </div>
         {onRemove && (
           <button
@@ -51,9 +51,7 @@ export function GuideDetailCard({ item, onAppend, onRemove }: GuideDetailCardPro
           {item.query && (
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[0.68rem] font-semibold uppercase tracking-wider text-text-tertiary shrink-0">Syntax</span>
-              {item.query.split(/\s+/).map((token) => (
-                <QueryChip key={token} text={token} onAppend={onAppend} />
-              ))}
+              <QueryChip text={item.query} onAppend={onAppend} />
             </div>
           )}
           {item.shorthand && (

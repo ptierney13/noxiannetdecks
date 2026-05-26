@@ -1,10 +1,10 @@
 import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { useNavigate, Link } from "@tanstack/react-router";
-import { ChevronIcon } from "../ui-elements";
+import { QuerySyntaxText, ToolSection as Section, ToolSubsection as Subsection } from "../ui-elements";
 import { CardSearchResultsPane, QuerySummaryChips } from "../features";
 import { useDebounce } from "../lib";
 import { renderTokenizedText, raritySymbolSrc } from "../lib";
-import { parseQuery, executedTokensToDisplay, resolveField, type DisplayItem } from "@noxiannet/card-store/query";
+import { parseQuery, executedTokensToDisplay, type DisplayItem } from "@noxiannet/card-store/query";
 import { FIELD_COLOR } from "../lib";
 
 // ── Data constants ────────────────────────────────────────────────────────────
@@ -90,118 +90,6 @@ function orGroup(items: string[]): string {
 
 // ── Syntax-highlighted query ──────────────────────────────────────────────────
 
-type QuerySpan = {
-  text: string;
-  kind: "space" | "structural" | "connector" | "predicate" | "error";
-  color?: string;
-};
-
-function tokenizeQueryString(source: string): QuerySpan[] {
-  const spans: QuerySpan[] = [];
-  let i = 0;
-
-  while (i < source.length) {
-    const rest = source.slice(i);
-
-    // Whitespace
-    const ws = rest.match(/^\s+/);
-    if (ws) {
-      spans.push({ text: ws[0], kind: "space" });
-      i += ws[0].length;
-      continue;
-    }
-
-    // Structural: ( )
-    if (rest[0] === "(" || rest[0] === ")") {
-      spans.push({ text: rest[0], kind: "structural" });
-      i++;
-      continue;
-    }
-
-    // Connectors: or / and / not — must be followed by space, paren, or end
-    const conn = rest.match(/^(or|and|not)(?=[\s()]|$)/i);
-    if (conn) {
-      spans.push({ text: conn[0], kind: "connector" });
-      i += conn[0].length;
-      continue;
-    }
-
-    // Predicate: optional -, field, op, value (quoted or bare)
-    const pred = rest.match(
-      /^(-?)([A-Za-z_][A-Za-z0-9_]*)(:|=|>=?|<=?)("(?:[^"\\]|\\.)*"|[^\s()]+)/
-    );
-    if (pred) {
-      const [fullText, , rawField] = pred;
-      const defn = resolveField(rawField);
-      const color = defn ? (FIELD_COLOR[defn.canonical] ?? "#94a3b8") : undefined;
-      spans.push({ text: fullText, kind: defn ? "predicate" : "error", color });
-      i += fullText.length;
-      continue;
-    }
-
-    // Bare unrecognized word
-    const bare = rest.match(/^[^\s()]+/);
-    if (bare) {
-      spans.push({ text: bare[0], kind: "error" });
-      i += bare[0].length;
-      continue;
-    }
-
-    // Fallback: advance one character
-    spans.push({ text: rest[0], kind: "structural" });
-    i++;
-  }
-
-  return spans;
-}
-
-function SyntaxHighlightedQuery({ query }: { query: string }) {
-  const spans = useMemo(() => tokenizeQueryString(query), [query]);
-
-  if (!query.trim()) {
-    return (
-      <span className="text-2xl font-thin text-text-tertiary/45 italic">
-        Select filters below to build a query…
-      </span>
-    );
-  }
-
-  return (
-    <code className="text-base font-mono break-all leading-snug">
-      {spans.map((span, idx) => {
-        switch (span.kind) {
-          case "space":
-            return <span key={idx}>{span.text}</span>;
-          case "structural":
-            return (
-              <span key={idx} style={{ color: "rgba(255,255,255,0.3)" }}>
-                {span.text}
-              </span>
-            );
-          case "connector":
-            return (
-              <span key={idx} style={{ color: "rgba(255,255,255,0.42)", fontStyle: "italic" }}>
-                {span.text}
-              </span>
-            );
-          case "error":
-            return (
-              <span key={idx} style={{ color: "#f87171" }}>
-                {span.text}
-              </span>
-            );
-          case "predicate":
-            return (
-              <span key={idx} style={{ color: span.color ?? "#94a3b8" }}>
-                {span.text}
-              </span>
-            );
-        }
-      })}
-    </code>
-  );
-}
-
 // ── Private sub-components ───────────────────────────────────────────────────
 
 // Closed book — used for nav links
@@ -253,14 +141,6 @@ function SearchIcon() {
 
 const QB_TOKENS = {
   builderShell: "flex min-w-0 flex-col gap-5 rounded-2xl border border-border-subtle bg-[linear-gradient(180deg,rgba(16,20,30,0.72),rgba(7,9,14,0.46))] p-3 shadow-[0_18px_48px_rgba(0,0,0,0.24)] sm:p-4",
-  section: "overflow-hidden rounded-xl bg-[rgba(14,18,28,0.92)] shadow-[0_0_0_1px_rgba(197,50,71,0.14),0_0_28px_rgba(197,50,71,0.08),0_4px_14px_rgba(0,0,0,0.28)]",
-  sectionHeader: "flex items-center gap-2.5 px-4 pt-3.5 pb-2",
-  sectionBody: "flex flex-col gap-3.5 px-4 pb-4",
-  sectionTitle: "text-[0.77rem] font-bold tracking-[0.04em] text-accent-warm/75 leading-none",
-  sectionHint: "rounded-md border border-border-default bg-[rgba(8,11,18,0.82)] px-1.5 py-0.5 font-mono text-[0.66rem] text-accent-warm leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
-  subsection: "rounded-lg border border-border-subtle bg-[linear-gradient(180deg,rgba(20,25,36,0.72),rgba(10,13,20,0.78))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
-  subsectionRaised: "border-border-default bg-[linear-gradient(180deg,rgba(25,31,43,0.82),rgba(12,15,23,0.88))]",
-  subsectionLabel: "mb-2.5 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-accent-warm/65",
   helperText: "text-xs leading-relaxed text-text-tertiary/78",
   chipBase: "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-[6px] text-sm font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.075),0_4px_10px_rgba(0,0,0,0.2)] transition-[background,border-color,box-shadow,transform,color] duration-[180ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
   chipOff: "border-[rgba(255,255,255,0.18)] bg-[linear-gradient(180deg,rgba(38,45,61,0.96),rgba(18,22,32,0.98))] text-text-secondary hover:-translate-y-px hover:border-border-strong hover:bg-[linear-gradient(180deg,rgba(47,55,72,0.98),rgba(23,28,40,0.98))] hover:text-text-primary hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_8px_20px_rgba(0,0,0,0.28)]",
@@ -270,71 +150,6 @@ const QB_TOKENS = {
   statRow: "flex items-center gap-2 rounded-lg border border-border-default bg-[linear-gradient(180deg,rgba(27,33,45,0.88),rgba(13,16,24,0.94))] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.055),0_5px_14px_rgba(0,0,0,0.18)] transition-[background,border-color,box-shadow] duration-150 hover:border-border-strong hover:bg-[linear-gradient(180deg,rgba(35,42,56,0.94),rgba(16,20,30,0.98))] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.075),0_9px_20px_rgba(0,0,0,0.24)]",
   previewFrame: "flex flex-col flex-1 overflow-hidden rounded-2xl border border-border-default bg-[linear-gradient(180deg,rgba(18,22,32,0.96),rgba(7,9,14,0.98))] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_22px_52px_rgba(0,0,0,0.34)]",
 } as const;
-
-type SectionProps = {
-  title: string;
-  hint?: string;
-  children: ReactNode;
-  collapsible?: boolean;
-  defaultOpen?: boolean;
-};
-
-function Section({ title, hint, children, collapsible = false, defaultOpen = true }: SectionProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-
-  const headerContent = (
-    <>
-      <h2 className={QB_TOKENS.sectionTitle}>{title}</h2>
-      {hint ? <code className={QB_TOKENS.sectionHint}>{hint}</code> : null}
-      {collapsible ? (
-        <span className="ml-auto text-text-tertiary opacity-60">
-          <ChevronIcon expanded={isOpen} />
-        </span>
-      ) : null}
-    </>
-  );
-
-  return (
-    <section className={QB_TOKENS.section}>
-      {collapsible ? (
-        <button
-          type="button"
-          className={`w-full flex ${QB_TOKENS.sectionHeader} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)] focus-visible:ring-inset`}
-          onClick={() => setIsOpen((v) => !v)}
-          aria-expanded={isOpen}
-        >
-          {headerContent}
-        </button>
-      ) : (
-        <div className={QB_TOKENS.sectionHeader}>{headerContent}</div>
-      )}
-      {isOpen ? (
-        <div className={QB_TOKENS.sectionBody}>{children}</div>
-      ) : null}
-    </section>
-  );
-}
-
-type SubsectionProps = {
-  label?: string;
-  hint?: string;  // syntax example shown right of the subsection label
-  raised?: boolean;
-  children: ReactNode;
-};
-
-function Subsection({ label, hint, raised = false, children }: SubsectionProps) {
-  return (
-    <div className={[QB_TOKENS.subsection, raised ? QB_TOKENS.subsectionRaised : ""].join(" ")}>
-      {(label || hint) ? (
-        <div className="flex items-center gap-2 mb-2.5">
-          {label ? <span className="text-[0.7rem] font-bold uppercase tracking-[0.1em] text-accent-warm/65 leading-none">{label}</span> : null}
-          {hint ? <code className={QB_TOKENS.sectionHint}>{hint}</code> : null}
-        </div>
-      ) : null}
-      {children}
-    </div>
-  );
-}
 
 type ChipProps = {
   label: ReactNode;
@@ -646,7 +461,12 @@ export default function QueryBuilderView() {
             {/* Syntax query (top, text-base) + human-readable chips (bottom, sm) */}
             <div className="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
               <output aria-live="polite" aria-label="Your query" className="block">
-                <SyntaxHighlightedQuery query={builtQuery} />
+                <QuerySyntaxText
+                  query={builtQuery}
+                  className="text-base leading-snug"
+                  emptyText="Select filters below to build a query..."
+                  emptyClassName="text-2xl font-thin text-text-tertiary/45 italic"
+                />
               </output>
               {queryDisplayBlocks.length > 0 ? (
                 <div className="hidden md:flex flex-wrap items-center gap-x-1.5 gap-y-1">
