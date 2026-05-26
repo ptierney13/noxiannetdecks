@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   PRICE_SERIES_COLORS,
-  formatSeriesLegendLabel,
   formatUsdPrice,
   type PublishedPriceRow,
 } from "../../lib";
@@ -90,19 +89,6 @@ export function PriceHistoryChart({
       className="flex flex-col gap-3 rounded-[10px] border border-border-subtle bg-surface-2 p-4"
       data-testid="price-history-chart"
     >
-      {/* Legend */}
-      <div className="flex flex-wrap gap-3">
-        {series.map((entry) => (
-          <div key={entry.row.rowId} className="inline-flex items-center gap-2 text-[0.82rem] text-text-secondary">
-            <span
-              className="h-3 w-3 shrink-0 rounded-full"
-              style={{ backgroundColor: entry.color }}
-            />
-            <span>{formatSeriesLegendLabel(entry.row)}</span>
-          </div>
-        ))}
-      </div>
-
       {/* SVG chart — series colors stay as inline style (runtime values) */}
       <svg
         viewBox={`0 0 ${width} ${height}`}
