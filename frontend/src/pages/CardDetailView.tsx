@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { cardDetailQueryOptions, cardPrintingsQueryOptions } from "../data";
@@ -6,7 +6,6 @@ import {
   buildCardDetailPath,
   buildTcgplayerAffiliateLink,
   formatCostText,
-  formatHeadlinePrice,
   formatSeriesToggleLabel,
   formatTypeline,
   formatUsdPrice,
@@ -190,8 +189,6 @@ function PrintingsList({
 export default function CardDetailView({ cardId }: { cardId: string }) {
   const navigate = useNavigate();
   const [selectedPriceRowIds, setSelectedPriceRowIds] = useState<string[]>([]);
-  const priceSeriesColorsRef = useRef<Record<string, string>>({});
-  const nextPriceSeriesColorIndexRef = useRef(0);
 
   const cardQuery = useQuery(cardDetailQueryOptions(cardId));
   const card = cardQuery.data ?? null;
@@ -216,12 +213,17 @@ export default function CardDetailView({ cardId }: { cardId: string }) {
     () => getPublishedRowsForCard(publishedPriceIndex, card?.tcgplayer_id),
     [publishedPriceIndex, card?.tcgplayer_id]
   );
-  const currentNearMintPrice = useMemo(
-    () => resolveNearMintMarketPrice(currentPriceRows),
-    [currentPriceRows]
-  );
-  const currentHeadlinePrice = formatHeadlinePrice(currentNearMintPrice);
   const pricingGroups = useMemo(() => groupRowsByPrinting(currentPriceRows), [currentPriceRows]);
+
+  // Pre-assign each row a stable series color by its position in the full list.
+  // This lets chips show their chart color before they're toggled.
+  const rowColorMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    currentPriceRows.forEach((row, index) => {
+      map[row.rowId] = PRICE_SERIES_COLORS[index % PRICE_SERIES_COLORS.length];
+    });
+    return map;
+  }, [currentPriceRows]);
 
   const cardDetailBuyLinks = useMemo(() => {
     const productId = card?.tcgplayer_id?.trim();
@@ -258,19 +260,6 @@ export default function CardDetailView({ cardId }: { cardId: string }) {
     () => currentPriceRows.filter((row) => selectedPriceRowIds.includes(row.rowId)),
     [currentPriceRows, selectedPriceRowIds]
   );
-
-  const selectedPriceRowColors = useMemo(() => {
-    const colorsByRowId = priceSeriesColorsRef.current;
-    let nextIndex = nextPriceSeriesColorIndexRef.current;
-    for (const rowId of selectedPriceRowIds) {
-      if (!colorsByRowId[rowId]) {
-        colorsByRowId[rowId] = PRICE_SERIES_COLORS[nextIndex % PRICE_SERIES_COLORS.length];
-        nextIndex += 1;
-      }
-    }
-    nextPriceSeriesColorIndexRef.current = nextIndex;
-    return { ...colorsByRowId };
-  }, [selectedPriceRowIds]);
 
   function togglePriceRow(rowId: string) {
     setSelectedPriceRowIds((current) =>
@@ -320,17 +309,10 @@ export default function CardDetailView({ cardId }: { cardId: string }) {
 
           {/* Info column */}
           <div className="flex min-w-0 flex-col gap-5">
-            {/* Name + headline price */}
-            <div className="flex flex-wrap items-baseline gap-3">
-              <h1 className="m-0 text-[1.75rem] font-bold leading-[1.1] tracking-[-0.01em] text-text-primary">
-                {card.riot_name}
-              </h1>
-              {currentHeadlinePrice ? (
-                <span className="text-[1.1rem] font-bold text-accent-warm">
-                  {currentHeadlinePrice}
-                </span>
-              ) : null}
-            </div>
+            {/* Name */}
+            <h1 className="m-0 text-[1.75rem] font-bold leading-[1.1] tracking-[-0.01em] text-text-primary">
+              {card.riot_name}
+            </h1>
 
             {/* Typeline */}
             <p className="m-0 text-[0.92rem] text-text-secondary">{formatTypeline(card)}</p>
@@ -443,6 +425,7 @@ export default function CardDetailView({ cardId }: { cardId: string }) {
             </div>
 
             {/* Pricing panel — reserves space during price index load to avoid reflow */}
+            <hr className="m-0 border-border-subtle" />
             <div className="flex flex-col gap-3.5">
               <h2 className="m-0 text-[1.05rem] font-semibold text-text-primary">Pricing</h2>
               {priceStatus === "loading" && (
@@ -466,19 +449,27 @@ export default function CardDetailView({ cardId }: { cardId: string }) {
                       <div className="flex flex-wrap gap-2.5">
                         {group.rows.map((row) => {
                           const isSelected = selectedPriceRowIds.includes(row.rowId);
+                          const seriesColor = rowColorMap[row.rowId];
                           return (
                             <button
                               key={row.rowId}
                               type="button"
+                              style={isSelected ? { borderColor: seriesColor, color: seriesColor } : undefined}
                               className={[
-                                "rounded-full border px-3.5 py-2 text-[0.84rem] font-semibold transition-[border-color,background,color] duration-[120ms] cursor-pointer",
+                                "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[0.84rem] font-semibold transition-all duration-[120ms] cursor-pointer",
                                 isSelected
-                                  ? "border-[rgba(215,170,73,0.7)] bg-[var(--color-accent-warm-soft)] text-[#fde68a]"
+                                  ? "bg-[rgba(255,255,255,0.04)]"
                                   : "border-border-default bg-surface-2 text-text-secondary hover:border-border-strong hover:bg-[#22243a] hover:text-text-primary",
                               ].join(" ")}
                               onClick={() => togglePriceRow(row.rowId)}
                               aria-pressed={isSelected}
                             >
+                              {isSelected && (
+                                <span
+                                  className="h-2 w-2 shrink-0 rounded-full"
+                                  style={{ backgroundColor: seriesColor }}
+                                />
+                              )}
                               {formatSeriesToggleLabel(row)}
                             </button>
                           );
@@ -487,7 +478,7 @@ export default function CardDetailView({ cardId }: { cardId: string }) {
                     </div>
                   ))}
                   {selectedPriceRows.length > 0 ? (
-                    <PriceHistoryChart rows={selectedPriceRows} colorsByRowId={selectedPriceRowColors} />
+                    <PriceHistoryChart rows={selectedPriceRows} colorsByRowId={rowColorMap} />
                   ) : null}
                 </>
               )}
