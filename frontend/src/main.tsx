@@ -27,10 +27,22 @@ class RootErrorBoundary extends Component<{ children: ReactNode }, { error: Erro
   }
 }
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <RootErrorBoundary>
-      <App />
-    </RootErrorBoundary>
-  </StrictMode>
-);
+function showCrash(message: string) {
+  document.body.style.cssText = "margin:0;padding:2rem;background:#1a0a0a;font-family:monospace;color:#f87171";
+  document.body.innerHTML = `<h2>App crashed</h2><pre style="white-space:pre-wrap;color:#fca5a5">${message}</pre>`;
+}
+
+window.addEventListener("error", (e) => showCrash(e.message + "\n" + (e.error?.stack ?? "")));
+window.addEventListener("unhandledrejection", (e) => showCrash(String(e.reason)));
+
+try {
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <RootErrorBoundary>
+        <App />
+      </RootErrorBoundary>
+    </StrictMode>
+  );
+} catch (e) {
+  showCrash(String(e) + "\n" + (e instanceof Error ? e.stack ?? "" : ""));
+}
