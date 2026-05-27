@@ -35,6 +35,20 @@ function showCrash(message: string) {
 window.addEventListener("error", (e) => showCrash(e.message + "\n" + (e.error?.stack ?? "")));
 window.addEventListener("unhandledrejection", (e) => showCrash(String(e.reason)));
 
+function showDiagnostics() {
+  const sheets = Array.from(document.styleSheets);
+  const cssInfo = sheets.map((s) => {
+    try { return `${s.href ?? "(inline)"}: ${s.cssRules.length} rules`; }
+    catch { return `${s.href ?? "(inline)"}: (CORS blocked)`; }
+  });
+  const bg = getComputedStyle(document.body).getPropertyValue("background-color");
+  const appBg = getComputedStyle(document.documentElement).getPropertyValue("--color-app-bg");
+  const diag = document.createElement("div");
+  diag.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:#1a0a0a;color:#fca5a5;font-family:monospace;font-size:12px;padding:8px 12px;border-bottom:2px solid #f87171";
+  diag.innerHTML = `<b>CSS DIAG</b> | body bg: <b>${bg}</b> | --color-app-bg: "<b>${appBg}</b>" | sheets: ${sheets.length} | ${cssInfo.slice(0, 4).join(" | ")}`;
+  document.body.prepend(diag);
+}
+
 try {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
@@ -43,6 +57,8 @@ try {
       </RootErrorBoundary>
     </StrictMode>
   );
+  // Show CSS diagnostics after React renders
+  setTimeout(showDiagnostics, 500);
 } catch (e) {
   showCrash(String(e) + "\n" + (e instanceof Error ? e.stack ?? "" : ""));
 }
