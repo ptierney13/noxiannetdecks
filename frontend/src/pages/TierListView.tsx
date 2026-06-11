@@ -582,10 +582,12 @@ export default function TierListView() {
   const [showChangeQueryModal, setShowChangeQueryModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [queryExpanded, setQueryExpanded] = useState(true);
+  const [labelWidth, setLabelWidth] = useState(56);
 
   const nextRowId = useRef(defaultTierLabels.length + 1);
   const dragStateRef = useRef<TierDragState | null>(null);
   const dragHandleRef = useRef<HTMLButtonElement | null>(null);
+  const labelResizeDragRef = useRef<{ startX: number; startWidth: number } | null>(null);
 
   useEffect(() => {
     dragStateRef.current = dragState;
@@ -733,6 +735,22 @@ export default function TierListView() {
     });
   }
 
+  function handleLabelResizeStart(event: ReactPointerEvent<HTMLDivElement>) {
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    labelResizeDragRef.current = { startX: event.clientX, startWidth: labelWidth };
+  }
+
+  function handleLabelResizeMove(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!labelResizeDragRef.current) return;
+    const delta = event.clientX - labelResizeDragRef.current.startX;
+    setLabelWidth(Math.min(200, Math.max(40, labelResizeDragRef.current.startWidth + delta)));
+  }
+
+  function handleLabelResizeEnd() {
+    labelResizeDragRef.current = null;
+  }
+
   function addRow() {
     const rowId = `tier-row-${nextRowId.current}`;
     nextRowId.current += 1;
@@ -766,7 +784,6 @@ export default function TierListView() {
       >
         <div className="flex items-center justify-between gap-4 px-5 py-4 sm:px-7">
           <div className="min-w-0">
-            <p className="eyebrow">Tier List Builder</p>
             <h1 id="tier-list-heading" className="text-xl font-bold text-text-primary sm:text-2xl">
               {hasGenerated && !queryExpanded
                 ? <>Tier List for <code className="font-mono text-accent-warm text-lg">{bannerQueryLabel}</code></>
@@ -832,10 +849,7 @@ export default function TierListView() {
           data-dragging={dragState ? "true" : "false"}
         >
           {/* Toolbar */}
-          <div className="flex items-center justify-between gap-3 border-b border-border-subtle px-5 py-3">
-            <h2 className="text-[0.77rem] font-bold uppercase tracking-[0.06em] text-text-secondary">
-              Tier Rows
-            </h2>
+          <div className="flex items-center justify-end gap-3 border-b border-border-subtle px-5 py-3">
             <button
               type="button"
               className="flex items-center gap-1.5 rounded-lg border border-border-default bg-surface-glass px-3 py-1.5 text-xs font-semibold text-text-secondary transition hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
@@ -866,8 +880,8 @@ export default function TierListView() {
                 >
                   {/* Colored label cell */}
                   <div
-                    className="relative flex w-14 shrink-0 flex-col items-center justify-center sm:w-16"
-                    style={{ backgroundColor: "var(--tier-accent)" } as CSSProperties}
+                    className="relative flex shrink-0 flex-col items-center justify-center"
+                    style={{ width: labelWidth, backgroundColor: "var(--tier-accent)" } as CSSProperties}
                   >
                     <input
                       aria-label={`${row.label || "Untitled"} row label`}
@@ -887,6 +901,15 @@ export default function TierListView() {
                         <span aria-hidden="true" className="text-base leading-none">×</span>
                       </button>
                     )}
+                    {/* Drag handle */}
+                    <div
+                      className="absolute right-0 top-0 h-full w-1.5 cursor-col-resize touch-none opacity-0 transition-opacity hover:opacity-100 group-hover:opacity-60"
+                      style={{ backgroundColor: "rgba(255,255,255,0.5)" } as CSSProperties}
+                      onPointerDown={handleLabelResizeStart}
+                      onPointerMove={handleLabelResizeMove}
+                      onPointerUp={handleLabelResizeEnd}
+                      onPointerCancel={handleLabelResizeEnd}
+                    />
                   </div>
 
                   {/* Card track */}
@@ -925,12 +948,9 @@ export default function TierListView() {
               id="tier-unranked-heading"
               className="text-[0.77rem] font-bold uppercase tracking-[0.06em] text-text-secondary"
             >
-              Unranked Cards
-              {unrankedCount > 0 && (
-                <span className="ml-2 rounded-md bg-surface-inset px-1.5 py-0.5 text-[0.7rem] font-bold text-text-tertiary">
-                  {unrankedCount.toLocaleString()}
-                </span>
-              )}
+              {unrankedCount > 0
+                ? `Unranked Cards (${unrankedCount.toLocaleString()})`
+                : "Unranked Cards"}
             </h2>
             <button
               type="button"
