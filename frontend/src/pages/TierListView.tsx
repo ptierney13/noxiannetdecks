@@ -342,11 +342,7 @@ function TierCardButton({ card, hidden, inRow, onPointerDown }: TierCardButtonPr
     <button
       type="button"
       className="relative block shrink-0 cursor-grab overflow-hidden rounded-lg border-0 p-0 select-none data-[hidden=true]:pointer-events-none data-[hidden=true]:opacity-0"
-      style={
-        inRow
-          ? { width: widthPx, height: "100%" }
-          : { width: widthPx, height: ROW_HEIGHT }
-      }
+      style={{ width: widthPx, height: ROW_HEIGHT }}
       data-layout={layout}
       data-hidden={hidden ? "true" : "false"}
       data-testid={`tier-card-${card.id}`}
@@ -411,16 +407,13 @@ function TierLaneView({
 
   return (
     <div
-      className={["flex flex-1 items-stretch overflow-x-auto overflow-y-hidden", inRow ? "h-full" : ""].join(" ")}
+      className="flex flex-1 overflow-hidden"
       aria-label={label}
       data-testid={testId}
     >
       <div
-        className={[
-          "flex flex-1 items-center gap-0 px-2 py-2 select-none",
-          inRow ? "h-full min-h-0" : `min-h-[${ROW_HEIGHT}px]`,
-        ].join(" ")}
-        style={inRow ? undefined : { minHeight: ROW_HEIGHT }}
+        className="flex flex-1 flex-wrap content-start items-center gap-0 px-2 py-2 select-none"
+        style={{ minHeight: ROW_HEIGHT }}
         data-empty={isEmpty ? "true" : "false"}
         data-tier-track="true"
         data-tier-lane-kind={lane.kind}
