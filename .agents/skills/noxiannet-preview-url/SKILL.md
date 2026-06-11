@@ -37,13 +37,17 @@ The repo assumes Cloudflare branch aliases are:
 - converted so non-alphanumeric characters become `-`
 - collapsed so repeated `-` become one `-`
 - trimmed so aliases do not start or end with `-`
-- truncated to the first 28 characters after sanitization
+- **truncated to 28 characters** — Cloudflare Pages hard limit on subdomain length
+- trailing `-` stripped after truncation
 
 The preview URL shape is:
 
 ```text
 https://<sanitized-branch-alias>.noxiannetdecks.pages.dev
 ```
+
+The 28-character cap is the most common source of URL mismatch. Always run the
+script — never reconstruct the alias manually.
 
 ## Important Caveat
 

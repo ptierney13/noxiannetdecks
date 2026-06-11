@@ -11,12 +11,17 @@ function currentBranch() {
   return execFileSync("git", ["branch", "--show-current"], { encoding: "utf8" }).trim();
 }
 
+// Cloudflare Pages truncates branch alias subdomains to 28 characters.
+const CLOUDFLARE_ALIAS_MAX_LENGTH = 28;
+
 function sanitizeBranchAlias(branch) {
   return branch
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "-")
     .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
+    .replace(/^-|-$/g, "")
+    .slice(0, CLOUDFLARE_ALIAS_MAX_LENGTH)
+    .replace(/-$/, "");
 }
 
 const config = readConfig();
