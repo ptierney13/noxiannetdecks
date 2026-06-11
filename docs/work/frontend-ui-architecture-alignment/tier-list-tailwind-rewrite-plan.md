@@ -1,6 +1,6 @@
 # Plan: Tier List Tailwind Rewrite
 
-> Status: plan
+> Status: in-progress
 > Initiative: Stage 7 — Page-by-Page UI Rewrites
 
 ## Summary
@@ -54,6 +54,36 @@ migration, not a behavioral redesign.
   attributes, not styling handles; keep them exactly as-is
 - Inline `style={{ "--tier-accent": ..., "--tier-accent-soft": ... }}` per-row
   CSS variable injection — these are runtime values and must stay as inline styles
+
+## Visual Redesign Decisions
+
+These decisions were approved alongside the Tailwind migration. The legacy visual treatment is being replaced wholesale — not just translated.
+
+### Page title and query label
+
+- Page title: `"Tier List Builder"` — no site name repetition (that is the nav's job).
+- Below the tier editor header band, a quiet secondary-text line shows the active query:
+  `"Showing results for: [query]"` — text-secondary color, not competing with content.
+
+### Query input → collapse after generation
+
+- **Before any generation**: full search input with a `"Generate Tier List"` primary CTA. Follow the QB `ToolSection`/`CardSearchInput` visual language.
+- **After generation**: the search panel collapses. In the tier toolbar row, a compact `"Change Query"` or `"Reset Tier List"` button with destructive/crimson treatment replaces the full input. Clicking it opens a `ModalShell` confirmation warning that current rankings will be lost. On confirm, the input re-expands and the tier editor is reset.
+- Rationale: the always-visible input competes with the tier content after first use. Following the design system rule that controls dominate containers, the search input is secondary once a tier list is generated.
+
+### Tier row labels
+
+- Drop the labeled-panel + left-bar treatment entirely.
+- Standard tier list pattern: the tier label sits inside a **full-height colored cell** at the left edge of the row. The cell background is `var(--tier-accent)` (already injected via inline style). The label text is high-contrast white/light on that color. No "Tier" prefix word.
+- The remove button is a small icon button rendered inside the colored cell, visible on hover.
+- The inline `style={{ "--tier-accent": ..., "--tier-accent-soft": ... }}` injection is preserved exactly as-is on the row element.
+
+### Unranked section
+
+- Rename `"Unmatched Cards"` → `"Unranked Cards"` (label and aria-label).
+- Header band: `"Unranked Cards"` heading on the left with the card count as an inline secondary badge — e.g., `"Unranked Cards (12)"`.
+- Right side of the header band: `"Reset Rankings"` button. This button requires a `ModalShell` confirmation before executing.
+- No other chrome changes to this section.
 
 ## Key Design Decisions
 

@@ -7,7 +7,7 @@ import LearnToSearchView from "../pages/LearnToSearchView";
 import QueryBuilderView from "../pages/QueryBuilderView";
 import CardDetailView from "../pages/legacy/CardDetailView";
 import DeckExplorerView from "../pages/DeckExplorerView";
-import TierListView from "../pages/legacy/TierListView";
+import TierListView from "../pages/TierListView";
 import SealedSimulator from "../pages/legacy/SealedSimulator";
 import TradeBalancerView from "../pages/legacy/TradeBalancerView";
 
