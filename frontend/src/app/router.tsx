@@ -9,7 +9,7 @@ import CardDetailView from "../pages/CardDetailView";
 import DeckExplorerView from "../pages/DeckExplorerView";
 import TierListView from "../pages/TierListView";
 import SealedSimulator from "../pages/legacy/SealedSimulator";
-import TradeBalancerView from "../pages/legacy/TradeBalancerView";
+import TradeBalancerView from "../pages/TradeBalancerView";
 
 export const rootRoute = createRootRoute({ component: AppShell });
 
