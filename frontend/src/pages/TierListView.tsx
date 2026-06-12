@@ -885,7 +885,7 @@ export default function TierListView() {
                   >
                     <textarea
                       aria-label={`${row.label || "Untitled"} row label`}
-                      className="w-full resize-none overflow-hidden bg-transparent text-center text-xl font-black uppercase text-white placeholder:text-white/50 focus:outline-none"
+                      className="w-full resize-none overflow-hidden bg-transparent text-center text-xl font-black uppercase text-black placeholder:text-black/40 focus:outline-none"
                       style={{ hyphens: "auto", overflowWrap: "break-word" } as CSSProperties}
                       lang="en"
                       value={row.label}
