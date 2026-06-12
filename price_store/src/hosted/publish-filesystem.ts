@@ -15,6 +15,7 @@ export function createFilesystemPublishedArtifactWriter(
 ): HostedPublishedArtifactWriter {
   return async (input: HostedPublishedArtifactWriterInput): Promise<void> => {
     const layout = resolvePriceDataLayout(options.dataRootDir);
+    const dateSlug = input.publishedAt.slice(0, 10);
     await writePublishedPriceArtifacts(layout, {
       gameKey: input.gameKey,
       publishedAt: input.publishedAt,
@@ -22,7 +23,7 @@ export function createFilesystemPublishedArtifactWriter(
       manifest: input.manifest,
       snapshot: input.snapshot,
       repositoryRoot: options.repositoryRoot,
-      pathPrefix: "prices-d1"
+      pathPrefix: `price_snapshots/${dateSlug}`
     });
   };
 }

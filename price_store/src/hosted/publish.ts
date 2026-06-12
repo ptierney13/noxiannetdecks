@@ -85,8 +85,9 @@ export async function runHostedPricePublish(input: RunHostedPricePublishInput): 
       snapshotKey = result.snapshotKey;
     } else if (input.publishedArtifactWriter) {
       await input.publishedArtifactWriter(artifactWriteInput);
-      manifestKey = "prices-d1/manifest.json";
-      snapshotKey = `prices-d1/${snapshot.game.key}/latest.json`;
+      const dateSlug = publishedAt.slice(0, 10);
+      manifestKey = `price_snapshots/${dateSlug}/manifest.json`;
+      snapshotKey = `price_snapshots/${dateSlug}/${snapshot.game.key}/latest.json`;
     } else {
       throw new Error("Publish requires either a KV namespace or a published artifact writer.");
     }

@@ -650,11 +650,11 @@ function mockFetch(poolFactory = generatedPool) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
 
-    if (url === "/data/prices-d1/manifest.json") {
+    if (url === "/data/price_snapshots/2026-06-11/manifest.json") {
       return Response.json(d1PriceManifest);
     }
 
-    if (url === "/data/prices-d1/riftbound/latest.json") {
+    if (url === "/data/price_snapshots/2026-06-11/riftbound/latest.json") {
       return Response.json(d1PriceSnapshot);
     }
 
@@ -905,8 +905,8 @@ describe("App", () => {
 
     vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
-      if (url === "/data/prices-d1/manifest.json") return Response.json(d1PriceManifest);
-      if (url === "/data/prices-d1/riftbound/latest.json") return Response.json(d1PriceSnapshot);
+      if (url === "/data/price_snapshots/2026-06-11/manifest.json") return Response.json(d1PriceManifest);
+      if (url === "/data/price_snapshots/2026-06-11/riftbound/latest.json") return Response.json(d1PriceSnapshot);
       if (url === "/api/query/features") return Response.json({ fields, syntax });
       if (url === "/api/cards/void-gate-ogn") return Response.json(ognPrinting);
       if (url.startsWith("/api/cards")) {

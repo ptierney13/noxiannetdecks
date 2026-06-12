@@ -20,6 +20,26 @@ begin by verifying the contents of:
 - `docs/reference/cloudflare-deployment/price-pipeline.md`
 - `docs/reference/cloudflare-deployment/price-published-data.md`
 
+## Local Price Data
+
+**Do not use `hosted:local:refresh` to get local price data for development.**
+That path runs the full JustTCG capture pipeline and burns API budget (100
+requests/day free plan).
+
+The canonical way to refresh local price data is:
+
+```bash
+npm run pull:live:snapshot -w @noxiannet/price-store
+```
+
+This fetches the current published snapshot from `https://noxiannetdecks.com/data/prices-d1/`
+and writes it to `frontend/public/data/price_snapshots/<date>/`. After running,
+update `ACTIVE_PRICE_PATH_PREFIX` in `frontend/src/lib/priceData.ts` to match
+the printed path prefix.
+
+`hosted:local:refresh` is reserved for testing the full pipeline end-to-end
+(capture → cook → publish) when the pipeline itself needs development work.
+
 ## Key Invariants
 
 - Mutable operational data lives under the repo-local `.price_data/` store by
@@ -29,6 +49,8 @@ begin by verifying the contents of:
 - Source-specific behavior belongs under `src/sources/`.
 - Canonical, published, and hosted layers have distinct responsibilities and
   should not be collapsed together casually.
+- Local development price data comes from the live production endpoint, not from
+  a local JustTCG API run. See Local Price Data section above.
 
 ## Task Routing
 

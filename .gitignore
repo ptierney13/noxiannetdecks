@@ -18,4 +18,4 @@ frontend/test-results/
 playwright-report/
 scripts/out/
 *.local
-frontend/public/data/prices-d1/
+card_store/data/temp/

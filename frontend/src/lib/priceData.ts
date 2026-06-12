@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const D1_PRICE_PATH_PREFIX = "/data/prices-d1";
+const ACTIVE_PRICE_PATH_PREFIX = "/data/price_snapshots/2026-06-11";
 const TCGPLAYER_AFFILIATE_BASE_URL = "https://partner.tcgplayer.com/B5PQx1";
 
 export type PublishedPriceHistoryPoint = {
@@ -402,7 +402,7 @@ function buildTcgplayerSearchUrl(options: TcgplayerAffiliateSearchLinkOptions): 
   return `https://www.tcgplayer.com/search/${encodeURIComponent(gameSlug)}/product?${params.toString()}`;
 }
 
-async function buildPublishedPriceIndex(pathPrefix = D1_PRICE_PATH_PREFIX): Promise<PublishedPriceIndex> {
+async function buildPublishedPriceIndex(pathPrefix = ACTIVE_PRICE_PATH_PREFIX): Promise<PublishedPriceIndex> {
   const manifest = await fetchJson<PublishedPriceManifest>(`${pathPrefix}/manifest.json`);
   const snapshot = await fetchJson<PublishedPriceSnapshot>(`${pathPrefix}/${manifest.snapshotPath}`);
   const rowsByTcgplayerId = new Map<string, PublishedPriceRow[]>();
@@ -439,7 +439,7 @@ export function resolveActivePricePathPrefix(): string {
     return configured;
   }
 
-  return D1_PRICE_PATH_PREFIX;
+  return ACTIVE_PRICE_PATH_PREFIX;
 }
 
 async function fetchJson<T>(path: string): Promise<T> {

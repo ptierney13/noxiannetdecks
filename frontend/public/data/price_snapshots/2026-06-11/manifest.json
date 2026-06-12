@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "game": {
+    "slug": "riftbound-league-of-legends-trading-card-game",
+    "key": "riftbound",
+    "label": "Riftbound"
+  },
+  "priceSource": {
+    "id": "tcgplayer",
+    "label": "TCGPlayer"
+  },
+  "publishedAt": "2026-06-11T09:10:05.187Z",
+  "sourceCapturedAt": "2026-06-11T09:00:50.655Z",
+  "snapshotPath": "riftbound/latest.json",
+  "rowCount": 3505,
+  "variantCount": 3505,
+  "freshness": {
+    "rowCount": 3505,
+    "pricedRowCount": 3505,
+    "freshestPriceAt": "2026-06-11T03:10:49.000Z",
+    "stalestPriceAt": "2025-11-05T12:41:12.000Z"
+  },
+  "provenance": {
+    "upstreamProvider": {
+      "id": "justtcg",
+      "label": "JustTCG"
+    },
+    "canonicalRelativeSnapshotPath": "d1://price_pipeline_runs/hosted-run-20260611t090050655Z-riftbound-league-of-legends-trading-card-game",
+    "rawRelativePayloadPaths": [],
+    "rawRelativeMetadataPaths": []
+  }
+}

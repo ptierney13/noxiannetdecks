@@ -33,8 +33,27 @@ Stage 1 also establishes raw capture conventions:
 - each payload gets a sibling `.meta.json` sidecar
 - run status records are stored under `runs/<runId>.json`
 
+## Local Price Data
+
+To refresh local price data for development, pull from the live production
+snapshot — do **not** run `hosted:local:refresh`, which burns JustTCG API
+budget (100 req/day free plan):
+
+```bash
+npm run pull:live:snapshot -w @noxiannet/price-store
+```
+
+This fetches `https://noxiannetdecks.com/data/prices-d1/` and writes to
+`frontend/public/data/price_snapshots/<date>/`. After running, update
+`ACTIVE_PRICE_PATH_PREFIX` in `frontend/src/lib/priceData.ts` to the printed
+path prefix.
+
+`hosted:local:refresh` is for testing the full pipeline (capture → cook →
+publish) when the pipeline itself needs development work.
+
 ## Commands
 
+- `npm run pull:live:snapshot -w @noxiannet/price-store`
 - `npm run init:data-dir -w @noxiannet/price-store`
 - `npm run inspect:data-dir -w @noxiannet/price-store`
 - `npm run import:tcgplayer:samples -w @noxiannet/price-store`

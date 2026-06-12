@@ -1,4 +1,6 @@
-import cards from "../../../card_store/data/cards.json" with { type: "json" };
+import { readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { resolvePriceStorePackageRoot } from "../package-root.js";
 
 type RawCardRecord = {
   tcgplayer_id: string | null;
@@ -31,9 +33,11 @@ export function loadHostedPublishCardMetadataIndex(): Map<string, HostedPublishe
     return cachedMetadataIndex;
   }
 
+  const cardsPath = resolve(join(resolvePriceStorePackageRoot(), "..", "card_store", "data", "cards.json"));
+  const cards = JSON.parse(readFileSync(cardsPath, "utf8")) as RawCardRecord[];
   const metadataIndex = new Map<string, HostedPublishedCardMetadata[]>();
 
-  for (const card of cards as RawCardRecord[]) {
+  for (const card of cards) {
     if (!card.tcgplayer_id) {
       continue;
     }

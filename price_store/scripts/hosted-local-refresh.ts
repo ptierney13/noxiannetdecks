@@ -63,7 +63,7 @@ async function main() {
           message,
           requestDelayMs: process.env.NOXIANNET_PRICE_CAPTURE_REQUEST_DELAY_MS
             ? Number(process.env.NOXIANNET_PRICE_CAPTURE_REQUEST_DELAY_MS)
-            : 0
+            : undefined
         },
         config
       );

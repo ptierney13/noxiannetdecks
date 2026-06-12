@@ -35,7 +35,9 @@
     "prehosted:local:publish": "npm run build",
     "hosted:local:publish": "node dist/scripts/hosted-local-publish.js",
     "prehosted:local:cleanup": "npm run build",
-    "hosted:local:cleanup": "node dist/scripts/hosted-local-cleanup.js"
+    "hosted:local:cleanup": "node dist/scripts/hosted-local-cleanup.js",
+    "prepull:live:snapshot": "npm run build",
+    "pull:live:snapshot": "node dist/scripts/pull-live-snapshot.js"
   },
   "dependencies": {
     "@noxiannet/card-store": "0.1.0",
