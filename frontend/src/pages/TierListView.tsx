@@ -883,13 +883,23 @@ export default function TierListView() {
                     className="relative flex shrink-0 flex-col items-center justify-center"
                     style={{ width: labelWidth, backgroundColor: "var(--tier-accent)" } as CSSProperties}
                   >
-                    <input
+                    <textarea
                       aria-label={`${row.label || "Untitled"} row label`}
-                      className="w-full bg-transparent text-center text-lg font-black uppercase text-white placeholder:text-white/50 focus:outline-none"
+                      className="w-full resize-none overflow-hidden bg-transparent text-center text-xl font-black uppercase text-white placeholder:text-white/50 focus:outline-none"
+                      style={{ hyphens: "auto", overflowWrap: "break-word" } as CSSProperties}
+                      lang="en"
                       value={row.label}
-                      onChange={(e) => updateRowLabel(row.id, e.target.value)}
+                      rows={1}
                       placeholder="?"
-                      maxLength={4}
+                      ref={(el) => {
+                        if (el) { el.style.height = "auto"; el.style.height = `${el.scrollHeight}px`; }
+                      }}
+                      onChange={(e) => {
+                        const el = e.currentTarget;
+                        el.style.height = "auto";
+                        el.style.height = `${el.scrollHeight}px`;
+                        updateRowLabel(row.id, e.target.value);
+                      }}
                     />
                     {rows.length > 1 && (
                       <button
