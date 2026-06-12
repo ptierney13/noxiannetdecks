@@ -29,17 +29,18 @@ export type VariantSelectorRowProps = {
 
 function variantButtonLabel(card: CardRecord, finish: CardFinish): string {
   const parts: string[] = [card.set.set_id];
-  if (card.variant.alternate_art) {
-    parts.push("AA");
-  }
+  if (card.variant.alternate_art) parts.push("AA");
   if (card.variant.signed) {
     parts.push("SIG");
   } else if (card.variant.overnumbered) {
     parts.push("ON");
   }
-  if (finish === "foil" && card.finishes.includes("nonfoil")) {
-    parts.push("FOIL");
-  }
+  if (card.variant.metal) parts.push("MTL");
+  if (card.variant.starter) parts.push("STR");
+  if (card.variant.gg_ez) parts.push("GGEZ");
+  if (card.variant.launch_exclusive) parts.push("LEX");
+  if (card.variant.ultimate) parts.push("ULT");
+  if (finish === "foil" && card.finishes.includes("nonfoil")) parts.push("FOIL");
   return parts.join(" ");
 }
 

@@ -15,7 +15,12 @@ export function makeCard(overrides: FixtureOverrides = {}): CardRecord {
     variant: {
       alternate_art: false,
       overnumbered: false,
-      signed: false
+      signed: false,
+      metal: false,
+      starter: false,
+      gg_ez: false,
+      launch_exclusive: false,
+      ultimate: false,
     },
     finishes: ["foil"],
     attributes: {
@@ -96,7 +101,7 @@ export const fixtureCards: CardRecord[] = [
     clean_name: "alternate gate",
     collector_number: "3a",
     rarity: "Showcase",
-    variant: { alternate_art: true, overnumbered: false, signed: false },
+    variant: { alternate_art: true, overnumbered: false, signed: false, metal: false, starter: false, gg_ez: false, launch_exclusive: false, ultimate: false },
     attributes: { cost: "{4}{H}{H}", energy: 4, might: 5, power: 2, domain: ["Chaos"] },
     type: { cardtype: "Spell", supertype: null, tags: ["Alternate"], typeline: "Spell - Alternate" },
     text: {
@@ -114,7 +119,7 @@ export const fixtureCards: CardRecord[] = [
     clean_name: "signed gate",
     collector_number: "4",
     rarity: "Promo",
-    variant: { alternate_art: false, overnumbered: true, signed: true },
+    variant: { alternate_art: false, overnumbered: true, signed: true, metal: false, starter: false, gg_ez: false, launch_exclusive: false, ultimate: false },
     attributes: { cost: "{2}", energy: 2, might: null, power: 0, domain: ["Mind"] },
     type: { cardtype: "Spell", supertype: null, tags: [], typeline: "Spell" },
     text: {
@@ -132,7 +137,7 @@ export const fixtureCards: CardRecord[] = [
     clean_name: "overnumbered gate",
     collector_number: "5",
     rarity: "Promo",
-    variant: { alternate_art: false, overnumbered: true, signed: false },
+    variant: { alternate_art: false, overnumbered: true, signed: false, metal: false, starter: false, gg_ez: false, launch_exclusive: false, ultimate: false },
     attributes: { cost: "{2}", energy: 2, might: null, power: 0, domain: ["Order"] },
     type: { cardtype: "Gear", supertype: null, tags: [], typeline: "Gear" },
     text: {
@@ -150,7 +155,7 @@ export const fixtureCards: CardRecord[] = [
     clean_name: "foil gate",
     collector_number: "6",
     rarity: "Promo",
-    variant: { alternate_art: false, overnumbered: false, signed: false },
+    variant: { alternate_art: false, overnumbered: false, signed: false, metal: false, starter: false, gg_ez: false, launch_exclusive: false, ultimate: false },
     attributes: { cost: "{1}", energy: 1, might: null, power: 0, domain: ["Body"] },
     type: { cardtype: "Spell", supertype: null, tags: [], typeline: "Spell" },
     text: {

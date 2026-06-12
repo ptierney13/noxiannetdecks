@@ -17,7 +17,12 @@ export const cardRecordSchema = z.object({
   variant: z.object({
     alternate_art: z.boolean(),
     overnumbered: z.boolean(),
-    signed: z.boolean()
+    signed: z.boolean(),
+    metal: z.boolean(),
+    starter: z.boolean(),
+    gg_ez: z.boolean(),
+    launch_exclusive: z.boolean(),
+    ultimate: z.boolean(),
   }),
   finishes: z.array(finishSchema).min(1),
   attributes: z.object({

@@ -112,13 +112,32 @@ function sourceValidationMessage(error: z.ZodError): string {
   return error.issues.map((issue) => `${issue.path.join(".") || "<root>"}: ${issue.message}`).join("; ");
 }
 
+const PARENTHETICAL_VARIANT_MAP: Record<string, Partial<Parameters<typeof deriveCardVariant>[0]>> = {
+  "metal":           { metal: true },
+  "starter":         { starter: true },
+  "gg ez":           { gg_ez: true },
+  "launch exclusive":{ launch_exclusive: true },
+  "ultimate":        { ultimate: true },
+};
+
+function variantFlagsFromName(name: string): Partial<Parameters<typeof deriveCardVariant>[0]> {
+  const match = name.match(/\(([^)]+)\)$/);
+  if (!match) return {};
+  return PARENTHETICAL_VARIANT_MAP[match[1].toLowerCase()] ?? {};
+}
+
 function hasDualFinishes(card: Pick<CardRecord, "set" | "rarity" | "variant">): boolean {
   return (
     BASE_FOIL_SETS.has(card.set.set_id) &&
     Boolean(card.rarity && BASE_FOIL_RARITIES.has(card.rarity)) &&
     !card.variant.alternate_art &&
     !card.variant.overnumbered &&
-    !card.variant.signed
+    !card.variant.signed &&
+    !card.variant.metal &&
+    !card.variant.starter &&
+    !card.variant.gg_ez &&
+    !card.variant.launch_exclusive &&
+    !card.variant.ultimate
   );
 }
 
@@ -127,7 +146,7 @@ function finishesForCard(card: Pick<CardRecord, "set" | "rarity" | "variant">): 
 }
 
 function normalizeSourceCard(card: SourceCard): CardRecord {
-  const variant = deriveCardVariant(card.metadata);
+  const variant = deriveCardVariant({ ...card.metadata, ...variantFlagsFromName(card.name) });
   const cleanName = deriveLegalCleanName(card.metadata.clean_name, card.name);
   const baseCard = {
     set: card.set,

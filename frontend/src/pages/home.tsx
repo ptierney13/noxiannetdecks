@@ -57,6 +57,7 @@ export function HomePage({ onNavigate }: { onNavigate: (href: string) => void })
               value={query}
               onChange={setQuery}
               onSubmit={handleSearchSubmit}
+              autoFocus
             />
           </div>
         </div>

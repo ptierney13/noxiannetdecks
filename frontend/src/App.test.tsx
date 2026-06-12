@@ -97,7 +97,7 @@ function createCard({
     collector_number: collectorNumber,
     language: "en",
     rarity,
-    variant: { alternate_art: false, overnumbered: false, signed: false },
+    variant: { alternate_art: false, overnumbered: false, signed: false, metal: false, starter: false, gg_ez: false, launch_exclusive: false, ultimate: false },
     finishes,
     attributes: { cost, energy, might, power, domain },
     type: { cardtype, supertype, tags, typeline },
@@ -900,7 +900,7 @@ describe("App", () => {
         finishes: ["nonfoil"]
       }),
       riftbound_id: "void-gate-shared",
-      variant: { alternate_art: true, overnumbered: false, signed: false }
+      variant: { alternate_art: true, overnumbered: false, signed: false, metal: false, starter: false, gg_ez: false, launch_exclusive: false, ultimate: false }
     };
 
     vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {

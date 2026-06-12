@@ -6,9 +6,10 @@ export type CardSearchInputProps = {
   onChange: (value: string) => void;
   onSubmit: (value: string) => void;
   className?: string;
+  autoFocus?: boolean;
 };
 
-export function CardSearchInput({ value, onChange, onSubmit, className }: CardSearchInputProps) {
+export function CardSearchInput({ value, onChange, onSubmit, className, autoFocus }: CardSearchInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -42,6 +43,7 @@ export function CardSearchInput({ value, onChange, onSubmit, className }: CardSe
           placeholder="Search for Cards"
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          autoFocus={autoFocus}
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}
