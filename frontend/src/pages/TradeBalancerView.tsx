@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { searchCards } from "../api";
-import { CardSummaryPopup } from "../features";
+import { CardSummaryPopup, VariantSelectorRow, type VariantSelection } from "../features";
 import { normalizeCardFinish } from "../lib";
+import { ResultCard } from "../ui-elements";
 import {
   formatUsdPrice,
   getPublishedRowsForCard,
@@ -82,32 +83,15 @@ const T = {
   searchHint:
     "py-8 text-center text-[0.75rem] text-[var(--color-text-dim)]",
   resultsGrid:
-    "grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-2.5",
+    "grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3",
 
-  // ── Trade search card (result grid item) ──────────────────────────────
+  // ── Trade search card footer (add buttons) ────────────────────────────
 
-  srCard:
-    "flex flex-col rounded-xl overflow-hidden bg-[rgba(20,24,36,0.7)] border border-[rgba(255,255,255,0.07)] hover:border-[rgba(255,255,255,0.13)] transition-colors",
-  srArtWrap:
-    "aspect-[5/7] bg-[rgba(255,255,255,0.04)] overflow-hidden shrink-0",
-  srArtImg:
-    "w-full h-full object-cover",
-  srArtPlaceholder:
-    "w-full h-full",
-  srInfo:
-    "px-2.5 pt-2 pb-1.5 flex flex-col gap-1 flex-1",
-  srName:
-    "text-[0.75rem] font-medium text-[var(--color-text-primary)] leading-snug line-clamp-2",
-  srMeta:
-    "text-[0.63rem] text-[var(--color-text-tertiary)] leading-snug",
-  srPrice:
-    "font-mono text-[0.75rem] text-[var(--color-price)] font-medium mt-auto pt-1",
-  srActions:
-    "grid grid-cols-2 gap-1 px-2 pb-2 pt-0 shrink-0",
+  srFooter: "flex flex-col gap-2 pt-1",
   srBtnMine:
-    "py-1.5 rounded-lg text-[0.68rem] font-semibold bg-[rgba(25,65,38,0.65)] text-[var(--color-positive-strong)] border border-[rgba(42,143,82,0.32)] hover:bg-[rgba(25,65,38,0.9)] transition-colors",
+    "w-full py-1.5 rounded-xl text-[0.72rem] font-semibold bg-[rgba(25,65,38,0.65)] text-[var(--color-positive-strong)] border border-[rgba(42,143,82,0.32)] hover:bg-[rgba(25,65,38,0.9)] transition-colors",
   srBtnYours:
-    "py-1.5 rounded-lg text-[0.68rem] font-semibold bg-[rgba(65,12,18,0.65)] text-[var(--color-negative)] border border-[rgba(181,32,56,0.32)] hover:bg-[rgba(65,12,18,0.9)] transition-colors",
+    "w-full py-1.5 rounded-xl text-[0.72rem] font-semibold bg-[rgba(65,12,18,0.65)] text-[var(--color-negative)] border border-[rgba(181,32,56,0.32)] hover:bg-[rgba(65,12,18,0.9)] transition-colors",
 
   // ── Trade item row ────────────────────────────────────────────────────
 
@@ -237,9 +221,9 @@ function cycleCondition(current: string): string {
   return CONDITIONS[(idx + 1) % CONDITIONS.length];
 }
 
-// ── TradeSearchCard — card grid result with + Mine / + Yours ───────────────
+// ── TradeSearchResultCard — uses site's ResultCard + VariantSelectorRow ───────
 
-function TradeSearchCard({
+function TradeSearchResultCard({
   card,
   priceIndex,
   onAdd,
@@ -247,63 +231,53 @@ function TradeSearchCard({
 }: {
   card: CardRecord;
   priceIndex: PublishedPriceIndex | null;
-  onAdd: (card: CardRecord, side: TradeSide) => void;
+  onAdd: (card: CardRecord, finish: "foil" | "nonfoil", side: TradeSide) => void;
   onQuickLook: (card: CardRecord) => void;
 }) {
-  const price = nearMintPrice(priceIndex, card);
-  const finishLabel = card.finishes.includes("foil") ? "Foil" : "Non-foil";
-  const setLine = [
-    card.set.label,
-    card.collector_number ? `#${card.collector_number}` : null,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const initFinish = defaultFinish(card);
+  const [activeKey, setActiveKey] = useState(`${card.id}-${initFinish}`);
+  const [selected, setSelected] = useState<{ card: CardRecord; finish: "foil" | "nonfoil" }>({
+    card,
+    finish: initFinish,
+  });
+
+  function handleVariantSelect({ card: c, finish, key }: VariantSelection) {
+    setSelected({ card: c, finish: finish as "foil" | "nonfoil" });
+    setActiveKey(key);
+  }
+
+  const footer = (
+    <div className={T.srFooter}>
+      <VariantSelectorRow
+        cards={[card]}
+        activeKey={activeKey}
+        showPrice={true}
+        publishedPriceIndex={priceIndex}
+        onVariantSelect={handleVariantSelect}
+      />
+      <button
+        className={T.srBtnMine}
+        onClick={() => onAdd(selected.card, selected.finish, "mine")}
+      >
+        + Mine
+      </button>
+      <button
+        className={T.srBtnYours}
+        onClick={() => onAdd(selected.card, selected.finish, "yours")}
+      >
+        + Yours
+      </button>
+    </div>
+  );
 
   return (
-    <div className={T.srCard}>
-      {/* Art */}
-      <div
-        className={T.srArtWrap}
-        onClick={() => onQuickLook(card)}
-        style={{ cursor: "pointer" }}
-      >
-        {card.media.image_url ? (
-          <img
-            src={card.media.image_url}
-            alt={card.media.accessibility_text ?? card.riot_name}
-            loading="lazy"
-            className={T.srArtImg}
-          />
-        ) : (
-          <div className={T.srArtPlaceholder} />
-        )}
-      </div>
-
-      {/* Info */}
-      <div className={T.srInfo}>
-        <div className={T.srName}>{card.riot_name}</div>
-        <div className={T.srMeta}>
-          {setLine && <div>{setLine}</div>}
-          <div>
-            {finishLabel}
-            {card.rarity ? ` · ${card.rarity}` : ""}
-          </div>
-        </div>
-        {price != null && (
-          <div className={T.srPrice}>{formatUsdPrice(price)}</div>
-        )}
-      </div>
-
-      {/* Add buttons */}
-      <div className={T.srActions}>
-        <button className={T.srBtnMine} onClick={() => onAdd(card, "mine")}>
-          + Mine
-        </button>
-        <button className={T.srBtnYours} onClick={() => onAdd(card, "yours")}>
-          + Yours
-        </button>
-      </div>
-    </div>
+    <ResultCard
+      name={card.riot_name}
+      imageUrl={card.media.image_url}
+      imageAlt={card.media.accessibility_text ?? card.riot_name}
+      footer={footer}
+      onClick={() => onQuickLook(card)}
+    />
   );
 }
 
@@ -463,9 +437,9 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
 
   // ── Item mutations ──
 
-  function addCard(card: CardRecord, side: TradeSide) {
-    const finish = defaultFinish(card);
-    const key = makeKey(card.id, finish);
+  function addCard(card: CardRecord, side: TradeSide, finish?: "foil" | "nonfoil") {
+    const resolvedFinish = finish ?? defaultFinish(card);
+    const key = makeKey(card.id, resolvedFinish);
     const updater = (prev: TradeItem[]): TradeItem[] => {
       const idx = prev.findIndex((i) => i.key === key);
       if (idx !== -1) {
@@ -473,7 +447,7 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
         next[idx] = { ...next[idx], qty: next[idx].qty + 1 };
         return next;
       }
-      return [...prev, { key, card, qty: 1, condition: "near mint", finish }];
+      return [...prev, { key, card, qty: 1, condition: "near mint", finish: resolvedFinish }];
     };
     if (side === "mine") setMine(updater);
     else setYours(updater);
@@ -718,11 +692,11 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
         {searchResults.length > 0 && (
           <div className={T.resultsGrid}>
             {searchResults.map((card) => (
-              <TradeSearchCard
+              <TradeSearchResultCard
                 key={card.id}
                 card={card}
                 priceIndex={priceIndex}
-                onAdd={addCard}
+                onAdd={(c, finish, side) => addCard(c, side, finish)}
                 onQuickLook={setQuickLookCard}
               />
             ))}
