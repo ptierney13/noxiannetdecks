@@ -145,7 +145,7 @@ const T = {
   // ── Delta bar — shown at all sizes, gradient always on ────────────────
 
   deltaBar:
-    "flex items-center justify-between px-3 py-3 lg:px-6 lg:py-5 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.07)]",
+    "flex items-center justify-between px-3 py-2.5 lg:px-6 lg:py-5 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.07)] shrink-0",
   deltaSide: "flex flex-col items-center gap-0.5 min-w-[4.5rem] lg:min-w-[6rem]",
   deltaSideLabel: "text-[0.6rem] lg:text-[0.65rem] font-bold tracking-[0.1em] uppercase",
   deltaSideTotal:
@@ -544,6 +544,13 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
   const showSearchHint = activeQuery.length === 0 && !searching;
   const showNoResults = activeQuery.length > 0 && !searching && searchGroups.length === 0;
 
+  function sideCountLabel(items: TradeItem[]) {
+    const total = items.reduce((s, i) => s + i.qty, 0);
+    const unique = items.length;
+    if (total === 0) return null;
+    return `${total} card${total !== 1 ? "s" : ""} · ${unique} unique`;
+  }
+
   function clearSearch() {
     setSearchQuery("");
     searchInputRef.current?.focus();
@@ -597,13 +604,20 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
 
   const mineSection = (
     <div
-      className={`${T.mineSection} ${dragOverSide === "mine" ? T.dropTarget : ""} min-h-[120px]`}
+      className={`${T.mineSection} ${dragOverSide === "mine" ? T.dropTarget : ""} flex flex-col overflow-hidden`}
       onDragOver={(e) => handleDragOver(e, "mine")}
       onDragLeave={() => setDragOverSide(null)}
       onDrop={() => handleDrop("mine")}
     >
       <div className={T.sectionHeader}>
-        <span className={T.mineLabel}>Mine</span>
+        <span className={T.mineLabel}>
+          Mine
+          {sideCountLabel(mine) && (
+            <span className="ml-2 text-[0.6rem] font-normal tracking-normal normal-case text-[var(--color-text-dim)]">
+              {sideCountLabel(mine)}
+            </span>
+          )}
+        </span>
         <span className={T.sideTotal}>{formatUsdPrice(mineTotal) ?? "$0.00"}</span>
       </div>
       <div className={T.sideBody}>
@@ -621,13 +635,20 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
 
   const yoursSection = (
     <div
-      className={`${T.yoursSection} ${dragOverSide === "yours" ? T.dropTarget : ""} min-h-[120px]`}
+      className={`${T.yoursSection} ${dragOverSide === "yours" ? T.dropTarget : ""} flex flex-col overflow-hidden`}
       onDragOver={(e) => handleDragOver(e, "yours")}
       onDragLeave={() => setDragOverSide(null)}
       onDrop={() => handleDrop("yours")}
     >
       <div className={T.sectionHeader}>
-        <span className={T.yoursLabel}>Yours</span>
+        <span className={T.yoursLabel}>
+          Yours
+          {sideCountLabel(yours) && (
+            <span className="ml-2 text-[0.6rem] font-normal tracking-normal normal-case text-[var(--color-text-dim)]">
+              {sideCountLabel(yours)}
+            </span>
+          )}
+        </span>
         <span className={T.sideTotal}>{formatUsdPrice(yoursTotal) ?? "$0.00"}</span>
       </div>
       <div className={T.sideBody}>
@@ -697,39 +718,43 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
 
   // ── Render ──
   // Delta bar at top for all sizes.
-  // Mobile (< lg): delta → Mine → Search (fixed-height scrollable) → Yours
-  // Desktop (lg+): delta (col-span-2) → Mine | Yours → Search (col-span-2)
+  // Mobile (< lg): full-viewport flex column; sections have fixed dvh-based
+  //   heights so nothing shifts when items are added — only the list scrolls.
+  //   Mine/Yours min 2.5 visible rows (~265px); search fills the remainder.
+  // Desktop (lg+): delta (col-span-2) → Mine | Yours → Search (col-span-2).
 
   return (
     <>
-      <div className="px-4 pb-12 pt-4 min-h-screen">
-        <div className="mx-auto max-w-[1240px] flex flex-col gap-3 lg:gap-4">
+      {/* ── Mobile layout (< lg) — fills viewport, nothing scrolls outside ── */}
+      <div className="lg:hidden flex flex-col gap-2 p-2 overflow-hidden" style={{ height: "100dvh" }}>
+        {deltaBar}
+        {/* Mine: fixed height — clamp ensures ≥2.5 visible rows at any viewport */}
+        <div className="shrink-0 flex flex-col overflow-hidden"
+          style={{ height: "clamp(265px, 30dvh, 340px)" }}>
+          {mineSection}
+        </div>
+        {/* Search: takes all remaining space */}
+        <div className="flex-1 min-h-0 flex flex-col">
+          {searchSection}
+        </div>
+        {/* Yours: same fixed height as Mine */}
+        <div className="shrink-0 flex flex-col overflow-hidden"
+          style={{ height: "clamp(265px, 30dvh, 340px)" }}>
+          {yoursSection}
+        </div>
+      </div>
 
-          {/* ── Mobile layout (< lg) ── */}
-          <div className="flex flex-col gap-3 lg:hidden">
-            {deltaBar}
-            {mineSection}
-            <div className="h-[440px] flex flex-col">
-              {searchSection}
-            </div>
-            {yoursSection}
+      {/* ── Desktop layout (lg+) ── */}
+      <div className="hidden lg:block px-4 pb-12 pt-4">
+        <div className="mx-auto max-w-[1240px] flex flex-col gap-4">
+          {deltaBar}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="min-h-[200px] flex flex-col">{mineSection}</div>
+            <div className="min-h-[200px] flex flex-col">{yoursSection}</div>
           </div>
-
-          {/* ── Desktop layout (lg+) ── */}
-          <div className="hidden lg:grid lg:grid-cols-2 lg:gap-4">
-            {/* Row 1: Delta bar (full width) */}
-            <div className="lg:col-span-2">{deltaBar}</div>
-
-            {/* Row 2: Mine | Yours */}
-            <div className="min-h-[200px]">{mineSection}</div>
-            <div className="min-h-[200px]">{yoursSection}</div>
-
-            {/* Row 3: Search (full width) */}
-            <div className="lg:col-span-2 min-h-[320px] flex flex-col">
-              {searchSection}
-            </div>
+          <div className="min-h-[320px] flex flex-col">
+            {searchSection}
           </div>
-
         </div>
       </div>
 
