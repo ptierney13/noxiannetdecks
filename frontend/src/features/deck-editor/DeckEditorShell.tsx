@@ -16,14 +16,28 @@ type PickerContext =
   | { kind: "maindeck" }
   | { kind: "sideboard" };
 
-function buildFilterQuery(ctx: PickerContext, legendDomains: string[]): string {
+function charName(cardName: string): string {
+  return cardName.split(",")[0].trim();
+}
+
+type FilterQueryArgs = {
+  ctx: PickerContext;
+  legendDomains: string[];
+  legendCardName: string | null;
+  championCardName: string | null;
+};
+
+function buildFilterQuery({ ctx, legendDomains, legendCardName, championCardName }: FilterQueryArgs): string {
   switch (ctx.kind) {
-    case "legend":
-      return "unique:legal t:legend";
-    case "champion":
-      return legendDomains.length > 0
-        ? `unique:legal supertype:Champion d:${legendDomains[0]}`
-        : "unique:legal supertype:Champion";
+    case "legend": {
+      const base = "unique:legal t:legend";
+      return championCardName ? `${base} g:"${charName(championCardName)}"` : base;
+    }
+    case "champion": {
+      const domainClause = legendDomains.length > 0 ? ` d:${legendDomains[0]}` : "";
+      const tagClause = legendCardName ? ` g:"${charName(legendCardName)}"` : "";
+      return `unique:legal supertype:Champion${domainClause}${tagClause}`;
+    }
     case "battlefield":
       return "unique:legal ct:Battlefield";
     case "maindeck":
@@ -164,6 +178,8 @@ export function DeckEditorShell() {
 
   // ── Picker callbacks ──────────────────────────────────────────────────────
   const legendDomains = deck.legend?.domain ?? [];
+  const legendCardName = deck.legend?.cardName ?? null;
+  const championCardName = deck.champion?.cardName ?? null;
 
   function handlePickerSelect(card: CardRecord) {
     if (!pickerCtx) return;
@@ -234,15 +250,10 @@ export function DeckEditorShell() {
 
         {/* ── Runes ── */}
         <div className="rounded-xl bg-surface-2 py-3 px-4">
-          <div className="flex items-center justify-between mb-2">
+          <div className="mb-2">
             <span className="text-[0.75rem] font-bold tracking-[0.06em] uppercase text-accent-warm/75">
               Runes
             </span>
-            {deck.runes ? (
-              <span className="text-[0.68rem] text-text-dim font-mono">
-                {deck.runes.leftCount + deck.runes.rightCount}/12
-              </span>
-            ) : null}
           </div>
           <RuneRow
             runes={deck.runes}
@@ -310,7 +321,7 @@ export function DeckEditorShell() {
       {pickerCtx ? (
         <CardPickerModal
           title={buildPickerTitle(pickerCtx)}
-          filterQuery={buildFilterQuery(pickerCtx, legendDomains)}
+          filterQuery={buildFilterQuery({ ctx: pickerCtx, legendDomains, legendCardName, championCardName })}
           onSelect={handlePickerSelect}
           onClose={() => setPickerCtx(null)}
         />

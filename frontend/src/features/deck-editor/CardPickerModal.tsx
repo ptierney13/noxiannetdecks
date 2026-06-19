@@ -1,7 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { ModalShell } from "../../ui-elements";
-import { searchCards } from "../../api";
+import { useCardSearchResults } from "../../data";
+import {
+  buildCardSearchResultGroups,
+  sortCardsByKey,
+  usePublishedPriceIndex,
+  type CardSearchSortKey,
+  type CardSearchVariantMode,
+} from "../../lib";
 import { useDebounce } from "../../lib/useDebounce";
+import { CardSearchResultsContent } from "../card-search/CardSearchResultsContent";
 import type { CardRecord } from "../../types";
 
 type CardPickerModalProps = {
@@ -13,53 +21,49 @@ type CardPickerModalProps = {
 
 export function CardPickerModal({ title, filterQuery, onSelect, onClose }: CardPickerModalProps) {
   const [userQuery, setUserQuery] = useState("");
-  const [cards, setCards] = useState<CardRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [sort, setSort] = useState<CardSearchSortKey>("energy-asc");
+  const [variantMode, setVariantMode] = useState<CardSearchVariantMode>("unique-cards");
+  const [showPrice, setShowPrice] = useState(false);
+  const [showVariants, setShowVariants] = useState(false);
 
   const debouncedUserQuery = useDebounce(userQuery, 260);
+  const combinedQuery = [filterQuery, debouncedUserQuery.trim()].filter(Boolean).join(" ");
 
-  const combinedQuery = [filterQuery, debouncedUserQuery.trim()]
-    .filter(Boolean)
-    .join(" ");
+  const resultsQuery = useCardSearchResults(combinedQuery);
+  const { index: publishedPriceIndex } = usePublishedPriceIndex();
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(false);
-    searchCards(combinedQuery)
-      .then((result) => {
-        if (!cancelled) {
-          setCards(result.items);
-          setLoading(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setError(true);
-          setLoading(false);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [combinedQuery]);
+  const cards = resultsQuery.data?.items ?? [];
+  const sortedCards = useMemo(() => sortCardsByKey(cards, sort), [cards, sort]);
+  const groups = useMemo(
+    () => buildCardSearchResultGroups(sortedCards, variantMode),
+    [sortedCards, variantMode],
+  );
+  const visibleResultCount = variantMode === "unique-cards" ? groups.length : cards.length;
 
   return (
     <ModalShell
       label={title}
       onClose={onClose}
-      panelClassName="flex flex-col max-h-[82vh]"
+      panelClassName="flex flex-col"
+      className="items-start pt-16 pb-6"
     >
-      {/* Header */}
+      {/* Title + inline search */}
       <div className="flex-shrink-0 px-5 pt-5 pb-3 pr-14">
-        <h2 className="text-[0.78rem] font-bold tracking-[0.08em] uppercase text-accent-warm/80 mb-3">
+        <h2 className="mb-3 text-[0.78rem] font-bold tracking-[0.08em] uppercase text-accent-warm/80">
           {title}
         </h2>
-        {/* Simple search input */}
-        <div className="flex items-center gap-2 rounded-xl border border-border-default bg-surface-inset px-3 h-11 focus-within:border-border-strong transition-colors">
-          <svg className="w-4 h-4 text-text-tertiary flex-shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+        <div className="flex h-10 items-center gap-2 rounded-xl border border-border-default bg-surface-inset px-3 focus-within:border-border-strong transition-colors">
+          <svg
+            className="h-4 w-4 flex-shrink-0 text-text-tertiary"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+              clipRule="evenodd"
+            />
           </svg>
           <input
             type="search"
@@ -75,9 +79,9 @@ export function CardPickerModal({ title, filterQuery, onSelect, onClose }: CardP
           {userQuery ? (
             <button
               type="button"
-              className="text-text-tertiary hover:text-text-secondary text-xs flex-shrink-0 leading-none"
+              className="flex-shrink-0 text-xs leading-none text-text-tertiary hover:text-text-secondary"
               onClick={() => setUserQuery("")}
-              aria-label="Clear"
+              aria-label="Clear filter"
             >
               ✕
             </button>
@@ -85,52 +89,39 @@ export function CardPickerModal({ title, filterQuery, onSelect, onClose }: CardP
         </div>
       </div>
 
-      {/* Results */}
-      <div className="flex-1 overflow-y-auto px-5 pb-5">
-        {loading ? (
-          <div className="py-10 text-center text-sm text-text-tertiary">Loading…</div>
-        ) : error ? (
-          <div className="py-10 text-center text-sm text-negative">Failed to load cards</div>
-        ) : cards.length === 0 ? (
-          <div className="py-10 text-center text-sm text-text-tertiary">No cards found</div>
-        ) : (
-          <div className="flex flex-col gap-0.5">
-            {cards.map((card) => (
-              <button
-                key={card.id}
-                type="button"
-                className="flex items-center gap-3 rounded-lg px-2 py-2 text-left hover:bg-surface-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-                onClick={() => {
-                  onSelect(card);
-                  onClose();
-                }}
-              >
-                <div className="h-10 w-10 flex-shrink-0 rounded-lg overflow-hidden bg-surface-inset">
-                  {card.media.image_url ? (
-                    <img
-                      src={card.media.image_url}
-                      alt={card.riot_name}
-                      className="w-full h-[120px] object-cover object-top"
-                    />
-                  ) : null}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-text-primary truncate leading-tight">
-                    {card.riot_name}
-                  </div>
-                  <div className="text-xs text-text-tertiary truncate leading-tight mt-0.5">
-                    {card.type.typeline}
-                  </div>
-                </div>
-                {card.attributes.cost !== null ? (
-                  <span className="text-xs font-mono text-accent-warm flex-shrink-0">
-                    {card.attributes.cost}
-                  </span>
-                ) : null}
-              </button>
-            ))}
-          </div>
-        )}
+      {/* Results — CardSearchResultsContent owns the grid and controls */}
+      <div className="flex-1 min-h-0 overflow-y-auto w-full" style={{ maxHeight: "70vh" }}>
+        <CardSearchResultsContent
+          groups={groups}
+          rawResultCount={cards.length}
+          visibleResultCount={visibleResultCount}
+          executedTokens={resultsQuery.data?.executedTokens ?? []}
+          isPending={resultsQuery.isPending}
+          isError={resultsQuery.isError}
+          errorMessage={
+            resultsQuery.error instanceof Error ? resultsQuery.error.message : undefined
+          }
+          sort={sort}
+          variantMode={variantMode}
+          showPrice={showPrice}
+          showVariants={showVariants}
+          publishedPriceIndex={publishedPriceIndex}
+          onSortChange={setSort}
+          onVariantModeChange={setVariantMode}
+          onShowPriceChange={(v) => {
+            setShowPrice(v);
+            if (v) setShowVariants(true);
+          }}
+          onShowVariantsChange={(v) => {
+            setShowVariants(v);
+            if (!v) setShowPrice(false);
+          }}
+          onCardClick={(card) => {
+            onSelect(card);
+            onClose();
+          }}
+          hideSummary
+        />
       </div>
     </ModalShell>
   );
