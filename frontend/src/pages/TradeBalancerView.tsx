@@ -35,120 +35,103 @@ const CONDITIONS = [
   "damaged",
 ] as const;
 
-const CONDITION_LABELS: Record<string, string> = {
-  "near mint": "Near Mint",
-  "lightly played": "Lightly Played",
-  "moderately played": "Mod. Played",
-  "heavily played": "Heavily Played",
-  "damaged": "Damaged",
+// Standard card condition shorthand codes
+const CONDITION_CODES: Record<string, string> = {
+  "near mint": "NM",
+  "lightly played": "LP",
+  "moderately played": "MP",
+  "heavily played": "HP",
+  "damaged": "DMG",
 };
 
-// ── Local style tokens ─────────────────────────────────────────────────────
+// ── Style tokens ───────────────────────────────────────────────────────────
 
 const T = {
-  // Section containers
+  // Section containers — top accent bar is the color signal
   mineSection:
-    "flex flex-col rounded-xl overflow-hidden bg-[rgba(13,16,24,0.94)] shadow-[0_0_0_1px_rgba(42,143,82,0.22),inset_3px_0_0_rgba(109,186,138,0.65),0_6px_24px_rgba(0,0,0,0.36)]",
+    "rounded-xl overflow-hidden flex flex-col bg-[rgba(13,16,24,0.94)] border-t-[3px] border-t-[var(--color-positive-strong)] shadow-[0_0_0_1px_rgba(42,143,82,0.18),0_6px_24px_rgba(0,0,0,0.34)]",
   yoursSection:
-    "flex flex-col rounded-xl overflow-hidden bg-[rgba(13,16,24,0.94)] shadow-[0_0_0_1px_rgba(181,32,56,0.22),inset_3px_0_0_rgba(181,32,56,0.65),0_6px_24px_rgba(0,0,0,0.36)]",
+    "rounded-xl overflow-hidden flex flex-col bg-[rgba(13,16,24,0.94)] border-t-[3px] border-t-[var(--color-negative)] shadow-[0_0_0_1px_rgba(181,32,56,0.18),0_6px_24px_rgba(0,0,0,0.34)]",
   searchSection:
-    "flex flex-col rounded-xl overflow-hidden bg-[rgba(13,16,24,0.94)] shadow-[0_0_0_1px_rgba(197,50,71,0.16),0_0_28px_rgba(197,50,71,0.07),0_6px_24px_rgba(0,0,0,0.36)]",
+    "rounded-xl overflow-hidden flex flex-col bg-[rgba(13,16,24,0.94)] shadow-[0_0_0_1px_rgba(197,50,71,0.16),0_0_28px_rgba(197,50,71,0.07),0_6px_24px_rgba(0,0,0,0.34)]",
 
-  // Section headers
-  mineHeader:
-    "flex items-center justify-between px-4 py-3 bg-[rgba(12,38,20,0.55)] border-b border-[rgba(42,143,82,0.22)] shrink-0",
-  yoursHeader:
-    "flex items-center justify-between px-4 py-3 bg-[rgba(38,10,14,0.55)] border-b border-[rgba(181,32,56,0.22)] shrink-0",
-  searchHeader:
-    "flex items-center gap-2 px-4 pt-3.5 pb-2 shrink-0",
-
-  // Header labels
+  // Section headers — quiet; the top bar carries the color
+  sectionHeader:
+    "flex items-center justify-between px-4 py-3 border-b border-[rgba(255,255,255,0.06)] shrink-0",
   mineLabel:
     "text-[0.72rem] font-bold tracking-[0.09em] uppercase text-[var(--color-positive-strong)]",
   yoursLabel:
     "text-[0.72rem] font-bold tracking-[0.09em] uppercase text-[var(--color-negative)]",
-  searchTitle:
-    "text-[0.77rem] font-bold tracking-[0.04em] text-[var(--color-accent-warm)] opacity-75 leading-none",
-
-  // Section total display
   sideTotal:
     "font-mono text-base font-semibold text-[var(--color-text-primary)]",
 
+  // Search header
+  searchHeader:
+    "flex items-center gap-2 px-4 pt-3.5 pb-2 shrink-0",
+  searchTitle:
+    "text-[0.77rem] font-bold tracking-[0.04em] text-[var(--color-accent-warm)] opacity-75 leading-none",
+
   // Section body
-  sideBody: "flex-1 flex flex-col divide-y divide-[rgba(255,255,255,0.05)] overflow-y-auto",
+  sideBody:
+    "flex-1 flex flex-col overflow-y-auto divide-y divide-[rgba(255,255,255,0.05)]",
   sideBodyEmpty:
     "flex-1 flex flex-col items-center justify-center gap-2 py-10 px-4 text-center",
 
-  // Card bar
-  cardBar:
-    "flex items-center gap-3 px-4 py-3 hover:bg-[rgba(255,255,255,0.03)] cursor-grab active:cursor-grabbing transition-colors duration-[120ms] group",
-  cardBarExpanded: "bg-[rgba(255,255,255,0.02)]",
-  dragHandle:
-    "text-[rgba(255,255,255,0.2)] text-lg leading-none select-none group-hover:text-[rgba(255,255,255,0.4)] transition-colors shrink-0",
-  cardName:
-    "text-sm font-medium text-[var(--color-text-primary)] leading-tight",
-  cardTagRow: "flex flex-wrap gap-1 mt-1",
+  // ── Trade item row ──────────────────────────────────────────────────────
 
-  // Tags
-  tagBase: "rounded px-1.5 py-0.5 text-[0.63rem] font-medium leading-none border",
+  itemRow:
+    "flex items-center gap-2.5 px-3 py-2 hover:bg-[rgba(255,255,255,0.025)] transition-colors duration-[120ms]",
+
+  // Card art
+  artWrap:
+    "shrink-0 w-9 h-[52px] rounded-md overflow-hidden bg-[rgba(255,255,255,0.05)] cursor-pointer",
+  artImg:
+    "w-full h-full object-cover hover:opacity-85 transition-opacity",
+  artPlaceholder:
+    "w-full h-full bg-[rgba(255,255,255,0.03)]",
+
+  // Card name + tags
+  cardInfo: "flex-1 min-w-0",
+  cardName:
+    "text-[0.8rem] font-medium text-[var(--color-text-primary)] leading-tight truncate",
+  cardTags: "flex flex-wrap gap-1 mt-0.5",
+  tagBase: "rounded px-1.5 py-0.5 text-[0.62rem] font-medium leading-none border",
   tagRarity:
     "bg-[rgba(201,129,58,0.1)] text-[var(--color-warning)] border-[rgba(201,129,58,0.28)]",
-  tagDomain:
-    "bg-[var(--color-info-soft)] text-[var(--color-info)] border-[var(--color-info-border)]",
   tagFoil:
     "bg-[rgba(212,160,240,0.08)] text-[#d4a0f0] border-[rgba(212,160,240,0.28)]",
   tagNonfoil:
     "bg-[rgba(255,255,255,0.04)] text-[var(--color-text-dim)] border-[rgba(255,255,255,0.1)]",
 
-  // Desktop inline controls
-  desktopControls: "hidden sm:flex items-center gap-2 shrink-0",
+  // Condition cycle button
+  conditionBtn:
+    "shrink-0 text-[0.65rem] font-bold tracking-wide text-[var(--color-accent-warm)] bg-[rgba(215,170,73,0.1)] border border-[rgba(215,170,73,0.25)] rounded-md px-1.5 py-1 hover:bg-[rgba(215,170,73,0.18)] transition-colors cursor-pointer min-w-[2rem] text-center leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
 
-  // Select
-  select:
-    "text-xs bg-[rgba(8,11,18,0.72)] border border-[rgba(255,255,255,0.1)] text-[var(--color-text-secondary)] rounded-lg px-2 py-1.5 focus:outline-none focus:border-[var(--color-accent)] transition-colors cursor-pointer appearance-none",
+  // Finish toggle (dual-finish cards only)
+  finishBtnFoil:
+    "shrink-0 text-[0.62rem] font-medium text-[#d4a0f0] bg-[rgba(212,160,240,0.08)] border border-[rgba(212,160,240,0.22)] rounded-md px-1.5 py-1 hover:bg-[rgba(212,160,240,0.16)] transition-colors cursor-pointer leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
+  finishBtnNF:
+    "shrink-0 text-[0.62rem] font-medium text-[var(--color-text-dim)] bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] rounded-md px-1.5 py-1 hover:bg-[rgba(255,255,255,0.08)] transition-colors cursor-pointer leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
 
-  // Qty stepper
-  qtyStepper:
-    "flex items-center bg-[rgba(8,11,18,0.72)] border border-[rgba(255,255,255,0.1)] rounded-lg overflow-hidden",
+  // Vertical qty stepper
+  qtyWrap: "shrink-0 flex flex-col items-center",
   qtyBtn:
-    "px-2 h-7 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[rgba(255,255,255,0.07)] transition-colors text-sm leading-none",
+    "w-5 h-[18px] flex items-center justify-center text-[0.7rem] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[rgba(255,255,255,0.07)] rounded transition-colors leading-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-focus-ring)]",
   qtyVal:
-    "px-2 text-xs text-[var(--color-text-primary)] font-mono min-w-[1.75rem] text-center leading-7",
+    "text-[0.8rem] font-mono font-bold text-[var(--color-text-primary)] min-w-[1.25rem] text-center leading-tight py-[2px]",
 
-  // Price
-  cardPrice:
-    "shrink-0 font-mono text-sm text-[var(--color-price)] min-w-[3.5rem] text-right",
-  cardPriceDash:
-    "shrink-0 font-mono text-sm text-[var(--color-text-dim)] min-w-[3.5rem] text-right",
+  // Line price
+  itemPrice:
+    "shrink-0 font-mono text-[0.8rem] text-[var(--color-price)] min-w-[3.25rem] text-right",
+  itemPriceDash:
+    "shrink-0 font-mono text-[0.8rem] text-[var(--color-text-dim)] min-w-[3.25rem] text-right",
 
-  // Remove button
+  // Remove
   removeBtn:
-    "hidden sm:flex shrink-0 w-6 h-6 items-center justify-center text-[0.7rem] opacity-30 hover:opacity-100 text-[var(--color-negative)] transition-opacity rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
+    "shrink-0 w-5 h-5 flex items-center justify-center text-[0.65rem] opacity-25 hover:opacity-90 text-[var(--color-negative)] transition-opacity rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-focus-ring)]",
 
-  // Mobile chevron
-  mobileChevron:
-    "sm:hidden shrink-0 text-[0.65rem] text-[var(--color-text-tertiary)] opacity-60",
+  // ── Search ───────────────────────────────────────────────────────────────
 
-  // Mobile expand panel
-  expandPanel:
-    "sm:hidden px-4 pb-4 pt-1 bg-[rgba(8,11,18,0.45)] border-t border-[rgba(255,255,255,0.05)]",
-  expandGrid: "grid grid-cols-2 gap-3 mb-3",
-  expandFieldFull: "col-span-2",
-  expandLabel:
-    "block text-[0.65rem] font-bold uppercase tracking-[0.09em] text-[var(--color-text-tertiary)] mb-1.5",
-  expandQtyRemoveRow: "flex items-center gap-2",
-  expandRemoveBtn:
-    "ml-auto w-8 h-8 flex items-center justify-center text-xs rounded-lg bg-[rgba(181,32,56,0.1)] text-[var(--color-negative)] border border-[rgba(181,32,56,0.2)] hover:bg-[rgba(181,32,56,0.18)] transition-colors",
-  expandPriceRow:
-    "flex items-center flex-wrap gap-x-3 gap-y-1.5 pt-2 border-t border-[rgba(255,255,255,0.06)]",
-  expandPriceVal:
-    "font-mono text-sm font-semibold text-[var(--color-price)]",
-  tcgLink:
-    "text-[0.72rem] text-[var(--color-accent-warm)] opacity-70 hover:opacity-100 transition-opacity underline-offset-2 hover:underline",
-  expandMoveBtn:
-    "ml-auto text-[0.72rem] font-medium text-[var(--color-text-secondary)] border border-[rgba(255,255,255,0.12)] rounded-lg px-3 py-1.5 hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-text-primary)] transition-colors",
-
-  // Search
   searchBody: "px-3 pb-3 flex flex-col gap-2",
   searchInputWrap: "relative",
   searchInput:
@@ -158,7 +141,7 @@ const T = {
   searchClearBtn:
     "absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-[0.65rem] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors rounded focus-visible:outline-none",
   searchResults:
-    "flex flex-col divide-y divide-[rgba(255,255,255,0.05)] overflow-y-auto rounded-xl bg-[rgba(8,11,18,0.6)] border border-[rgba(255,255,255,0.07)]",
+    "flex flex-col divide-y divide-[rgba(255,255,255,0.05)] overflow-y-auto max-h-[360px] rounded-xl bg-[rgba(8,11,18,0.6)] border border-[rgba(255,255,255,0.07)]",
   searchHint:
     "py-5 text-center text-[0.75rem] text-[var(--color-text-dim)]",
 
@@ -176,21 +159,22 @@ const T = {
   srBtnYours:
     "flex-1 py-1.5 rounded-lg text-[0.72rem] font-semibold bg-[rgba(65,12,18,0.6)] text-[var(--color-negative)] border border-[rgba(181,32,56,0.32)] hover:bg-[rgba(65,12,18,0.85)] transition-colors",
 
-  // Delta bar (desktop)
+  // ── Delta bar ────────────────────────────────────────────────────────────
+
   deltaBar:
     "sm:col-span-3 hidden sm:flex items-center justify-between px-6 py-5 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.07)]",
   deltaSide: "flex flex-col items-center gap-1 min-w-[6rem]",
   deltaSideLabel: "text-[0.65rem] font-bold tracking-[0.1em] uppercase",
-  deltaSideTotal: "font-mono text-xl font-bold text-[var(--color-text-primary)]",
+  deltaSideTotal:
+    "font-mono text-xl font-bold text-[var(--color-text-primary)]",
   deltaMid: "flex flex-col items-center gap-1",
   deltaMidLabel:
     "text-[0.65rem] font-bold tracking-[0.1em] uppercase text-[var(--color-text-tertiary)]",
   deltaMidNote: "text-[0.67rem] text-[var(--color-text-dim)]",
   deltaArrow: "text-[var(--color-text-dim)] text-lg opacity-40",
 
-  // Mobile delta
-  mobileDelta:
-    "sm:hidden rounded-xl px-4 py-3 text-sm font-semibold text-center",
+  // Mobile delta strip
+  mobileDelta: "sm:hidden rounded-xl px-4 py-3 text-sm font-semibold text-center",
   mobileDeltaEven:
     "bg-[rgba(255,255,255,0.04)] text-[var(--color-text-tertiary)] border border-[rgba(255,255,255,0.07)]",
   mobileDeltaPos:
@@ -198,26 +182,8 @@ const T = {
   mobileDeltaNeg:
     "bg-[rgba(181,32,56,0.12)] text-[var(--color-negative)] border border-[rgba(181,32,56,0.2)]",
 
-  // Mobile compact strip
-  compactStrip:
-    "sm:hidden flex items-center justify-between px-4 py-2.5 rounded-xl bg-[rgba(13,16,24,0.94)] border border-[rgba(255,255,255,0.08)]",
-  compactSide: "flex flex-col gap-0.5",
-  compactSideRight: "items-end",
-  compactLabel: "text-[0.63rem] font-bold uppercase tracking-[0.08em]",
-  compactTotal:
-    "font-mono text-sm font-semibold text-[var(--color-text-primary)]",
-  compactDeltaPill:
-    "px-3 py-1 rounded-full text-xs font-bold",
-  compactDeltaEven:
-    "bg-[rgba(255,255,255,0.06)] text-[var(--color-text-tertiary)]",
-  compactDeltaPos:
-    "bg-[rgba(42,143,82,0.18)] text-[var(--color-positive-strong)]",
-  compactDeltaNeg:
-    "bg-[rgba(181,32,56,0.18)] text-[var(--color-negative)]",
-
-  // Drop target
-  dropTarget:
-    "ring-2 ring-[rgba(255,255,255,0.2)] ring-inset brightness-110",
+  // Drop target highlight
+  dropTarget: "ring-2 ring-inset ring-[rgba(255,255,255,0.2)] brightness-110",
 } as const;
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -269,6 +235,11 @@ function nearMintPrice(
   const nonfoilRow = resolveItemPrice(rows, "nonfoil", "near mint");
   const def = defaultFinish(card);
   return (def === "foil" ? foilRow : nonfoilRow) ?? foilRow ?? nonfoilRow;
+}
+
+function cycleCondition(current: string): string {
+  const idx = CONDITIONS.indexOf(current as (typeof CONDITIONS)[number]);
+  return CONDITIONS[(idx + 1) % CONDITIONS.length];
 }
 
 // ── SearchResultItem ───────────────────────────────────────────────────────
@@ -323,20 +294,17 @@ function SearchResultItem({
   );
 }
 
-// ── TradeCardBar ───────────────────────────────────────────────────────────
+// ── TradeItemRow — single unified component for both sides ─────────────────
 
-function TradeCardBar({
+function TradeItemRow({
   item,
   side,
   itemPrice,
   tcgUrl,
-  isExpanded,
-  onToggleExpand,
   onQty,
   onCondition,
   onFinish,
   onRemove,
-  onMove,
   onDragStart,
   onDragEnd,
   onQuickLook,
@@ -345,13 +313,10 @@ function TradeCardBar({
   side: TradeSide;
   itemPrice: number | null;
   tcgUrl: string | null;
-  isExpanded: boolean;
-  onToggleExpand: () => void;
   onQty: (delta: number) => void;
   onCondition: (c: string) => void;
   onFinish: (f: "foil" | "nonfoil") => void;
   onRemove: () => void;
-  onMove: () => void;
   onDragStart: () => void;
   onDragEnd: () => void;
   onNavigate: (path: string) => void;
@@ -360,11 +325,13 @@ function TradeCardBar({
   const { card } = item;
   const hasBothFinishes = card.finishes.length > 1;
   const lineTotal = itemPrice != null ? itemPrice * item.qty : null;
-  const domains = card.attributes.domain;
-  const moveLabel = side === "mine" ? "Move to Yours →" : "← Move to Mine";
+  // suppress unused warning — kept for API compatibility with router
+  void side;
+  void tcgUrl;
 
   return (
     <div
+      className={T.itemRow}
       draggable
       onDragStart={(e) => {
         e.dataTransfer.effectAllowed = "move";
@@ -372,161 +339,72 @@ function TradeCardBar({
       }}
       onDragEnd={onDragEnd}
     >
-      {/* Collapsed row */}
-      <div
-        className={`${T.cardBar} ${isExpanded ? T.cardBarExpanded : ""}`}
-        onClick={onToggleExpand}
-      >
-        <span className={T.dragHandle} aria-hidden="true">⠿</span>
-
-        <div className="flex-1 min-w-0">
-          <div className={T.cardName}>{card.riot_name}</div>
-          <div className={T.cardTagRow}>
-            {card.rarity && (
-              <span className={`${T.tagBase} ${T.tagRarity}`}>{card.rarity}</span>
-            )}
-            {domains.map((d) => (
-              <span key={d} className={`${T.tagBase} ${T.tagDomain}`}>{d}</span>
-            ))}
-            <span className={`${T.tagBase} ${item.finish === "foil" ? T.tagFoil : T.tagNonfoil}`}>
-              {item.finish === "foil" ? "Foil" : "Non-foil"}
-            </span>
-          </div>
-        </div>
-
-        {/* Desktop inline controls */}
-        <div className={T.desktopControls} onClick={(e) => e.stopPropagation()}>
-          <select
-            className={T.select}
-            value={item.condition}
-            onChange={(e) => onCondition(e.target.value)}
-          >
-            {CONDITIONS.map((c) => (
-              <option key={c} value={c}>{CONDITION_LABELS[c]}</option>
-            ))}
-          </select>
-
-          {hasBothFinishes && (
-            <select
-              className={T.select}
-              value={item.finish}
-              onChange={(e) => onFinish(e.target.value as "foil" | "nonfoil")}
-            >
-              <option value="foil">Foil</option>
-              <option value="nonfoil">Non-foil</option>
-            </select>
-          )}
-
-          <div className={T.qtyStepper}>
-            <button className={T.qtyBtn} onClick={() => onQty(-1)}>−</button>
-            <span className={T.qtyVal}>{item.qty}</span>
-            <button className={T.qtyBtn} onClick={() => onQty(1)}>+</button>
-          </div>
-        </div>
-
-        <span className={lineTotal != null ? T.cardPrice : T.cardPriceDash}>
-          {lineTotal != null ? formatUsdPrice(lineTotal) : "—"}
-        </span>
-
-        <button
-          className={T.removeBtn}
-          onClick={(e) => { e.stopPropagation(); onRemove(); }}
-          aria-label="Remove card"
-        >
-          ✕
-        </button>
-
-        <span className={T.mobileChevron} aria-hidden="true">
-          {isExpanded ? "▲" : "▼"}
-        </span>
+      {/* Card art — always visible, click to quick-look */}
+      <div className={T.artWrap} onClick={() => onQuickLook(card)}>
+        {card.media.image_url ? (
+          <img
+            src={card.media.image_url}
+            alt={card.media.accessibility_text ?? card.riot_name}
+            loading="lazy"
+            className={T.artImg}
+          />
+        ) : (
+          <div className={T.artPlaceholder} />
+        )}
       </div>
 
-      {/* Mobile expanded panel */}
-      {isExpanded && (
-        <div className={T.expandPanel}>
-          {/* Card art */}
-          {card.media.image_url && (
-            <div className="mb-3 flex justify-center">
-              <img
-                src={card.media.image_url}
-                alt={card.media.accessibility_text ?? card.riot_name}
-                loading="lazy"
-                className="h-28 rounded-lg object-cover shadow-[0_4px_16px_rgba(0,0,0,0.5)] cursor-pointer"
-                onClick={() => onQuickLook(card)}
-              />
-            </div>
+      {/* Name + compact tags (rarity + finish only; no domain) */}
+      <div className={T.cardInfo}>
+        <div className={T.cardName}>{card.riot_name}</div>
+        <div className={T.cardTags}>
+          {card.rarity && (
+            <span className={`${T.tagBase} ${T.tagRarity}`}>{card.rarity}</span>
           )}
-
-          {/* Controls grid */}
-          <div className={T.expandGrid}>
-            <div>
-              <label className={T.expandLabel}>Condition</label>
-              <select
-                className={`${T.select} w-full`}
-                value={item.condition}
-                onChange={(e) => onCondition(e.target.value)}
-              >
-                {CONDITIONS.map((c) => (
-                  <option key={c} value={c}>{CONDITION_LABELS[c]}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className={T.expandLabel}>Qty</label>
-              <div className={T.expandQtyRemoveRow}>
-                <div className={T.qtyStepper}>
-                  <button className={T.qtyBtn} onClick={() => onQty(-1)}>−</button>
-                  <span className={T.qtyVal}>{item.qty}</span>
-                  <button className={T.qtyBtn} onClick={() => onQty(1)}>+</button>
-                </div>
-                <button
-                  className={T.expandRemoveBtn}
-                  onClick={onRemove}
-                  aria-label="Remove card"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-
-            {hasBothFinishes && (
-              <div className={T.expandFieldFull}>
-                <label className={T.expandLabel}>Finish</label>
-                <select
-                  className={`${T.select} w-full`}
-                  value={item.finish}
-                  onChange={(e) => onFinish(e.target.value as "foil" | "nonfoil")}
-                >
-                  <option value="foil">Foil</option>
-                  <option value="nonfoil">Non-foil</option>
-                </select>
-              </div>
-            )}
-          </div>
-
-          {/* Price row */}
-          <div className={T.expandPriceRow}>
-            <span className={T.expandPriceVal}>
-              {lineTotal != null ? formatUsdPrice(lineTotal) : "—"}
-            </span>
-            {tcgUrl && (
-              <a
-                className={T.tcgLink}
-                href={tcgUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-              >
-                TCGPlayer ↗
-              </a>
-            )}
-            <button className={T.expandMoveBtn} onClick={onMove}>
-              {moveLabel}
-            </button>
-          </div>
+          <span className={`${T.tagBase} ${item.finish === "foil" ? T.tagFoil : T.tagNonfoil}`}>
+            {item.finish === "foil" ? "Foil" : "NF"}
+          </span>
         </div>
+      </div>
+
+      {/* Condition — click to cycle NM → LP → MP → HP → DMG → NM */}
+      <button
+        className={T.conditionBtn}
+        onClick={() => onCondition(cycleCondition(item.condition))}
+        title={item.condition}
+      >
+        {CONDITION_CODES[item.condition] ?? "NM"}
+      </button>
+
+      {/* Finish toggle — only for dual-finish cards */}
+      {hasBothFinishes && (
+        <button
+          className={item.finish === "foil" ? T.finishBtnFoil : T.finishBtnNF}
+          onClick={() => onFinish(item.finish === "foil" ? "nonfoil" : "foil")}
+        >
+          {item.finish === "foil" ? "Foil" : "NF"}
+        </button>
       )}
+
+      {/* Vertical qty stepper: + on top, qty in middle, − on bottom */}
+      <div className={T.qtyWrap}>
+        <button className={T.qtyBtn} onClick={() => onQty(1)}>+</button>
+        <span className={T.qtyVal}>{item.qty}</span>
+        <button className={T.qtyBtn} onClick={() => onQty(-1)}>−</button>
+      </div>
+
+      {/* Line total price */}
+      <span className={lineTotal != null ? T.itemPrice : T.itemPriceDash}>
+        {lineTotal != null ? formatUsdPrice(lineTotal) : "—"}
+      </span>
+
+      {/* Remove */}
+      <button
+        className={T.removeBtn}
+        onClick={onRemove}
+        aria-label={`Remove ${card.riot_name}`}
+      >
+        ✕
+      </button>
     </div>
   );
 }
@@ -546,12 +424,9 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
   const [dragOverSide, setDragOverSide] = useState<TradeSide | null>(null);
   const [activeDrag, setActiveDrag] = useState<{ key: string; fromSide: TradeSide } | null>(null);
 
-  const [expandedKey, setExpandedKey] = useState<string | null>(null);
-  const [searchFocused, setSearchFocused] = useState(false);
   const [quickLookCard, setQuickLookCard] = useState<CardRecord | null>(null);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
-
   const debouncedQuery = useDebounce(searchQuery, 150);
 
   useEffect(() => {
@@ -560,10 +435,8 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
       setSearching(false);
       return;
     }
-
     let cancelled = false;
     setSearching(true);
-
     searchCards(`${debouncedQuery} unique:id`)
       .then((resp) => {
         if (!cancelled) {
@@ -577,7 +450,6 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
           setSearching(false);
         }
       });
-
     return () => { cancelled = true; };
   }, [debouncedQuery]);
 
@@ -603,7 +475,6 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
     const updater = (prev: TradeItem[]) => prev.filter((i) => i.key !== key);
     if (side === "mine") setMine(updater);
     else setYours(updater);
-    if (expandedKey === key) setExpandedKey(null);
   }
 
   function updateQty(key: string, side: TradeSide, delta: number) {
@@ -638,7 +509,6 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
 
     if (side === "mine") setMine(updater);
     else setYours(updater);
-    if (expandedKey === key) setExpandedKey(newKey);
   }
 
   function moveItem(key: string, fromSide: TradeSide) {
@@ -660,7 +530,6 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
 
     if (fromSide === "mine") { setMine(fromUpdater); setYours(toUpdater); }
     else { setYours(fromUpdater); setMine(toUpdater); }
-    setExpandedKey(null);
   }
 
   // ── Price helpers ──
@@ -761,38 +630,17 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
             </p>
           </div>
 
-          {/* Mobile compact strip — visible when search open */}
-          {searchFocused && (
-            <div className={T.compactStrip}>
-              <div className={T.compactSide}>
-                <span className={`${T.compactLabel} text-[var(--color-positive-strong)]`}>Mine</span>
-                <span className={T.compactTotal}>{formatUsdPrice(mineTotal) ?? "$0.00"}</span>
-              </div>
-              <span className={`${T.compactDeltaPill} ${
-                deltaSign === "pos" ? T.compactDeltaPos
-                : deltaSign === "neg" ? T.compactDeltaNeg
-                : T.compactDeltaEven
-              }`}>
-                {formatDelta(delta)}
-              </span>
-              <div className={`${T.compactSide} ${T.compactSideRight}`}>
-                <span className={`${T.compactLabel} text-[var(--color-negative)]`}>Yours</span>
-                <span className={T.compactTotal}>{formatUsdPrice(yoursTotal) ?? "$0.00"}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Main 3-col grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-[1fr_280px_1fr] gap-3 sm:gap-4">
+          {/* Main grid: stacked on mobile, 3-col on sm+ */}
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_260px_1fr] gap-3 sm:gap-4">
 
             {/* ── Mine ── */}
             <div
-              className={`${T.mineSection} ${dragOverSide === "mine" ? T.dropTarget : ""} ${searchFocused ? "hidden sm:flex" : ""} min-h-[160px] sm:min-h-0`}
+              className={`${T.mineSection} ${dragOverSide === "mine" ? T.dropTarget : ""} min-h-[140px]`}
               onDragOver={(e) => handleDragOver(e, "mine")}
               onDragLeave={() => setDragOverSide(null)}
               onDrop={() => handleDrop("mine")}
             >
-              <div className={T.mineHeader}>
+              <div className={T.sectionHeader}>
                 <span className={T.mineLabel}>Mine</span>
                 <span className={T.sideTotal}>{formatUsdPrice(mineTotal) ?? "$0.00"}</span>
               </div>
@@ -806,21 +654,16 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
                   </div>
                 ) : (
                   mine.map((item) => (
-                    <TradeCardBar
+                    <TradeItemRow
                       key={item.key}
                       item={item}
                       side="mine"
                       itemPrice={getItemPrice(item)}
                       tcgUrl={getItemTcgUrl(item)}
-                      isExpanded={expandedKey === item.key}
-                      onToggleExpand={() =>
-                        setExpandedKey(expandedKey === item.key ? null : item.key)
-                      }
                       onQty={(d) => updateQty(item.key, "mine", d)}
                       onCondition={(c) => updateCondition(item.key, "mine", c)}
                       onFinish={(f) => updateFinish(item.key, "mine", f)}
                       onRemove={() => removeItem(item.key, "mine")}
-                      onMove={() => moveItem(item.key, "mine")}
                       onDragStart={() => handleDragStart(item.key, "mine")}
                       onDragEnd={handleDragEnd}
                       onNavigate={onNavigate}
@@ -832,7 +675,7 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
             </div>
 
             {/* ── Search ── */}
-            <div className={`${T.searchSection} ${searchFocused ? "flex-1 sm:flex-none" : ""}`}>
+            <div className={T.searchSection}>
               <div className={T.searchHeader}>
                 <h2 className={T.searchTitle}>Add Cards</h2>
               </div>
@@ -846,12 +689,8 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
                     value={searchQuery}
                     autoComplete="off"
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => setSearchFocused(true)}
-                    onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
                   />
-                  {searching && (
-                    <span className={T.searchSpinner} aria-hidden="true" />
-                  )}
+                  {searching && <span className={T.searchSpinner} aria-hidden="true" />}
                   {searchQuery && !searching && (
                     <button
                       className={T.searchClearBtn}
@@ -865,7 +704,7 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
                 </div>
 
                 {(showSearchHint || showNoResults || searchResults.length > 0) && (
-                  <div className={`${T.searchResults} ${searchFocused ? "max-h-[55vh]" : "max-h-[360px]"}`}>
+                  <div className={T.searchResults}>
                     {showSearchHint && (
                       <p className={T.searchHint}>Type at least 2 characters to search</p>
                     )}
@@ -887,12 +726,12 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
 
             {/* ── Yours ── */}
             <div
-              className={`${T.yoursSection} ${dragOverSide === "yours" ? T.dropTarget : ""} ${searchFocused ? "hidden sm:flex" : ""} min-h-[160px] sm:min-h-0`}
+              className={`${T.yoursSection} ${dragOverSide === "yours" ? T.dropTarget : ""} min-h-[140px]`}
               onDragOver={(e) => handleDragOver(e, "yours")}
               onDragLeave={() => setDragOverSide(null)}
               onDrop={() => handleDrop("yours")}
             >
-              <div className={T.yoursHeader}>
+              <div className={T.sectionHeader}>
                 <span className={T.yoursLabel}>Yours</span>
                 <span className={T.sideTotal}>{formatUsdPrice(yoursTotal) ?? "$0.00"}</span>
               </div>
@@ -906,21 +745,16 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
                   </div>
                 ) : (
                   yours.map((item) => (
-                    <TradeCardBar
+                    <TradeItemRow
                       key={item.key}
                       item={item}
                       side="yours"
                       itemPrice={getItemPrice(item)}
                       tcgUrl={getItemTcgUrl(item)}
-                      isExpanded={expandedKey === item.key}
-                      onToggleExpand={() =>
-                        setExpandedKey(expandedKey === item.key ? null : item.key)
-                      }
                       onQty={(d) => updateQty(item.key, "yours", d)}
                       onCondition={(c) => updateCondition(item.key, "yours", c)}
                       onFinish={(f) => updateFinish(item.key, "yours", f)}
                       onRemove={() => removeItem(item.key, "yours")}
-                      onMove={() => moveItem(item.key, "yours")}
                       onDragStart={() => handleDragStart(item.key, "yours")}
                       onDragEnd={handleDragEnd}
                       onNavigate={onNavigate}
@@ -932,12 +766,11 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
             </div>
 
             {/* ── Delta bar (desktop) ── */}
-            <div
-              className={`${T.deltaBar} ${searchFocused ? "hidden" : ""}`}
-              style={deltaBarStyle}
-            >
+            <div className={T.deltaBar} style={deltaBarStyle}>
               <div className={T.deltaSide}>
-                <span className={`${T.deltaSideLabel} text-[var(--color-positive-strong)] opacity-75`}>Mine</span>
+                <span className={`${T.deltaSideLabel} text-[var(--color-positive-strong)] opacity-75`}>
+                  Mine
+                </span>
                 <span className={T.deltaSideTotal}>{formatUsdPrice(mineTotal) ?? "$0.00"}</span>
               </div>
               <span className={T.deltaArrow} aria-hidden="true">⟵</span>
@@ -954,26 +787,26 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
               </div>
               <span className={T.deltaArrow} aria-hidden="true">⟶</span>
               <div className={T.deltaSide}>
-                <span className={`${T.deltaSideLabel} text-[var(--color-negative)] opacity-75`}>Yours</span>
+                <span className={`${T.deltaSideLabel} text-[var(--color-negative)] opacity-75`}>
+                  Yours
+                </span>
                 <span className={T.deltaSideTotal}>{formatUsdPrice(yoursTotal) ?? "$0.00"}</span>
               </div>
             </div>
           </div>
 
           {/* Mobile delta strip */}
-          {!searchFocused && (
-            <div className={`${T.mobileDelta} ${
-              deltaSign === "pos" ? T.mobileDeltaPos
-              : deltaSign === "neg" ? T.mobileDeltaNeg
-              : T.mobileDeltaEven
-            }`}>
-              {delta === 0
-                ? "Trade is even"
-                : delta > 0
-                ? `You're offering ${formatUsdPrice(Math.abs(delta))} more`
-                : `You're offering ${formatUsdPrice(Math.abs(delta))} less`}
-            </div>
-          )}
+          <div className={`${T.mobileDelta} ${
+            deltaSign === "pos" ? T.mobileDeltaPos
+            : deltaSign === "neg" ? T.mobileDeltaNeg
+            : T.mobileDeltaEven
+          }`}>
+            {delta === 0
+              ? "Trade is even"
+              : delta > 0
+              ? `You're offering ${formatUsdPrice(Math.abs(delta))} more`
+              : `You're offering ${formatUsdPrice(Math.abs(delta))} less`}
+          </div>
         </div>
       </div>
 
