@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import { searchCards } from "../api";
+import { useRef, useState } from "react";
 import { CardSummaryPopup, VariantSelectorRow, type VariantSelection } from "../features";
 import { normalizeCardFinish } from "../lib";
 import { ResultCard } from "../ui-elements";
@@ -12,6 +11,7 @@ import {
   type PublishedPriceRow,
 } from "../lib";
 import { useDebounce } from "../lib";
+import { useCardSearchResults } from "../data/cards";
 import type { CardRecord } from "../types";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -88,10 +88,11 @@ const T = {
   // ── Trade search card footer (add buttons) ────────────────────────────
 
   srFooter: "flex flex-col gap-2 pt-1",
+  srBtnRow: "grid grid-cols-2 gap-1.5",
   srBtnMine:
-    "w-full py-1.5 rounded-xl text-[0.72rem] font-semibold bg-[rgba(25,65,38,0.65)] text-[var(--color-positive-strong)] border border-[rgba(42,143,82,0.32)] hover:bg-[rgba(25,65,38,0.9)] transition-colors",
+    "py-1.5 rounded-xl text-[0.72rem] font-semibold bg-[rgba(25,65,38,0.65)] text-[var(--color-positive-strong)] border border-[rgba(42,143,82,0.32)] hover:bg-[rgba(25,65,38,0.9)] transition-colors",
   srBtnYours:
-    "w-full py-1.5 rounded-xl text-[0.72rem] font-semibold bg-[rgba(65,12,18,0.65)] text-[var(--color-negative)] border border-[rgba(181,32,56,0.32)] hover:bg-[rgba(65,12,18,0.9)] transition-colors",
+    "py-1.5 rounded-xl text-[0.72rem] font-semibold bg-[rgba(65,12,18,0.65)] text-[var(--color-negative)] border border-[rgba(181,32,56,0.32)] hover:bg-[rgba(65,12,18,0.9)] transition-colors",
 
   // ── Trade item row ────────────────────────────────────────────────────
 
@@ -255,18 +256,20 @@ function TradeSearchResultCard({
         publishedPriceIndex={priceIndex}
         onVariantSelect={handleVariantSelect}
       />
-      <button
-        className={T.srBtnMine}
-        onClick={() => onAdd(selected.card, selected.finish, "mine")}
-      >
-        + Mine
-      </button>
-      <button
-        className={T.srBtnYours}
-        onClick={() => onAdd(selected.card, selected.finish, "yours")}
-      >
-        + Yours
-      </button>
+      <div className={T.srBtnRow}>
+        <button
+          className={T.srBtnMine}
+          onClick={() => onAdd(selected.card, selected.finish, "mine")}
+        >
+          + Mine
+        </button>
+        <button
+          className={T.srBtnYours}
+          onClick={() => onAdd(selected.card, selected.finish, "yours")}
+        >
+          + Yours
+        </button>
+      </div>
     </div>
   );
 
@@ -400,8 +403,6 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
   const [yours, setYours] = useState<TradeItem[]>([]);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<CardRecord[]>([]);
-  const [searching, setSearching] = useState(false);
 
   const [dragOverSide, setDragOverSide] = useState<TradeSide | null>(null);
   const [activeDrag, setActiveDrag] = useState<{ key: string; fromSide: TradeSide } | null>(null);
@@ -409,31 +410,10 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
   const [quickLookCard, setQuickLookCard] = useState<CardRecord | null>(null);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const debouncedQuery = useDebounce(searchQuery, 150);
-
-  useEffect(() => {
-    if (debouncedQuery.trim().length < 2) {
-      setSearchResults([]);
-      setSearching(false);
-      return;
-    }
-    let cancelled = false;
-    setSearching(true);
-    searchCards(`${debouncedQuery} unique:id`)
-      .then((resp) => {
-        if (!cancelled) {
-          setSearchResults(resp.items.slice(0, 20));
-          setSearching(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setSearchResults([]);
-          setSearching(false);
-        }
-      });
-    return () => { cancelled = true; };
-  }, [debouncedQuery]);
+  const debouncedQuery = useDebounce(searchQuery, 300);
+  const activeQuery = debouncedQuery.trim().length >= 2 ? debouncedQuery.trim() : "";
+  const { data: searchData, isFetching: searching } = useCardSearchResults(activeQuery);
+  const searchResults = searchData?.items ?? [];
 
   // ── Item mutations ──
 
@@ -576,13 +556,11 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
     setDragOverSide(null);
   }
 
-  const showSearchHint = debouncedQuery.trim().length < 2 && !searching;
-  const showNoResults =
-    debouncedQuery.trim().length >= 2 && !searching && searchResults.length === 0;
+  const showSearchHint = activeQuery.length === 0 && !searching;
+  const showNoResults = activeQuery.length > 0 && !searching && searchResults.length === 0;
 
   function clearSearch() {
     setSearchQuery("");
-    setSearchResults([]);
     searchInputRef.current?.focus();
   }
 
