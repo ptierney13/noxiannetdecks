@@ -6,6 +6,7 @@ import CardSearchView from "../pages/CardSearchView";
 import LearnToSearchView from "../pages/LearnToSearchView";
 import QueryBuilderView from "../pages/QueryBuilderView";
 import CardDetailView from "../pages/CardDetailView";
+import DeckEditorPage from "../pages/DeckEditorPage";
 import DeckExplorerView from "../pages/DeckExplorerView";
 import TierListView from "../pages/TierListView";
 import SealedSimulator from "../pages/legacy/SealedSimulator";
@@ -69,6 +70,12 @@ const cardDetailRoute = createRoute({
     const { cardId } = cardDetailRoute.useParams();
     return <CardDetailView cardId={cardId} />;
   },
+});
+
+const decksCreateRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "decks/create",
+  component: () => <DeckEditorPage />,
 });
 
 const deckExplorerIndexRoute = createRoute({
@@ -146,6 +153,7 @@ const notFoundRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   indexRoute,
   cardsRoute,
+  decksCreateRoute,
   cardsLearnToSearchRoute,
   cardsQueryBuilderRoute,
   cardDetailRoute,

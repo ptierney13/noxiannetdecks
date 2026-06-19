@@ -1,6 +1,11 @@
 {
   "initiatives": [
     {
+      "path": "docs/work/deck-editor-mobile-v1.md",
+      "type": "single-file",
+      "status": "plan"
+    },
+    {
       "path": "docs/work/ai-reliability-uplift",
       "type": "staged-folder",
       "status": "in progress"

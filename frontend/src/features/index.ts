@@ -1,3 +1,4 @@
+export { DeckEditorShell } from "./deck-editor";
 export {
   VariantSelectorRow,
   normalizeCardFinish,
