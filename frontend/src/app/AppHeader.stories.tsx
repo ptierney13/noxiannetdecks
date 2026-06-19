@@ -51,7 +51,7 @@ export const Desktop: Story = {
     viewport: { defaultViewport: "desktop" },
     docs: {
       description: {
-        story: "Desktop (900px) — between md (768px) and lg (1024px). Inline nav visible (Cards, Deck Explorer, Tools), hamburger collapsed, no wordmark yet.",
+        story: "Desktop (900px) — between md (768px) and lg (1024px). Inline nav visible (Cards, Decks, Tools), hamburger collapsed, no wordmark yet.",
       },
     },
   },

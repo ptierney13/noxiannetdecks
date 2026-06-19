@@ -6,7 +6,7 @@ import { useHeaderSearch } from "./HeaderSearchContext";
 
 function resolveActiveSection(pathname: string) {
   if (pathname === "/" || pathname === "/home") return "home";
-  if (pathname.startsWith("/deck-explorer")) return "deck-explorer";
+  if (pathname.startsWith("/deck-explorer") || pathname.startsWith("/decks")) return "decks";
   if (pathname.startsWith("/cards")) return "cards";
   if (pathname.startsWith("/tools/tier-list")) return "tools-tier-list";
   if (pathname.startsWith("/tools/sealed-pools")) return "tools-sealed-pools";
@@ -38,12 +38,15 @@ export function AppHeader() {
   const toolsMenuRef = useRef<HTMLDivElement | null>(null);
   const [showCardsMenu, setShowCardsMenu] = useState(false);
   const cardsMenuRef = useRef<HTMLDivElement | null>(null);
+  const [showDecksMenu, setShowDecksMenu] = useState(false);
+  const decksMenuRef = useRef<HTMLDivElement | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setShowToolsMenu(false);
     setShowCardsMenu(false);
+    setShowDecksMenu(false);
     setShowMenu(false);
   }, [pathname]);
 
@@ -55,6 +58,9 @@ export function AppHeader() {
       if (cardsMenuRef.current && !cardsMenuRef.current.contains(event.target as Node)) {
         setShowCardsMenu(false);
       }
+      if (decksMenuRef.current && !decksMenuRef.current.contains(event.target as Node)) {
+        setShowDecksMenu(false);
+      }
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setShowMenu(false);
       }
@@ -64,6 +70,7 @@ export function AppHeader() {
       if (event.key === "Escape") {
         setShowToolsMenu(false);
         setShowCardsMenu(false);
+        setShowDecksMenu(false);
         setShowMenu(false);
       }
     }
@@ -90,9 +97,17 @@ export function AppHeader() {
 
   const cardItems = cardNavItems.map(item => ({ ...item, selected: pathname === item.href }));
   const toolItems = toolNavItems.map(item => ({ ...item, selected: pathname === item.href }));
+  const decksMyItems = [
+    { href: "/decks/create", label: "Create", selected: pathname === "/decks/create" },
+    { href: "/decks/library", label: "Library", selected: pathname === "/decks/library" },
+  ];
+  const decksPublicItems = [
+    { href: "/deck-explorer", label: "Metagame", selected: pathname.startsWith("/deck-explorer") },
+  ];
   const navSections: MenuSection[] = [
     { title: "Cards", items: cardItems },
-    { title: "Explore", items: [{ href: "/deck-explorer", label: "Deck Explorer", selected: pathname === "/deck-explorer" }] },
+    { title: "My Decks", items: decksMyItems },
+    { title: "Public Decks", items: decksPublicItems },
     { title: "Tools", items: toolItems },
   ];
 
@@ -194,7 +209,27 @@ export function AppHeader() {
                 />
               ) : null}
             </div>
-            <MenuItem variant="inline" href="/deck-explorer" label="Deck Explorer" />
+            <div className="relative" ref={decksMenuRef}>
+              <MenuItem
+                variant="inline"
+                label="Decks"
+                chevron
+                onClick={() => { setShowDecksMenu(c => !c); setShowCardsMenu(false); setShowToolsMenu(false); setShowMenu(false); }}
+                selected={activeSection === "decks"}
+                aria-expanded={showDecksMenu}
+                aria-haspopup="menu"
+              />
+              {showDecksMenu ? (
+                <Menu
+                  sections={[
+                    { title: "My Decks", items: decksMyItems },
+                    { title: "Public Decks", items: decksPublicItems },
+                  ]}
+                  aria-label="Decks"
+                  className="absolute right-0 top-[calc(100%+0.65rem)] min-w-[14rem] z-10"
+                />
+              ) : null}
+            </div>
             <div className="relative" ref={toolsMenuRef}>
               <MenuItem
                 variant="inline"
