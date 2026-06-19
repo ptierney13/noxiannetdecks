@@ -3,6 +3,7 @@ import { CardSummaryPopup, VariantSelectorRow, type VariantSelection } from "../
 import { normalizeCardFinish } from "../lib";
 import { ResultCard } from "../ui-elements";
 import {
+  buildCardSearchResultGroups,
   formatUsdPrice,
   getPublishedRowsForCard,
   normalizePrinting,
@@ -94,7 +95,7 @@ const T = {
   srBtnYours:
     "py-1.5 rounded-xl text-[0.72rem] font-semibold bg-[rgba(65,12,18,0.65)] text-[var(--color-negative)] border border-[rgba(181,32,56,0.32)] hover:bg-[rgba(65,12,18,0.9)] transition-colors",
 
-  // ── Trade item row ────────────────────────────────────────────────────
+  // ── Trade item row — sized ~30% larger than baseline ──────────────────
 
   sideBody:
     "flex-1 flex flex-col overflow-y-auto divide-y divide-[rgba(255,255,255,0.05)]",
@@ -102,17 +103,17 @@ const T = {
     "flex-1 flex flex-col items-center justify-center gap-2 py-10 px-4 text-center",
 
   itemRow:
-    "flex items-center gap-2.5 px-3 py-2 hover:bg-[rgba(255,255,255,0.025)] transition-colors duration-[120ms]",
+    "flex items-center gap-3 px-3 py-2.5 hover:bg-[rgba(255,255,255,0.025)] transition-colors duration-[120ms]",
   artWrap:
-    "shrink-0 w-9 h-[52px] rounded-md overflow-hidden bg-[rgba(255,255,255,0.05)] cursor-pointer",
+    "shrink-0 w-[46px] h-[67px] rounded-md overflow-hidden bg-[rgba(255,255,255,0.05)] cursor-pointer",
   artImg: "w-full h-full object-cover hover:opacity-85 transition-opacity",
   artPlaceholder: "w-full h-full bg-[rgba(255,255,255,0.03)]",
 
   cardInfo: "flex-1 min-w-0",
   cardName:
-    "text-[0.8rem] font-medium text-[var(--color-text-primary)] leading-tight truncate",
+    "text-[1.0rem] font-medium text-[var(--color-text-primary)] leading-tight truncate",
   cardTags: "flex flex-wrap gap-1 mt-0.5",
-  tagBase: "rounded px-1.5 py-0.5 text-[0.62rem] font-medium leading-none border",
+  tagBase: "rounded px-2 py-[3px] text-[0.72rem] font-medium leading-none border",
   tagRarity:
     "bg-[rgba(201,129,58,0.1)] text-[var(--color-warning)] border-[rgba(201,129,58,0.28)]",
   tagFoil:
@@ -121,47 +122,40 @@ const T = {
     "bg-[rgba(255,255,255,0.04)] text-[var(--color-text-dim)] border-[rgba(255,255,255,0.1)]",
 
   conditionBtn:
-    "shrink-0 text-[0.65rem] font-bold tracking-wide text-[var(--color-accent-warm)] bg-[rgba(215,170,73,0.1)] border border-[rgba(215,170,73,0.25)] rounded-md px-1.5 py-1 hover:bg-[rgba(215,170,73,0.18)] transition-colors cursor-pointer min-w-[2rem] text-center leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
+    "shrink-0 text-[0.8rem] font-bold tracking-wide text-[var(--color-accent-warm)] bg-[rgba(215,170,73,0.1)] border border-[rgba(215,170,73,0.25)] rounded-md px-2 py-[5px] hover:bg-[rgba(215,170,73,0.18)] transition-colors cursor-pointer min-w-[2.6rem] text-center leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
   finishBtnFoil:
-    "shrink-0 text-[0.62rem] font-medium text-[#d4a0f0] bg-[rgba(212,160,240,0.08)] border border-[rgba(212,160,240,0.22)] rounded-md px-1.5 py-1 hover:bg-[rgba(212,160,240,0.16)] transition-colors cursor-pointer leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
+    "shrink-0 text-[0.75rem] font-medium text-[#d4a0f0] bg-[rgba(212,160,240,0.08)] border border-[rgba(212,160,240,0.22)] rounded-md px-2 py-[5px] hover:bg-[rgba(212,160,240,0.16)] transition-colors cursor-pointer leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
   finishBtnNF:
-    "shrink-0 text-[0.62rem] font-medium text-[var(--color-text-dim)] bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] rounded-md px-1.5 py-1 hover:bg-[rgba(255,255,255,0.08)] transition-colors cursor-pointer leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
+    "shrink-0 text-[0.75rem] font-medium text-[var(--color-text-dim)] bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] rounded-md px-2 py-[5px] hover:bg-[rgba(255,255,255,0.08)] transition-colors cursor-pointer leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
 
   qtyWrap: "shrink-0 flex flex-col items-center",
   qtyBtn:
-    "w-5 h-[18px] flex items-center justify-center text-[0.7rem] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[rgba(255,255,255,0.07)] rounded transition-colors leading-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-focus-ring)]",
+    "w-[26px] h-[24px] flex items-center justify-center text-[0.9rem] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[rgba(255,255,255,0.07)] rounded transition-colors leading-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-focus-ring)]",
   qtyVal:
-    "text-[0.8rem] font-mono font-bold text-[var(--color-text-primary)] min-w-[1.25rem] text-center leading-tight py-[2px]",
+    "text-[1.0rem] font-mono font-bold text-[var(--color-text-primary)] min-w-[1.6rem] text-center leading-tight py-[2px]",
 
   itemPrice:
-    "shrink-0 font-mono text-[0.8rem] text-[var(--color-price)] min-w-[3.25rem] text-right",
+    "shrink-0 font-mono text-[1.0rem] text-[var(--color-price)] min-w-[4.25rem] text-right",
   itemPriceDash:
-    "shrink-0 font-mono text-[0.8rem] text-[var(--color-text-dim)] min-w-[3.25rem] text-right",
+    "shrink-0 font-mono text-[1.0rem] text-[var(--color-text-dim)] min-w-[4.25rem] text-right",
 
   removeBtn:
     "shrink-0 w-5 h-5 flex items-center justify-center text-[0.65rem] opacity-25 hover:opacity-90 text-[var(--color-negative)] transition-opacity rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-focus-ring)]",
 
-  // ── Delta bar ─────────────────────────────────────────────────────────
+  // ── Delta bar — shown at all sizes, gradient always on ────────────────
 
   deltaBar:
-    "hidden lg:flex items-center justify-between px-6 py-5 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.07)]",
-  deltaSide: "flex flex-col items-center gap-1 min-w-[6rem]",
-  deltaSideLabel: "text-[0.65rem] font-bold tracking-[0.1em] uppercase",
+    "flex items-center justify-between px-3 py-3 lg:px-6 lg:py-5 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.07)]",
+  deltaSide: "flex flex-col items-center gap-0.5 min-w-[4.5rem] lg:min-w-[6rem]",
+  deltaSideLabel: "text-[0.6rem] lg:text-[0.65rem] font-bold tracking-[0.1em] uppercase",
   deltaSideTotal:
-    "font-mono text-xl font-bold text-[var(--color-text-primary)]",
-  deltaMid: "flex flex-col items-center gap-1",
+    "font-mono text-base lg:text-xl font-bold text-[var(--color-text-primary)]",
+  deltaMid: "flex flex-col items-center gap-0.5 lg:gap-1",
   deltaMidLabel:
-    "text-[0.65rem] font-bold tracking-[0.1em] uppercase text-[var(--color-text-tertiary)]",
-  deltaMidNote: "text-[0.67rem] text-[var(--color-text-dim)]",
-  deltaArrow: "text-[var(--color-text-dim)] text-lg opacity-40",
-
-  mobileDelta: "lg:hidden rounded-xl px-4 py-3 text-sm font-semibold text-center",
-  mobileDeltaEven:
-    "bg-[rgba(255,255,255,0.04)] text-[var(--color-text-tertiary)] border border-[rgba(255,255,255,0.07)]",
-  mobileDeltaPos:
-    "bg-[rgba(42,143,82,0.12)] text-[var(--color-positive-strong)] border border-[rgba(42,143,82,0.2)]",
-  mobileDeltaNeg:
-    "bg-[rgba(181,32,56,0.12)] text-[var(--color-negative)] border border-[rgba(181,32,56,0.2)]",
+    "text-[0.6rem] lg:text-[0.65rem] font-bold tracking-[0.1em] uppercase text-[var(--color-text-tertiary)]",
+  deltaMidNote: "hidden lg:block text-[0.67rem] text-[var(--color-text-dim)]",
+  deltaArrow: "text-[var(--color-text-dim)] text-base lg:text-lg opacity-40",
+  deltaValue: "font-mono text-xl lg:text-2xl font-bold",
 
   dropTarget: "ring-2 ring-inset ring-[rgba(255,255,255,0.2)] brightness-110",
 } as const;
@@ -206,51 +200,41 @@ function formatDelta(delta: number): string {
   return `${sign}${formatUsdPrice(Math.abs(delta)) ?? ""}`;
 }
 
-function nearMintPrice(
-  index: PublishedPriceIndex | null,
-  card: CardRecord
-): number | null {
-  const rows = getPublishedRowsForCard(index, card.tcgplayer_id);
-  const foilRow = resolveItemPrice(rows, "foil", "near mint");
-  const nonfoilRow = resolveItemPrice(rows, "nonfoil", "near mint");
-  const def = defaultFinish(card);
-  return (def === "foil" ? foilRow : nonfoilRow) ?? foilRow ?? nonfoilRow;
-}
-
 function cycleCondition(current: string): string {
   const idx = CONDITIONS.indexOf(current as (typeof CONDITIONS)[number]);
   return CONDITIONS[(idx + 1) % CONDITIONS.length];
 }
 
-// ── TradeSearchResultCard — uses site's ResultCard + VariantSelectorRow ───────
+// ── TradeSearchResultCard — ResultCard + grouped VariantSelectorRow ────────
 
 function TradeSearchResultCard({
-  card,
+  cards,
   priceIndex,
   onAdd,
   onQuickLook,
 }: {
-  card: CardRecord;
+  cards: CardRecord[];
   priceIndex: PublishedPriceIndex | null;
   onAdd: (card: CardRecord, finish: "foil" | "nonfoil", side: TradeSide) => void;
   onQuickLook: (card: CardRecord) => void;
 }) {
-  const initFinish = defaultFinish(card);
-  const [activeKey, setActiveKey] = useState(`${card.id}-${initFinish}`);
+  const representative = cards[0]!;
+  const initFinish = defaultFinish(representative);
+  const [activeKey, setActiveKey] = useState(`${representative.id}-${initFinish}`);
   const [selected, setSelected] = useState<{ card: CardRecord; finish: "foil" | "nonfoil" }>({
-    card,
+    card: representative,
     finish: initFinish,
   });
 
-  function handleVariantSelect({ card: c, finish, key }: VariantSelection) {
-    setSelected({ card: c, finish: finish as "foil" | "nonfoil" });
+  function handleVariantSelect({ card, finish, key }: VariantSelection) {
+    setSelected({ card, finish: finish as "foil" | "nonfoil" });
     setActiveKey(key);
   }
 
   const footer = (
     <div className={T.srFooter}>
       <VariantSelectorRow
-        cards={[card]}
+        cards={cards}
         activeKey={activeKey}
         showPrice={true}
         publishedPriceIndex={priceIndex}
@@ -275,11 +259,11 @@ function TradeSearchResultCard({
 
   return (
     <ResultCard
-      name={card.riot_name}
-      imageUrl={card.media.image_url}
-      imageAlt={card.media.accessibility_text ?? card.riot_name}
+      name={representative.riot_name}
+      imageUrl={representative.media.image_url}
+      imageAlt={representative.media.accessibility_text ?? representative.riot_name}
       footer={footer}
-      onClick={() => onQuickLook(card)}
+      onClick={() => onQuickLook(selected.card)}
     />
   );
 }
@@ -414,6 +398,7 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
   const activeQuery = debouncedQuery.trim().length >= 2 ? debouncedQuery.trim() : "";
   const { data: searchData, isFetching: searching } = useCardSearchResults(activeQuery);
   const searchResults = searchData?.items ?? [];
+  const searchGroups = buildCardSearchResultGroups(searchResults, "unique-cards");
 
   // ── Item mutations ──
 
@@ -557,7 +542,7 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
   }
 
   const showSearchHint = activeQuery.length === 0 && !searching;
-  const showNoResults = activeQuery.length > 0 && !searching && searchResults.length === 0;
+  const showNoResults = activeQuery.length > 0 && !searching && searchGroups.length === 0;
 
   function clearSearch() {
     setSearchQuery("");
@@ -583,6 +568,32 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
       />
     ));
   }
+
+  // ── Delta bar — shown at all sizes with runtime gradient ──
+
+  const deltaBar = (
+    <div className={T.deltaBar} style={deltaBarStyle}>
+      <div className={T.deltaSide}>
+        <span className={`${T.deltaSideLabel} text-[var(--color-positive-strong)] opacity-75`}>Mine</span>
+        <span className={T.deltaSideTotal}>{formatUsdPrice(mineTotal) ?? "$0.00"}</span>
+      </div>
+      <span className={T.deltaArrow} aria-hidden="true">⟵</span>
+      <div className={T.deltaMid}>
+        <span className={T.deltaMidLabel}>Difference</span>
+        <span className={`${T.deltaValue} ${deltaValueClass}`}>{formatDelta(delta)}</span>
+        {delta !== 0 && (
+          <span className={T.deltaMidNote}>
+            {delta > 0 ? "You're offering more" : "You're offering less"}
+          </span>
+        )}
+      </div>
+      <span className={T.deltaArrow} aria-hidden="true">⟶</span>
+      <div className={T.deltaSide}>
+        <span className={`${T.deltaSideLabel} text-[var(--color-negative)] opacity-75`}>Yours</span>
+        <span className={T.deltaSideTotal}>{formatUsdPrice(yoursTotal) ?? "$0.00"}</span>
+      </div>
+    </div>
+  );
 
   const mineSection = (
     <div
@@ -667,12 +678,12 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
         {showNoResults && (
           <p className={T.searchHint}>No cards found for "{debouncedQuery}"</p>
         )}
-        {searchResults.length > 0 && (
+        {searchGroups.length > 0 && (
           <div className={T.resultsGrid}>
-            {searchResults.map((card) => (
+            {searchGroups.map((group) => (
               <TradeSearchResultCard
-                key={card.id}
-                card={card}
+                key={group.key}
+                cards={group.cards}
                 priceIndex={priceIndex}
                 onAdd={(c, finish, side) => addCard(c, side, finish)}
                 onQuickLook={setQuickLookCard}
@@ -684,47 +695,10 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
     </div>
   );
 
-  const deltaBar = (
-    <div className={T.deltaBar} style={deltaBarStyle}>
-      <div className={T.deltaSide}>
-        <span className={`${T.deltaSideLabel} text-[var(--color-positive-strong)] opacity-75`}>Mine</span>
-        <span className={T.deltaSideTotal}>{formatUsdPrice(mineTotal) ?? "$0.00"}</span>
-      </div>
-      <span className={T.deltaArrow} aria-hidden="true">⟵</span>
-      <div className={T.deltaMid}>
-        <span className={T.deltaMidLabel}>Difference</span>
-        <span className={`font-mono text-2xl font-bold ${deltaValueClass}`}>{formatDelta(delta)}</span>
-        {delta !== 0 && (
-          <span className={T.deltaMidNote}>
-            {delta > 0 ? "You're offering more" : "You're offering less"}
-          </span>
-        )}
-      </div>
-      <span className={T.deltaArrow} aria-hidden="true">⟶</span>
-      <div className={T.deltaSide}>
-        <span className={`${T.deltaSideLabel} text-[var(--color-negative)] opacity-75`}>Yours</span>
-        <span className={T.deltaSideTotal}>{formatUsdPrice(yoursTotal) ?? "$0.00"}</span>
-      </div>
-    </div>
-  );
-
-  const mobileDelta = (
-    <div className={`${T.mobileDelta} ${
-      deltaSign === "pos" ? T.mobileDeltaPos
-      : deltaSign === "neg" ? T.mobileDeltaNeg
-      : T.mobileDeltaEven
-    }`}>
-      {delta === 0
-        ? "Trade is even"
-        : delta > 0
-        ? `You're offering ${formatUsdPrice(Math.abs(delta))} more`
-        : `You're offering ${formatUsdPrice(Math.abs(delta))} less`}
-    </div>
-  );
-
   // ── Render ──
-  // Mobile (< lg): Mine → Search (fixed-height scrollable) → Yours → delta strip
-  // Desktop (lg+): Mine | Yours (2-col row 1), Search full-width (row 2), delta bar (row 3)
+  // Delta bar at top for all sizes.
+  // Mobile (< lg): delta → Mine → Search (fixed-height scrollable) → Yours
+  // Desktop (lg+): delta (col-span-2) → Mine | Yours → Search (col-span-2)
 
   return (
     <>
@@ -733,27 +707,27 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
 
           {/* ── Mobile layout (< lg) ── */}
           <div className="flex flex-col gap-3 lg:hidden">
+            {deltaBar}
             {mineSection}
             <div className="h-[440px] flex flex-col">
               {searchSection}
             </div>
             {yoursSection}
-            {mobileDelta}
           </div>
 
           {/* ── Desktop layout (lg+) ── */}
           <div className="hidden lg:grid lg:grid-cols-2 lg:gap-4">
-            {/* Row 1: Mine | Yours */}
+            {/* Row 1: Delta bar (full width) */}
+            <div className="lg:col-span-2">{deltaBar}</div>
+
+            {/* Row 2: Mine | Yours */}
             <div className="min-h-[200px]">{mineSection}</div>
             <div className="min-h-[200px]">{yoursSection}</div>
 
-            {/* Row 2: Search (full width) */}
+            {/* Row 3: Search (full width) */}
             <div className="lg:col-span-2 min-h-[320px] flex flex-col">
               {searchSection}
             </div>
-
-            {/* Row 3: Delta bar (full width) */}
-            <div className="lg:col-span-2">{deltaBar}</div>
           </div>
 
         </div>
