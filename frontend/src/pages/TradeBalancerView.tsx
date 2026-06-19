@@ -35,7 +35,6 @@ const CONDITIONS = [
   "damaged",
 ] as const;
 
-// Standard card condition shorthand codes
 const CONDITION_CODES: Record<string, string> = {
   "near mint": "NM",
   "lightly played": "LP",
@@ -47,7 +46,7 @@ const CONDITION_CODES: Record<string, string> = {
 // ── Style tokens ───────────────────────────────────────────────────────────
 
 const T = {
-  // Section containers — top accent bar is the color signal
+  // Section containers
   mineSection:
     "rounded-xl overflow-hidden flex flex-col bg-[rgba(13,16,24,0.94)] border-t-[3px] border-t-[var(--color-positive-strong)] shadow-[0_0_0_1px_rgba(42,143,82,0.18),0_6px_24px_rgba(0,0,0,0.34)]",
   yoursSection:
@@ -55,7 +54,7 @@ const T = {
   searchSection:
     "rounded-xl overflow-hidden flex flex-col bg-[rgba(13,16,24,0.94)] shadow-[0_0_0_1px_rgba(197,50,71,0.16),0_0_28px_rgba(197,50,71,0.07),0_6px_24px_rgba(0,0,0,0.34)]",
 
-  // Section headers — quiet; the top bar carries the color
+  // Section headers
   sectionHeader:
     "flex items-center justify-between px-4 py-3 border-b border-[rgba(255,255,255,0.06)] shrink-0",
   mineLabel:
@@ -66,31 +65,64 @@ const T = {
     "font-mono text-base font-semibold text-[var(--color-text-primary)]",
 
   // Search header
-  searchHeader:
-    "flex items-center gap-2 px-4 pt-3.5 pb-2 shrink-0",
+  searchHeader: "flex items-center gap-3 px-4 pt-3.5 pb-3 border-b border-[rgba(255,255,255,0.06)] shrink-0",
   searchTitle:
     "text-[0.77rem] font-bold tracking-[0.04em] text-[var(--color-accent-warm)] opacity-75 leading-none",
+  searchInputWrap: "relative flex-1",
+  searchInput:
+    "w-full bg-[rgba(8,11,18,0.8)] border border-[rgba(255,255,255,0.1)] text-sm text-[var(--color-text-primary)] rounded-xl px-3.5 py-2 pr-8 placeholder:text-[var(--color-text-dim)] focus:outline-none focus:border-[rgba(197,50,71,0.5)] focus:shadow-[0_0_0_2px_var(--color-focus-ring)] transition-all",
+  searchSpinner:
+    "absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-2 border-[rgba(255,255,255,0.08)] border-t-[var(--color-accent)] animate-spin",
+  searchClearBtn:
+    "absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-[0.65rem] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors rounded focus-visible:outline-none",
 
-  // Section body
+  // Search results
+  searchBody:
+    "flex-1 overflow-y-auto p-3",
+  searchHint:
+    "py-8 text-center text-[0.75rem] text-[var(--color-text-dim)]",
+  resultsGrid:
+    "grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-2.5",
+
+  // ── Trade search card (result grid item) ──────────────────────────────
+
+  srCard:
+    "flex flex-col rounded-xl overflow-hidden bg-[rgba(20,24,36,0.7)] border border-[rgba(255,255,255,0.07)] hover:border-[rgba(255,255,255,0.13)] transition-colors",
+  srArtWrap:
+    "aspect-[5/7] bg-[rgba(255,255,255,0.04)] overflow-hidden shrink-0",
+  srArtImg:
+    "w-full h-full object-cover",
+  srArtPlaceholder:
+    "w-full h-full",
+  srInfo:
+    "px-2.5 pt-2 pb-1.5 flex flex-col gap-1 flex-1",
+  srName:
+    "text-[0.75rem] font-medium text-[var(--color-text-primary)] leading-snug line-clamp-2",
+  srMeta:
+    "text-[0.63rem] text-[var(--color-text-tertiary)] leading-snug",
+  srPrice:
+    "font-mono text-[0.75rem] text-[var(--color-price)] font-medium mt-auto pt-1",
+  srActions:
+    "grid grid-cols-2 gap-1 px-2 pb-2 pt-0 shrink-0",
+  srBtnMine:
+    "py-1.5 rounded-lg text-[0.68rem] font-semibold bg-[rgba(25,65,38,0.65)] text-[var(--color-positive-strong)] border border-[rgba(42,143,82,0.32)] hover:bg-[rgba(25,65,38,0.9)] transition-colors",
+  srBtnYours:
+    "py-1.5 rounded-lg text-[0.68rem] font-semibold bg-[rgba(65,12,18,0.65)] text-[var(--color-negative)] border border-[rgba(181,32,56,0.32)] hover:bg-[rgba(65,12,18,0.9)] transition-colors",
+
+  // ── Trade item row ────────────────────────────────────────────────────
+
   sideBody:
     "flex-1 flex flex-col overflow-y-auto divide-y divide-[rgba(255,255,255,0.05)]",
   sideBodyEmpty:
     "flex-1 flex flex-col items-center justify-center gap-2 py-10 px-4 text-center",
 
-  // ── Trade item row ──────────────────────────────────────────────────────
-
   itemRow:
     "flex items-center gap-2.5 px-3 py-2 hover:bg-[rgba(255,255,255,0.025)] transition-colors duration-[120ms]",
-
-  // Card art
   artWrap:
     "shrink-0 w-9 h-[52px] rounded-md overflow-hidden bg-[rgba(255,255,255,0.05)] cursor-pointer",
-  artImg:
-    "w-full h-full object-cover hover:opacity-85 transition-opacity",
-  artPlaceholder:
-    "w-full h-full bg-[rgba(255,255,255,0.03)]",
+  artImg: "w-full h-full object-cover hover:opacity-85 transition-opacity",
+  artPlaceholder: "w-full h-full bg-[rgba(255,255,255,0.03)]",
 
-  // Card name + tags
   cardInfo: "flex-1 min-w-0",
   cardName:
     "text-[0.8rem] font-medium text-[var(--color-text-primary)] leading-tight truncate",
@@ -103,66 +135,31 @@ const T = {
   tagNonfoil:
     "bg-[rgba(255,255,255,0.04)] text-[var(--color-text-dim)] border-[rgba(255,255,255,0.1)]",
 
-  // Condition cycle button
   conditionBtn:
     "shrink-0 text-[0.65rem] font-bold tracking-wide text-[var(--color-accent-warm)] bg-[rgba(215,170,73,0.1)] border border-[rgba(215,170,73,0.25)] rounded-md px-1.5 py-1 hover:bg-[rgba(215,170,73,0.18)] transition-colors cursor-pointer min-w-[2rem] text-center leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
-
-  // Finish toggle (dual-finish cards only)
   finishBtnFoil:
     "shrink-0 text-[0.62rem] font-medium text-[#d4a0f0] bg-[rgba(212,160,240,0.08)] border border-[rgba(212,160,240,0.22)] rounded-md px-1.5 py-1 hover:bg-[rgba(212,160,240,0.16)] transition-colors cursor-pointer leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
   finishBtnNF:
     "shrink-0 text-[0.62rem] font-medium text-[var(--color-text-dim)] bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] rounded-md px-1.5 py-1 hover:bg-[rgba(255,255,255,0.08)] transition-colors cursor-pointer leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
 
-  // Vertical qty stepper
   qtyWrap: "shrink-0 flex flex-col items-center",
   qtyBtn:
     "w-5 h-[18px] flex items-center justify-center text-[0.7rem] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[rgba(255,255,255,0.07)] rounded transition-colors leading-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-focus-ring)]",
   qtyVal:
     "text-[0.8rem] font-mono font-bold text-[var(--color-text-primary)] min-w-[1.25rem] text-center leading-tight py-[2px]",
 
-  // Line price
   itemPrice:
     "shrink-0 font-mono text-[0.8rem] text-[var(--color-price)] min-w-[3.25rem] text-right",
   itemPriceDash:
     "shrink-0 font-mono text-[0.8rem] text-[var(--color-text-dim)] min-w-[3.25rem] text-right",
 
-  // Remove
   removeBtn:
     "shrink-0 w-5 h-5 flex items-center justify-center text-[0.65rem] opacity-25 hover:opacity-90 text-[var(--color-negative)] transition-opacity rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-focus-ring)]",
 
-  // ── Search ───────────────────────────────────────────────────────────────
-
-  searchBody: "px-3 pb-3 flex flex-col gap-2",
-  searchInputWrap: "relative",
-  searchInput:
-    "w-full bg-[rgba(8,11,18,0.8)] border border-[rgba(255,255,255,0.1)] text-sm text-[var(--color-text-primary)] rounded-xl px-3.5 py-2.5 pr-8 placeholder:text-[var(--color-text-dim)] focus:outline-none focus:border-[rgba(197,50,71,0.5)] focus:shadow-[0_0_0_2px_var(--color-focus-ring)] transition-all",
-  searchSpinner:
-    "absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-2 border-[rgba(255,255,255,0.08)] border-t-[var(--color-accent)] animate-spin",
-  searchClearBtn:
-    "absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-[0.65rem] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors rounded focus-visible:outline-none",
-  searchResults:
-    "flex flex-col divide-y divide-[rgba(255,255,255,0.05)] overflow-y-auto max-h-[360px] rounded-xl bg-[rgba(8,11,18,0.6)] border border-[rgba(255,255,255,0.07)]",
-  searchHint:
-    "py-5 text-center text-[0.75rem] text-[var(--color-text-dim)]",
-
-  // Search result item
-  srItem:
-    "flex flex-col gap-1.5 px-3 py-2.5 hover:bg-[rgba(255,255,255,0.04)] transition-colors cursor-default",
-  srTop: "flex items-center justify-between gap-2",
-  srName: "text-sm font-medium text-[var(--color-text-primary)] leading-tight",
-  srPrice: "shrink-0 font-mono text-xs text-[var(--color-price)]",
-  srMeta: "flex flex-wrap items-center gap-1 text-[0.67rem] text-[var(--color-text-tertiary)]",
-  srDot: "opacity-40",
-  srActions: "flex gap-2",
-  srBtnMine:
-    "flex-1 py-1.5 rounded-lg text-[0.72rem] font-semibold bg-[rgba(25,65,38,0.6)] text-[var(--color-positive-strong)] border border-[rgba(42,143,82,0.32)] hover:bg-[rgba(25,65,38,0.85)] transition-colors",
-  srBtnYours:
-    "flex-1 py-1.5 rounded-lg text-[0.72rem] font-semibold bg-[rgba(65,12,18,0.6)] text-[var(--color-negative)] border border-[rgba(181,32,56,0.32)] hover:bg-[rgba(65,12,18,0.85)] transition-colors",
-
-  // ── Delta bar ────────────────────────────────────────────────────────────
+  // ── Delta bar ─────────────────────────────────────────────────────────
 
   deltaBar:
-    "sm:col-span-3 hidden sm:flex items-center justify-between px-6 py-5 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.07)]",
+    "hidden lg:flex items-center justify-between px-6 py-5 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.07)]",
   deltaSide: "flex flex-col items-center gap-1 min-w-[6rem]",
   deltaSideLabel: "text-[0.65rem] font-bold tracking-[0.1em] uppercase",
   deltaSideTotal:
@@ -173,8 +170,7 @@ const T = {
   deltaMidNote: "text-[0.67rem] text-[var(--color-text-dim)]",
   deltaArrow: "text-[var(--color-text-dim)] text-lg opacity-40",
 
-  // Mobile delta strip
-  mobileDelta: "sm:hidden rounded-xl px-4 py-3 text-sm font-semibold text-center",
+  mobileDelta: "lg:hidden rounded-xl px-4 py-3 text-sm font-semibold text-center",
   mobileDeltaEven:
     "bg-[rgba(255,255,255,0.04)] text-[var(--color-text-tertiary)] border border-[rgba(255,255,255,0.07)]",
   mobileDeltaPos:
@@ -182,7 +178,6 @@ const T = {
   mobileDeltaNeg:
     "bg-[rgba(181,32,56,0.12)] text-[var(--color-negative)] border border-[rgba(181,32,56,0.2)]",
 
-  // Drop target highlight
   dropTarget: "ring-2 ring-inset ring-[rgba(255,255,255,0.2)] brightness-110",
 } as const;
 
@@ -242,24 +237,21 @@ function cycleCondition(current: string): string {
   return CONDITIONS[(idx + 1) % CONDITIONS.length];
 }
 
-// ── SearchResultItem ───────────────────────────────────────────────────────
+// ── TradeSearchCard — card grid result with + Mine / + Yours ───────────────
 
-function SearchResultItem({
+function TradeSearchCard({
   card,
   priceIndex,
   onAdd,
+  onQuickLook,
 }: {
   card: CardRecord;
   priceIndex: PublishedPriceIndex | null;
   onAdd: (card: CardRecord, side: TradeSide) => void;
+  onQuickLook: (card: CardRecord) => void;
 }) {
   const price = nearMintPrice(priceIndex, card);
   const finishLabel = card.finishes.includes("foil") ? "Foil" : "Non-foil";
-  const variantTags: string[] = [];
-  if (card.variant.alternate_art) variantTags.push("Alt Art");
-  if (card.variant.signed) variantTags.push("Signed");
-  else if (card.variant.overnumbered) variantTags.push("Overnumbered");
-
   const setLine = [
     card.set.label,
     card.collector_number ? `#${card.collector_number}` : null,
@@ -268,20 +260,41 @@ function SearchResultItem({
     .join(" ");
 
   return (
-    <div className={T.srItem}>
-      <div className={T.srTop}>
-        <span className={T.srName}>{card.riot_name}</span>
-        {price != null && <span className={T.srPrice}>{formatUsdPrice(price)}</span>}
+    <div className={T.srCard}>
+      {/* Art */}
+      <div
+        className={T.srArtWrap}
+        onClick={() => onQuickLook(card)}
+        style={{ cursor: "pointer" }}
+      >
+        {card.media.image_url ? (
+          <img
+            src={card.media.image_url}
+            alt={card.media.accessibility_text ?? card.riot_name}
+            loading="lazy"
+            className={T.srArtImg}
+          />
+        ) : (
+          <div className={T.srArtPlaceholder} />
+        )}
       </div>
-      <div className={T.srMeta}>
-        {card.rarity && <span>{card.rarity}</span>}
-        {setLine && <><span className={T.srDot}>·</span><span>{setLine}</span></>}
-        <span className={T.srDot}>·</span>
-        <span>{finishLabel}</span>
-        {variantTags.map((t) => (
-          <span key={t}><span className={T.srDot}>·</span> {t}</span>
-        ))}
+
+      {/* Info */}
+      <div className={T.srInfo}>
+        <div className={T.srName}>{card.riot_name}</div>
+        <div className={T.srMeta}>
+          {setLine && <div>{setLine}</div>}
+          <div>
+            {finishLabel}
+            {card.rarity ? ` · ${card.rarity}` : ""}
+          </div>
+        </div>
+        {price != null && (
+          <div className={T.srPrice}>{formatUsdPrice(price)}</div>
+        )}
       </div>
+
+      {/* Add buttons */}
       <div className={T.srActions}>
         <button className={T.srBtnMine} onClick={() => onAdd(card, "mine")}>
           + Mine
@@ -294,25 +307,22 @@ function SearchResultItem({
   );
 }
 
-// ── TradeItemRow — single unified component for both sides ─────────────────
+// ── TradeItemRow — unified row for Mine and Yours lists ────────────────────
 
 function TradeItemRow({
   item,
-  side,
   itemPrice,
-  tcgUrl,
   onQty,
   onCondition,
   onFinish,
   onRemove,
   onDragStart,
   onDragEnd,
+  onNavigate,
   onQuickLook,
 }: {
   item: TradeItem;
-  side: TradeSide;
   itemPrice: number | null;
-  tcgUrl: string | null;
   onQty: (delta: number) => void;
   onCondition: (c: string) => void;
   onFinish: (f: "foil" | "nonfoil") => void;
@@ -325,9 +335,7 @@ function TradeItemRow({
   const { card } = item;
   const hasBothFinishes = card.finishes.length > 1;
   const lineTotal = itemPrice != null ? itemPrice * item.qty : null;
-  // suppress unused warning — kept for API compatibility with router
-  void side;
-  void tcgUrl;
+  void onNavigate;
 
   return (
     <div
@@ -339,7 +347,7 @@ function TradeItemRow({
       }}
       onDragEnd={onDragEnd}
     >
-      {/* Card art — always visible, click to quick-look */}
+      {/* Card art */}
       <div className={T.artWrap} onClick={() => onQuickLook(card)}>
         {card.media.image_url ? (
           <img
@@ -353,7 +361,7 @@ function TradeItemRow({
         )}
       </div>
 
-      {/* Name + compact tags (rarity + finish only; no domain) */}
+      {/* Name + tags */}
       <div className={T.cardInfo}>
         <div className={T.cardName}>{card.riot_name}</div>
         <div className={T.cardTags}>
@@ -366,7 +374,7 @@ function TradeItemRow({
         </div>
       </div>
 
-      {/* Condition — click to cycle NM → LP → MP → HP → DMG → NM */}
+      {/* Condition — click to cycle */}
       <button
         className={T.conditionBtn}
         onClick={() => onCondition(cycleCondition(item.condition))}
@@ -375,7 +383,7 @@ function TradeItemRow({
         {CONDITION_CODES[item.condition] ?? "NM"}
       </button>
 
-      {/* Finish toggle — only for dual-finish cards */}
+      {/* Finish toggle — dual-finish cards only */}
       {hasBothFinishes && (
         <button
           className={item.finish === "foil" ? T.finishBtnFoil : T.finishBtnNF}
@@ -385,14 +393,14 @@ function TradeItemRow({
         </button>
       )}
 
-      {/* Vertical qty stepper: + on top, qty in middle, − on bottom */}
+      {/* Vertical qty stepper */}
       <div className={T.qtyWrap}>
         <button className={T.qtyBtn} onClick={() => onQty(1)}>+</button>
         <span className={T.qtyVal}>{item.qty}</span>
         <button className={T.qtyBtn} onClick={() => onQty(-1)}>−</button>
       </div>
 
-      {/* Line total price */}
+      {/* Price */}
       <span className={lineTotal != null ? T.itemPrice : T.itemPriceDash}>
         {lineTotal != null ? formatUsdPrice(lineTotal) : "—"}
       </span>
@@ -440,7 +448,7 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
     searchCards(`${debouncedQuery} unique:id`)
       .then((resp) => {
         if (!cancelled) {
-          setSearchResults(resp.items.slice(0, 15));
+          setSearchResults(resp.items.slice(0, 20));
           setSearching(false);
         }
       })
@@ -539,15 +547,6 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
     return resolveItemPrice(rows, item.finish, item.condition);
   }
 
-  function getItemTcgUrl(item: TradeItem): string | null {
-    if (!item.card.tcgplayer_id) return null;
-    const rows = getPublishedRowsForCard(priceIndex, item.card.tcgplayer_id);
-    const row = resolveMatchingRow(rows, item.finish, item.condition);
-    const skuId = row?.externalIds.tcgplayerSkuId;
-    const base = `https://www.tcgplayer.com/product/${item.card.tcgplayer_id}`;
-    return skuId ? `${base}?skuId=${skuId}` : base;
-  }
-
   function sideTotal(items: TradeItem[]): number {
     return items.reduce((sum, item) => {
       const price = getItemPrice(item);
@@ -613,200 +612,198 @@ export default function TradeBalancerView({ onNavigate }: { onNavigate: (path: s
     searchInputRef.current?.focus();
   }
 
+  // ── Shared section renderers ──
+
+  function renderSideItems(items: TradeItem[], side: TradeSide) {
+    return items.map((item) => (
+      <TradeItemRow
+        key={item.key}
+        item={item}
+        itemPrice={getItemPrice(item)}
+        onQty={(d) => updateQty(item.key, side, d)}
+        onCondition={(c) => updateCondition(item.key, side, c)}
+        onFinish={(f) => updateFinish(item.key, side, f)}
+        onRemove={() => removeItem(item.key, side)}
+        onDragStart={() => handleDragStart(item.key, side)}
+        onDragEnd={handleDragEnd}
+        onNavigate={onNavigate}
+        onQuickLook={setQuickLookCard}
+      />
+    ));
+  }
+
+  const mineSection = (
+    <div
+      className={`${T.mineSection} ${dragOverSide === "mine" ? T.dropTarget : ""} min-h-[120px]`}
+      onDragOver={(e) => handleDragOver(e, "mine")}
+      onDragLeave={() => setDragOverSide(null)}
+      onDrop={() => handleDrop("mine")}
+    >
+      <div className={T.sectionHeader}>
+        <span className={T.mineLabel}>Mine</span>
+        <span className={T.sideTotal}>{formatUsdPrice(mineTotal) ?? "$0.00"}</span>
+      </div>
+      <div className={T.sideBody}>
+        {mine.length === 0 ? (
+          <div className={T.sideBodyEmpty}>
+            <span className="text-2xl opacity-20" aria-hidden="true">+</span>
+            <span className="text-[0.75rem] text-[var(--color-text-dim)]">
+              Search and add your cards
+            </span>
+          </div>
+        ) : renderSideItems(mine, "mine")}
+      </div>
+    </div>
+  );
+
+  const yoursSection = (
+    <div
+      className={`${T.yoursSection} ${dragOverSide === "yours" ? T.dropTarget : ""} min-h-[120px]`}
+      onDragOver={(e) => handleDragOver(e, "yours")}
+      onDragLeave={() => setDragOverSide(null)}
+      onDrop={() => handleDrop("yours")}
+    >
+      <div className={T.sectionHeader}>
+        <span className={T.yoursLabel}>Yours</span>
+        <span className={T.sideTotal}>{formatUsdPrice(yoursTotal) ?? "$0.00"}</span>
+      </div>
+      <div className={T.sideBody}>
+        {yours.length === 0 ? (
+          <div className={T.sideBodyEmpty}>
+            <span className="text-2xl opacity-20" aria-hidden="true">+</span>
+            <span className="text-[0.75rem] text-[var(--color-text-dim)]">
+              Search and add their cards
+            </span>
+          </div>
+        ) : renderSideItems(yours, "yours")}
+      </div>
+    </div>
+  );
+
+  const searchSection = (
+    <div className={T.searchSection}>
+      <div className={T.searchHeader}>
+        <h2 className={T.searchTitle}>Add Cards</h2>
+        <div className={T.searchInputWrap}>
+          <input
+            ref={searchInputRef}
+            className={T.searchInput}
+            type="text"
+            placeholder="Search by name…"
+            value={searchQuery}
+            autoComplete="off"
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searching && <span className={T.searchSpinner} aria-hidden="true" />}
+          {searchQuery && !searching && (
+            <button
+              className={T.searchClearBtn}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={clearSearch}
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className={T.searchBody}>
+        {showSearchHint && (
+          <p className={T.searchHint}>Type at least 2 characters to search</p>
+        )}
+        {showNoResults && (
+          <p className={T.searchHint}>No cards found for "{debouncedQuery}"</p>
+        )}
+        {searchResults.length > 0 && (
+          <div className={T.resultsGrid}>
+            {searchResults.map((card) => (
+              <TradeSearchCard
+                key={card.id}
+                card={card}
+                priceIndex={priceIndex}
+                onAdd={addCard}
+                onQuickLook={setQuickLookCard}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const deltaBar = (
+    <div className={T.deltaBar} style={deltaBarStyle}>
+      <div className={T.deltaSide}>
+        <span className={`${T.deltaSideLabel} text-[var(--color-positive-strong)] opacity-75`}>Mine</span>
+        <span className={T.deltaSideTotal}>{formatUsdPrice(mineTotal) ?? "$0.00"}</span>
+      </div>
+      <span className={T.deltaArrow} aria-hidden="true">⟵</span>
+      <div className={T.deltaMid}>
+        <span className={T.deltaMidLabel}>Difference</span>
+        <span className={`font-mono text-2xl font-bold ${deltaValueClass}`}>{formatDelta(delta)}</span>
+        {delta !== 0 && (
+          <span className={T.deltaMidNote}>
+            {delta > 0 ? "You're offering more" : "You're offering less"}
+          </span>
+        )}
+      </div>
+      <span className={T.deltaArrow} aria-hidden="true">⟶</span>
+      <div className={T.deltaSide}>
+        <span className={`${T.deltaSideLabel} text-[var(--color-negative)] opacity-75`}>Yours</span>
+        <span className={T.deltaSideTotal}>{formatUsdPrice(yoursTotal) ?? "$0.00"}</span>
+      </div>
+    </div>
+  );
+
+  const mobileDelta = (
+    <div className={`${T.mobileDelta} ${
+      deltaSign === "pos" ? T.mobileDeltaPos
+      : deltaSign === "neg" ? T.mobileDeltaNeg
+      : T.mobileDeltaEven
+    }`}>
+      {delta === 0
+        ? "Trade is even"
+        : delta > 0
+        ? `You're offering ${formatUsdPrice(Math.abs(delta))} more`
+        : `You're offering ${formatUsdPrice(Math.abs(delta))} less`}
+    </div>
+  );
+
   // ── Render ──
+  // Mobile (< lg): Mine → Search (fixed-height scrollable) → Yours → delta strip
+  // Desktop (lg+): Mine | Yours (2-col row 1), Search full-width (row 2), delta bar (row 3)
 
   return (
     <>
       <div className="px-4 pb-12 pt-4 min-h-screen">
-        <div className="mx-auto max-w-[1240px] flex flex-col gap-4">
+        <div className="mx-auto max-w-[1240px] flex flex-col gap-3 lg:gap-4">
 
-          {/* Page header */}
-          <div className="px-1">
-            <h1 className="text-lg font-bold tracking-tight text-[var(--color-text-primary)]">
-              Trade Balancer
-            </h1>
-            <p className="text-[0.75rem] text-[var(--color-text-tertiary)] mt-0.5">
-              Compare card values to find a fair trade
-            </p>
+          {/* ── Mobile layout (< lg) ── */}
+          <div className="flex flex-col gap-3 lg:hidden">
+            {mineSection}
+            <div className="h-[440px] flex flex-col">
+              {searchSection}
+            </div>
+            {yoursSection}
+            {mobileDelta}
           </div>
 
-          {/* Main grid: stacked on mobile, 3-col on sm+ */}
-          <div className="grid grid-cols-1 sm:grid-cols-[1fr_260px_1fr] gap-3 sm:gap-4">
+          {/* ── Desktop layout (lg+) ── */}
+          <div className="hidden lg:grid lg:grid-cols-2 lg:gap-4">
+            {/* Row 1: Mine | Yours */}
+            <div className="min-h-[200px]">{mineSection}</div>
+            <div className="min-h-[200px]">{yoursSection}</div>
 
-            {/* ── Mine ── */}
-            <div
-              className={`${T.mineSection} ${dragOverSide === "mine" ? T.dropTarget : ""} min-h-[140px]`}
-              onDragOver={(e) => handleDragOver(e, "mine")}
-              onDragLeave={() => setDragOverSide(null)}
-              onDrop={() => handleDrop("mine")}
-            >
-              <div className={T.sectionHeader}>
-                <span className={T.mineLabel}>Mine</span>
-                <span className={T.sideTotal}>{formatUsdPrice(mineTotal) ?? "$0.00"}</span>
-              </div>
-              <div className={T.sideBody}>
-                {mine.length === 0 ? (
-                  <div className={T.sideBodyEmpty}>
-                    <span className="text-2xl opacity-20" aria-hidden="true">+</span>
-                    <span className="text-[0.75rem] text-[var(--color-text-dim)]">
-                      Search for cards to add yours
-                    </span>
-                  </div>
-                ) : (
-                  mine.map((item) => (
-                    <TradeItemRow
-                      key={item.key}
-                      item={item}
-                      side="mine"
-                      itemPrice={getItemPrice(item)}
-                      tcgUrl={getItemTcgUrl(item)}
-                      onQty={(d) => updateQty(item.key, "mine", d)}
-                      onCondition={(c) => updateCondition(item.key, "mine", c)}
-                      onFinish={(f) => updateFinish(item.key, "mine", f)}
-                      onRemove={() => removeItem(item.key, "mine")}
-                      onDragStart={() => handleDragStart(item.key, "mine")}
-                      onDragEnd={handleDragEnd}
-                      onNavigate={onNavigate}
-                      onQuickLook={setQuickLookCard}
-                    />
-                  ))
-                )}
-              </div>
+            {/* Row 2: Search (full width) */}
+            <div className="lg:col-span-2 min-h-[320px] flex flex-col">
+              {searchSection}
             </div>
 
-            {/* ── Search ── */}
-            <div className={T.searchSection}>
-              <div className={T.searchHeader}>
-                <h2 className={T.searchTitle}>Add Cards</h2>
-              </div>
-              <div className={`${T.searchBody} flex-1`}>
-                <div className={T.searchInputWrap}>
-                  <input
-                    ref={searchInputRef}
-                    className={T.searchInput}
-                    type="text"
-                    placeholder="Search by name…"
-                    value={searchQuery}
-                    autoComplete="off"
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                  {searching && <span className={T.searchSpinner} aria-hidden="true" />}
-                  {searchQuery && !searching && (
-                    <button
-                      className={T.searchClearBtn}
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={clearSearch}
-                      aria-label="Clear search"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-
-                {(showSearchHint || showNoResults || searchResults.length > 0) && (
-                  <div className={T.searchResults}>
-                    {showSearchHint && (
-                      <p className={T.searchHint}>Type at least 2 characters to search</p>
-                    )}
-                    {showNoResults && (
-                      <p className={T.searchHint}>No cards found for "{debouncedQuery}"</p>
-                    )}
-                    {searchResults.map((card) => (
-                      <SearchResultItem
-                        key={card.id}
-                        card={card}
-                        priceIndex={priceIndex}
-                        onAdd={addCard}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* ── Yours ── */}
-            <div
-              className={`${T.yoursSection} ${dragOverSide === "yours" ? T.dropTarget : ""} min-h-[140px]`}
-              onDragOver={(e) => handleDragOver(e, "yours")}
-              onDragLeave={() => setDragOverSide(null)}
-              onDrop={() => handleDrop("yours")}
-            >
-              <div className={T.sectionHeader}>
-                <span className={T.yoursLabel}>Yours</span>
-                <span className={T.sideTotal}>{formatUsdPrice(yoursTotal) ?? "$0.00"}</span>
-              </div>
-              <div className={T.sideBody}>
-                {yours.length === 0 ? (
-                  <div className={T.sideBodyEmpty}>
-                    <span className="text-2xl opacity-20" aria-hidden="true">+</span>
-                    <span className="text-[0.75rem] text-[var(--color-text-dim)]">
-                      Search for cards to add theirs
-                    </span>
-                  </div>
-                ) : (
-                  yours.map((item) => (
-                    <TradeItemRow
-                      key={item.key}
-                      item={item}
-                      side="yours"
-                      itemPrice={getItemPrice(item)}
-                      tcgUrl={getItemTcgUrl(item)}
-                      onQty={(d) => updateQty(item.key, "yours", d)}
-                      onCondition={(c) => updateCondition(item.key, "yours", c)}
-                      onFinish={(f) => updateFinish(item.key, "yours", f)}
-                      onRemove={() => removeItem(item.key, "yours")}
-                      onDragStart={() => handleDragStart(item.key, "yours")}
-                      onDragEnd={handleDragEnd}
-                      onNavigate={onNavigate}
-                      onQuickLook={setQuickLookCard}
-                    />
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* ── Delta bar (desktop) ── */}
-            <div className={T.deltaBar} style={deltaBarStyle}>
-              <div className={T.deltaSide}>
-                <span className={`${T.deltaSideLabel} text-[var(--color-positive-strong)] opacity-75`}>
-                  Mine
-                </span>
-                <span className={T.deltaSideTotal}>{formatUsdPrice(mineTotal) ?? "$0.00"}</span>
-              </div>
-              <span className={T.deltaArrow} aria-hidden="true">⟵</span>
-              <div className={T.deltaMid}>
-                <span className={T.deltaMidLabel}>Difference</span>
-                <span className={`font-mono text-2xl font-bold ${deltaValueClass}`}>
-                  {formatDelta(delta)}
-                </span>
-                {delta !== 0 && (
-                  <span className={T.deltaMidNote}>
-                    {delta > 0 ? "You're offering more" : "You're offering less"}
-                  </span>
-                )}
-              </div>
-              <span className={T.deltaArrow} aria-hidden="true">⟶</span>
-              <div className={T.deltaSide}>
-                <span className={`${T.deltaSideLabel} text-[var(--color-negative)] opacity-75`}>
-                  Yours
-                </span>
-                <span className={T.deltaSideTotal}>{formatUsdPrice(yoursTotal) ?? "$0.00"}</span>
-              </div>
-            </div>
+            {/* Row 3: Delta bar (full width) */}
+            <div className="lg:col-span-2">{deltaBar}</div>
           </div>
 
-          {/* Mobile delta strip */}
-          <div className={`${T.mobileDelta} ${
-            deltaSign === "pos" ? T.mobileDeltaPos
-            : deltaSign === "neg" ? T.mobileDeltaNeg
-            : T.mobileDeltaEven
-          }`}>
-            {delta === 0
-              ? "Trade is even"
-              : delta > 0
-              ? `You're offering ${formatUsdPrice(Math.abs(delta))} more`
-              : `You're offering ${formatUsdPrice(Math.abs(delta))} less`}
-          </div>
         </div>
       </div>
 
