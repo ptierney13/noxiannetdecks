@@ -17,7 +17,7 @@ type PickerContext =
   | { kind: "sideboard" };
 
 function charName(cardName: string): string {
-  return cardName.split(",")[0].trim();
+  return cardName.split(" - ")[0].trim();
 }
 
 type FilterQueryArgs = {
