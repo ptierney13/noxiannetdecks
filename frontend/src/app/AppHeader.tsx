@@ -119,7 +119,7 @@ export function AppHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-60 [background:linear-gradient(180deg,#5c1623_0%,#3a0c15_100%)] border-b border-[rgba(255,160,160,0.16)] shadow-[0_4px_30px_rgba(255,50,50,0.16)]">
+    <header className="sticky top-0 z-60 [background:linear-gradient(180deg,#171b25_0%,#12161e_100%)] border-b border-[rgba(203,62,77,0.22)] shadow-[0_2px_20px_rgba(0,0,0,0.35)]">
       <nav
         className="flex items-center gap-4 min-h-[60px] w-full px-[var(--space-shell-x)] py-[0.6rem]"
         aria-label="Primary navigation"
