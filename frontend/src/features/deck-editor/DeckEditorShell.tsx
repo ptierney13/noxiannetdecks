@@ -207,125 +207,181 @@ export function DeckEditorShell() {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-app-bg px-3 pt-4 pb-12">
-      {/* Deck name */}
-      <div className="mb-5">
-        <input
-          type="text"
-          value={deckName}
-          onChange={(e) => setDeckName(e.target.value)}
-          className="w-full bg-transparent border-0 outline-none text-[1.15rem] font-bold text-text-primary placeholder:text-text-dim focus:border-b focus:border-border-default pb-0.5"
-          placeholder="Untitled Deck"
-          aria-label="Deck name"
-        />
-        <p className="text-[0.68rem] text-text-dim mt-0.5">
-          {deck.updatedAt ? `Saved ${new Date(deck.updatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : "Not saved"}
-        </p>
-      </div>
+  // ── Shared section renderers ──────────────────────────────────────────────
 
-      <div className="flex flex-col gap-4">
-        {/* ── Legend + Champion row ── */}
-        <div>
+  const legendChampionSection = (
+    <div>
+      {/* Aligned label row */}
+      <div className="flex gap-2 mb-2">
+        <div className="flex-1">
           <SectionLabel title="Legend" count={deck.legend ? 1 : 0} max={1} />
-          <div className="flex gap-2 mt-2">
-            <div className="flex-1">
-              <CardSlot
-                label="Legend"
-                card={deck.legend}
-                onClick={() => setPickerCtx({ kind: "legend" })}
-              />
-            </div>
-            <div className="flex-1">
-              <SectionLabel title="Champion" count={deck.champion ? 1 : 0} max={1} className="mb-2" />
-              <CardSlot
-                label="Champion"
-                card={deck.champion}
-                onClick={() => setPickerCtx({ kind: "champion" })}
-                disabled={!deck.legend}
-              />
+        </div>
+        <div className="flex-1">
+          <SectionLabel title="Champion" count={deck.champion ? 1 : 0} max={1} />
+        </div>
+      </div>
+      {/* Slot row */}
+      <div className="flex gap-2">
+        <div className="flex-1">
+          <CardSlot
+            label="Legend"
+            card={deck.legend}
+            onClick={() => setPickerCtx({ kind: "legend" })}
+            fullImage
+          />
+        </div>
+        <div className="flex-1">
+          <CardSlot
+            label="Champion"
+            card={deck.champion}
+            onClick={() => setPickerCtx({ kind: "champion" })}
+            disabled={!deck.legend}
+            fullImage
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const runesSection = (
+    <div className="rounded-xl bg-surface-2 py-3 px-4">
+      <div className="mb-2">
+        <span className="text-[0.75rem] font-bold tracking-[0.06em] uppercase text-accent-warm/75">
+          Runes
+        </span>
+      </div>
+      <RuneRow
+        runes={deck.runes}
+        onShiftLeft={shiftRuneLeft}
+        onShiftRight={shiftRuneRight}
+      />
+    </div>
+  );
+
+  const battlefieldsSection = (
+    <div>
+      <SectionLabel title="Battlefields" count={deck.battlefields.filter(Boolean).length} max={3} className="mb-2" />
+      <BattlefieldRow
+        slots={deck.battlefields as [any, any, any]}
+        onSlotClick={(i) => setPickerCtx({ kind: "battlefield", index: i })}
+        onToggleEnabled={toggleBattlefieldEnabled}
+      />
+    </div>
+  );
+
+  const deckNameSection = (
+    <div>
+      <input
+        type="text"
+        value={deckName}
+        onChange={(e) => setDeckName(e.target.value)}
+        className="w-full bg-transparent border-0 outline-none text-[1.15rem] font-bold text-text-primary placeholder:text-text-dim focus:border-b focus:border-border-default pb-0.5"
+        placeholder="Untitled Deck"
+        aria-label="Deck name"
+      />
+      <p className="text-[0.68rem] text-text-dim mt-0.5">
+        {deck.updatedAt
+          ? `Saved ${new Date(deck.updatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+          : "Not saved"}
+      </p>
+    </div>
+  );
+
+  const maindeckSection = (
+    <CardListSection
+      section="maindeck"
+      title="Maindeck"
+      entries={deck.maindeck}
+      count={maindeckCount}
+      max={MAINDECK_MAX}
+      onAddCards={() => setPickerCtx({ kind: "maindeck" })}
+      onAdjustQuantity={(cardId, delta) => adjustQuantity("maindeck", cardId, delta)}
+      dragState={dragState}
+      onDragStart={handleDragStart}
+      isDropTarget={dragState?.targetSection === "maindeck"}
+    />
+  );
+
+  const sideboardSection = (
+    <CardListSection
+      section="sideboard"
+      title="Sideboard"
+      entries={deck.sideboard}
+      count={sideboardCount}
+      max={SIDEBOARD_MAX}
+      onAddCards={() => setPickerCtx({ kind: "sideboard" })}
+      onAdjustQuantity={(cardId, delta) => adjustQuantity("sideboard", cardId, delta)}
+      dragState={dragState}
+      onDragStart={handleDragStart}
+      isDropTarget={dragState?.targetSection === "sideboard"}
+    />
+  );
+
+  const dragPreview = dragState ? (
+    <div
+      className="fixed z-50 pointer-events-none select-none"
+      style={{
+        left: dragState.x - dragState.offsetX,
+        top: dragState.y - dragState.offsetY,
+        opacity: 0.85,
+      }}
+    >
+      <div className="bg-surface-3 border border-border-strong rounded-lg px-3 py-2 shadow-surface-2 text-sm font-medium text-text-primary whitespace-nowrap">
+        {dragState.cardName}
+      </div>
+    </div>
+  ) : null;
+
+  const pickerModal = pickerCtx ? (
+    <CardPickerModal
+      title={buildPickerTitle(pickerCtx)}
+      filterQuery={buildFilterQuery({ ctx: pickerCtx, legendDomains, legendCardName, championCardName })}
+      onSelect={handlePickerSelect}
+      onClose={() => setPickerCtx(null)}
+    />
+  ) : null;
+
+  return (
+    <div className="min-h-screen bg-app-bg">
+      {/*
+       * Layout:
+       *   Mobile  — single column, all sections stacked.
+       *   lg+     — two-column: fixed left pane (hero + runes + battlefields)
+       *             and flex right pane (deck name + lists).
+       * Left pane is sticky + scrollable so it stays in view while the right
+       * pane content scrolls independently.
+       */}
+      <div className="lg:flex lg:min-h-screen">
+
+        {/* ── Left pane — hero setup ── */}
+        <div className="lg:w-[640px] lg:shrink-0 lg:border-r lg:border-border-subtle lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
+          <div className="flex flex-col gap-4 px-3 pt-4 pb-6">
+            {legendChampionSection}
+            {runesSection}
+            {battlefieldsSection}
+
+            {/* Mobile-only: deck lists follow directly below setup sections */}
+            <div className="flex flex-col gap-4 lg:hidden">
+              {deckNameSection}
+              {maindeckSection}
+              {sideboardSection}
             </div>
           </div>
         </div>
 
-        {/* ── Runes ── */}
-        <div className="rounded-xl bg-surface-2 py-3 px-4">
-          <div className="mb-2">
-            <span className="text-[0.75rem] font-bold tracking-[0.06em] uppercase text-accent-warm/75">
-              Runes
-            </span>
+        {/* ── Right pane — deck lists (desktop only) ── */}
+        <div className="hidden lg:flex lg:flex-col lg:flex-1 lg:min-w-0">
+          <div className="flex flex-col gap-4 px-6 pt-4 pb-12">
+            {deckNameSection}
+            {maindeckSection}
+            {sideboardSection}
           </div>
-          <RuneRow
-            runes={deck.runes}
-            onShiftLeft={shiftRuneLeft}
-            onShiftRight={shiftRuneRight}
-          />
         </div>
 
-        {/* ── Battlefields ── */}
-        <div>
-          <SectionLabel title="Battlefields" count={deck.battlefields.filter(Boolean).length} max={3} className="mb-2" />
-          <BattlefieldRow
-            slots={deck.battlefields as [any, any, any]}
-            onSlotClick={(i) => setPickerCtx({ kind: "battlefield", index: i })}
-            onToggleEnabled={toggleBattlefieldEnabled}
-          />
-        </div>
-
-        {/* ── Maindeck ── */}
-        <CardListSection
-          section="maindeck"
-          title="Maindeck"
-          entries={deck.maindeck}
-          count={maindeckCount}
-          max={MAINDECK_MAX}
-          onAddCards={() => setPickerCtx({ kind: "maindeck" })}
-          onAdjustQuantity={(cardId, delta) => adjustQuantity("maindeck", cardId, delta)}
-          dragState={dragState}
-          onDragStart={handleDragStart}
-          isDropTarget={dragState?.targetSection === "maindeck"}
-        />
-
-        {/* ── Sideboard ── */}
-        <CardListSection
-          section="sideboard"
-          title="Sideboard"
-          entries={deck.sideboard}
-          count={sideboardCount}
-          max={SIDEBOARD_MAX}
-          onAddCards={() => setPickerCtx({ kind: "sideboard" })}
-          onAdjustQuantity={(cardId, delta) => adjustQuantity("sideboard", cardId, delta)}
-          dragState={dragState}
-          onDragStart={handleDragStart}
-          isDropTarget={dragState?.targetSection === "sideboard"}
-        />
       </div>
 
-      {/* ── Drag preview ── */}
-      {dragState ? (
-        <div
-          className="fixed z-50 pointer-events-none select-none"
-          style={{
-            left: dragState.x - dragState.offsetX,
-            top: dragState.y - dragState.offsetY,
-            opacity: 0.85,
-          }}
-        >
-          <div className="bg-surface-3 border border-border-strong rounded-lg px-3 py-2 shadow-surface-2 text-sm font-medium text-text-primary whitespace-nowrap">
-            {dragState.cardName}
-          </div>
-        </div>
-      ) : null}
-
-      {/* ── Card picker modal ── */}
-      {pickerCtx ? (
-        <CardPickerModal
-          title={buildPickerTitle(pickerCtx)}
-          filterQuery={buildFilterQuery({ ctx: pickerCtx, legendDomains, legendCardName, championCardName })}
-          onSelect={handlePickerSelect}
-          onClose={() => setPickerCtx(null)}
-        />
-      ) : null}
+      {dragPreview}
+      {pickerModal}
     </div>
   );
 }

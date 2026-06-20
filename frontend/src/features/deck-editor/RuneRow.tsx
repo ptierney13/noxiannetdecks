@@ -1,4 +1,11 @@
-import { domainColor } from "./DeckEditorTypes";
+const RUNE_SYMBOL_SRC: Record<string, string> = {
+  fury:  "/assets/riftbound/symbols/runes/rune-fury-inline.png",
+  calm:  "/assets/riftbound/symbols/runes/rune-calm-inline.png",
+  mind:  "/assets/riftbound/symbols/runes/rune-mind-inline.png",
+  body:  "/assets/riftbound/symbols/runes/rune-body-inline.png",
+  chaos: "/assets/riftbound/symbols/runes/rune-chaos-inline.png",
+  order: "/assets/riftbound/symbols/runes/rune-order-inline.png",
+};
 
 type RuneRowProps = {
   runes: { leftDomain: string; leftCount: number; rightDomain: string; rightCount: number } | null;
@@ -7,38 +14,35 @@ type RuneRowProps = {
 };
 
 function RuneGem({ domain, count }: { domain: string; count: number }) {
-  const color = domainColor(domain);
+  const src = RUNE_SYMBOL_SRC[domain.toLowerCase()];
   return (
     <div className="flex flex-col items-center gap-1">
-      <div className="relative flex items-center justify-center">
-        <svg viewBox="0 0 36 42" width="36" height="42" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          {/* Hexagon rune shape */}
-          <polygon
-            points="18,2 34,11 34,31 18,40 2,31 2,11"
-            fill={color}
-            fillOpacity="0.15"
-            stroke={color}
-            strokeWidth="1.5"
-            strokeOpacity="0.7"
-          />
-          <polygon
-            points="18,7 29,13.5 29,28.5 18,35 7,28.5 7,13.5"
-            fill={color}
-            fillOpacity="0.08"
-          />
-        </svg>
-        <span
-          className="absolute text-[0.9rem] font-bold leading-none"
-          style={{ color }}
-        >
+      <div className="relative inline-flex items-center justify-center">
+        {src ? (
+          <img src={src} alt={domain} className="w-10 h-10" />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-surface-inset opacity-30" />
+        )}
+        {/* Count badge */}
+        <span className="absolute -bottom-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-surface-1 border border-border-default text-[0.62rem] font-bold leading-none text-text-primary px-0.5">
           {count}
         </span>
       </div>
-      <span
-        className="text-[0.62rem] font-bold uppercase tracking-[0.06em] leading-none"
-        style={{ color, opacity: 0.7 }}
-      >
+      <span className="text-[0.6rem] font-bold uppercase tracking-[0.06em] leading-none text-text-secondary mt-0.5">
         {domain}
+      </span>
+    </div>
+  );
+}
+
+function LockedRuneGem() {
+  return (
+    <div className="flex flex-col items-center gap-1 opacity-25">
+      <div className="w-10 h-10 rounded-full border-2 border-dashed border-text-tertiary flex items-center justify-center">
+        <span className="text-[0.9rem] font-bold text-text-tertiary leading-none">–</span>
+      </div>
+      <span className="text-[0.6rem] font-bold uppercase tracking-[0.06em] leading-none text-text-tertiary mt-0.5">
+        rune
       </span>
     </div>
   );
@@ -49,79 +53,30 @@ export function RuneRow({ runes, onShiftLeft, onShiftRight }: RuneRowProps) {
 
   return (
     <div className="flex items-center justify-center gap-3 py-1">
-      {/* Left + button */}
+      {/* Left + button (shifts a rune right→left) */}
       <button
         type="button"
         onClick={onShiftLeft}
         disabled={locked || runes.rightCount <= 1}
-        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-[1.1rem] font-bold leading-none border border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring disabled:opacity-30 disabled:cursor-not-allowed"
-        style={
-          locked || runes.rightCount <= 1
-            ? {}
-            : {
-                color: domainColor(runes.leftDomain),
-                borderColor: `color-mix(in srgb, ${domainColor(runes.leftDomain)} 30%, transparent)`,
-              }
-        }
+        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-[1.1rem] font-bold leading-none border border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring disabled:opacity-30 disabled:cursor-not-allowed text-text-secondary hover:enabled:text-text-primary hover:enabled:bg-surface-2"
         aria-label={locked ? "Select a legend first" : `Add ${runes.leftDomain} rune`}
       >
         +
       </button>
 
-      {/* Left rune */}
-      {locked ? (
-        <LockedRuneGem />
-      ) : (
-        <RuneGem domain={runes.leftDomain} count={runes.leftCount} />
-      )}
+      {locked ? <LockedRuneGem /> : <RuneGem domain={runes.leftDomain} count={runes.leftCount} />}
+      {locked ? <LockedRuneGem /> : <RuneGem domain={runes.rightDomain} count={runes.rightCount} />}
 
-      {/* Right rune */}
-      {locked ? (
-        <LockedRuneGem />
-      ) : (
-        <RuneGem domain={runes.rightDomain} count={runes.rightCount} />
-      )}
-
-      {/* Right + button */}
+      {/* Right + button (shifts a rune left→right) */}
       <button
         type="button"
         onClick={onShiftRight}
         disabled={locked || runes.leftCount <= 1}
-        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-[1.1rem] font-bold leading-none border border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring disabled:opacity-30 disabled:cursor-not-allowed"
-        style={
-          locked || runes.leftCount <= 1
-            ? {}
-            : {
-                color: domainColor(runes.rightDomain),
-                borderColor: `color-mix(in srgb, ${domainColor(runes.rightDomain)} 30%, transparent)`,
-              }
-        }
+        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-[1.1rem] font-bold leading-none border border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring disabled:opacity-30 disabled:cursor-not-allowed text-text-secondary hover:enabled:text-text-primary hover:enabled:bg-surface-2"
         aria-label={locked ? "Select a legend first" : `Add ${runes.rightDomain} rune`}
       >
         +
       </button>
-    </div>
-  );
-}
-
-function LockedRuneGem() {
-  return (
-    <div className="flex flex-col items-center gap-1 opacity-25">
-      <div className="relative flex items-center justify-center">
-        <svg viewBox="0 0 36 42" width="36" height="42" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <polygon
-            points="18,2 34,11 34,31 18,40 2,31 2,11"
-            fill="currentColor"
-            fillOpacity="0.12"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeOpacity="0.5"
-            className="text-text-tertiary"
-          />
-        </svg>
-        <span className="absolute text-[0.9rem] font-bold leading-none text-text-tertiary">–</span>
-      </div>
-      <span className="text-[0.62rem] font-bold uppercase tracking-[0.06em] text-text-tertiary">rune</span>
     </div>
   );
 }
