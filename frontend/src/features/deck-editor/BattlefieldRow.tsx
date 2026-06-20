@@ -28,6 +28,7 @@ function SlotCell({
         card={slot}
         onClick={onSlotClick}
         fullImage
+        imageAspect="aspect-[7/5]"
         hideName
       />
       {/* Label + enabled toggle */}

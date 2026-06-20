@@ -6,8 +6,10 @@ type CardSlotProps = {
   onClick: () => void;
   disabled?: boolean;
   className?: string;
-  /** Show the full portrait instead of a top-cropped strip. */
+  /** Show the full image instead of a top-cropped strip. */
   fullImage?: boolean;
+  /** Tailwind aspect-ratio class to use for fullImage mode. Defaults to portrait (9/14). */
+  imageAspect?: string;
   /** Suppress the card name row below the image (useful when the caller renders its own label). */
   hideName?: boolean;
 };
@@ -19,6 +21,7 @@ export function CardSlot({
   disabled = false,
   className = "",
   fullImage = false,
+  imageAspect = "aspect-[9/14]",
   hideName = false,
 }: CardSlotProps) {
   const base = `w-full flex flex-col rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring transition-colors ${className}`;
@@ -31,8 +34,8 @@ export function CardSlot({
         className={`${base} bg-surface-2 border border-border-default hover:border-border-strong cursor-pointer`}
       >
         {fullImage ? (
-          /* Full portrait — 9:14 approximates a Riftbound card */
-          <div className="w-full aspect-[9/14] bg-surface-inset overflow-hidden flex items-center justify-center">
+          /* Full image — aspect ratio controlled by imageAspect prop */
+          <div className={`w-full ${imageAspect} bg-surface-inset overflow-hidden flex items-center justify-center`}>
             {card.imageUrl ? (
               <img
                 src={card.imageUrl}
@@ -74,7 +77,7 @@ export function CardSlot({
       onClick={onClick}
       disabled={disabled}
       className={`${base} items-center justify-center gap-1.5 border-2 border-dashed ${
-        fullImage ? "aspect-[9/14]" : ""
+        fullImage ? imageAspect : ""
       } ${
         disabled
           ? "border-border-subtle opacity-35 cursor-not-allowed"
