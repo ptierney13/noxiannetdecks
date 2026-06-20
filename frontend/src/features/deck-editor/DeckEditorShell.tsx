@@ -354,7 +354,7 @@ export function DeckEditorShell() {
       <div className="lg:flex lg:min-h-screen">
 
         {/* ── Left pane — hero setup ── */}
-        <div className="lg:w-[640px] lg:shrink-0 lg:border-r lg:border-border-subtle">
+        <div className="lg:w-[448px] lg:shrink-0 lg:border-r lg:border-border-subtle">
           <div className="flex flex-col gap-4 px-3 pt-4 pb-6">
             {legendChampionSection}
             {runesSection}
