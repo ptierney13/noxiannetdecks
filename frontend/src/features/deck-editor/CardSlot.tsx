@@ -31,7 +31,7 @@ export function CardSlot({
       <button
         type="button"
         onClick={onClick}
-        className={`${base} bg-surface-1 border border-[rgba(255,255,255,0.07)] hover:border-[rgba(255,255,255,0.14)] cursor-pointer`}
+        className={`${base} bg-surface-2 border border-border-default hover:border-border-strong cursor-pointer`}
       >
         {fullImage ? (
           /* Full image — aspect ratio controlled by imageAspect prop */
@@ -76,17 +76,17 @@ export function CardSlot({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`${base} items-center justify-center gap-1.5 border ${
+      className={`${base} items-center justify-center gap-1.5 border-2 border-dashed ${
         fullImage ? imageAspect : ""
       } ${
         disabled
-          ? "border-[rgba(255,255,255,0.05)] opacity-30 cursor-not-allowed bg-surface-1/30"
-          : "border-[rgba(255,255,255,0.07)] hover:border-[rgba(255,255,255,0.13)] hover:bg-surface-1 cursor-pointer bg-surface-1/50"
+          ? "border-border-subtle opacity-35 cursor-not-allowed"
+          : "border-border-default hover:border-border-strong hover:bg-surface-2 cursor-pointer"
       }`}
       style={!fullImage ? { minHeight: "116px" } : undefined}
     >
-      <span className="text-lg leading-none text-text-dim/50 select-none">+</span>
-      <span className="text-[0.65rem] font-medium tracking-[0.08em] uppercase text-text-dim/50">
+      <span className="text-[1.4rem] leading-none text-text-tertiary select-none">+</span>
+      <span className="text-[0.68rem] font-bold tracking-[0.06em] uppercase text-text-tertiary">
         {label}
       </span>
     </button>

@@ -244,10 +244,12 @@ export function DeckEditorShell() {
   );
 
   const runesSection = (
-    <div className="py-2 px-1">
-      <span className="text-[0.68rem] font-semibold tracking-[0.1em] uppercase text-text-dim block mb-2">
-        Runes
-      </span>
+    <div className="rounded-xl bg-surface-2 py-3 px-4">
+      <div className="mb-2">
+        <span className="text-[0.75rem] font-bold tracking-[0.06em] uppercase text-accent-warm/75">
+          Runes
+        </span>
+      </div>
       <RuneRow
         runes={deck.runes}
         onShiftLeft={shiftRuneLeft}
@@ -268,19 +270,19 @@ export function DeckEditorShell() {
   );
 
   const deckNameSection = (
-    <div className="pb-2 border-b border-[rgba(255,255,255,0.06)]">
+    <div>
       <input
         type="text"
         value={deckName}
         onChange={(e) => setDeckName(e.target.value)}
-        className="w-full bg-transparent border-0 outline-none text-xl font-semibold text-text-primary placeholder:text-text-dim/50 pb-1"
+        className="w-full bg-transparent border-0 outline-none text-[1.15rem] font-bold text-text-primary placeholder:text-text-dim focus:border-b focus:border-border-default pb-0.5"
         placeholder="Untitled Deck"
         aria-label="Deck name"
       />
-      <p className="text-[0.68rem] text-text-dim/50 mt-0.5">
+      <p className="text-[0.68rem] text-text-dim mt-0.5">
         {deck.updatedAt
           ? `Saved ${new Date(deck.updatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
-          : "Draft · not saved"}
+          : "Not saved"}
       </p>
     </div>
   );
@@ -352,14 +354,14 @@ export function DeckEditorShell() {
       <div className="lg:flex lg:min-h-screen">
 
         {/* ── Left pane — hero setup ── */}
-        <div className="lg:w-[538px] lg:shrink-0 lg:border-r lg:border-[rgba(255,255,255,0.05)]">
-          <div className="flex flex-col gap-5 px-4 pt-5 pb-6">
+        <div className="lg:w-[538px] lg:shrink-0 lg:border-r lg:border-border-subtle">
+          <div className="flex flex-col gap-4 px-3 pt-4 pb-6">
             {legendChampionSection}
             {runesSection}
             {battlefieldsSection}
 
             {/* Mobile-only: deck lists follow directly below setup sections */}
-            <div className="flex flex-col gap-5 lg:hidden">
+            <div className="flex flex-col gap-4 lg:hidden">
               {deckNameSection}
               {maindeckSection}
               {sideboardSection}
@@ -369,7 +371,7 @@ export function DeckEditorShell() {
 
         {/* ── Right pane — deck lists (desktop only) ── */}
         <div className="hidden lg:flex lg:flex-col lg:flex-1 lg:min-w-0">
-          <div className="flex flex-col gap-6 px-8 pt-6 pb-16">
+          <div className="flex flex-col gap-4 px-6 pt-4 pb-12">
             {deckNameSection}
             {maindeckSection}
             {sideboardSection}
@@ -394,10 +396,10 @@ type SectionLabelProps = {
 function SectionLabel({ title, count, max, className = "" }: SectionLabelProps) {
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <span className="text-[0.68rem] font-semibold tracking-[0.1em] uppercase text-text-dim">
+      <span className="text-[0.75rem] font-bold tracking-[0.06em] uppercase text-accent-warm/75">
         {title}
       </span>
-      <span className="text-[0.65rem] font-mono text-text-dim/60 tabular-nums">
+      <span className="text-[0.68rem] font-mono text-text-dim tabular-nums">
         {count}/{max}
       </span>
     </div>
