@@ -4,6 +4,10 @@ Use this folder for repeatable operational procedures and maintenance workflows.
 If a document describes how to perform the same task repeatedly, it belongs
 here instead of in active work tracking.
 
+## Runbooks
+
+- [Riftcodex Card Refresh](./riftcodex-card-refresh.md)
+
 ## Required Sections
 
 Every runbook in this folder or its subfolders should include an

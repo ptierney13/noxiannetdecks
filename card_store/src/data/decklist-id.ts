@@ -27,6 +27,7 @@ export function deriveLegalCleanName(cleanName: string | null, fallbackName: str
   return sourceName
     .replace(RIOT_PRESENTATION_SUFFIX_PATTERN, "")
     .replace(PRESENTATION_SUFFIX_PATTERN, "")
+    .replace(/[^A-Za-z0-9]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }

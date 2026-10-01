@@ -87,7 +87,7 @@ CardRecord:
 | `variant.alternate_art` | `boolean` | Whether this record is an alternate-art printed version. | Independent of foil/nonfoil finish. | Querying `is:AA` / `is:altart` and distinguishing presentation records. |
 | `variant.overnumbered` | `boolean` | Whether this record is overnumbered. | Signed cards are also overnumbered. | Querying `is:ON` / `is:overnumbered`; identifying collector treatments. |
 | `variant.signed` | `boolean` | Whether this record is a signature version. | If `true`, `variant.overnumbered` must also be `true`. | Querying `is:Signed` / `is:Signature`; distinguishing signed products. |
-| `finishes` | `Array<"nonfoil" \| "foil">` | Finish availability for this card record. | Required, non-empty, no duplicates. Current import rule: base-set Common/Uncommon records can be `["nonfoil", "foil"]`; higher rarities and special treatments are `["foil"]`. | Scryfall-style finish availability without duplicating records by foil state. Keeps finish availability separate from treatment flags and marketplace product IDs. |
+| `finishes` | `Array<"nonfoil" \| "foil">` | Finish availability for this card record. | Required, non-empty, no duplicates. Current import rule: configured normal booster-set Common/Uncommon records can be `["nonfoil", "foil"]`; higher rarities and special treatments are `["foil"]`. The configured set policy lives in `card_store/src/data/riftcodex-import-policy.ts`. | Scryfall-style finish availability without duplicating records by foil state. Keeps finish availability separate from treatment flags and marketplace product IDs. |
 
 ## Attribute Fields
 
@@ -167,6 +167,9 @@ These invariants should be enforced by tests and preserved by importers:
   not match this schema.
 - `attributes.cost` prefers source `stats.cost` or `attributes.cost` if present;
   current Riftcodex data falls back to `attributes.energy`.
+- New normal booster sets must be added to the Riftcodex import finish policy
+  before refresh. The importer intentionally fails when it sees a likely booster
+  set that is not classified as dual-finish or foil-only/special.
 
 ## Search Semantics
 

@@ -3,13 +3,16 @@ import path from "node:path";
 import { z } from "zod";
 import { deriveDecklistCardId, deriveLegalCleanName } from "../src/data/decklist-id.js";
 import { cardDatabaseSchema, type CardRecord } from "../src/data/schema.js";
-import { deriveCardVariant, type CardFinish } from "../src/data/variant.js";
+import {
+  assertKnownRiftcodexSetFinishPolicy,
+  finishesForImportedCard,
+  summarizeImportedSets
+} from "../src/data/riftcodex-import-policy.js";
+import { deriveCardVariant } from "../src/data/variant.js";
 
 const SOURCE_BASE_URL = "https://api.riftcodex.com/cards";
 const PAGE_SIZE = 100;
 const OUTPUT_PATH = path.resolve("data", "cards.json");
-const BASE_FOIL_SETS = new Set(["OGN", "SFD", "UNL"]);
-const BASE_FOIL_RARITIES = new Set(["Common", "Uncommon"]);
 
 const nullableString = z.string().nullable();
 const nullableNumber = z.number().int().nullable();
@@ -126,25 +129,6 @@ function variantFlagsFromName(name: string): Partial<Parameters<typeof deriveCar
   return PARENTHETICAL_VARIANT_MAP[match[1].toLowerCase()] ?? {};
 }
 
-function hasDualFinishes(card: Pick<CardRecord, "set" | "rarity" | "variant">): boolean {
-  return (
-    BASE_FOIL_SETS.has(card.set.set_id) &&
-    Boolean(card.rarity && BASE_FOIL_RARITIES.has(card.rarity)) &&
-    !card.variant.alternate_art &&
-    !card.variant.overnumbered &&
-    !card.variant.signed &&
-    !card.variant.metal &&
-    !card.variant.starter &&
-    !card.variant.gg_ez &&
-    !card.variant.launch_exclusive &&
-    !card.variant.ultimate
-  );
-}
-
-function finishesForCard(card: Pick<CardRecord, "set" | "rarity" | "variant">): CardFinish[] {
-  return hasDualFinishes(card) ? ["nonfoil", "foil"] : ["foil"];
-}
-
 function normalizeSourceCard(card: SourceCard): CardRecord {
   const variant = deriveCardVariant({ ...card.metadata, ...variantFlagsFromName(card.name) });
   const cleanName = deriveLegalCleanName(card.metadata.clean_name, card.name);
@@ -164,7 +148,7 @@ function normalizeSourceCard(card: SourceCard): CardRecord {
     language: "en",
     rarity: card.classification.rarity,
     variant,
-    finishes: finishesForCard(baseCard),
+    finishes: finishesForImportedCard(baseCard),
     attributes: {
       cost: costFromSource(card),
       energy: card.attributes.energy,
@@ -227,9 +211,15 @@ async function main() {
     return (a.collector_number ?? "").localeCompare(b.collector_number ?? "", undefined, { numeric: true });
   });
 
+  assertKnownRiftcodexSetFinishPolicy(cards);
+
   await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
   await writeFile(OUTPUT_PATH, `${JSON.stringify(cards, null, 2)}\n`, "utf8");
   console.log(`Wrote ${cards.length} cards to ${OUTPUT_PATH}`);
+  console.log("Imported sets:");
+  for (const summary of summarizeImportedSets(cards)) {
+    console.log(`- ${summary.setId} (${summary.label}): ${summary.count}`);
+  }
 }
 
 main().catch((error) => {

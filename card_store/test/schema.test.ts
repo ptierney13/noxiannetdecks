@@ -4,6 +4,12 @@ import { createCardRepository, loadCardDatabase, type CardSource } from "../src/
 import { fixtureCards } from "./fixtures.js";
 
 describe("canonical card data", () => {
+  it("canonicalizes legal clean-name punctuation to match decklist identity", () => {
+    expect(deriveLegalCleanName("Draven, Showboat", "Draven, Showboat")).toBe("Draven Showboat");
+    expect(deriveLegalCleanName("Tomb-Raider Barbara", "Tomb-Raider Barbara")).toBe("Tomb Raider Barbara");
+    expect(deriveLegalCleanName("Ol' Poro", "Ol' Poro")).toBe("Ol Poro");
+  });
+
   it("validates every card and has unique source IDs", async () => {
     const database = await loadCardDatabase();
     const ids = new Set(database.map((card) => card.id));

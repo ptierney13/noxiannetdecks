@@ -41,12 +41,18 @@ From the repo root, the common entrypoint is:
 
 - `npm run import:riftcodex -w @noxiannet/card-store`
 
+The repeatable operator workflow is documented in
+[`docs/runbooks/riftcodex-card-refresh.md`](../../runbooks/riftcodex-card-refresh.md).
+
 ## Current Constraints
 
 - `cards.json` is one large repo-tracked blob today
 - card data changes ship by committing the updated file and deploying the repo
 - this is separate from the hosted `price_store` pipeline, which publishes
   price data independently
+- new normal booster set codes must be classified in
+  `card_store/src/data/riftcodex-import-policy.ts` before import so finish
+  availability remains explicit and reviewable
 
 Agents should treat `card_store/data/cards.json` as the authoritative shipped
 card dataset.
