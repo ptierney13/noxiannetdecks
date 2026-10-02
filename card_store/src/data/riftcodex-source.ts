@@ -11,6 +11,9 @@ type RiftcodexDedupeSourceCard = RiftcodexCollectorNumberSource & {
   set: {
     set_id: string;
   };
+  metadata: {
+    overnumbered?: boolean | null;
+  };
 };
 
 const RIOT_LEGEND_NAME_DELIMITER = " - ";
@@ -26,13 +29,17 @@ export function collectorNumberFromRiftcodexSource(card: RiftcodexCollectorNumbe
 }
 
 function normalizeLegendTitle(name: string): string {
-  const presentationName = name.replace(TRAILING_PARENTHETICAL_PATTERN, "").trim();
+  const presentationName = legendPresentationName(name);
   const titleStart = presentationName.indexOf(RIOT_LEGEND_NAME_DELIMITER);
   const title = titleStart === -1
     ? presentationName
     : presentationName.slice(titleStart + RIOT_LEGEND_NAME_DELIMITER.length);
 
-  return title
+  return normalizeLegendNamePart(title);
+}
+
+function normalizeLegendNamePart(name: string): string {
+  return name
     .normalize("NFKD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase()
@@ -40,8 +47,18 @@ function normalizeLegendTitle(name: string): string {
     .trim();
 }
 
+function legendPresentationName(name: string): string {
+  return name.replace(TRAILING_PARENTHETICAL_PATTERN, "").trim();
+}
+
 function hasLegendChampionPrefix(name: string): boolean {
-  return name.replace(TRAILING_PARENTHETICAL_PATTERN, "").includes(RIOT_LEGEND_NAME_DELIMITER);
+  return legendPresentationName(name).includes(RIOT_LEGEND_NAME_DELIMITER);
+}
+
+function legendChampionPrefix(name: string): string | null {
+  const presentationName = legendPresentationName(name);
+  const titleStart = presentationName.indexOf(RIOT_LEGEND_NAME_DELIMITER);
+  return titleStart === -1 ? null : presentationName.slice(0, titleStart);
 }
 
 function legendDedupeKey(card: RiftcodexDedupeSourceCard): string | null {
@@ -75,5 +92,85 @@ export function dedupeRiftcodexSourceCards<T extends RiftcodexDedupeSourceCard>(
     }
 
     return !championPrefixedLegendKeys.has(key);
+  });
+}
+
+function numericCollectorNumber(card: RiftcodexCollectorNumberSource): number | null {
+  const collectorNumber = collectorNumberFromRiftcodexSource(card);
+  if (!collectorNumber) {
+    return null;
+  }
+
+  const match = collectorNumber.match(/^\d+/);
+  return match ? Number(match[0]) : null;
+}
+
+type LegendBaseCard = {
+  championPrefix: string;
+  collectorNumber: number;
+};
+
+function uniqueLegendBaseByTitle<T extends RiftcodexDedupeSourceCard>(cards: T[]): Map<string, LegendBaseCard> {
+  const basesByTitle = new Map<string, LegendBaseCard | null>();
+
+  for (const card of cards) {
+    if (card.classification.type?.toLowerCase() !== "legend") {
+      continue;
+    }
+
+    const championPrefix = legendChampionPrefix(card.name);
+    if (!championPrefix) {
+      continue;
+    }
+
+    const collectorNumber = numericCollectorNumber(card);
+    if (collectorNumber === null) {
+      continue;
+    }
+
+    const presentationName = legendPresentationName(card.name);
+    const title = presentationName.slice(championPrefix.length + RIOT_LEGEND_NAME_DELIMITER.length);
+    const key = `${card.set.set_id.toUpperCase()}:${normalizeLegendNamePart(title)}`;
+    const existing = basesByTitle.get(key);
+    if (existing === null) {
+      continue;
+    }
+
+    if (existing) {
+      basesByTitle.set(key, null);
+      continue;
+    }
+
+    basesByTitle.set(key, { championPrefix, collectorNumber });
+  }
+
+  return new Map([...basesByTitle.entries()].filter((entry): entry is [string, LegendBaseCard] => entry[1] !== null));
+}
+
+export function normalizeRiftcodexSourceCards<T extends RiftcodexDedupeSourceCard>(cards: T[]): T[] {
+  const dedupedCards = dedupeRiftcodexSourceCards(cards);
+  const legendBases = uniqueLegendBaseByTitle(dedupedCards);
+
+  return dedupedCards.map((card) => {
+    if (card.classification.type?.toLowerCase() !== "legend" || hasLegendChampionPrefix(card.name)) {
+      return card;
+    }
+
+    const title = normalizeLegendTitle(card.name);
+    const key = `${card.set.set_id.toUpperCase()}:${title}`;
+    const base = legendBases.get(key);
+    const collectorNumber = numericCollectorNumber(card);
+    if (!base || collectorNumber === null || collectorNumber <= base.collectorNumber) {
+      return card;
+    }
+
+    return {
+      ...card,
+      name: `${base.championPrefix} - ${legendPresentationName(card.name)} (Overnumbered)`,
+      metadata: {
+        ...card.metadata,
+        overnumbered: true
+      }
+    };
   });
 }

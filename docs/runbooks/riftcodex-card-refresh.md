@@ -72,6 +72,9 @@ Useful sanity checks:
 - special treatments still have the expected finish availability
 - Riftcodex source quirks, such as subtitle-only duplicate Legend rows beside
   full champion/title Legend rows, were removed by the importer
+- Legend rows with title-only later collector numbers are normalized into the
+  matching champion/title overnumbered printing when an earlier base Legend
+  identifies the champion
 
 ## Verification
 

@@ -10,7 +10,7 @@ import {
 } from "../src/data/riftcodex-import-policy.js";
 import {
   collectorNumberFromRiftcodexSource,
-  dedupeRiftcodexSourceCards
+  normalizeRiftcodexSourceCards
 } from "../src/data/riftcodex-source.js";
 import { deriveCardVariant } from "../src/data/variant.js";
 
@@ -198,13 +198,13 @@ async function main() {
     page += 1;
   }
 
-  const dedupedSourceCards = dedupeRiftcodexSourceCards(sourceCards);
-  const removedSourceRows = sourceCards.length - dedupedSourceCards.length;
+  const normalizedSourceCards = normalizeRiftcodexSourceCards(sourceCards);
+  const removedSourceRows = sourceCards.length - normalizedSourceCards.length;
   if (removedSourceRows > 0) {
     console.log(`Removed ${removedSourceRows} duplicate Riftcodex source rows`);
   }
 
-  const normalizedCards = dedupedSourceCards.map(normalizeSourceCard);
+  const normalizedCards = normalizedSourceCards.map(normalizeSourceCard);
 
   const cards = cardDatabaseSchema.parse(normalizedCards).sort((a, b) => {
     const setOrder = (a.set?.set_id ?? "").localeCompare(b.set?.set_id ?? "");

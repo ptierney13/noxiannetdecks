@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   collectorNumberFromRiftcodexSource,
-  dedupeRiftcodexSourceCards
+  dedupeRiftcodexSourceCards,
+  normalizeRiftcodexSourceCards
 } from "../src/data/riftcodex-source.js";
 
 type TestSourceCard = {
@@ -14,6 +15,9 @@ type TestSourceCard = {
   };
   set: {
     set_id: string;
+  };
+  metadata: {
+    overnumbered?: boolean | null;
   };
 };
 
@@ -29,6 +33,7 @@ function sourceCard(overrides: Partial<TestSourceCard>): TestSourceCard {
     set: {
       set_id: "VEN"
     },
+    metadata: {},
     ...overrides
   };
 }
@@ -106,5 +111,35 @@ describe("Riftcodex source helpers", () => {
     ]);
 
     expect(cards.map((card) => card.id)).toEqual(["spell-subtitle", "spell-prefixed"]);
+  });
+
+  it("repairs title-only later Legend rows into overnumbered champion variants", () => {
+    const cards = normalizeRiftcodexSourceCards([
+      sourceCard({
+        id: "base",
+        name: "Jayce - Defender of Tomorrow",
+        collector_number: "149"
+      }),
+      sourceCard({
+        id: "overnumbered-source-gap",
+        name: "Defender of Tomorrow",
+        collector_number: "194"
+      })
+    ]);
+
+    expect(cards).toMatchObject([
+      {
+        id: "base",
+        name: "Jayce - Defender of Tomorrow",
+        metadata: {}
+      },
+      {
+        id: "overnumbered-source-gap",
+        name: "Jayce - Defender of Tomorrow (Overnumbered)",
+        metadata: {
+          overnumbered: true
+        }
+      }
+    ]);
   });
 });
