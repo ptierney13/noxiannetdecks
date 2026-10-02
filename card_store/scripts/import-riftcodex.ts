@@ -8,6 +8,10 @@ import {
   finishesForImportedCard,
   summarizeImportedSets
 } from "../src/data/riftcodex-import-policy.js";
+import {
+  collectorNumberFromRiftcodexSource,
+  dedupeRiftcodexSourceCards
+} from "../src/data/riftcodex-source.js";
 import { deriveCardVariant } from "../src/data/variant.js";
 
 const SOURCE_BASE_URL = "https://api.riftcodex.com/cards";
@@ -67,15 +71,6 @@ const riftcodexPageSchema = z.object({
 });
 
 type SourceCard = z.infer<typeof sourceCardSchema>;
-
-function collectorNumberFromSource(card: SourceCard): string | null {
-  const riftboundIdMatch = card.riftbound_id?.match(/^[^-]+-(\d+)([a-z]*)\*?-\d+$/i);
-  if (riftboundIdMatch) {
-    return `${Number(riftboundIdMatch[1])}${riftboundIdMatch[2].toLowerCase()}`;
-  }
-
-  return card.collector_number === null ? null : String(card.collector_number);
-}
 
 function keywordsFromText(text: string): string[] {
   const keywords = new Set<string>();
@@ -144,7 +139,7 @@ function normalizeSourceCard(card: SourceCard): CardRecord {
     clean_name: cleanName,
     riftbound_id: deriveDecklistCardId(cleanName, card.name),
     tcgplayer_id: card.tcgplayer_id,
-    collector_number: collectorNumberFromSource(card),
+    collector_number: collectorNumberFromRiftcodexSource(card),
     language: "en",
     rarity: card.classification.rarity,
     variant,
@@ -203,7 +198,13 @@ async function main() {
     page += 1;
   }
 
-  const normalizedCards = sourceCards.map(normalizeSourceCard);
+  const dedupedSourceCards = dedupeRiftcodexSourceCards(sourceCards);
+  const removedSourceRows = sourceCards.length - dedupedSourceCards.length;
+  if (removedSourceRows > 0) {
+    console.log(`Removed ${removedSourceRows} duplicate Riftcodex source rows`);
+  }
+
+  const normalizedCards = dedupedSourceCards.map(normalizeSourceCard);
 
   const cards = cardDatabaseSchema.parse(normalizedCards).sort((a, b) => {
     const setOrder = (a.set?.set_id ?? "").localeCompare(b.set?.set_id ?? "");

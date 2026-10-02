@@ -70,6 +70,8 @@ Useful sanity checks:
 - card count increased or changed as expected
 - existing set counts are not unexpectedly zeroed
 - special treatments still have the expected finish availability
+- Riftcodex source quirks, such as subtitle-only duplicate Legend rows beside
+  full champion/title Legend rows, were removed by the importer
 
 ## Verification
 
